@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const https = require('https');
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 const events = require('events');
+const socketIO = require('socket.io');
 
 const serverEmitter = new events.EventEmitter();
 
@@ -60,7 +61,7 @@ if (process.env.NODE_ENV === 'dev') {
 
 }
 
-const io = require('socket.io')(app);
+const io = socketIO(app);
 
 io.on('connection', function (socket) {
   console.log('someone connected to my socket!');
