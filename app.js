@@ -1,10 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+// const cookieParser = require('cookie-parser');
 const https = require('https');
 
 const app = express();
-const router = express.Router();
+// const router = express.Router();
 
 app.use('/scripts', express.static(`${__dirname}/scripts`));
 app.use('/dist', express.static(`${__dirname}/dist`));
@@ -15,12 +15,12 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
-app.use(cookieParser());
+// app.use(cookieParser());
 
 require('./lib/app-express')(app);
-require('./lib/app-router')(router);
+// require('./lib/app-router')(router);
 
-app.use('/api', router);
+// app.use('/api', router);
 
 const port = process.env.PORT || 8443;
 
@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === 'dev') {
   };
 
   const httpsServer = https.createServer(sslOptions, app);
-  
+
   httpsServer.listen(port, () => {
     console.log(`Example app listening on port ${port}!`);
   });

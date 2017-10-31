@@ -22,7 +22,13 @@ You'll need the following setup to run this project locally.
 
     - Note down the consumer key and consumer secret for later.
 
-4. Create a Postgres database in Heroku and a memachier service.  Memcachier has a [local option](https://devcenter.heroku.com/articles/memcachier#local-usage)
+4. Create a Postgres database in Heroku and a memcachier service.  Memcachier has a [local option](https://devcenter.heroku.com/articles/memcachier#local-usage)
+
+```
+psql -h host -p port -d dbname -U username -f datafile.sql
+```
+
+where all the credentials can be found from the resources > heorku postgres > settings.  It'll ask you for the password.
 
 5. Create the `deployments` table by running the `deployments.sql` script against your Postgres database.
 
