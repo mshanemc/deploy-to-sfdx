@@ -1,5 +1,5 @@
 /* globals WebSocket, location */
-const HOST = location.origin.replace(/^https/, 'wss');
+const HOST = location.href.replace(/^http/, 'ws');
 console.log(HOST);
 
 const ws = new WebSocket(HOST);

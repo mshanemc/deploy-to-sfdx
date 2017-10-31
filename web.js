@@ -1,15 +1,16 @@
 // https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops
 
 const express = require('express');
+const expressWs = require('express-ws');
 const bodyParser = require('body-parser');
 // const cookieParser = require('cookie-parser');
-const SocketServer = require('ws').Server;
 
 const https = require('https');
 
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 
 const app = express();
+expressWs(app);
 
 // const router = express.Router();
 
@@ -23,10 +24,49 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 // app.use(cookieParser());
+app.get('/launch', (req, res) => {
+  // what are we deploying?
+  const template = req.query.template;
+  // generate unique id for this deployment
+  const deployId = encodeURIComponent(`${template}-${new Date().toUTCString()}`);
+  console.log(`creating new deployId of ${deployId}`);
 
-require('./lib/app-express')(app);
+  // drop a message
+  const message = {
+    deployId,
+    template
+  };
 
-const wss = new SocketServer({ server: app });
+  mq.then( (mqConn) => {
+    let ok = mqConn.createChannel();
+    ok = ok.then((ch) => {
+      ch.assertQueue('deploys', { durable: true });
+      ch.sendToQueue('deploys', new Buffer(JSON.stringify(message)));
+    });
+    return ok;
+  }).then( () => {
+    // return the deployId page
+    return res.redirect(`/deploying/${deployId}`);
+  }, (mqerr) => {
+    console.log(mqerr);
+    return res.redirect('/error', {
+      customError : mqerr
+    });
+  });
+});
+
+app.get('/deploying/:deployId', (req, res) =>
+  // show the page with .io to subscribe to a topic
+  res.render('pages/messages', { deployId: req.params.deployId })
+);
+
+app.ws('/deploying/:deployId', (ws, req) => {
+    console.log('client connected!');
+    ws.send('welcome to the socket!');
+    ws.on('close', () => console.log('Client disconnected'));
+  }
+);
+
 
 // require('./lib/app-router')(router);
 
@@ -63,13 +103,6 @@ if (process.env.NODE_ENV === 'dev') {
 
 }
 
-wss.on('connection', (ws, req) => {
-  console.log('Client connected');
-  console.log(req);
-  ws.send('connected!');
-  ws.on('close', () => console.log('Client disconnected'));
-});
-
 mq.then( (mqConn) => {
 	let ok = mqConn.createChannel();
 	ok = ok.then((ch) => {
@@ -78,7 +111,7 @@ mq.then( (mqConn) => {
       // do a whole bunch of stuff here!
       console.log('heard a message from the worker');
       console.log(msg);
-      wss.clients.forEach((client) => {
+      expressWs.wsInstance.getWss().clients.forEach((client) => {
         client.send(msg.content.toString());
       });
 
