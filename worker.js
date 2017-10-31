@@ -1,4 +1,4 @@
-// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops
+// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/cg7demorepo
 
 console.log('I am a worker and I am up!');
 
@@ -31,6 +31,7 @@ mq.then( (mqConn) => {
 			console.log(msgJSON.deployId);
 			console.log(msgJSON.template);
 
+
 			// clone repo into local fs
 			exec(`cd tmp;git clone ${msgJSON.template}.git ${msgJSON.deployId}`)
 				.then( (result) => {
@@ -38,20 +39,25 @@ mq.then( (mqConn) => {
 					console.log(result.stderr);
 					ch.sendToQueue('deployMessages', bufferKey(result.stdout));
 					return exec(`cd tmp;cd ${msgJSON.deployId};ls`);
-					// grab the deploy script from the repo
-					// readline.createInterface({
-					// 	input: fs.createReadStream(`tmp/${msgJSON.deployId}/orgInit.sh`),
-					// 	terminal: false
-					// }).on('line', (line) => {
-					// 	console.log(`Line: ${line}`);
-					// 	ch.sendToQueue('deployMessages', bufferKey(line));
-					// }).on('close', () => ch.ack(msg)); // keep moving this toward the end!
 				})
 				.then( (result) => {
 					console.log(result.stdout);
 					console.log(result.stderr);
 					ch.sendToQueue('deployMessages', bufferKey('Verify git clone'));
 					ch.sendToQueue('deployMessages', bufferKey(result.stdout));
+					// grab the deploy script from the repo
+					if (fs.exists(`/app/tmp/${msgJSON.deployId}/orgInit.sh`)){
+						readline.createInterface({
+							input: fs.createReadStream(`/app/tmp/${msgJSON.deployId}/orgInit.sh`),
+							terminal: false
+						}).on('line', (line) => {
+							console.log(`Line: ${line}`);
+							ch.sendToQueue('deployMessages', bufferKey(line));
+						}).on('close', () => ch.ack(msg)); // keep moving this toward the end!
+					} else {
+						ch.sendToQueue('deployMessages', bufferKey('There is no orgInit.sh'));
+						ch.ack(msg)
+					}
 				})
 				.catch( err => console.error('Error: ', err));
 
