@@ -10,8 +10,6 @@ const events = require('events');
 const serverEmitter = new events.EventEmitter();
 
 const app = express();
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
 
 // const router = express.Router();
 
@@ -34,30 +32,6 @@ require('./lib/app-express')(app);
 const port = process.env.PORT || 8443;
 
 // subscribe to the q for deploy messages and broadcast them to everyone
-
-io.sockets.on('connection', function (socket) {
-  serverEmitter.on('deployMessage', function (msg) {
-    socket.emit(msg);
-  });
-});
-
-mq.then( (mqConn) => {
-	let ok = mqConn.createChannel();
-	ok = ok.then((ch) => {
-		ch.assertQueue('deployMessages', { durable: true });
-		ch.consume('deployMessages', (msg) => {
-      // do a whole bunch of stuff here!
-      console.log('heard a message from the worker');
-      console.log(msg);
-      serverEmitter.emit('deployMessage', 'I\'m a Test deploy message');
-
-			ch.ack(msg);
-		}, { noAck: false });
-	});
-	return ok;
-
-});
-
 
 // if local, use 8443 and certificate
 if (process.env.NODE_ENV === 'dev') {
@@ -84,8 +58,31 @@ if (process.env.NODE_ENV === 'dev') {
     console.log(`Example app listening on port ${port}!`);
   });
 
-  server.listen(80);
-
-
 }
+
+const io = require('socket.io')(app);
+
+io.on('connection', function (socket) {
+  console.log('someone connected to my socket!');
+  serverEmitter.on('deployMessage', function (msg) {
+    socket.emit(msg);
+  });
+});
+
+mq.then( (mqConn) => {
+	let ok = mqConn.createChannel();
+	ok = ok.then((ch) => {
+		ch.assertQueue('deployMessages', { durable: true });
+		ch.consume('deployMessages', (msg) => {
+      // do a whole bunch of stuff here!
+      console.log('heard a message from the worker');
+      console.log(msg);
+      serverEmitter.emit('deployMessage', 'I\'m a Test deploy message');
+
+			ch.ack(msg);
+		}, { noAck: false });
+	});
+	return ok;
+
+});
 
