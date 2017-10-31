@@ -1,7 +1,12 @@
+// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops
+
 console.log('I am a worker and I am up!');
 
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 const exec = require('child-process-promise').exec;
+const readline = require('readline');
+const fs = require('fs');
+
 
 // listen for messages
 mq.then( (mqConn) => {
@@ -24,11 +29,21 @@ mq.then( (mqConn) => {
 					console.log(result.stdout);
 					console.log(result.stderr);
 					ch.sendToQueue('deployMessages', new Buffer(result.stdout));
-					ch.ack(msg);
+					// grab the deploy script from the repo
+					readline.createInterface({
+						input: fs.createReadStream(`tmp/${msgJSON.deployId}/orgInit.sh`),
+						terminal: false
+					}).on('line', function(line) {
+						console.log('Line: ' + line);
+						ch.sendToQueue('deployMessages', new Buffer(line));
+					}).on('close'){
+						ch.ack(msg); //keep moving this toward the end!
+					}
 				})
+
 				.catch( (err) => console.error('Error: ', err));
 
-			// grab the deploy script from the repo
+
 
 			// split deploy script into lines
 
@@ -39,7 +54,7 @@ mq.then( (mqConn) => {
 			// execute the line
 
 
-			//ch.sendToQueue('deployMessages', new Buffer(JSON.stringify('DONE!')));
+			// ch.sendToQueue('deployMessages', new Buffer(JSON.stringify('DONE!')));
 
 		}, { noAck: false });
 	});
