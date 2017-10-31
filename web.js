@@ -10,7 +10,7 @@ const https = require('https');
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 
 const app = express();
-expressWs(app);
+const wsInstance = expressWs(app);
 
 // const router = express.Router();
 
@@ -111,7 +111,7 @@ mq.then( (mqConn) => {
       // do a whole bunch of stuff here!
       console.log('heard a message from the worker');
       console.log(msg);
-      expressWs.wsInstance.getWss().clients.forEach((client) => {
+      wsInstance.getWss().clients.forEach((client) => {
         client.send(msg.content.toString());
       });
 
