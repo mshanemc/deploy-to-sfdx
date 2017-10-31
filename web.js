@@ -4,11 +4,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 // const cookieParser = require('cookie-parser');
 const https = require('https');
-const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
-const events = require('events');
-const socketIO = require('socket.io');
 
-const serverEmitter = new events.EventEmitter();
+const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 
 const app = express();
 
@@ -59,15 +56,14 @@ if (process.env.NODE_ENV === 'dev') {
     console.log(`Example app listening on port ${port}!`);
   });
 
+
 }
 
-const io = socketIO(app);
+const wss = new SocketServer({ app });
 
-io.on('connection', function (socket) {
-  console.log('someone connected to my socket!');
-  serverEmitter.on('deployMessage', function (msg) {
-    socket.emit(msg);
-  });
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+  ws.on('close', () => console.log('Client disconnected'));
 });
 
 mq.then( (mqConn) => {

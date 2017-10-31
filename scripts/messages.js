@@ -1,6 +1,6 @@
-/* globals io */
-const socket = io();
-console.log('Messages script is running');
-socket.on('deployMessage', function(msg){
-	console.log(msg);
-});
+var HOST = location.origin.replace(/^http/, 'ws')
+var ws = new WebSocket(HOST);
+
+ws.onmessage = function (event) {
+  console.log(event);
+};
