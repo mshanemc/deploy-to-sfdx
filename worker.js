@@ -18,7 +18,8 @@ mq.then( (mqConn) => {
 			console.log(msgJSON.deployId);
 			console.log(msgJSON.template);
 
-			exec(`cd tmp;mkdir ${msgJSON.deployId};ls`)
+			// clone repo into local fs
+			exec(`cd tmp;git clone ${msgJSON.template}.git ${msgJSON.deployId}`)
 				.then( (result) => {
 					console.log(result.stdout);
 					console.log(result.stderr);
