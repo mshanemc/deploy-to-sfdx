@@ -26,7 +26,7 @@ app.set('view engine', 'ejs');
 // app.use(cookieParser());
 app.get('/launch', (req, res) => {
   // what are we deploying?
-  const repo = req.query.template.replace('https://github.com/', '');
+  const repo = req.query.template.replace('https://github.com/', '').replace('/', '-');
   // generate unique id for this deployment
   const deployId = encodeURIComponent(`${repo}-${new Date().valueOf()}`);
   console.log(`creating new deployId of ${deployId}`);

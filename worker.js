@@ -23,6 +23,7 @@ mq.then( (mqConn) => {
 					console.log(result.stdout);
 					console.log(result.stderr);
 					ch.sendToQueue('deployMessages', new Buffer('local directory created'));
+					ch.ack(msg);
 				})
 				.catch( (err) => console.error('Error: ', err));
 
@@ -36,8 +37,8 @@ mq.then( (mqConn) => {
 
 			// execute the line
 
-			ch.ack(msg);
-			ch.sendToQueue('deployMessages', new Buffer(JSON.stringify('DONE!')));
+
+			//ch.sendToQueue('deployMessages', new Buffer(JSON.stringify('DONE!')));
 
 		}, { noAck: false });
 	});
