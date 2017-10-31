@@ -67,6 +67,7 @@ if (process.env.NODE_ENV === 'dev') {
 
 wss.on('connection', (ws) => {
   console.log('Client connected');
+  ws.send('connected!');
   ws.on('close', () => console.log('Client disconnected'));
 });
 
