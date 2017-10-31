@@ -2,6 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 // const cookieParser = require('cookie-parser');
 const https = require('https');
+const io = require('socket.io')(https);
+const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
+
 
 const app = express();
 // const router = express.Router();
@@ -23,6 +26,25 @@ require('./lib/app-express')(app);
 // app.use('/api', router);
 
 const port = process.env.PORT || 8443;
+
+// subscribe to the q for deploy messages and broadcast them to everyone
+
+mq.then( (mqConn) => {
+	let ok = mqConn.createChannel();
+	ok = ok.then((ch) => {
+		ch.assertQueue('deployMessages', { durable: true });
+		ch.consume('deployMessages', (msg) => {
+      // do a whole bunch of stuff here!
+      console.log('heard a message');
+      console.log(msg);
+      io.emit('deployMessage', msg);
+			ch.ack(msg);
+		}, { noAck: false });
+	});
+	return ok;
+
+});
+
 
 // if local, use 8443 and certificate
 if (process.env.NODE_ENV === 'dev') {
@@ -50,3 +72,4 @@ if (process.env.NODE_ENV === 'dev') {
   });
 
 }
+

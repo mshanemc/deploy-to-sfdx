@@ -2,7 +2,7 @@
   "name": "deploy-to-sfdx",
   "version": "0.0.1",
   "description": "An application that will deploy an SFDX project from a public Github repo",
-  "main": "app.js",
+  "main": "web.js",
   "scripts": {
     "start": "node .",
     "css-build": "mkdirp dist/assets/css && mkdirp dist/assets/fonts && ncp src/assets dist/assets && ncp src/assets/favicons dist/assets/favicons && node-sass src/scss -o dist/assets/css && ncp node_modules/@salesforce-ux/design-system/assets/fonts dist/assets/fonts",
@@ -20,6 +20,7 @@
   "homepage": "https://github.com/wadewegner/deploy-to-sfdx#readme",
   "dependencies": {
     "@salesforce-ux/design-system": "^2.3.1",
+    "amqplib": "^0.5.1",
     "body-parser": "^1.17.2",
     "child_process": "^1.0.2",
     "cookie-parser": "^1.4.3",
@@ -32,6 +33,7 @@
     "pg-pool": "^2.0.3",
     "salesforce-oauth2": "^0.1.8",
     "sleep": "^5.1.1",
+    "socket.io": "^2.0.4",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
