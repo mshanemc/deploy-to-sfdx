@@ -23,6 +23,7 @@
     "amqplib": "^0.5.1",
     "body-parser": "^1.17.2",
     "bufferutil": "3.0.2",
+    "child-process-promise": "^2.2.1",
     "child_process": "^1.0.2",
     "cookie-parser": "^1.4.3",
     "ejs": "^2.5.6",

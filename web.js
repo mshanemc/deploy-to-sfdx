@@ -26,15 +26,15 @@ app.set('view engine', 'ejs');
 // app.use(cookieParser());
 app.get('/launch', (req, res) => {
   // what are we deploying?
-  const template = req.query.template;
+  const repo = req.query.template.replace('https://github.com/', '');
   // generate unique id for this deployment
-  const deployId = encodeURIComponent(`${template}-${new Date().toUTCString()}`);
+  const deployId = encodeURIComponent(`${repo}-${new Date().valueOf()}`);
   console.log(`creating new deployId of ${deployId}`);
 
   // drop a message
   const message = {
     deployId,
-    template
+    template : req.query.template
   };
 
   mq.then( (mqConn) => {
@@ -110,7 +110,7 @@ mq.then( (mqConn) => {
 		ch.consume('deployMessages', (msg) => {
       // do a whole bunch of stuff here!
       console.log('heard a message from the worker');
-      console.log(msg);
+      console.log(msg.content.toString());
       wsInstance.getWss().clients.forEach((client) => {
         client.send(msg.content.toString());
       });

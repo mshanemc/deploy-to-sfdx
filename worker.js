@@ -1,6 +1,7 @@
 console.log('I am a worker and I am up!');
 
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
+const exec = require('child-process-promise').exec;
 
 // listen for messages
 mq.then( (mqConn) => {
@@ -17,6 +18,13 @@ mq.then( (mqConn) => {
 			console.log(msgJSON.deployId);
 			console.log(msgJSON.template);
 
+			exec('cd tmp;ls')
+				.then( (result) => {
+					console.log(result);
+					ch.sendToQueue('deployMessages', new Buffer(JSON.stringify(result)));
+				})
+				.catch( (err) => console.error('Error: ', err));
+
 			// grab the deploy script from the repo
 
 			// split deploy script into lines
@@ -28,13 +36,16 @@ mq.then( (mqConn) => {
 			// execute the line
 
 			ch.ack(msg);
-			ch.sendToQueue('deployMessages', new Buffer(JSON.stringify('Test Message for round trip to client')));
+			ch.sendToQueue('deployMessages', new Buffer(JSON.stringify('DONE!')));
 
 		}, { noAck: false });
 	});
 	return ok;
 
 });
+
+
+
 
 
 
