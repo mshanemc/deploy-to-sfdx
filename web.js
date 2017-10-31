@@ -1,3 +1,5 @@
+// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops
+
 const express = require('express');
 const bodyParser = require('body-parser');
 // const cookieParser = require('cookie-parser');
@@ -81,6 +83,9 @@ if (process.env.NODE_ENV === 'dev') {
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}!`);
   });
+
+  server.listen(80);
+
 
 }
 
