@@ -12,7 +12,7 @@ mq.then( (mqConn) => {
 		ch.consume('deploys', (msg) => {
 			// do a whole bunch of stuff here!
 			console.log(msg);
-			const msgJSON = JSON.parse(msg.toString());
+			const msgJSON = JSON.parse(msg.content.toString());
 			console.log(msgJSON);
 			console.log(msgJSON.deployId);
 			console.log(msgJSON.template);
