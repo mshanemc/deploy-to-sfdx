@@ -7,6 +7,7 @@ const exec = require('child-process-promise').exec;
 const readline = require('readline');
 const fs = require('fs');
 
+// do an exec to get auth'd to our standard sfdx hub
 
 function bufferKey(content, deployId) {
 	const message = {
@@ -46,7 +47,8 @@ mq.then( (mqConn) => {
 					ch.sendToQueue('deployMessages', bufferKey('Verify git clone'));
 					ch.sendToQueue('deployMessages', bufferKey(result.stdout));
 					// grab the deploy script from the repo
-					if (fs.exists(`/app/tmp/${msgJSON.deployId}/orgInit.sh`)){
+					console.log(`going to look in the directory /app/tmp/${msgJSON.deployId}/orgInit.sh`);
+					if (fs.existsSync(`/app/tmp/${msgJSON.deployId}/orgInit.sh`)){
 						readline.createInterface({
 							input: fs.createReadStream(`/app/tmp/${msgJSON.deployId}/orgInit.sh`),
 							terminal: false
@@ -56,7 +58,7 @@ mq.then( (mqConn) => {
 						}).on('close', () => ch.ack(msg)); // keep moving this toward the end!
 					} else {
 						ch.sendToQueue('deployMessages', bufferKey('There is no orgInit.sh'));
-						ch.ack(msg)
+						ch.ack(msg);
 					}
 				})
 				.catch( err => console.error('Error: ', err));
