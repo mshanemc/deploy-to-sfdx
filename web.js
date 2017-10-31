@@ -25,6 +25,9 @@ app.set('view engine', 'ejs');
 // app.use(cookieParser());
 
 require('./lib/app-express')(app);
+
+const wss = new SocketServer({ server: app });
+
 // require('./lib/app-router')(router);
 
 // app.use('/api', router);
@@ -61,7 +64,6 @@ if (process.env.NODE_ENV === 'dev') {
 
 }
 
-const wss = new SocketServer({ app });
 
 wss.on('connection', (ws) => {
   console.log('Client connected');
