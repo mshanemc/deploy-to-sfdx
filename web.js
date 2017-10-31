@@ -3,6 +3,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 // const cookieParser = require('cookie-parser');
+const SocketServer = require('ws').Server;
+
 const https = require('https');
 
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
