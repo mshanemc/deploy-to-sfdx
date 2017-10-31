@@ -1,3 +1,5 @@
+console.log('I am a worker and I am up!');
+
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 
 // listen for messages
@@ -10,7 +12,7 @@ mq.then( (mqConn) => {
 		ch.consume('deploys', (msg) => {
 			// do a whole bunch of stuff here!
 			console.log(msg);
-			const msgJSON = JSON.parse(msg);
+			const msgJSON = JSON.parse(msg.toString());
 			console.log(msgJSON);
 			console.log(msgJSON.deployId);
 			console.log(msgJSON.template);
