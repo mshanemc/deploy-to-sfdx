@@ -8,6 +8,14 @@ const readline = require('readline');
 const fs = require('fs');
 
 
+function bufferKey(content, deployId) {
+	const message = {
+		deployId,
+		content
+	};
+	return new Buffer(JSON.stringify(message));
+}
+
 // listen for messages
 mq.then( (mqConn) => {
 	let ok = mqConn.createChannel();
@@ -28,21 +36,17 @@ mq.then( (mqConn) => {
 				.then( (result) => {
 					console.log(result.stdout);
 					console.log(result.stderr);
-					ch.sendToQueue('deployMessages', new Buffer(result.stdout));
+					ch.sendToQueue('deployMessages', bufferKey(result.stdout));
 					// grab the deploy script from the repo
 					readline.createInterface({
 						input: fs.createReadStream(`tmp/${msgJSON.deployId}/orgInit.sh`),
 						terminal: false
-					}).on('line', function(line) {
-						console.log('Line: ' + line);
-						ch.sendToQueue('deployMessages', new Buffer(line));
-					}).on('close'){
-						ch.ack(msg); //keep moving this toward the end!
-					}
+					}).on('line', (line) => {
+						console.log(`Line: ${line}`);
+						ch.sendToQueue('deployMessages', bufferKey(line));
+					}).on('close', () => ch.ack(msg)); // keep moving this toward the end!
 				})
-
-				.catch( (err) => console.error('Error: ', err));
-
+				.catch( err => console.error('Error: ', err));
 
 
 			// split deploy script into lines
@@ -61,6 +65,8 @@ mq.then( (mqConn) => {
 	return ok;
 
 });
+
+
 
 
 
