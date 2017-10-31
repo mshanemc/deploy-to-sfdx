@@ -18,10 +18,11 @@ mq.then( (mqConn) => {
 			console.log(msgJSON.deployId);
 			console.log(msgJSON.template);
 
-			exec('cd tmp;ls')
+			exec(`cd tmp;mkdir ${msgJSON.deployId};ls`)
 				.then( (result) => {
-					console.log(result);
-					ch.sendToQueue('deployMessages', new Buffer(JSON.stringify(result)));
+					console.log(result.stdout);
+					console.log(result.stderr);
+					ch.sendToQueue('deployMessages', new Buffer('local directory created'));
 				})
 				.catch( (err) => console.error('Error: ', err));
 
