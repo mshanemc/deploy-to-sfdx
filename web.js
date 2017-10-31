@@ -61,12 +61,11 @@ if (process.env.NODE_ENV === 'dev') {
     console.log(`Example app listening on port ${port}!`);
   });
 
-
 }
 
-
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
   console.log('Client connected');
+  console.log(req);
   ws.send('connected!');
   ws.on('close', () => console.log('Client disconnected'));
 });
