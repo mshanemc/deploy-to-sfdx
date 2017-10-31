@@ -74,7 +74,9 @@ mq.then( (mqConn) => {
       // do a whole bunch of stuff here!
       console.log('heard a message from the worker');
       console.log(msg);
-      serverEmitter.emit('deployMessage', 'I\'m a Test deploy message');
+      wss.clients.forEach((client) => {
+        client.send(msg.content.toString());
+      });
 
 			ch.ack(msg);
 		}, { noAck: false });
