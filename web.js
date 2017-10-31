@@ -4,7 +4,9 @@ const bodyParser = require('body-parser');
 const https = require('https');
 const io = require('socket.io')(https);
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
+const events = require('events');
 
+const serverEmitter = new events.EventEmitter();
 
 const app = express();
 // const router = express.Router();
@@ -29,6 +31,12 @@ const port = process.env.PORT || 8443;
 
 // subscribe to the q for deploy messages and broadcast them to everyone
 
+io.sockets.on('connection', function (socket) {
+  serverEmitter.on('deployMessage', function (msg) {
+    socket.emit(msg);
+  });
+});
+
 mq.then( (mqConn) => {
 	let ok = mqConn.createChannel();
 	ok = ok.then((ch) => {
@@ -37,7 +45,8 @@ mq.then( (mqConn) => {
       // do a whole bunch of stuff here!
       console.log('heard a message');
       console.log(msg);
-      io.emit('deployMessage', msg);
+      serverEmitter.emit('deployMessage', 'I\'m a Test deploy message');
+
 			ch.ack(msg);
 		}, { noAck: false });
 	});
