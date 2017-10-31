@@ -37,14 +37,21 @@ mq.then( (mqConn) => {
 					console.log(result.stdout);
 					console.log(result.stderr);
 					ch.sendToQueue('deployMessages', bufferKey(result.stdout));
+					return exec(`cd tmp;cd ${msgJSON.deployId};ls`);
 					// grab the deploy script from the repo
-					readline.createInterface({
-						input: fs.createReadStream(`tmp/${msgJSON.deployId}/orgInit.sh`),
-						terminal: false
-					}).on('line', (line) => {
-						console.log(`Line: ${line}`);
-						ch.sendToQueue('deployMessages', bufferKey(line));
-					}).on('close', () => ch.ack(msg)); // keep moving this toward the end!
+					// readline.createInterface({
+					// 	input: fs.createReadStream(`tmp/${msgJSON.deployId}/orgInit.sh`),
+					// 	terminal: false
+					// }).on('line', (line) => {
+					// 	console.log(`Line: ${line}`);
+					// 	ch.sendToQueue('deployMessages', bufferKey(line));
+					// }).on('close', () => ch.ack(msg)); // keep moving this toward the end!
+				})
+				.then( (result) => {
+					console.log(result.stdout);
+					console.log(result.stderr);
+					ch.sendToQueue('deployMessages', bufferKey('Verify git clone'));
+					ch.sendToQueue('deployMessages', bufferKey(result.stdout));
 				})
 				.catch( err => console.error('Error: ', err));
 
