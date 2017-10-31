@@ -2,13 +2,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 // const cookieParser = require('cookie-parser');
 const https = require('https');
-const io = require('socket.io')(https);
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 const events = require('events');
 
 const serverEmitter = new events.EventEmitter();
 
 const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+
 // const router = express.Router();
 
 app.use('/scripts', express.static(`${__dirname}/scripts`));
@@ -43,7 +45,7 @@ mq.then( (mqConn) => {
 		ch.assertQueue('deployMessages', { durable: true });
 		ch.consume('deployMessages', (msg) => {
       // do a whole bunch of stuff here!
-      console.log('heard a message');
+      console.log('heard a message from the worker');
       console.log(msg);
       serverEmitter.emit('deployMessage', 'I\'m a Test deploy message');
 
