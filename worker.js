@@ -23,7 +23,7 @@ mq.then( (mqConn) => {
 				.then( (result) => {
 					console.log(result.stdout);
 					console.log(result.stderr);
-					ch.sendToQueue('deployMessages', new Buffer('local directory created'));
+					ch.sendToQueue('deployMessages', new Buffer(result.stdout));
 					ch.ack(msg);
 				})
 				.catch( (err) => console.error('Error: ', err));
