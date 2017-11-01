@@ -1,7 +1,7 @@
 @import '../../node_modules/@salesforce-ux/design-system/scss/index';
 
 body {
-	width: 600px;
+	width: 1000px;
 	margin: 0 auto;
 	line-height: 1.5rem;
 }
@@ -81,7 +81,7 @@ ol, ul {
 }
 
 .slds-notify_toast {
-	padding-right: $card-spacing-large;	
+	padding-right: $card-spacing-large;
 }
 /* END SLDS Overrides */
 
