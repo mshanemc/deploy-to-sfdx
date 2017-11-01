@@ -103,25 +103,31 @@
 				let goodstuff = JSON.parse(content);
 				document.getElementById("password").innerHTML = goodstuff.result.password;
 				document.getElementById("passwordBlock").setAttribute("style", "display : block");
+				defaultContent('Password Generated');
 			} else if (content.includes('username') && content.includes('orgId')) {
 				console.log('this is the username');
 				let goodstuff = JSON.parse(content);
 				document.getElementById("username").innerHTML = goodstuff.result.username;
 				// document.getElementById("passwordBlock").setAttribute("style", "display : block");
+				defaultContent('Scratch org created');
 			} else if (content.includes('ALLDONE')) {
 				document.getElementById("loaderBlock").setAttribute("style", "display : none");
 				// document.getElementById("passwordBlock").setAttribute("style", "display : block");
 			} else {
 				// everything unspecified
-				var para = document.createElement("p");
-				para.classList.add('slds-m-vertical_medium')
-				var node = document.createTextNode(content);
-				para.appendChild(node);
-
-				var element = document.getElementById("status");
-				element.appendChild(para);
+				defaultContent(content);
 			}
 
+		}
+
+		defaultContent = function(content){
+			var para = document.createElement("p");
+			para.classList.add('slds-m-vertical_medium')
+			var node = document.createTextNode(content);
+			para.appendChild(node);
+
+			var element = document.getElementById("status");
+			element.appendChild(para);
 		}
 
 	</script>
