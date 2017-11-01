@@ -1,8 +1,7 @@
 <% include ../partials/head %>
-<script type="text/javascript" src="../../scripts/messages.js"></script>
 
 <main class="slds-card">
-	<div id="loaderBlock"><h2 class="slds-text-heading_medium slds-p-top_medium slds-p-bottom_medium sfdx-wrap"><img src="../dist/assets/images/loader.gif" style="width:27px;" /> Deployment ID <strong><%= deployId %></strong></h2></div>
+	<div id="loaderBlock"><h2 class="slds-text-heading_medium slds-p-top_medium slds-p-bottom_medium sfdx-wrap"><img src="../dist/assets/images/loader.gif" style="width:27px;" /> Deployment ID <strong id="deployId"><%= deployId %></strong></h2></div>
 
 	<div id="loginBlock" style="display: none;">
 		<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
@@ -22,7 +21,40 @@
 	</div>
 
 	<textarea id="status" class="slds-m-bottom_small sfdx-output"></textarea>
-	<input type="hidden" id="deployId" value="<%= deployId %>"></input>
+	<script>
+		const HOST = location.href.replace(/^http/, 'ws');
+		console.log(HOST);
+
+		const ws = new WebSocket(HOST);
+		const deployIdInput = document.getElementById('deployId');
+		console.log(deployIdInput);
+
+		let pinger;
+
+		function startPing() {
+			pinger = setTimeout(() => ws.send('ping'), 10000);
+		}
+		// const deployId = deployIdInput.value;
+
+		// console.log(deployId);
+
+		ws.onmessage = function (event) {
+			// console.log(event);
+			console.log(event.data);
+			// if (event.data.deployId === deployId){
+			// 	console.log('mine');
+			// 	console.log(event.data);
+			// } else {
+			// 	console.log('not mine');
+			// 	console.log(event.data);
+			// }
+		};
+
+		ws.onopen = function () {
+			startPing();
+		};
+
+	</script>
 
 </main>
 <% include ../partials/footer %>
