@@ -1,4 +1,9 @@
 // https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops
+// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/community-apps-workshop-df17
+// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/process-automation-workshop-df17
+// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/df17-community-content-workshop
+// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/df17AppBuilding
+
 // heroku ps:exec -a hosted-scratch-qa --dyno=worker.1
 
 console.log('I am a worker and I am up!');
@@ -74,8 +79,8 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 				})
 				.then( (result) => {
 					logResult(result);
-					ch.sendToQueue('deployMessages', bufferKey('Verify git clone', msgJSON.deployId));
-					ch.sendToQueue('deployMessages', bufferKey(result.stdout, msgJSON.deployId));
+					ch.sendToQueue('deployMessages', bufferKey('Cloning the repository', msgJSON.deployId));
+					// ch.sendToQueue('deployMessages', bufferKey(result.stdout, msgJSON.deployId));
 					// grab the deploy script from the repo
 					console.log(`going to look in the directory /app/tmp/${msgJSON.deployId}/orgInit.sh`);
 					if (fs.existsSync(`/app/tmp/${msgJSON.deployId}/orgInit.sh`)){
