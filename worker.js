@@ -68,11 +68,11 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 					ch.sendToQueue('deployMessages', bufferKey(result.stdout, msgJSON.deployId));
 					return exec(`cd tmp;cd ${msgJSON.deployId};ls`);
 				})
-				.then( (result) => {
-					logResult(result);
-					// create a project from that directoyr
-					return exec(`cd tmp;sfdx force:project:create -n ${msgJSON.deployId}`);
-				})
+				// .then( (result) => {
+				// 	logResult(result);
+				// 	// create a project from that directoyr
+				// 	return exec(`cd tmp;sfdx force:project:create -n ${msgJSON.deployId}`);
+				// })
 				.then( (result) => {
 					logResult(result);
 					ch.sendToQueue('deployMessages', bufferKey('Verify git clone', msgJSON.deployId));
@@ -94,7 +94,7 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 								ch.sendToQueue('deployMessages', bufferKey(`Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`, msgJSON.deployId));
 								rl.close();
 							} else {
-								exec(`cd tmp;${line}`)
+								exec(`cd tmp;cd ${msgJSON.deployId};${line}`)
 									.then( (lineResult) => {
 										console.log(lineResult.stderr);
 										if (lineResult.stdout){
