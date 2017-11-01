@@ -9,14 +9,14 @@ console.log(deployIdInput);
 let pinger;
 
 function startPing(){
-	pinger = setTimeout( () => ws.ping(), 3000);
+	pinger = setTimeout( () => ws.send('ping'), 10000);
 }
 // const deployId = deployIdInput.value;
 
 // console.log(deployId);
 
 ws.onmessage = function (event) {
-	console.log(event);
+	// console.log(event);
 	console.log(event.data);
 	// if (event.data.deployId === deployId){
 	// 	console.log('mine');
