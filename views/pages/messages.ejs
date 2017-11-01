@@ -74,11 +74,12 @@
 
 		displayContent = function(content){
 			// the login url
-			if (content.result && content.result.url && content.result.url.includes('secur/frontdoor')){
-				console.log('This is the login url');
+			if (content.includes('secur/frontdoor')){
+				console.log('This is the login url in JSON');
+				let goodstuff = JSON.parse(content);
 				var link = document.getElementById("loginUrl");
-				link.href = content.result.url;
-				link.innerHTML = content.result.url;
+				link.href = goodstuff.result.url;
+				link.innerHTML = goodstuff.result.url;
 				document.getElementById("loginBlock").setAttribute("style", "display : block");
 			} else {
 				// everything unspecified
