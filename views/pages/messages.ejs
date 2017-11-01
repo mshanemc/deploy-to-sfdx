@@ -30,6 +30,7 @@
 		console.log(deployIdInput);
 
 		const deployId = deployIdInput.innerText;
+		console.log(deployId);
 
 		const ws = new WebSocket(HOST);
 		let pinger;
@@ -45,11 +46,12 @@
 			msgCounter++;
 			// console.log(event);
 			//console.log(event.data);
-			if (event.data.deployId === deployId){
+			let parsedData = JSON.parse(event.data);
+			if (parsedData.deployId === deployId){
 				console.log('mine');
-				console.log(event.data);
+				console.log(parsedData);
 				var para = document.createElement("p");
-				var node = document.createTextNode(event.data.content);
+				var node = document.createTextNode(parsedData.content);
 				para.appendChild(node);
 
 				var element = document.getElementById("div1");
@@ -57,7 +59,7 @@
 
 			} else {
 				console.log('not mine');
-				console.log(event.data);
+				console.log(parsedData);
 			}
 		};
 

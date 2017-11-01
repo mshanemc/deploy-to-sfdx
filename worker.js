@@ -86,7 +86,7 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 							terminal: false
 						}).on('line', (line) => {
 							console.log(`Line: ${line}`);
-							ch.sendToQueue('deployMessages', bufferKey(line, msgJSON.deployId));
+							// ch.sendToQueue('deployMessages', bufferKey(line, msgJSON.deployId));
 
 							// exclusions
 							if (line.includes(';')) {
