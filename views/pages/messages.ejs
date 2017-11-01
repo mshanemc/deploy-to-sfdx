@@ -42,7 +42,6 @@
 		ws.onmessage = function (event) {
 			msgCounter++;
 			// console.log(event);
-			console.log(event.data);
 			try {
 				let parsedData = JSON.parse(event.data);
 				if (parsedData.deployId === deployId) {
@@ -75,6 +74,20 @@
 
 		ws.onclose = function(){
 			console.log('WS is closing');
+		}
+
+		parseContent = function(content){
+			// the login url
+			if (content.result.url.includes('secur/frontdoor')){
+				console.log('This is the login url');
+				var link = document.getElementById("loginUrl");
+				link.href = content.result.url;
+				link.innerHTML = content.result.url;
+				document.getElementById("loginBlock").setAttribute("style", "display : block");
+			} else {
+				return content;
+			}
+
 		}
 
 	</script>

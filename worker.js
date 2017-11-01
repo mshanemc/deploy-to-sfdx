@@ -117,7 +117,7 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 										console.log(localLine);
 										// corrections and improvements for individual commands
 										if (localLine.includes('sfdx force:org:open') && !localLine.includes(' -r')) {
-											localLine = localLine + ' -r';
+											localLine = localLine + ' -r --json';
 											console.log(localLine);
 										}
 										try {
