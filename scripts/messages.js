@@ -11,7 +11,7 @@ console.log(deployIdInput);
 // console.log(deployId);
 
 ws.onmessage = function (event) {
-	console.log(event.data);
+	console.log(event);
 	// if (event.data.deployId === deployId){
 	// 	console.log('mine');
 	// 	console.log(event.data);

@@ -87,6 +87,8 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 						}).on('line', (line) => {
 							console.log(`Line: ${line}`);
 							ch.sendToQueue('deployMessages', bufferKey(line, msgJSON.deployId));
+
+							// exclusions
 							if (line.includes(';')) {
 								ch.sendToQueue('deployMessages', bufferKey(`Commands with semicolons (;) cannot be executed.  Put each command on a separate line.  Your command: ${line}`, msgJSON.deployId));
 								noFail = false;
@@ -112,6 +114,10 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 								async function executeLines(lines) {
 									for(let line of lines) {
 										console.log(line);
+										// corrections and improvements for individual commands
+										if (line.startsWith('sfdx force:org:open' && !line.includes('-p'))) {
+											line = line + ' -p';
+										}
 										try {
 											var lineResult = await exec(line);
 											console.log(lineResult.stderr);
