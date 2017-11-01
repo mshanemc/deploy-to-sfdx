@@ -120,6 +120,10 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 											localLine = localLine + ' -r --json';
 											console.log(localLine);
 										}
+										if (localLine.includes('sfdx force:user:password') && !localLine.includes(' --json')) {
+											localLine = localLine + ' --json';
+											console.log(localLine);
+										}
 										try {
 											var lineResult = await exec(localLine);
 											console.log(lineResult.stderr);
