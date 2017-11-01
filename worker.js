@@ -19,10 +19,10 @@ function bufferKey(content, deployId) {
 
 function logResult(result){
 	if (result.stderr){
-		console.log(stderr);
+		console.log(result.stderr);
 	}
 	if (result.stdout){
-		console.log(stdout);
+		console.log(result.stdout);
 	}
 }
 
@@ -108,7 +108,7 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 										rl.resume();
 									})
 								.catch( (err) => {
-									console.error('Error: ', err)
+									console.error('Error: ', err);
 									ch.sendToQueue('deployMessages', bufferKey(`Error: ${err}`, msgJSON.deployId));
 								});
 							}
