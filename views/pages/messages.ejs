@@ -35,9 +35,6 @@
 		const ws = new WebSocket(HOST);
 		let pinger;
 
-		function startPing() {
-			pinger = setTimeout(() => ws.send('ping'), 5000);
-		}
 		// const deployId = deployIdInput.value;
 
 		// console.log(deployId);
@@ -70,8 +67,13 @@
 		};
 
 		ws.onopen = function () {
-			startPing();
+			console.log('connection open!');
+			pinger = setTimeout(() => ws.send('ping'), 5000);
 		};
+
+		ws.onclose = function(){
+			console.log('WS is closing');
+		}
 
 	</script>
 
