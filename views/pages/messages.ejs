@@ -101,10 +101,14 @@
 			} else if (content.includes('password')) {
 				console.log('this is the password');
 				let goodstuff = JSON.parse(content);
-				document.getElementById("username").innerHTML = goodstuff.result.username;
 				document.getElementById("password").innerHTML = goodstuff.result.password;
 				document.getElementById("passwordBlock").setAttribute("style", "display : block");
-			} else {
+			} else if (content.includes('username') && content.includes('orgId')) {
+				console.log('this is the username');
+				let goodstuff = JSON.parse(content);
+				document.getElementById("username").innerHTML = goodstuff.result.username;
+				// document.getElementById("passwordBlock").setAttribute("style", "display : block");
+			}else {
 				// everything unspecified
 				var para = document.createElement("p");
 				para.classList.add('slds-m-vertical_medium')
