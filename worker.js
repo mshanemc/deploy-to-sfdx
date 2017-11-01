@@ -113,10 +113,10 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 								console.log('no fail is true');
 								async function executeLines(lines) {
 									for(let line of lines) {
-										let localLine = line
+										let localLine = line;
 										console.log(localLine);
 										// corrections and improvements for individual commands
-										if (localLine.includes('sfdx force:org:open' && !localLine.includes('-p'))) {
+										if (localLine.includes('sfdx force:org:open') && !localLine.includes(' -p')) {
 											localLine = localLine + ' -p';
 											console.log(localLine);
 										}
