@@ -104,7 +104,8 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 							console.log('in the close event');
 							console.log(parsedLines);
 							if (noFail){
-								async function readFiles(parsedLines) {
+								console.log('no fail is true');
+								async function executeLines(lines) {
 									for(let line of lines) {
 										console.log(line);
 										try {
@@ -124,6 +125,11 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 										}
 									}
 								};
+								executeLines(parsedLines)
+								.then( () => {
+									ch.sendToQueue('deployMessages', bufferKey('ALLDONE', msgJSON.deployId));
+									ch.ack(msg);
+								});
 							}
 						}); // end of on.close event
 					} else {
