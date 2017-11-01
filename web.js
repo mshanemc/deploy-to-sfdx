@@ -62,7 +62,7 @@ app.get('/deploying/:deployId', (req, res) =>
 
 app.ws('/deploying/:deployId', (ws, req) => {
     console.log('client connected!');
-    ws.send('welcome to the socket!');
+    // ws.send('welcome to the socket!');
     ws.on('close', () => console.log('Client disconnected'));
   }
 );
