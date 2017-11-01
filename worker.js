@@ -17,6 +17,15 @@ function bufferKey(content, deployId) {
 	return new Buffer(JSON.stringify(message));
 }
 
+function logResult(result){
+	if (result.stderr){
+		console.log(stderr);
+	}
+	if (result.stdout){
+		console.log(stdout);
+	}
+}
+
 
 // save the key file
 // exec(`cd tmp;echo ${process.env.JWTKEY}>server.key`)
@@ -28,13 +37,11 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 	return exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile /app/tmp/server.key --setdefaultdevhubusername -a hub`);
 	}, (err) => console.log(err))
 .then( (result) => {
-	console.log(result.stdout);
-	console.log(result.stderr);
+	logResult(result);
 	return exec('sfdx force:org:display -u hub');
 })
 .then( (result) => {
-	console.log(result.stdout);
-	console.log(result.stderr);
+	logResult(result);
 	return mq;
 })
 .then( (mqConn) => {
@@ -57,14 +64,17 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 			// clone repo into local fs
 			exec(`cd tmp;git clone ${msgJSON.template}.git ${msgJSON.deployId}`)
 				.then( (result) => {
-					console.log(result.stdout);
-					console.log(result.stderr);
+					logResult(result);
 					ch.sendToQueue('deployMessages', bufferKey(result.stdout, msgJSON.deployId));
 					return exec(`cd tmp;cd ${msgJSON.deployId};ls`);
 				})
 				.then( (result) => {
-					console.log(result.stdout);
-					console.log(result.stderr);
+					logResult(result);
+					// create a project from that directoyr
+					return exec(`cd tmp;sfdx force:project:create -n ${msgJSON.deployId}`);
+				})
+				.then( (result) => {
+					logResult(result);
 					ch.sendToQueue('deployMessages', bufferKey('Verify git clone', msgJSON.deployId));
 					ch.sendToQueue('deployMessages', bufferKey(result.stdout, msgJSON.deployId));
 					// grab the deploy script from the repo
@@ -96,7 +106,11 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 											ch.sendToQueue('deployMessages', bufferKey(lineResult.stderr, msgJSON.deployId));
 										}
 										rl.resume();
-									});
+									})
+								.catch( (err) => {
+									console.error('Error: ', err)
+									ch.sendToQueue('deployMessages', bufferKey(`Error: ${err}`, msgJSON.deployId));
+								});
 							}
 						}).on('close', () => ch.ack(msg)); // keep moving this toward the end!
 					} else {
