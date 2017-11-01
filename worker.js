@@ -88,6 +88,8 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 								noFail = false;
 								rl.close();
 								ch.ack(msg);
+							} else if (!line){
+								console.log('empty line');
 							} else if (!line.startsWith('sfdx') && !line.startsWith('#')){
 								ch.sendToQueue('deployMessages', bufferKey(`Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`, msgJSON.deployId));
 								noFail = false;
