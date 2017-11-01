@@ -20,7 +20,7 @@ function bufferKey(content, deployId) {
 // save the key file
 // exec(`cd tmp;echo ${process.env.JWTKEY}>server.key`)
 const write = util.promisify(fs.writeFile);
-write('/app/tmp/server.key', process.env.JWTKEY, 'uft8')
+write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 .then( (result) => {
 	console.log(result);
 	// do an exec to get auth'd to our standard sfdx hub
@@ -73,7 +73,7 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'uft8')
 							input: fs.createReadStream(`/app/tmp/${msgJSON.deployId}/orgInit.sh`),
 							terminal: false
 						}).on('line', (line) => {
-							rl.pause();
+							// rl.pause();
 							console.log(`Line: ${line}`);
 							ch.sendToQueue('deployMessages', bufferKey(line, msgJSON.deployId));
 
