@@ -1,4 +1,5 @@
 // https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/cg7demorepo
+// heroku ps:exec -a hosted-scratch-qa --dyno=worker.1
 
 console.log('I am a worker and I am up!');
 
@@ -6,8 +7,7 @@ const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://local
 const exec = require('child-process-promise').exec;
 const readline = require('readline');
 const fs = require('fs');
-
-// do an exec to get auth'd to our standard sfdx hub
+const util = require('util');
 
 function bufferKey(content, deployId) {
 	const message = {
@@ -17,13 +17,33 @@ function bufferKey(content, deployId) {
 	return new Buffer(JSON.stringify(message));
 }
 
-// listen for messages
-mq.then( (mqConn) => {
+// save the key file
+// exec(`cd tmp;echo ${process.env.JWTKEY}>server.key`)
+const write = util.promisify(fs.writeFile);
+write('/app/tmp/server.key', process.env.JWTKEY, 'uft8')
+.then( (result) => {
+	console.log(result);
+	// do an exec to get auth'd to our standard sfdx hub
+	return exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile /app/tmp/server.key --setdefaultdevhubusername -a hub`);
+	}, (err) => console.log(err))
+.then( (result) => {
+	console.log(result.stdout);
+	console.log(result.stderr);
+	return exec('sfdx force:org:display -u hub');
+})
+.then( (result) => {
+	console.log(result.stdout);
+	console.log(result.stderr);
+	return mq;
+})
+.then( (mqConn) => {
 	let ok = mqConn.createChannel();
 	ok = ok.then((ch) => {
 		ch.assertQueue('deploys', { durable: true });
 		ch.assertQueue('deployMessages',{ durable: true });
 		ch.prefetch(1);
+
+		// this consumer eats deploys, creates local folders, and chops up the tasks into steps
 		ch.consume('deploys', (msg) => {
 			// do a whole bunch of stuff here!
 			console.log(msg);
@@ -38,26 +58,28 @@ mq.then( (mqConn) => {
 				.then( (result) => {
 					console.log(result.stdout);
 					console.log(result.stderr);
-					ch.sendToQueue('deployMessages', bufferKey(result.stdout));
+					ch.sendToQueue('deployMessages', bufferKey(result.stdout, msgJSON.deployId));
 					return exec(`cd tmp;cd ${msgJSON.deployId};ls`);
 				})
 				.then( (result) => {
 					console.log(result.stdout);
 					console.log(result.stderr);
-					ch.sendToQueue('deployMessages', bufferKey('Verify git clone'));
-					ch.sendToQueue('deployMessages', bufferKey(result.stdout));
+					ch.sendToQueue('deployMessages', bufferKey('Verify git clone', msgJSON.deployId));
+					ch.sendToQueue('deployMessages', bufferKey(result.stdout, msgJSON.deployId));
 					// grab the deploy script from the repo
 					console.log(`going to look in the directory /app/tmp/${msgJSON.deployId}/orgInit.sh`);
 					if (fs.existsSync(`/app/tmp/${msgJSON.deployId}/orgInit.sh`)){
-						readline.createInterface({
+						const rl = readline.createInterface({
 							input: fs.createReadStream(`/app/tmp/${msgJSON.deployId}/orgInit.sh`),
 							terminal: false
 						}).on('line', (line) => {
+							rl.pause();
 							console.log(`Line: ${line}`);
-							ch.sendToQueue('deployMessages', bufferKey(line));
+							ch.sendToQueue('deployMessages', bufferKey(line, msgJSON.deployId));
+
 						}).on('close', () => ch.ack(msg)); // keep moving this toward the end!
 					} else {
-						ch.sendToQueue('deployMessages', bufferKey('There is no orgInit.sh'));
+						ch.sendToQueue('deployMessages', bufferKey('There is no orgInit.sh', msgJSON.deployId));
 						ch.ack(msg);
 					}
 				})
