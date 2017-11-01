@@ -68,7 +68,9 @@
 
 		ws.onopen = function () {
 			console.log('WS is open!');
-			pinger = setTimeout(() => ws.send('ping'), 5000);
+			pinger = setInterval(function(){
+				ws.send('ping');
+			}, 5000);
 		};
 
 		ws.onclose = function(){
