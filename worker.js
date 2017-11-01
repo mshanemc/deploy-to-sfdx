@@ -117,6 +117,7 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 										// corrections and improvements for individual commands
 										if (line.startsWith('sfdx force:org:open' && !line.includes('-p'))) {
 											line = line + ' -p';
+											console.log(line);
 										}
 										try {
 											var lineResult = await exec(line);
