@@ -46,21 +46,27 @@
 			msgCounter++;
 			// console.log(event);
 			//console.log(event.data);
-			let parsedData = JSON.parse(event.data);
-			if (parsedData.deployId === deployId){
-				console.log('mine');
-				console.log(parsedData);
-				var para = document.createElement("p");
-				var node = document.createTextNode(parsedData.content);
-				para.appendChild(node);
+			try {
+				let parsedData = JSON.parse(event.data);
+				if (parsedData.deployId === deployId) {
+					console.log('mine');
+					console.log(parsedData);
+					var para = document.createElement("p");
+					var node = document.createTextNode(parsedData.content);
+					para.appendChild(node);
 
-				var element = document.getElementById("div1");
-				element.appendChild(para);
+					var element = document.getElementById("div1");
+					element.appendChild(para);
 
-			} else {
-				console.log('not mine');
-				console.log(parsedData);
+				} else {
+					console.log('not mine');
+					console.log(parsedData);
+				}
+			} catch (err) {
+				console.log('unparseable message (not JSON)');
+				console.log(event.data);
 			}
+
 		};
 
 		ws.onopen = function () {
