@@ -20,7 +20,7 @@
 		</div>
 	</div>
 
-	<textarea id="status" class="slds-m-bottom_small sfdx-output"></textarea>
+	<div id="status" class="slds-m-bottom_small sfdx-output"></div>
 	<script>
 		const HOST = location.href.replace(/^http/, 'ws');
 		let msgCounter = 0;
@@ -67,7 +67,7 @@
 		};
 
 		ws.onopen = function () {
-			console.log('connection open!');
+			console.log('WS is open!');
 			pinger = setTimeout(() => ws.send('ping'), 5000);
 		};
 
