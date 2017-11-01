@@ -1,4 +1,4 @@
-// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/cg7demorepo
+// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops
 // heroku ps:exec -a hosted-scratch-qa --dyno=worker.1
 
 console.log('I am a worker and I am up!');
@@ -39,6 +39,10 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 .then( (result) => {
 	logResult(result);
 	return exec('sfdx force:org:display -u hub');
+})
+.then((result) => {
+	logResult(result);
+	return exec('sfdx force:org:list');
 })
 .then( (result) => {
 	logResult(result);
