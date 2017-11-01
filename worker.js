@@ -80,7 +80,7 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 							if (line.includes(';')) {
 								ch.sendToQueue('deployMessages', bufferKey(`Commands with semicolons (;) cannot be executed.  Put each command on a separate line.  Your command: ${line}`, msgJSON.deployId));
 								rl.close();
-							} else if (!line.startsWith('sfdx' && !line.startsWith('#'))){
+							} else if (!line.startsWith('sfdx') && !line.startsWith('#')){
 								ch.sendToQueue('deployMessages', bufferKey(`Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`, msgJSON.deployId));
 								rl.close();
 							} else {
