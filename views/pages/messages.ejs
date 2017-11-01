@@ -47,13 +47,7 @@
 				if (parsedData.deployId === deployId) {
 					console.log('mine');
 					console.log(parsedData);
-					var para = document.createElement("p");
-					var node = document.createTextNode(parsedData.content);
-					para.appendChild(node);
-
-					var element = document.getElementById("status");
-					element.appendChild(para);
-
+					displayContent(parsedData.content);
 				} else {
 					console.log('not mine');
 					console.log(parsedData);
@@ -76,7 +70,7 @@
 			console.log('WS is closing');
 		}
 
-		parseContent = function(content){
+		displayContent = function(content){
 			// the login url
 			if (content.result.url.includes('secur/frontdoor')){
 				console.log('This is the login url');
@@ -85,7 +79,13 @@
 				link.innerHTML = content.result.url;
 				document.getElementById("loginBlock").setAttribute("style", "display : block");
 			} else {
-				return content;
+				// everything unspecified
+				var para = document.createElement("p");
+				var node = document.createTextNode(content);
+				para.appendChild(node);
+
+				var element = document.getElementById("status");
+				element.appendChild(para);
 			}
 
 		}
