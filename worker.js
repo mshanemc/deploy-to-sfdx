@@ -17,6 +17,7 @@ function bufferKey(content, deployId) {
 	return new Buffer(JSON.stringify(message));
 }
 
+
 // save the key file
 // exec(`cd tmp;echo ${process.env.JWTKEY}>server.key`)
 const write = util.promisify(fs.writeFile);
@@ -73,10 +74,30 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 							input: fs.createReadStream(`/app/tmp/${msgJSON.deployId}/orgInit.sh`),
 							terminal: false
 						}).on('line', (line) => {
-							// rl.pause();
+							rl.pause();
 							console.log(`Line: ${line}`);
 							ch.sendToQueue('deployMessages', bufferKey(line, msgJSON.deployId));
-
+							if (line.includes(';')) {
+								ch.sendToQueue('deployMessages', bufferKey(`Commands with semicolons (;) cannot be executed.  Put each command on a separate line.  Your command: ${line}`, msgJSON.deployId));
+								rl.close();
+							} else if (!line.startsWith('sfdx' && !line.startsWith('#'))){
+								ch.sendToQueue('deployMessages', bufferKey(`Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`, msgJSON.deployId));
+								rl.close();
+							} else {
+								exec(`cd tmp;${line}`)
+									.then( (lineResult) => {
+										console.log(lineResult.stderr);
+										if (lineResult.stdout){
+											console.log(lineResult.stdout);
+											ch.sendToQueue('deployMessages', bufferKey(lineResult.stdout, msgJSON.deployId));
+										}
+										if (lineResult.stderr){
+											console.log(lineResult.stderr);
+											ch.sendToQueue('deployMessages', bufferKey(lineResult.stderr, msgJSON.deployId));
+										}
+										rl.resume();
+									});
+							}
 						}).on('close', () => ch.ack(msg)); // keep moving this toward the end!
 					} else {
 						ch.sendToQueue('deployMessages', bufferKey('There is no orgInit.sh', msgJSON.deployId));
