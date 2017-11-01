@@ -96,13 +96,17 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 								rl.close();
 								ch.ack(msg);
 							} else {
+								console.log('line pushed');
 								parsedLines.push(`cd tmp;cd ${msgJSON.deployId};${line}`);
 							}
 						}).on('close', () => {
 							// you have all the parsed lines
+							console.log('in the close event');
+							console.log(parsedLines);
 							if (noFail){
 								async function readFiles(parsedLines) {
-									for(const line of lines) {
+									for(let line of lines) {
+										console.log(line);
 										try {
 											var lineResult = await exec(line);
 											console.log(lineResult.stderr);

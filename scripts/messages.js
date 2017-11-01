@@ -3,8 +3,8 @@ const HOST = location.href.replace(/^http/, 'ws');
 console.log(HOST);
 
 const ws = new WebSocket(HOST);
-const deployId = document.getElementById('deployId').value;
-console.log('deployId is ' + deployId);
+const deployId = document.getElementById('deployId');
+console.log(deployId);
 
 ws.onmessage = function (event) {
 	if (event.data.deployId === deployId){
