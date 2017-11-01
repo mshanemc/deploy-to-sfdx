@@ -3,7 +3,9 @@ const HOST = location.href.replace(/^http/, 'ws');
 console.log(HOST);
 
 const ws = new WebSocket(HOST);
-const deployId = document.getElementById('deployId');
+const deployIdinput = document.getElementById('deployId');
+const deployId = deployIdinput.value;
+
 console.log(deployId);
 
 ws.onmessage = function (event) {
