@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "An application that will deploy an SFDX project from a public Github repo",
   "main": "web.js",
-  "engines" : {
-    "node" : "8.9.0"
+  "engines": {
+    "node": "8.9.0"
   },
   "scripts": {
     "start": "node .",
@@ -24,6 +24,7 @@
   "dependencies": {
     "@salesforce-ux/design-system": "^2.3.1",
     "amqplib": "^0.5.1",
+    "async": "^2.5.0",
     "body-parser": "^1.17.2",
     "bufferutil": "3.0.2",
     "child-process-promise": "^2.2.1",
@@ -33,16 +34,9 @@
     "express": "^4.15.3",
     "express-ws": "^3.0.0",
     "https": "^1.0.0",
-    "jsforce": "^1.8.0",
-    "memjs": "^1.0.0-rc.1",
-    "pg": "^7.1.2",
-    "pg-pool": "^2.0.3",
-    "salesforce-oauth2": "^0.1.8",
     "sleep": "^5.1.1",
-    "socket.io": "^2.0.4",
     "utf-8-validate": "3.0.3",
-    "ws": "3.2.0",
-    "yamljs": "^0.3.0"
+    "ws": "3.2.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",

@@ -68,11 +68,6 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 					ch.sendToQueue('deployMessages', bufferKey(result.stdout, msgJSON.deployId));
 					return exec(`cd tmp;cd ${msgJSON.deployId};ls`);
 				})
-				// .then( (result) => {
-				// 	logResult(result);
-				// 	// create a project from that directoyr
-				// 	return exec(`cd tmp;sfdx force:project:create -n ${msgJSON.deployId}`);
-				// })
 				.then( (result) => {
 					logResult(result);
 					ch.sendToQueue('deployMessages', bufferKey('Verify git clone', msgJSON.deployId));
@@ -80,57 +75,59 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 					// grab the deploy script from the repo
 					console.log(`going to look in the directory /app/tmp/${msgJSON.deployId}/orgInit.sh`);
 					if (fs.existsSync(`/app/tmp/${msgJSON.deployId}/orgInit.sh`)){
+						let parsedLines = [];
+						let noFail = true;
 						const rl = readline.createInterface({
 							input: fs.createReadStream(`/app/tmp/${msgJSON.deployId}/orgInit.sh`),
 							terminal: false
 						}).on('line', (line) => {
-							rl.pause();
 							console.log(`Line: ${line}`);
 							ch.sendToQueue('deployMessages', bufferKey(line, msgJSON.deployId));
 							if (line.includes(';')) {
 								ch.sendToQueue('deployMessages', bufferKey(`Commands with semicolons (;) cannot be executed.  Put each command on a separate line.  Your command: ${line}`, msgJSON.deployId));
+								noFail = false;
 								rl.close();
+								ch.ack(msg);
 							} else if (!line.startsWith('sfdx') && !line.startsWith('#')){
 								ch.sendToQueue('deployMessages', bufferKey(`Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`, msgJSON.deployId));
+								noFail = false;
 								rl.close();
+								ch.ack(msg);
 							} else {
-								exec(`cd tmp;cd ${msgJSON.deployId};${line}`)
-									.then( (lineResult) => {
-										console.log(lineResult.stderr);
-										if (lineResult.stdout){
-											console.log(lineResult.stdout);
-											ch.sendToQueue('deployMessages', bufferKey(lineResult.stdout, msgJSON.deployId));
-										}
-										if (lineResult.stderr){
-											console.log(lineResult.stderr);
-											ch.sendToQueue('deployMessages', bufferKey(lineResult.stderr, msgJSON.deployId));
-										}
-										rl.resume();
-									})
-								.catch( (err) => {
-									console.error('Error: ', err);
-									ch.sendToQueue('deployMessages', bufferKey(`Error: ${err}`, msgJSON.deployId));
-								});
+								parsedLines.push(`cd tmp;cd ${msgJSON.deployId};${line}`);
 							}
-						}).on('close', () => ch.ack(msg)); // keep moving this toward the end!
+						}).on('close', () => {
+							// you have all the parsed lines
+							if (noFail){
+								async function readFiles(parsedLines) {
+									for(const line of lines) {
+										try {
+											var lineResult = await exec(line);
+											console.log(lineResult.stderr);
+											if (lineResult.stdout){
+												console.log(lineResult.stdout);
+												ch.sendToQueue('deployMessages', bufferKey(lineResult.stdout, msgJSON.deployId));
+											}
+											if (lineResult.stderr){
+												console.log(lineResult.stderr);
+												ch.sendToQueue('deployMessages', bufferKey(lineResult.stderr, msgJSON.deployId));
+											}
+										} catch (err) {
+											console.error('Error: ', err);
+											ch.sendToQueue('deployMessages', bufferKey(`Error: ${err}`, msgJSON.deployId));
+										}
+									}
+								};
+							}
+						}); // end of on.close event
 					} else {
 						ch.sendToQueue('deployMessages', bufferKey('There is no orgInit.sh', msgJSON.deployId));
-						ch.ack(msg);
 					}
 				})
-				.catch( err => console.error('Error: ', err));
-
-
-			// split deploy script into lines
-
-			// iterate the lines
-
-			// validate the line for sfdx and no ;
-
-			// execute the line
-
-
-			// ch.sendToQueue('deployMessages', new Buffer(JSON.stringify('DONE!')));
+				.catch( err => {
+					console.error('Error: ', err);
+					ch.ack(msg);
+				});
 
 		}, { noAck: false });
 	});
