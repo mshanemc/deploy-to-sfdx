@@ -87,6 +87,7 @@
 
 		ws.onclose = function(){
 			console.log('WS is closing');
+			clearInterval(pinger);
 		}
 
 		displayContent = function(content){
