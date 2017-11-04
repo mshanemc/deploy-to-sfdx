@@ -85,13 +85,12 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 			logger.debug(msgJSON.template);
 			visitor.event('Deploy Request', msgJSON.template).send();
 
-
-
 			// clone repo into local fs
 			exec(`cd tmp;git clone ${msgJSON.template}.git ${msgJSON.deployId}`)
 				.then( (result) => {
-					logResult(result);
-					ch.sendToQueue('deployMessages', bufferKey(result.stdout, msgJSON.deployId));
+					// git outputs to stderr for unfathomable reasons
+					logger.debug(result.stderr);
+					ch.sendToQueue('deployMessages', bufferKey(result.stderr, msgJSON.deployId));
 					return exec(`cd tmp;cd ${msgJSON.deployId};ls`);
 				})
 				.then( (result) => {
