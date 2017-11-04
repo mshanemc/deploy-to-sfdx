@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/wadewegner/deploy-to-sfdx.git"
+    "url": "git+ssh://git@github.com/mshanemc/deploy-to-sfdx.git"
   },
-  "author": "Wade Wegner",
+  "author": "Shane McLaughlin",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/wadewegner/deploy-to-sfdx/issues"
+    "url": "https://github.com/mshanemc/deploy-to-sfdx/issues"
   },
-  "homepage": "https://github.com/wadewegner/deploy-to-sfdx#readme",
+  "homepage": "https://github.com/mshanemc/deploy-to-sfdx#readme",
   "dependencies": {
     "@salesforce-ux/design-system": "^2.3.1",
     "amqplib": "^0.5.1",

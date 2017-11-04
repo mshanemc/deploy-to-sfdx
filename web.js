@@ -5,7 +5,7 @@ const expressWs = require('express-ws');
 const bodyParser = require('body-parser');
 // const cookieParser = require('cookie-parser');
 
-const https = require('https');
+// const http = require('http');
 
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 
@@ -67,41 +67,13 @@ app.ws('/deploying/:deployId', (ws, req) => {
   }
 );
 
-
-// require('./lib/app-router')(router);
-
-// app.use('/api', router);
-
 const port = process.env.PORT || 8443;
 
-// subscribe to the q for deploy messages and broadcast them to everyone
 
-// if local, use 8443 and certificate
-if (process.env.NODE_ENV === 'dev') {
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}!`);
+});
 
-  const passPhrase = process.env.PASS_PHRASE;
-  const certPem = process.env.CERT_PEM.replace(/\\n/g, '\n');
-  const keyPem = process.env.KEY_PEM.replace(/\\n/g, '\n');
-
-  const sslOptions = {
-    key: keyPem,
-    cert: certPem,
-    passphrase: passPhrase
-  };
-
-  const httpsServer = https.createServer(sslOptions, app);
-
-  httpsServer.listen(port, () => {
-    console.log(`Example app listening on port ${port}!`);
-  });
-
-} else {
-
-  app.listen(port, () => {
-    console.log(`Example app listening on port ${port}!`);
-  });
-
-}
 
 mq.then( (mqConn) => {
 	let ok = mqConn.createChannel();
@@ -110,9 +82,17 @@ mq.then( (mqConn) => {
 		ch.consume('deployMessages', (msg) => {
       // do a whole bunch of stuff here!
       console.log('heard a message from the worker');
-      console.log(msg.content.toString());
+      const parsedMsg = JSON.parse(msg.content.toString());
+      console.log(parsedMsg);
       wsInstance.getWss().clients.forEach((client) => {
-        client.send(msg.content.toString());
+        console.log('ws client is');
+        console.log(client.upgradeReq.url);
+        if (client.upgradeReq.url.includes(parsedMsg.deployId)){
+          console.log(`client id ${client.upgradeReq.url} matches msg.deployId: ${parsedMsg.deployId}`);
+          client.send(msg.content.toString());
+        } else {
+          console.log(`client id ${client.upgradeReq.url} doesn't match msg.deployId: ${parsedMsg.deployId}`);
+        }
       });
 
 			ch.ack(msg);

@@ -1,11 +1,3 @@
-// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops
-// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/community-apps-workshop-df17
-// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/process-automation-workshop-df17
-// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/df17-community-content-workshop
-// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/df17AppBuilding
-
-// heroku ps:exec -a hosted-scratch-qa --dyno=worker.1
-
 console.log('I am a worker and I am up!');
 
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
@@ -13,6 +5,8 @@ const exec = require('child-process-promise').exec;
 const readline = require('readline');
 const fs = require('fs');
 const util = require('util');
+
+const setTimeoutPromise = util.promisify(setTimeout);
 
 function bufferKey(content, deployId) {
 	const message = {
@@ -22,28 +16,43 @@ function bufferKey(content, deployId) {
 	return new Buffer(JSON.stringify(message));
 }
 
+
 function logResult(result){
-	if (result.stderr){
-		console.log(result.stderr);
-	}
-	if (result.stdout){
-		console.log(result.stdout);
+	if (result){
+		if (result.stderr){
+			console.log(result.stderr);
+		}
+		if (result.stdout){
+			console.log(result.stdout);
+		}
 	}
 }
 
+let keypath;
+// where will our cert live?
+if (process.env.LOCAL_ONLY_KEY_PATH){
+	// I'm fairly local
+	console.log('loading local key');
+	keypath = process.env.LOCAL_ONLY_KEY_PATH;
+} else {
+	// we're doing it in the cloud
+	console.log('creating cloud key');
+	fs.writeFileSync('/app/tmp/server.key', process.env.JWTKEY, 'utf8');
+	keypath = '/app/tmp/server.key';
+}
 
-// save the key file
-// exec(`cd tmp;echo ${process.env.JWTKEY}>server.key`)
-const write = util.promisify(fs.writeFile);
-write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
-.then( (result) => {
-	console.log(result);
-	// do an exec to get auth'd to our standard sfdx hub
-	return exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile /app/tmp/server.key --setdefaultdevhubusername -a hub`);
-	}, (err) => console.log(err))
+// const write = util.promisify(fs.writeFile);
+// write('/app/tmp/server.key', process.env.JWTKEY, {
+// 	encoding: "utf8",
+// 	flag: "wx"
+// })
+
+// OK, we've got our environment prepared now.  Let's auth to our org and verify
+
+exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile ${keypath} --setdefaultdevhubusername -a deployBotHub`)
 .then( (result) => {
 	logResult(result);
-	return exec('sfdx force:org:display -u hub');
+	return exec('sfdx force:org:display -u deployBotHub');
 })
 .then((result) => {
 	logResult(result);
@@ -82,12 +91,12 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 					ch.sendToQueue('deployMessages', bufferKey('Cloning the repository', msgJSON.deployId));
 					// ch.sendToQueue('deployMessages', bufferKey(result.stdout, msgJSON.deployId));
 					// grab the deploy script from the repo
-					console.log(`going to look in the directory /app/tmp/${msgJSON.deployId}/orgInit.sh`);
-					if (fs.existsSync(`/app/tmp/${msgJSON.deployId}/orgInit.sh`)){
+					console.log(`going to look in the directory tmp/${msgJSON.deployId}/orgInit.sh`);
+					if (fs.existsSync(`tmp/${msgJSON.deployId}/orgInit.sh`)){
 						let parsedLines = [];
 						let noFail = true;
 						const rl = readline.createInterface({
-							input: fs.createReadStream(`/app/tmp/${msgJSON.deployId}/orgInit.sh`),
+							input: fs.createReadStream(`tmp/${msgJSON.deployId}/orgInit.sh`),
 							terminal: false
 						}).on('line', (line) => {
 							console.log(`Line: ${line}`);
@@ -101,7 +110,13 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 								ch.ack(msg);
 							} else if (!line){
 								console.log('empty line');
-							} else if (!line.startsWith('sfdx') && !line.startsWith('#')){
+							} else if (line.includes('-u ')) {
+								console.log('empty line');
+								ch.sendToQueue('deployMessages', bufferKey(`Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${line}`, msgJSON.deployId));
+								noFail = false;
+								rl.close();
+								ch.ack(msg);
+							}else if (!line.startsWith('sfdx') && !line.startsWith('#')){
 								ch.sendToQueue('deployMessages', bufferKey(`Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`, msgJSON.deployId));
 								noFail = false;
 								rl.close();
@@ -123,15 +138,15 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 										// corrections and improvements for individual commands
 										if (localLine.includes('sfdx force:org:open') && !localLine.includes(' -r')) {
 											localLine = localLine + ' -r --json';
-											console.log(localLine);
+											console.log('org open command : ' + localLine);
 										}
 										if (localLine.includes('sfdx force:user:password') && !localLine.includes(' --json')) {
 											localLine = localLine + ' --json';
-											console.log(localLine);
+											console.log('org password command : ' + localLine);
 										}
 										if (localLine.includes('sfdx force:org:create') && !localLine.includes(' --json')) {
 											localLine = localLine + ' --json';
-											console.log(localLine);
+											console.log('org create command : ' + localLine);
 										}
 										try {
 											var lineResult = await exec(localLine);
@@ -154,6 +169,21 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 								.then( () => {
 									ch.sendToQueue('deployMessages', bufferKey('ALLDONE', msgJSON.deployId));
 									ch.ack(msg);
+
+									// clean up after a minute
+									return setTimeoutPromise(1000 * 60, 'foobar');
+								}).then((value) => {
+									exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
+								}).then((result) => {
+									logResult(result);
+								});
+							} else {
+								// deploy failed
+								setTimeoutPromise(1000 * 60, 'foobar')
+								.then((value) => {
+									exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
+								}).then((result) => {
+									logResult(result);
 								});
 							}
 						}); // end of on.close event
@@ -170,6 +200,9 @@ write('/app/tmp/server.key', process.env.JWTKEY, 'utf8')
 	});
 	return ok;
 
+})
+.catch( (reason) => {
+	console.log(reason);
 });
 
 
