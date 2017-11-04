@@ -71,20 +71,16 @@ if **hosted-scratch-qa** is the name of your app
 
 
 
-
-
-
-
 ---
 
-## Example Repos
+## Example Repos with orgInit.sh scripts
 
-https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops
+https://github.com/mshanemc/DF17integrationWorkshops
 
-https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/community-apps-workshop-df17
+https://github.com/mshanemc/community-apps-workshop-df17
 
-https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/process-automation-workshop-df17
+https://github.com/mshanemc/process-automation-workshop-df17
 
-https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/df17-community-content-workshop
+https://github.com/mshanemc/df17-community-content-workshop
 
-https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/df17AppBuilding
+https://github.com/mshanemc/df17AppBuilding
