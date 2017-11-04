@@ -65,7 +65,7 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 	return mq;
 })
 .then( (mqConn) => {
-	const visitor = ua(process.env.UA_ID);
+	const visitor = ua(process.env.UA_ID || 0);
 
 	let ok = mqConn.createChannel();
 	ok = ok.then((ch) => {

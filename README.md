@@ -32,7 +32,8 @@ https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_de
 * `JWTKEY` use only in heroku cloud.  Cut/paste your server.key, including the ---- lines
 * `LOCAL_ONLY_KEY_PATH` don't use this in the cloud.  Put it in your local .env file, and it needs to be an absolute path
 
-
+### optional
+* `UA_ID` for google analytics measurement protocol
 
 
 
