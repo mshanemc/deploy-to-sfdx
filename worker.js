@@ -1,4 +1,3 @@
-logger.debug('I am a worker and I am up!');
 
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 const exec = require('child-process-promise').exec;
@@ -11,6 +10,9 @@ const logger = require('heroku-logger');
 
 const setTimeoutPromise = util.promisify(setTimeout);
 
+logger.debug('I am a worker and I am up!');
+
+//helper functions
 function bufferKey(content, deployId) {
 	const message = {
 		deployId,
