@@ -81,7 +81,7 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 			console.log(msgJSON);
 			console.log(msgJSON.deployId);
 			console.log(msgJSON.template);
-			visitor.event('Deploy Request', template).send();
+			visitor.event('Deploy Request', msgJSON.template).send();
 
 
 
@@ -112,7 +112,7 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 								noFail = false;
 								rl.close();
 								ch.ack(msg);
-								visitor.event('Repo Problems', 'line with semicolons', template).send();
+								visitor.event('Repo Problems', 'line with semicolons', msgJSON.template).send();
 							} else if (!line){
 								console.log('empty line');
 							} else if (line.includes('-u ')) {
@@ -121,13 +121,13 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 								noFail = false;
 								rl.close();
 								ch.ack(msg);
-								visitor.event('Repo Problems', 'line with -u', template).send();
+								visitor.event('Repo Problems', 'line with -u', msgJSON.template).send();
 							} else if (!line.startsWith('sfdx') && !line.startsWith('#')){
 								ch.sendToQueue('deployMessages', bufferKey(`Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`, msgJSON.deployId));
 								noFail = false;
 								rl.close();
 								ch.ack(msg);
-								visitor.event('Repo Problems', 'non-sfdx line', template).send();
+								visitor.event('Repo Problems', 'non-sfdx line', msgJSON.template).send();
 							} else {
 								console.log('line pushed');
 								parsedLines.push(`cd tmp;cd ${msgJSON.deployId};${line}`);
@@ -146,17 +146,17 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 										if (localLine.includes('sfdx force:org:open') && !localLine.includes(' -r')) {
 											localLine = localLine + ' -r --json';
 											console.log('org open command : ' + localLine);
-											visitor.event('sfdx event', 'org open', template).send();
+											visitor.event('sfdx event', 'org open', msgJSON.template).send();
 										}
 										if (localLine.includes('sfdx force:user:password') && !localLine.includes(' --json')) {
 											localLine = localLine + ' --json';
 											console.log('org password command : ' + localLine);
-											visitor.event('sfdx event', 'password gen', template).send();
+											visitor.event('sfdx event', 'password gen', msgJSON.template).send();
 										}
 										if (localLine.includes('sfdx force:org:create') && !localLine.includes(' --json')) {
 											localLine = localLine + ' --json';
 											console.log('org create command : ' + localLine);
-											visitor.event('sfdx event', 'org creation', template).send();
+											visitor.event('sfdx event', 'org creation', msgJSON.template).send();
 										}
 										try {
 											var lineResult = await exec(localLine);
@@ -168,12 +168,12 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 											if (lineResult.stderr){
 												console.log(lineResult.stderr);
 												ch.sendToQueue('deployMessages', bufferKey(lineResult.stderr, msgJSON.deployId));
-												visitor.event('deploy error', template, lineResult.stderr).send();
+												visitor.event('deploy error', msgJSON.template, lineResult.stderr).send();
 											}
 										} catch (err) {
 											console.error('Error: ', err);
 											ch.sendToQueue('deployMessages', bufferKey(`Error: ${err}`, msgJSON.deployId));
-											visitor.event('deploy error', template, err).send();
+											visitor.event('deploy error', msgJSON.template, err).send();
 
 										}
 									}
@@ -181,6 +181,7 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 								executeLines(parsedLines)
 								.then( () => {
 									ch.sendToQueue('deployMessages', bufferKey('ALLDONE', msgJSON.deployId));
+									visitor.event('deploy complete', msgJSON.template).send();
 									ch.ack(msg);
 
 									// clean up after a minute
@@ -202,7 +203,7 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 						}); // end of on.close event
 					} else {
 						ch.sendToQueue('deployMessages', bufferKey('There is no orgInit.sh', msgJSON.deployId));
-						visitor.event('Repo Problems', 'no orgInit.sh', template).send();
+						visitor.event('Repo Problems', 'no orgInit.sh', msgJSON.template).send();
 					}
 				})
 				.catch( err => {
