@@ -1,5 +1,6 @@
 // https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops
 
+const ua = require('universal-analytics');
 const express = require('express');
 const expressWs = require('express-ws');
 const bodyParser = require('body-parser');
@@ -36,6 +37,11 @@ app.get('/launch', (req, res) => {
     deployId,
     template : req.query.template
   };
+  // analytics
+  const visitor = ua(process.env.UA_ID);
+  visitor.pageview('/launch').send();
+  visitor.event('Repo', req.query.template).send();
+
 
   mq.then( (mqConn) => {
     let ok = mqConn.createChannel();
@@ -55,10 +61,10 @@ app.get('/launch', (req, res) => {
   });
 });
 
-app.get('/deploying/:deployId', (req, res) =>
+app.get('/deploying/:deployId', (req, res) => {
   // show the page with .io to subscribe to a topic
-  res.render('pages/messages', { deployId: req.params.deployId })
-);
+  res.render('pages/messages', { deployId: req.params.deployId });
+});
 
 app.ws('/deploying/:deployId', (ws, req) => {
     console.log('client connected!');

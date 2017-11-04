@@ -35,6 +35,7 @@
     "express-ws": "^3.0.0",
     "https": "^1.0.0",
     "sleep": "^5.1.1",
+    "universal-analytics": "^0.4.15",
     "utf-8-validate": "3.0.3",
     "ws": "3.2.0"
   },
