@@ -96,6 +96,10 @@ mq.then( (mqConn) => {
         if (client.upgradeReq.url.includes(parsedMsg.deployId)){
           console.log(`client id ${client.upgradeReq.url} matches msg.deployId: ${parsedMsg.deployId}`);
           client.send(msg.content.toString());
+          // close connection when ALLDONE
+          if (parsedMsg.content === 'ALLDONE'){
+            client.close();
+          }
         } else {
           console.log(`client id ${client.upgradeReq.url} doesn't match msg.deployId: ${parsedMsg.deployId}`);
         }
