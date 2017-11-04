@@ -39,6 +39,7 @@
 
 	<div id="status" class="slds-m-bottom_small sfdx-output"></div>
 	<script>
+		// works for both http and https
 		const HOST = location.href.replace(/^http/, 'ws');
 		let msgCounter = 0;
 		console.log(HOST);
