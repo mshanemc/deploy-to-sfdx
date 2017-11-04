@@ -4,6 +4,7 @@ const ua = require('universal-analytics');
 const express = require('express');
 const expressWs = require('express-ws');
 const bodyParser = require('body-parser');
+const logger = require('heroku-logger');
 // const cookieParser = require('cookie-parser');
 
 // const http = require('http');
@@ -30,7 +31,7 @@ app.get('/launch', (req, res) => {
   const repo = req.query.template.replace('https://github.com/', '').replace('/', '-');
   // generate unique id for this deployment
   const deployId = encodeURIComponent(`${repo}-${new Date().valueOf()}`);
-  console.log(`creating new deployId of ${deployId}`);
+  logger.debug(`creating new deployId of ${deployId}`);
 
   // drop a message
   const message = {
@@ -54,7 +55,7 @@ app.get('/launch', (req, res) => {
     // return the deployId page
     return res.redirect(`/deploying/${deployId}`);
   }, (mqerr) => {
-    console.log(mqerr);
+    logger.error(mqerr);
     return res.redirect('/error', {
       customError : mqerr
     });
@@ -67,9 +68,9 @@ app.get('/deploying/:deployId', (req, res) => {
 });
 
 app.ws('/deploying/:deployId', (ws, req) => {
-    console.log('client connected!');
+    logger.debug('client connected!');
     // ws.send('welcome to the socket!');
-    ws.on('close', () => console.log('Client disconnected'));
+    ws.on('close', () => logger.info('Client disconnected'));
   }
 );
 
@@ -77,7 +78,7 @@ const port = process.env.PORT || 8443;
 
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}!`);
+  logger.info(`Example app listening on port ${port}!`);
 });
 
 
@@ -87,21 +88,16 @@ mq.then( (mqConn) => {
 		ch.assertQueue('deployMessages', { durable: true });
 		ch.consume('deployMessages', (msg) => {
       // do a whole bunch of stuff here!
-      console.log('heard a message from the worker');
+      logger.debug('heard a message from the worker');
       const parsedMsg = JSON.parse(msg.content.toString());
-      console.log(parsedMsg);
+      logger.debug(parsedMsg);
       wsInstance.getWss().clients.forEach((client) => {
-        console.log('ws client is');
-        console.log(client.upgradeReq.url);
         if (client.upgradeReq.url.includes(parsedMsg.deployId)){
-          console.log(`client id ${client.upgradeReq.url} matches msg.deployId: ${parsedMsg.deployId}`);
           client.send(msg.content.toString());
           // close connection when ALLDONE
           if (parsedMsg.content === 'ALLDONE'){
             client.close();
           }
-        } else {
-          console.log(`client id ${client.upgradeReq.url} doesn't match msg.deployId: ${parsedMsg.deployId}`);
         }
       });
 

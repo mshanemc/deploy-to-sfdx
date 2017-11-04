@@ -1,4 +1,4 @@
-console.log('I am a worker and I am up!');
+logger.debug('I am a worker and I am up!');
 
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 const exec = require('child-process-promise').exec;
@@ -6,7 +6,8 @@ const readline = require('readline');
 const fs = require('fs');
 const util = require('util');
 const ua = require('universal-analytics');
-
+const shellSanitize = require('./lib/shellSanitize');
+const logger = require('heroku-logger');
 
 const setTimeoutPromise = util.promisify(setTimeout);
 
@@ -18,14 +19,13 @@ function bufferKey(content, deployId) {
 	return new Buffer(JSON.stringify(message));
 }
 
-
 function logResult(result){
 	if (result){
 		if (result.stderr){
-			console.log(result.stderr);
+			logger.error(result.stderr);
 		}
 		if (result.stdout){
-			console.log(result.stdout);
+			logger.debug(result.stdout);
 		}
 	}
 }
@@ -34,11 +34,11 @@ let keypath;
 // where will our cert live?
 if (process.env.LOCAL_ONLY_KEY_PATH){
 	// I'm fairly local
-	console.log('loading local key');
+	logger.debug('loading local key');
 	keypath = process.env.LOCAL_ONLY_KEY_PATH;
 } else {
 	// we're doing it in the cloud
-	console.log('creating cloud key');
+	logger.debug('creating cloud key');
 	fs.writeFileSync('/app/tmp/server.key', process.env.JWTKEY, 'utf8');
 	keypath = '/app/tmp/server.key';
 }
@@ -76,11 +76,11 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 		// this consumer eats deploys, creates local folders, and chops up the tasks into steps
 		ch.consume('deploys', (msg) => {
 			// do a whole bunch of stuff here!
-			console.log(msg);
+			logger.debug(msg);
 			const msgJSON = JSON.parse(msg.content.toString());
-			console.log(msgJSON);
-			console.log(msgJSON.deployId);
-			console.log(msgJSON.template);
+			logger.debug(msgJSON);
+			logger.debug(msgJSON.deployId);
+			logger.debug(msgJSON.template);
 			visitor.event('Deploy Request', msgJSON.template).send();
 
 
@@ -97,7 +97,7 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 					ch.sendToQueue('deployMessages', bufferKey('Cloning the repository', msgJSON.deployId));
 					// ch.sendToQueue('deployMessages', bufferKey(result.stdout, msgJSON.deployId));
 					// grab the deploy script from the repo
-					console.log(`going to look in the directory tmp/${msgJSON.deployId}/orgInit.sh`);
+					logger.debug(`going to look in the directory tmp/${msgJSON.deployId}/orgInit.sh`);
 					if (fs.existsSync(`tmp/${msgJSON.deployId}/orgInit.sh`)){
 						let parsedLines = [];
 						let noFail = true;
@@ -105,18 +105,18 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 							input: fs.createReadStream(`tmp/${msgJSON.deployId}/orgInit.sh`),
 							terminal: false
 						}).on('line', (line) => {
-							console.log(`Line: ${line}`);
+							logger.debug(`Line: ${line}`);
 
-							if (line.includes(';')) {
-								ch.sendToQueue('deployMessages', bufferKey(`Commands with semicolons (;) cannot be executed.  Put each command on a separate line.  Your command: ${line}`, msgJSON.deployId));
+							if (!shellSanitize(line)) {
+								ch.sendToQueue('deployMessages', bufferKey(`Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${line}`, msgJSON.deployId));
 								noFail = false;
 								rl.close();
 								ch.ack(msg);
 								visitor.event('Repo Problems', 'line with semicolons', msgJSON.template).send();
 							} else if (!line){
-								console.log('empty line');
+								logger.debug('empty line');
 							} else if (line.includes('-u ')) {
-								console.log('empty line');
+								logger.debug('found a -u in a command line');
 								ch.sendToQueue('deployMessages', bufferKey(`Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${line}`, msgJSON.deployId));
 								noFail = false;
 								rl.close();
@@ -129,44 +129,44 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 								ch.ack(msg);
 								visitor.event('Repo Problems', 'non-sfdx line', msgJSON.template).send();
 							} else {
-								console.log('line pushed');
+								logger.debug('line pushed');
 								parsedLines.push(`cd tmp;cd ${msgJSON.deployId};${line}`);
 							}
 						}).on('close', () => {
 							// you have all the parsed lines
-							console.log('in the close event');
-							console.log(parsedLines);
+							logger.debug('in the close event');
+							logger.debug(parsedLines);
 							if (noFail){
-								console.log('no fail is true');
+								logger.debug('no fail is true');
 								async function executeLines(lines) {
 									for(let line of lines) {
 										let localLine = line;
-										console.log(localLine);
+										logger.debug(localLine);
 										// corrections and improvements for individual commands
 										if (localLine.includes('sfdx force:org:open') && !localLine.includes(' -r')) {
 											localLine = localLine + ' -r --json';
-											console.log('org open command : ' + localLine);
+											logger.debug('org open command : ' + localLine);
 											visitor.event('sfdx event', 'org open', msgJSON.template).send();
 										}
 										if (localLine.includes('sfdx force:user:password') && !localLine.includes(' --json')) {
 											localLine = localLine + ' --json';
-											console.log('org password command : ' + localLine);
+											logger.debug('org password command : ' + localLine);
 											visitor.event('sfdx event', 'password gen', msgJSON.template).send();
 										}
 										if (localLine.includes('sfdx force:org:create') && !localLine.includes(' --json')) {
 											localLine = localLine + ' --json';
-											console.log('org create command : ' + localLine);
+											logger.debug('org create command : ' + localLine);
 											visitor.event('sfdx event', 'org creation', msgJSON.template).send();
 										}
 										try {
 											var lineResult = await exec(localLine);
-											console.log(lineResult.stderr);
+											logger.debug(lineResult.stderr);
 											if (lineResult.stdout){
-												console.log(lineResult.stdout);
+												logger.debug(lineResult.stdout);
 												ch.sendToQueue('deployMessages', bufferKey(lineResult.stdout, msgJSON.deployId));
 											}
 											if (lineResult.stderr){
-												console.log(lineResult.stderr);
+												logger.error(lineResult.stderr);
 												ch.sendToQueue('deployMessages', bufferKey(lineResult.stderr, msgJSON.deployId));
 												visitor.event('deploy error', msgJSON.template, lineResult.stderr).send();
 											}
@@ -207,7 +207,7 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 					}
 				})
 				.catch( err => {
-					console.error('Error: ', err);
+					logger.error('Error: ', err);
 					ch.ack(msg);
 				});
 
@@ -217,7 +217,7 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 
 })
 .catch( (reason) => {
-	console.log(reason);
+	logger.error(reason);
 });
 
 
