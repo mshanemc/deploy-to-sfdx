@@ -86,7 +86,7 @@
     "no-spaced-func": 2,
     "no-sparse-arrays": 2,
     "no-sync": 0,
-    "no-tabs": 2,
+    "no-tabs": 0,
     "no-ternary": 0,
     "no-trailing-spaces": 0,
     "no-throw-literal": 0,

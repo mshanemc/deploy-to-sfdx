@@ -1,9 +1,4 @@
-echo "Installing JQ for JSON parsing ..."
-
-wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-chmod +x ./jq
-
-echo "Updating PATH to include jq ..."
+echo "Updating PATH"
 export PATH=$PATH:/app
 
 echo "Updating PATH to include Salesforce CLI ..."
