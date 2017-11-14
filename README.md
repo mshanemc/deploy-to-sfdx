@@ -37,7 +37,6 @@ https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_de
 
 
 
-
 ---
 
 ## Local Setup (Mac...others, who knows?)

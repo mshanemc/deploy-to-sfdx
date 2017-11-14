@@ -6,6 +6,7 @@ const expressWs = require('express-ws');
 const bodyParser = require('body-parser');
 const logger = require('heroku-logger');
 // const cookieParser = require('cookie-parser');
+const ex = 'deployMsg';
 
 // const http = require('http');
 
@@ -81,30 +82,40 @@ app.listen(port, () => {
   logger.info(`Example app listening on port ${port}!`);
 });
 
-
 mq.then( (mqConn) => {
+  logger.debug('mq connection good');
+
 	let ok = mqConn.createChannel();
 	ok = ok.then((ch) => {
-		ch.assertQueue('deployMessages', { durable: true });
-		ch.consume('deployMessages', (msg) => {
-      // do a whole bunch of stuff here!
-      logger.debug('heard a message from the worker');
-      const parsedMsg = JSON.parse(msg.content.toString());
-      logger.debug(parsedMsg);
-      wsInstance.getWss().clients.forEach((client) => {
-        if (client.upgradeReq.url.includes(parsedMsg.deployId)){
-          client.send(msg.content.toString());
-          // close connection when ALLDONE
-          if (parsedMsg.content === 'ALLDONE'){
-            client.close();
+    logger.debug('channel created');
+    ch.assertExchange(ex, 'fanout', { durable: false })
+    .then( (exch) => {
+      logger.debug('exchange asserted');
+      return ch.assertQueue('', { exclusive: true });
+    }).then( (q) => {
+      logger.debug('queue asserted');
+      ch.bindQueue(q.queue, ex, '');
+      ch.consume(q.queue, (msg) => {
+        logger.debug('heard a message from the worker');
+        const parsedMsg = JSON.parse(msg.content.toString());
+        logger.debug(parsedMsg);
+        wsInstance.getWss().clients.forEach((client) => {
+          if (client.upgradeReq.url.includes(parsedMsg.deployId)) {
+            client.send(msg.content.toString());
+            // close connection when ALLDONE
+            if (parsedMsg.content === 'ALLDONE') {
+              client.close();
+            }
           }
-        }
-      });
+        });
 
-			ch.ack(msg);
-		}, { noAck: false });
-	});
-	return ok;
-
+        ch.ack(msg);
+      }, { noAck: false });
+    });
+  });
+  return ok;
+})
+.catch( (mqerr) => {
+  logger.error(`MQ error ${mqerr}`);
 });
 

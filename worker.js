@@ -9,6 +9,7 @@ const shellSanitize = require('./lib/shellSanitize');
 const logger = require('heroku-logger');
 
 const setTimeoutPromise = util.promisify(setTimeout);
+const ex = 'deployMsg';
 
 logger.debug('I am a worker and I am up!');
 
@@ -52,31 +53,35 @@ if (process.env.LOCAL_ONLY_KEY_PATH){
 // })
 
 // OK, we've got our environment prepared now.  Let's auth to our org and verify
-
 exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile ${keypath} --setdefaultdevhubusername -a deployBotHub`)
-.then( (result) => {
-	logResult(result);
-	return exec('sfdx force:org:display -u deployBotHub');
-})
-.then((result) => {
-	logResult(result);
-	return exec('sfdx force:org:list');
-})
+// .then( (result) => {
+// 	logResult(result);
+// 	return exec('sfdx force:org:display -u deployBotHub');
+// })
 .then( (result) => {
 	logResult(result);
 	return mq;
-})
-.then( (mqConn) => {
-	const visitor = ua(process.env.UA_ID || 0);
-
-	let ok = mqConn.createChannel();
-	ok = ok.then((ch) => {
+}).then( (mqConn) => {
+	return mqConn.createChannel();
+}).then( (ch) => {
+	//let ok = mqConn.createChannel();
+	//ok = ok.then((ch) => {
 		ch.assertQueue('deploys', { durable: true });
-		ch.assertQueue('deployMessages',{ durable: true });
+		//ch.assertQueue('deployMessages', { durable: true });
+		ch.assertExchange(ex, 'fanout', { durable: false }, (err, ok) => {
+			if (err){
+				logger.error(err);
+			}
+			if (ok){
+				logger.debug(ok);
+			}
+		});
+
 		ch.prefetch(1);
 
 		// this consumer eats deploys, creates local folders, and chops up the tasks into steps
 		ch.consume('deploys', (msg) => {
+			const visitor = ua(process.env.UA_ID || 0);
 			// do a whole bunch of stuff here!
 			logger.debug(msg);
 			const msgJSON = JSON.parse(msg.content.toString());
@@ -90,13 +95,13 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 				.then( (result) => {
 					// git outputs to stderr for unfathomable reasons
 					logger.debug(result.stderr);
-					ch.sendToQueue('deployMessages', bufferKey(result.stderr, msgJSON.deployId));
+					ch.publish(ex, '', bufferKey(result.stderr, msgJSON.deployId));
 					return exec(`cd tmp;cd ${msgJSON.deployId};ls`);
 				})
 				.then( (result) => {
 					logResult(result);
-					ch.sendToQueue('deployMessages', bufferKey('Cloning the repository', msgJSON.deployId));
-					// ch.sendToQueue('deployMessages', bufferKey(result.stdout, msgJSON.deployId));
+					ch.publish(ex, '', bufferKey('Cloning the repository', msgJSON.deployId));
+					// ch.publish(ex, '', bufferKey(result.stdout, msgJSON.deployId));
 					// grab the deploy script from the repo
 					logger.debug(`going to look in the directory tmp/${msgJSON.deployId}/orgInit.sh`);
 					if (fs.existsSync(`tmp/${msgJSON.deployId}/orgInit.sh`)){
@@ -109,7 +114,7 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 							logger.debug(`Line: ${line}`);
 
 							if (!shellSanitize(line)) {
-								ch.sendToQueue('deployMessages', bufferKey(`Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${line}`, msgJSON.deployId));
+								ch.publish(ex, '', bufferKey(`Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${line}`, msgJSON.deployId));
 								noFail = false;
 								rl.close();
 								ch.ack(msg);
@@ -118,13 +123,13 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 								logger.debug('empty line');
 							} else if (line.includes('-u ')) {
 								logger.debug('found a -u in a command line');
-								ch.sendToQueue('deployMessages', bufferKey(`Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${line}`, msgJSON.deployId));
+								ch.publish(ex, '', bufferKey(`Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${line}`, msgJSON.deployId));
 								noFail = false;
 								rl.close();
 								ch.ack(msg);
 								visitor.event('Repo Problems', 'line with -u', msgJSON.template).send();
 							} else if (!line.startsWith('sfdx') && !line.startsWith('#')){
-								ch.sendToQueue('deployMessages', bufferKey(`Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`, msgJSON.deployId));
+								ch.publish(ex, '', bufferKey(`Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`, msgJSON.deployId));
 								noFail = false;
 								rl.close();
 								ch.ack(msg);
@@ -161,27 +166,25 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 										}
 										try {
 											var lineResult = await exec(localLine);
-											logger.debug(lineResult.stderr);
 											if (lineResult.stdout){
 												logger.debug(lineResult.stdout);
-												ch.sendToQueue('deployMessages', bufferKey(lineResult.stdout, msgJSON.deployId));
+												ch.publish(ex, '', bufferKey(lineResult.stdout, msgJSON.deployId));
 											}
 											if (lineResult.stderr){
 												logger.error(lineResult.stderr);
-												ch.sendToQueue('deployMessages', bufferKey(lineResult.stderr, msgJSON.deployId));
+												ch.publish(ex, '', bufferKey(`ERROR ${lineResult.stderr}`, msgJSON.deployId));
 												visitor.event('deploy error', msgJSON.template, lineResult.stderr).send();
 											}
 										} catch (err) {
 											console.error('Error: ', err);
-											ch.sendToQueue('deployMessages', bufferKey(`Error: ${err}`, msgJSON.deployId));
+											ch.publish(ex, '', bufferKey(`ERROR: ${err}`, msgJSON.deployId));
 											visitor.event('deploy error', msgJSON.template, err).send();
-
 										}
 									}
 								};
 								executeLines(parsedLines)
 								.then( () => {
-									ch.sendToQueue('deployMessages', bufferKey('ALLDONE', msgJSON.deployId));
+									ch.publish(ex, '', bufferKey('ALLDONE', msgJSON.deployId));
 									visitor.event('deploy complete', msgJSON.template).send();
 									ch.ack(msg);
 
@@ -203,19 +206,19 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 							}
 						}); // end of on.close event
 					} else {
-						ch.sendToQueue('deployMessages', bufferKey('There is no orgInit.sh', msgJSON.deployId));
+						ch.publish(ex, '', bufferKey('There is no orgInit.sh', msgJSON.deployId));
 						visitor.event('Repo Problems', 'no orgInit.sh', msgJSON.template).send();
 					}
 				})
 				.catch( err => {
 					logger.error('Error: ', err);
+					// return an error message to the client!
+
 					ch.ack(msg);
 				});
 
 		}, { noAck: false });
-	});
-	return ok;
-
+		return;
 })
 .catch( (reason) => {
 	logger.error(reason);
