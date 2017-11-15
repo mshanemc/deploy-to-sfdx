@@ -1,37 +1,19 @@
 
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 const exec = require('child-process-promise').exec;
-const readline = require('readline');
 const fs = require('fs');
 const util = require('util');
 const ua = require('universal-analytics');
-const shellSanitize = require('./lib/shellSanitize');
+const lineRunner = require('./lib/lines');
 const logger = require('heroku-logger');
+const bufferKey = require('./lib/bufferKey');
+const logResult = require('./lib/logging');
+const lineParse = require('./lib/lineParse');
 
 const setTimeoutPromise = util.promisify(setTimeout);
 const ex = 'deployMsg';
 
 logger.debug('I am a worker and I am up!');
-
-//helper functions
-function bufferKey(content, deployId) {
-	const message = {
-		deployId,
-		content
-	};
-	return new Buffer(JSON.stringify(message));
-}
-
-function logResult(result){
-	if (result){
-		if (result.stderr){
-			logger.error(result.stderr);
-		}
-		if (result.stdout){
-			logger.debug(result.stdout);
-		}
-	}
-}
 
 let keypath;
 // where will our cert live?
@@ -46,28 +28,15 @@ if (process.env.LOCAL_ONLY_KEY_PATH){
 	keypath = '/app/tmp/server.key';
 }
 
-// const write = util.promisify(fs.writeFile);
-// write('/app/tmp/server.key', process.env.JWTKEY, {
-// 	encoding: "utf8",
-// 	flag: "wx"
-// })
-
 // OK, we've got our environment prepared now.  Let's auth to our org and verify
 exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile ${keypath} --setdefaultdevhubusername -a deployBotHub`)
-// .then( (result) => {
-// 	logResult(result);
-// 	return exec('sfdx force:org:display -u deployBotHub');
-// })
 .then( (result) => {
 	logResult(result);
 	return mq;
 }).then( (mqConn) => {
 	return mqConn.createChannel();
 }).then( (ch) => {
-	//let ok = mqConn.createChannel();
-	//ok = ok.then((ch) => {
 		ch.assertQueue('deploys', { durable: true });
-		//ch.assertQueue('deployMessages', { durable: true });
 		ch.assertExchange(ex, 'fanout', { durable: false }, (err, ok) => {
 			if (err){
 				logger.error(err);
@@ -77,7 +46,7 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 			}
 		});
 
-		ch.prefetch(1);
+		// ch.prefetch(1);
 
 		// this consumer eats deploys, creates local folders, and chops up the tasks into steps
 		ch.consume('deploys', (msg) => {
@@ -92,130 +61,66 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 
 			// clone repo into local fs
 			exec(`cd tmp;git clone ${msgJSON.template}.git ${msgJSON.deployId}`)
-				.then( (result) => {
-					// git outputs to stderr for unfathomable reasons
-					logger.debug(result.stderr);
-					ch.publish(ex, '', bufferKey(result.stderr, msgJSON.deployId));
-					return exec(`cd tmp;cd ${msgJSON.deployId};ls`);
-				})
-				.then( (result) => {
-					logResult(result);
-					ch.publish(ex, '', bufferKey('Cloning the repository', msgJSON.deployId));
-					// ch.publish(ex, '', bufferKey(result.stdout, msgJSON.deployId));
-					// grab the deploy script from the repo
-					logger.debug(`going to look in the directory tmp/${msgJSON.deployId}/orgInit.sh`);
-					if (fs.existsSync(`tmp/${msgJSON.deployId}/orgInit.sh`)){
-						let parsedLines = [];
-						let noFail = true;
-						const rl = readline.createInterface({
-							input: fs.createReadStream(`tmp/${msgJSON.deployId}/orgInit.sh`),
-							terminal: false
-						}).on('line', (line) => {
-							logger.debug(`Line: ${line}`);
+			.then( (result) => {
+				// git outputs to stderr for unfathomable reasons
+				logger.debug(result.stderr);
+				ch.publish(ex, '', bufferKey(result.stderr, msgJSON.deployId));
+				return exec(`cd tmp;cd ${msgJSON.deployId};ls`);
+			})
+			.then( (result) => {
+				logResult(result);
+				// ch.publish(ex, '', bufferKey('Cloning the repository', msgJSON.deployId));
+				// ch.publish(ex, '', bufferKey(result.stdout, msgJSON.deployId));
+				// grab the deploy script from the repo
+				logger.debug(`going to look in the directory tmp/${msgJSON.deployId}/orgInit.sh`);
 
-							if (!shellSanitize(line)) {
-								ch.publish(ex, '', bufferKey(`Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${line}`, msgJSON.deployId));
-								noFail = false;
-								rl.close();
-								ch.ack(msg);
-								visitor.event('Repo Problems', 'line with semicolons', msgJSON.template).send();
-							} else if (!line){
-								logger.debug('empty line');
-							} else if (line.includes('-u ')) {
-								logger.debug('found a -u in a command line');
-								ch.publish(ex, '', bufferKey(`Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${line}`, msgJSON.deployId));
-								noFail = false;
-								rl.close();
-								ch.ack(msg);
-								visitor.event('Repo Problems', 'line with -u', msgJSON.template).send();
-							} else if (!line.startsWith('sfdx') && !line.startsWith('#')){
-								ch.publish(ex, '', bufferKey(`Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`, msgJSON.deployId));
-								noFail = false;
-								rl.close();
-								ch.ack(msg);
-								visitor.event('Repo Problems', 'non-sfdx line', msgJSON.template).send();
-							} else {
-								logger.debug('line pushed');
-								parsedLines.push(`cd tmp;cd ${msgJSON.deployId};${line}`);
-							}
-						}).on('close', () => {
-							// you have all the parsed lines
-							logger.debug('in the close event');
-							logger.debug(parsedLines);
-							if (noFail){
-								logger.debug('no fail is true');
-								async function executeLines(lines) {
-									for(let line of lines) {
-										let localLine = line;
-										logger.debug(localLine);
-										// corrections and improvements for individual commands
-										if (localLine.includes('sfdx force:org:open') && !localLine.includes(' -r')) {
-											localLine = localLine + ' -r --json';
-											logger.debug('org open command : ' + localLine);
-											visitor.event('sfdx event', 'org open', msgJSON.template).send();
-										}
-										if (localLine.includes('sfdx force:user:password') && !localLine.includes(' --json')) {
-											localLine = localLine + ' --json';
-											logger.debug('org password command : ' + localLine);
-											visitor.event('sfdx event', 'password gen', msgJSON.template).send();
-										}
-										if (localLine.includes('sfdx force:org:create') && !localLine.includes(' --json')) {
-											localLine = localLine + ' --json';
-											logger.debug('org create command : ' + localLine);
-											visitor.event('sfdx event', 'org creation', msgJSON.template).send();
-										}
-										try {
-											var lineResult = await exec(localLine);
-											if (lineResult.stdout){
-												logger.debug(lineResult.stdout);
-												ch.publish(ex, '', bufferKey(lineResult.stdout, msgJSON.deployId));
-											}
-											if (lineResult.stderr){
-												logger.error(lineResult.stderr);
-												ch.publish(ex, '', bufferKey(`ERROR ${lineResult.stderr}`, msgJSON.deployId));
-												visitor.event('deploy error', msgJSON.template, lineResult.stderr).send();
-											}
-										} catch (err) {
-											console.error('Error: ', err);
-											ch.publish(ex, '', bufferKey(`ERROR: ${err}`, msgJSON.deployId));
-											visitor.event('deploy error', msgJSON.template, err).send();
-										}
-									}
-								};
-								executeLines(parsedLines)
-								.then( () => {
-									ch.publish(ex, '', bufferKey('ALLDONE', msgJSON.deployId));
-									visitor.event('deploy complete', msgJSON.template).send();
-									ch.ack(msg);
-
-									// clean up after a minute
-									return setTimeoutPromise(1000 * 60, 'foobar');
-								}).then((value) => {
-									exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
-								}).then((result) => {
-									logResult(result);
-								});
-							} else {
-								// deploy failed
-								setTimeoutPromise(1000 * 60, 'foobar')
-								.then((value) => {
-									exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
-								}).then((result) => {
-									logResult(result);
-								});
-							}
-						}); // end of on.close event
-					} else {
-						ch.publish(ex, '', bufferKey('There is no orgInit.sh', msgJSON.deployId));
-						visitor.event('Repo Problems', 'no orgInit.sh', msgJSON.template).send();
-					}
-				})
-				.catch( err => {
-					logger.error('Error: ', err);
-					// return an error message to the client!
-
+				// use the default file if there's not one
+				if (!fs.existsSync(`tmp/${msgJSON.deployId}/orgInit.sh`)) {
+					const parsedLines = [];
+					logger.debug('no orgInit.sh.  Will use default');
+					parsedLines.push(`cd tmp;cd ${msgJSON.deployId};sfdx force:org:create -f config/project-scratch-def.json -s -d 1`);
+					parsedLines.push(`cd tmp;cd ${msgJSON.deployId};sfdx force:source:push`);
+					parsedLines.push(`cd tmp;cd ${msgJSON.deployId};sfdx force:org:open`);
+					return parsedLines;
+				} else { // read the lines
+					logger.debug('found a orgInit.sh');
+					return lineParse(msgJSON, ch, visitor);
+				}
+			})
+			.then( (parsedLines) => {
+				logger.debug('these are the parsed lines:');
+				logger.debug(parsedLines);
+				// some kind of error occurred, already handled
+				if (!parsedLines) {
+					logger.error('line parsing failed');
 					ch.ack(msg);
-				});
+					return;
+				} else {
+					logger.debug('got back parsed lines');
+					let localLineRunner = new lineRunner(msgJSON, parsedLines, ch, visitor);
+					return localLineRunner.runLines();
+				}
+			})
+			.then( () => {
+				// this is true whether we errored or not
+				ch.publish(ex, '', bufferKey('ALLDONE', msgJSON.deployId));
+				visitor.event('deploy complete', msgJSON.template).send();
+				ch.ack(msg);
+
+				// clean up after a minute
+				return setTimeoutPromise(1000 * 60, 'foobar');
+			})
+			.then(() => {
+				// exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
+			})
+			.then((cleanResult) => {
+				logResult(cleanResult);
+			})
+			.catch((err) => {
+				logger.error('Error (worker.js): ', err);
+				ch.ack(msg);
+				// exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
+			});
 
 		}, { noAck: false });
 		return;
