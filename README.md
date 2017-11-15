@@ -35,7 +35,8 @@ https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_de
 ### optional
 * `UA_ID` for google analytics measurement protocol
 
-
+You can run it on heroku like this:
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https%3A%2F%2Fgithub.com%2Fmshanemc%2Fdeploy-to-sfdx)
 
 ---
 
