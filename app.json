@@ -1,5 +1,5 @@
 {
-  "name": "Deploy to Salesforce DX",
+  "name": "SFDX Public Deployer",
   "description": "An application that will deploy an SFDX project from a public Github repo",
   "repository": "https://github.com/mshanemc/deploy-to-sfdx",
   "logo": "",
@@ -22,11 +22,28 @@
       "value": ""
     }
   },
+  "formation": [
+    {
+      "web": {
+        "quantity": 1,
+        "size": "standard-1X"
+      }
+    },
+    {
+      "worker" : {
+        "quantity" : 1,
+        "size" : "standard-1X"
+      }
+    }
+  ],
   "buildpacks": [{
       "url": "https://github.com/wadewegner/salesforce-cli-buildpack"
     },
     {
       "url": "heroku/nodejs"
     }
-  ]
+  ],
+  "addons": [{
+      "plan": "cloudamqp:lemur"
+  }]
 }
