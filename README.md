@@ -77,7 +77,8 @@ if **hosted-scratch-qa** is the name of your app
 
 ## Example Repos with orgInit.sh scripts
 
-https://github.com/mshanemc/DF17integrationWorkshops
+https://github.com/mshanemc/DF17integrationWorkshops [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops)
+
 
 https://github.com/mshanemc/community-apps-workshop-df17
 
