@@ -5,7 +5,7 @@
 You have a dev hub, and an sfdx repo.  You'd like to let people spin up scratch orgs based on the repo, and these people might not feel like using a terminal, cloning the repo, loggin in to a dev hub, and executing sfdx commands.
 * because they might not be developers (think admins, or even end users in a training scenario)
 * because they might not be Salesforce developers (say you built an app and give your designer/CSS person github access to "make it cool")
-* because you might not want to give them dev hub access
+* because you might have dev hub access and you don't want to give it to them
 * because you want to let people test the app quickly
 * because (like me) you're using it for workshops and demos
 ---
@@ -35,7 +35,8 @@ https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_de
 ### optional
 * `UA_ID` for google analytics measurement protocol
 
-You can run it on heroku like this:
+Here's a heroku button so you can have your own instance of the Deployer
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https%3A%2F%2Fgithub.com%2Fmshanemc%2Fdeploy-to-sfdx)
 
 ---
