@@ -80,10 +80,10 @@ if **hosted-scratch-qa** is the name of your app
 https://github.com/mshanemc/DF17integrationWorkshops [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops)
 
 
-https://github.com/mshanemc/community-apps-workshop-df17
+https://github.com/mshanemc/community-apps-workshop-df17 [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/community-apps-workshop-df17)
 
-https://github.com/mshanemc/process-automation-workshop-df17
+https://github.com/mshanemc/process-automation-workshop-df17 [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/process-automation-workshop-df17)
 
-https://github.com/mshanemc/df17-community-content-workshop
+https://github.com/mshanemc/df17-community-content-workshop [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/df17-community-content-workshop)
 
-https://github.com/mshanemc/df17AppBuilding
+https://github.com/mshanemc/df17AppBuilding [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/df17AppBuilding)
