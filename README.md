@@ -40,6 +40,28 @@ Here's a heroku button so you can have your own instance of the Deployer
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https%3A%2F%2Fgithub.com%2Fmshanemc%2Fdeploy-to-sfdx)
 
 ---
+## Heroku setup
+
+The button will start this on free hobby dynos.  For real life, I'd recommend a pair of web 1x and a pair of workers at 1x.
+
+If you're going to be doing a lot of users (imagine a workshop where lots of people are pushing the button at the same time) you can scale out more workers so the people last in line don't have to wait so long.  Otherwise, it'll spin while the workers are busy processing the deploy request queue.
+
+---
+
+## Architectural overview
+
+Nodejs, express for the web server.
+When the web server receives a request, it creates a unique deployID (user-repo-timestamp) and a message on the deploy queue (using rabbitMQ)
+The server redirects the user to a web page which subscribes to a websocket
+
+When a worker starts up, it auths to a devhub via its environment variables.
+Then it listens to the deploy queue and executes jobs
+* clone the repo into local filestorage
+* execute the orgInit.sh script, or the default create/push/open flow if there isn't one
+* drop the output results of these steps into a broadcast exchange
+* delete the local folder and send the ALLDONE message
+
+All the web servers are subscribed to the broadcast exchange.  When they receive messages, they look at the deployID and send the messages down to the matching client.
 
 ## Local Setup (Mac...others, who knows?)
 

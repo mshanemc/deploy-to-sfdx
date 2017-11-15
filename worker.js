@@ -111,7 +111,7 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 				return setTimeoutPromise(1000 * 60, 'foobar');
 			})
 			.then(() => {
-				// exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
+				exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
 			})
 			.then((cleanResult) => {
 				logResult(cleanResult);
@@ -119,7 +119,7 @@ exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username
 			.catch((err) => {
 				logger.error('Error (worker.js): ', err);
 				ch.ack(msg);
-				// exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
+				exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
 			});
 
 		}, { noAck: false });
