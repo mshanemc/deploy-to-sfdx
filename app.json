@@ -19,16 +19,14 @@
   },
   "formation": [
     {
-      "web": {
-        "quantity": 1,
-        "size": "standard-1X"
-      }
+      "type" : "web",
+      "quantity": 1,
+      "size": "hobby"
     },
     {
-      "worker" : {
-        "quantity" : 1,
-        "size" : "standard-1X"
-      }
+      "type" :"worker",
+      "quantity" : 1,
+      "size" : "hobby"
     }
   ],
   "buildpacks": [{
