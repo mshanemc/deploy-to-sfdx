@@ -70,8 +70,14 @@ if **hosted-scratch-qa** is the name of your app
 
 `heroku ps:exec -a hosted-scratch-qa --dyno=worker.1` lets you ssh into the dyno of your choice and take a look around, clean stuff up, etc.
 
+---
+## Setting up a repo (optional)
 
+So you need a target repo to deploy (see examples below).  If your repo is simple, the tool will do the default behavior (create, push source, open).
 
+But with an orgInit.sh file, you can list out all your sfdx commands and they'll be executed by the deployer.  Remember, no bash metacharacters and only sfdx commands are allowed (We can't let anyone run any arbitrary command on our servers...security, yo!)
+
+That lets you create records, assign permsets, create users, install packages, run tests, generate passwords, and do anything you can do with an SFDX command
 
 ---
 
