@@ -28,8 +28,14 @@ if (process.env.LOCAL_ONLY_KEY_PATH){
 	keypath = '/app/tmp/server.key';
 }
 
+// load helpful plugins
+exec('echo y | sfdx plugins:install sfdx-msm-plugin')
+// auth to the hub
+.then( (result) => {
+	logResult(result);
+	return exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile ${keypath} --setdefaultdevhubusername -a deployBotHub`)
+})
 // OK, we've got our environment prepared now.  Let's auth to our org and verify
-exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile ${keypath} --setdefaultdevhubusername -a deployBotHub`)
 .then( (result) => {
 	logResult(result);
 	return mq;
