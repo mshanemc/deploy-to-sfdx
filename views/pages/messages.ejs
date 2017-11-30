@@ -109,6 +109,8 @@
 		displayContent = function(content){
 			// the login url
 			if (content.includes('ERROR: ')){
+				console.log('an error occurred');
+				console.log(content);
 				document.getElementById("errorBlock").setAttribute("style", "display : block");
 			} else if (content.includes('secur/frontdoor')){
 				console.log('This is the login url in JSON');
