@@ -102,7 +102,13 @@ But with an orgInit.sh file, you can list out all your sfdx commands and they'll
 That lets you create records, assign permsets, create users, install packages, run tests, generate passwords, and do anything you can do with an SFDX command
 
 ---
+## Launcher URLs
 
+There's not anything at / on the server.  The only page you care about is `/launch` which takes 1 parameter `template`
+
+So your path should be `https://whatever.herokuapp.com/launch?template=https://github.com/username/reponame`
+
+---
 ## Example Repos with orgInit.sh scripts
 
 https://github.com/mshanemc/DF17integrationWorkshops [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops)
