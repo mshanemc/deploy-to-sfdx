@@ -104,7 +104,7 @@ That lets you create records, assign permsets, create users, install packages, r
 ---
 ## Launcher URLs
 
-There's not anything at / on the server.  The only page you care about is `/launch` which takes 1 parameter `template`
+There's not anything at / on the server.  Don't worry.  The only page you care about is `/launch` which takes 1 parameter `template`
 
 So your path should be `https://whatever.herokuapp.com/launch?template=https://github.com/username/reponame`
 
