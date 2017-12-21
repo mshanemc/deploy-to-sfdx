@@ -6,6 +6,8 @@ const expressWs = require('express-ws');
 const bodyParser = require('body-parser');
 const logger = require('heroku-logger');
 // const cookieParser = require('cookie-parser');
+const msgBuilder = require('./lib/deployMsgBuilder');
+
 const ex = 'deployMsg';
 
 // const http = require('http');
@@ -28,22 +30,12 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 // app.use(cookieParser());
 app.get('/launch', (req, res) => {
-  // what are we deploying?
-  const repo = req.query.template.replace('https://github.com/', '').replace('/', '-');
-  // generate unique id for this deployment
-  const deployId = encodeURIComponent(`${repo}-${new Date().valueOf()}`);
-  logger.debug(`creating new deployId of ${deployId}`);
 
-  // drop a message
-  const message = {
-    deployId,
-    template : req.query.template
-  };
+  const message = msgBuilder(req.query.template);
   // analytics
   const visitor = ua(process.env.UA_ID);
   visitor.pageview('/launch').send();
   visitor.event('Repo', req.query.template).send();
-
 
   mq.then( (mqConn) => {
     let ok = mqConn.createChannel();
@@ -54,7 +46,7 @@ app.get('/launch', (req, res) => {
     return ok;
   }).then( () => {
     // return the deployId page
-    return res.redirect(`/deploying/${deployId}`);
+    return res.redirect(`/deploying/${message.deployId}`);
   }, (mqerr) => {
     logger.error(mqerr);
     return res.redirect('/error', {

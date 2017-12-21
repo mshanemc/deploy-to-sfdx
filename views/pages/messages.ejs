@@ -108,7 +108,7 @@
 
 		displayContent = function(content){
 			// the login url
-			if (content.includes('ERROR: ')){
+			if (content.includes('ERROR')){
 				console.log('an error occurred');
 				console.log(content);
 				document.getElementById("errorBlock").setAttribute("style", "display : block");
@@ -127,23 +127,23 @@
 			} else if (content.includes('pushedSource')) {
 
 				defaultContent('Source Pushed');
-				// let's create an array to share
-				var element = document.getElementById("status");
-				var para = document.createElement("p");
-				para.classList.add('slds-m-vertical_medium');
-				var ul = document.createElement("ul");
-				ul.classList.add('slds-list_vertical');
+				// // let's create an array to share
+				// var element = document.getElementById("status");
+				// var para = document.createElement("p");
+				// para.classList.add('slds-m-vertical_medium');
+				// var ul = document.createElement("ul");
+				// ul.classList.add('slds-list_vertical');
 
-				let goodstuff = JSON.parse(content);
-				for (let line of goodstuff.result.pushedSource){
-					var li = document.createElement("li");
-					var node = document.createTextNode(line.state + ' ' + line.fullName + ' (' + line.type + ')' );
-					li.appendChild(node);
-					ul.appendChild(li);
-				}
-				para.appendChild(ul);
-				var element = document.getElementById("status");
-				element.appendChild(para);
+				// let goodstuff = JSON.parse(content);
+				// for (let line of goodstuff.result.pushedSource){
+				// 	var li = document.createElement("li");
+				// 	var node = document.createTextNode(line.state + ' ' + line.fullName + ' (' + line.type + ')' );
+				// 	li.appendChild(node);
+				// 	ul.appendChild(li);
+				// }
+				// para.appendChild(ul);
+				// var element = document.getElementById("status");
+				// element.appendChild(para);
 				//refId
 			} else if (content.includes('Permsets Assigned')) {
 				defaultContent('Assigned Perm Sets (see console logs for details)');

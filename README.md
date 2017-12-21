@@ -34,6 +34,10 @@ https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_de
 
 ### optional
 * `UA_ID` for google analytics measurement protocol
+* `GITHUB_USERNAME_WHITELIST` lets you whitelist usernames.  It's a comma-separated list.  Ex: `mshanemc,andrew,bebraw`
+* `GITHUB_REPO_WHITELIST` lets you whitelist username/repo combinations.  It's a comma-separated list. Ex: `mshanemc/DF17integrationWorkshops,torvalds/linux`
+
+What's whitelisting do?  Normally, this app will parse your orgInit.sh and throw an error if you're doing any funny business.  BUT if you're on the whitelist, the app owner trusts you and you can do things with bash metacharacters (think &&, |, >) and execute non-sfdx commands  (grep, rm, whatever!) etc.  BE CAREFUL!
 
 Here's a heroku button so you can have your own instance of the Deployer
 
@@ -107,6 +111,8 @@ That lets you create records, assign permsets, create users, install packages, r
 There's not anything at / on the server.  Don't worry.  The only page you care about is `/launch` which takes 1 parameter `template`
 
 So your path should be `https://whatever.herokuapp.com/launch?template=https://github.com/username/reponame`
+
+Also handles branches on github, like `https://whatever.herokuapp.com/launch?template=https://github.com/username/reponame/tree/somebranch`
 
 ---
 ## Example Repos with orgInit.sh scripts
