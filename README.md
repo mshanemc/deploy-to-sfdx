@@ -112,6 +112,8 @@ There's not anything at / on the server.  Don't worry.  The only page you care a
 
 So your path should be `https://whatever.herokuapp.com/launch?template=https://github.com/username/reponame`
 
+Also handles branches on github, like `https://whatever.herokuapp.com/launch?template=https://github.com/username/reponame/tree/somebranch`
+
 ---
 ## Example Repos with orgInit.sh scripts
 
