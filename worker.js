@@ -33,15 +33,16 @@ exec('echo y | sfdx plugins:install sfdx-msm-plugin')
 // auth to the hub
 .then( (result) => {
 	logResult(result);
-	return exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile ${keypath} --setdefaultdevhubusername -a deployBotHub`)
-})
-// OK, we've got our environment prepared now.  Let's auth to our org and verify
+	return exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile ${keypath} --setdefaultdevhubusername -a deployBotHub`);
+})  // OK, we've got our environment prepared now.  Let's auth to our org and verify
 .then( (result) => {
 	logResult(result);
 	return mq;
-}).then( (mqConn) => {
+})
+.then( (mqConn) => {
 	return mqConn.createChannel();
-}).then( (ch) => {
+})
+.then( (ch) => {
 		ch.assertQueue('deploys', { durable: true });
 		ch.assertExchange(ex, 'fanout', { durable: false }, (err, ok) => {
 			if (err){
@@ -66,7 +67,16 @@ exec('echo y | sfdx plugins:install sfdx-msm-plugin')
 			visitor.event('Deploy Request', msgJSON.template).send();
 
 			// clone repo into local fs
-			exec(`cd tmp;git clone ${msgJSON.template}.git ${msgJSON.deployId}`)
+			// checkout only the specified branch, if specified
+			let gitCloneCmd;
+			if (msgJSON.branch){
+				logger.debug('It is a branch!');
+				gitCloneCmd = `cd tmp;git clone -b ${msgJSON.branch} --single-branch https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
+				logger.debug(gitCloneCmd);
+			} else {
+				gitCloneCmd = `cd tmp;git clone https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
+			}
+			exec(gitCloneCmd)
 			.then( (result) => {
 				// git outputs to stderr for unfathomable reasons
 				logger.debug(result.stderr);
