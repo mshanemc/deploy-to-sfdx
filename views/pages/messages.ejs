@@ -108,7 +108,7 @@
 
 		displayContent = function(content){
 			// the login url
-			if (content.includes('ERROR: ')){
+			if (content.includes('ERROR')){
 				console.log('an error occurred');
 				console.log(content);
 				document.getElementById("errorBlock").setAttribute("style", "display : block");
