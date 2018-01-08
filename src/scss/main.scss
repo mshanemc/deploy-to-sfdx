@@ -17,6 +17,12 @@ a.sfdx-logo:visited {
 }
 
 /* START SFDX Specific Styles */
+
+a#loginUrl {
+	color: initial;
+	text-decoration: initial;
+}
+
 .sfdx-button_large {
 	width: 100%;
 	padding: $spacing-xx-small $spacing-medium;
