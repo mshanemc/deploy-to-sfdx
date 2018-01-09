@@ -1,5 +1,5 @@
-import { config } from '../../Library/Caches/typescript/2.6/node_modules/@types/bluebird';
-import { writeFileSync } from 'fs';
+// import { config } from '../../Library/Caches/typescript/2.6/node_modules/@types/bluebird';
+// import { writeFileSync } from 'fs';
 
 
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
