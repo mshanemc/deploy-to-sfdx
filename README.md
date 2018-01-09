@@ -116,6 +116,9 @@ So your path should be `https://whatever.herokuapp.com/launch?template=https://g
 
 Also handles branches on github, like `https://whatever.herokuapp.com/launch?template=https://github.com/username/reponame/tree/somebranch`
 
+You can optionally pass in an `email` parameter so that the emails go to someone who's not the hub owner :)
+`https://whatever.herokuapp.com/launch?template=https://github.com/username/reponame&email=shane.mclaughlin@salesforce.com`
+
 ---
 ## Example Repos with orgInit.sh scripts
 
