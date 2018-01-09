@@ -1,7 +1,3 @@
-// import { config } from '../../Library/Caches/typescript/2.6/node_modules/@types/bluebird';
-// import { writeFileSync } from 'fs';
-
-
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 const exec = require('child-process-promise').exec;
 const fs = require('fs');
@@ -33,6 +29,10 @@ if (process.env.LOCAL_ONLY_KEY_PATH){
 
 // load helpful plugins
 exec('echo y | sfdx plugins:install sfdx-msm-plugin')
+.catch( (alreadyExists) => {
+	console.log(alreadyExists);
+	return { stdout : 'plugin already installed' };
+})
 // auth to the hub
 .then( (result) => {
 	logResult(result);
@@ -79,6 +79,7 @@ exec('echo y | sfdx plugins:install sfdx-msm-plugin')
 			} else {
 				gitCloneCmd = `cd tmp;git clone https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
 			}
+
 			exec(gitCloneCmd)
 			.then( (result) => {
 				// git outputs to stderr for unfathomable reasons

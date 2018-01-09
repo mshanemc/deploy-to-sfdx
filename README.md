@@ -88,6 +88,8 @@ which you'll start up with
 then start this app with
 `heroku local`
 
+You can also run some local integration tests using mocha.  See /tests and use `mocha --watch tests/`
+
 ---
 ## Debugging on [non-local] Heroku
 if **hosted-scratch-qa** is the name of your app
@@ -127,3 +129,6 @@ https://github.com/mshanemc/process-automation-workshop-df17 [![Deploy](https://
 https://github.com/mshanemc/df17-community-content-workshop [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/df17-community-content-workshop)
 
 https://github.com/mshanemc/df17AppBuilding [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/df17AppBuilding)
+
+email example:
+http://localhost:8543/launch?template=https://github.com/mshanemc/df17IntegrationWorkshops&email=shane.mclaughlin@salesforce.com
