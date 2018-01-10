@@ -31,7 +31,7 @@ app.set('view engine', 'ejs');
 // app.use(cookieParser());
 app.get('/launch', (req, res) => {
 
-  const message = msgBuilder(req.query.template);
+  const message = msgBuilder(req.query);
   // analytics
   const visitor = ua(process.env.UA_ID);
   visitor.pageview('/launch').send();

@@ -8,13 +8,16 @@ const msgBuilder = require('./../lib/deployMsgBuilder');
 
 describe('urlTestsMaster', function () {
 	it('handles master repos', function () {
-		const url = 'https://github.com/mshanemc/cg4Integrate';
 
-		expect(msgBuilder(url).repo).to.equal('cg4Integrate');
-		expect(msgBuilder(url).username).to.equal('mshanemc');
-		expect(msgBuilder(url).branch).to.be.an('undefined');
+		const req = {
+			template: 'https://github.com/mshanemc/cg4Integrate'
+		};
 
-		const message = msgBuilder(url);
+		expect(msgBuilder(req).repo).to.equal('cg4Integrate');
+		expect(msgBuilder(req).username).to.equal('mshanemc');
+		expect(msgBuilder(req).branch).to.be.an('undefined');
+
+		const message = msgBuilder(req);
 		assert.isOk(message.deployId);
 		// username-repo-timestamp
 		assert(message.deployId.split('-').length === 3, `invalid deploytId ${message.deployId}`);
@@ -26,12 +29,46 @@ describe('urlTestsMaster', function () {
 
 describe('urlTestsBranch', function () {
 	it('handles branch repos', function () {
-		const url = 'https://github.com/mshanemc/cg4Integrate/tree/passwordSet';
-		expect(msgBuilder(url).username).to.equal('mshanemc');
-		expect(msgBuilder(url).repo).to.equal('cg4Integrate');
-		expect(msgBuilder(url).branch).to.equal('passwordSet');
 
-		const message = msgBuilder(url);
+		const req = {
+			template: 'https://github.com/mshanemc/cg4Integrate/tree/passwordSet'
+		};
+
+		expect(msgBuilder(req).username).to.equal('mshanemc');
+		expect(msgBuilder(req).repo).to.equal('cg4Integrate');
+		expect(msgBuilder(req).branch).to.equal('passwordSet');
+		expect(msgBuilder(req).firstname).to.be.an('undefined');
+		expect(msgBuilder(req).lastname).to.be.an('undefined');
+		expect(msgBuilder(req).email).to.be.an('undefined');
+
+		const message = msgBuilder(req);
+		assert.isOk(message.deployId);
+		// username-repo-timestamp
+		assert(message.deployId.split('-').length === 3, `invalid deploytId ${message.deployId}`);
+		assert(message.deployId.split('-')[0] === message.username, 'incorrect username for deployId');
+		assert(message.deployId.split('-')[1] === message.repo, 'incorrect repo for deployId');
+
+	});
+});
+
+describe('userinfo', function () {
+	it('handles email, firstname, lastname', function () {
+
+		const req = {
+			template: 'https://github.com/mshanemc/cg4Integrate/tree/passwordSet',
+			firstname: 'shane',
+			lastname: 'mclaughlin',
+			email : 'shane.mclaughlin@salesforce.com'
+		};
+
+		expect(msgBuilder(req).username).to.equal('mshanemc');
+		expect(msgBuilder(req).repo).to.equal('cg4Integrate');
+		expect(msgBuilder(req).branch).to.equal('passwordSet');
+		expect(msgBuilder(req).firstname).to.equal('shane');
+		expect(msgBuilder(req).lastname).to.equal('mclaughlin');
+		expect(msgBuilder(req).email).to.equal('shane.mclaughlin@salesforce.com');
+
+		const message = msgBuilder(req);
 		assert.isOk(message.deployId);
 		// username-repo-timestamp
 		assert(message.deployId.split('-').length === 3, `invalid deploytId ${message.deployId}`);

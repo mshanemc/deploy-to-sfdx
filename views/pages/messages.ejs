@@ -6,21 +6,28 @@
 	<div id="loginBlock" style="display: none;">
 		<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
 
+			<p class="slds-m-around_large"><strong>Note:</strong> It can take up to 5 minutes for the my domain DNS to propogate. If the scratch org doesn't load, refresh it in a few minutes.</p>
+
 			<div class="slds-notify slds-notify_toast slds-theme_success" role="alert">
 				<span class="slds-assistive-text">warning</span>
 
 				<div class="slds-notify__content">
-					<h2 class="slds-text-heading_small ">Nice! Your app has been deployed! You can access it at: <strong><a id="loginUrl" target="_blank" href=""></a></strong></h2>
+					<h2 class="slds-text-heading_small slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+						Your org is ready!
+						<a id="loginUrl" target="_blank" href="" class="slds-button slds-button_neutral">Launch</a></h2>
 				</div>
 			</div>
 
-			<p class="slds-m-around_large"><strong>Note:</strong> It can take up to 5 minutes for the my domain DNS to propogate. If the scratch org doesn't load, refresh it in a few minutes.</p>
 
 		</div>
 	</div>
 
 	<div id="passwordBlock" style="display: none;">
 		<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
+
+			<p class="slds-m-around_large">
+				<strong>Note:</strong> Use the button above to login for the first time.  These credentials are for other uses (mobile app, integrations).  Be sure that you're logging in via sandbox (test.salesforce.com) and not production.
+			</p>
 
 			<div class="slds-notify slds-notify_toast" role="alert">
 				<span class="slds-assistive-text">warning</span>
@@ -117,7 +124,7 @@
 				let goodstuff = JSON.parse(content);
 				var link = document.getElementById("loginUrl");
 				link.href = goodstuff.result.url;
-				link.innerHTML = goodstuff.result.url;
+				// link.innerHTML = goodstuff.result.url;
 				document.getElementById("loginBlock").setAttribute("style", "display : block");
 			} else if (content.includes('password')) {
 				let goodstuff = JSON.parse(content);

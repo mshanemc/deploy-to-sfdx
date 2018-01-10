@@ -1,4 +1,3 @@
-
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 const exec = require('child-process-promise').exec;
 const fs = require('fs');
@@ -30,6 +29,10 @@ if (process.env.LOCAL_ONLY_KEY_PATH){
 
 // load helpful plugins
 exec('echo y | sfdx plugins:install sfdx-msm-plugin')
+.catch( (alreadyExists) => {
+	console.log(alreadyExists);
+	return { stdout : 'plugin already installed' };
+})
 // auth to the hub
 .then( (result) => {
 	logResult(result);
@@ -76,12 +79,26 @@ exec('echo y | sfdx plugins:install sfdx-msm-plugin')
 			} else {
 				gitCloneCmd = `cd tmp;git clone https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
 			}
+
 			exec(gitCloneCmd)
 			.then( (result) => {
 				// git outputs to stderr for unfathomable reasons
 				logger.debug(result.stderr);
 				ch.publish(ex, '', bufferKey(result.stderr, msgJSON.deployId));
 				return exec(`cd tmp;cd ${msgJSON.deployId};ls`);
+			})
+			.then( (result) => {
+				// if you passed in a custom email address, we need to edit the config file and add the adminEmail property
+				if (msgJSON.email){
+					console.log('write a file for custom email address');
+					const location = `tmp/${msgJSON.deployId}/config/project-scratch-def.json`;
+					const configFileJSON = JSON.parse(fs.readFileSync(location, 'utf8'));
+					configFileJSON.adminEmail = msgJSON.email;
+					fs.writeFileSync(location, JSON.stringify(configFileJSON), 'utf8');
+					return result;
+				} else {
+					return result;
+				}
 			})
 			.then( (result) => {
 				logResult(result);
