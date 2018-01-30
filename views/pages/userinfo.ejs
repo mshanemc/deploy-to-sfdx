@@ -1,0 +1,24 @@
+<% include ../partials/head %>
+
+<main class="slds-card">
+	Your email address will be used on the demo.  It's not stored anywhere else.
+	<div class="slds-form-element">
+		<label class="slds-form-element__label" for="input-unique-id">Email</label>
+		<div class="slds-form-element__control">
+			<input type="email" id="email" class="slds-input" />
+		</div>
+	</div>
+	<button class="slds-button" onclick="launch()">Go</button>
+	<div class="slds-hide" id="template"><%= template %></div>
+</main>
+
+<script>
+	// put the email address from the field into the button link
+	function launch(){
+		const template = document.getElementById('template');
+		const email = document.getElementById('email');
+		window.location.assign('/launch?template='+template+'&email='+email);
+	}
+</script>
+
+<% include ../partials/footer %>
