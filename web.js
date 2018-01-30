@@ -33,14 +33,14 @@ app.get('/launch', (req, res) => {
 
   // allow repos to require the email parameter
   if (req.query.email === 'required'){
-    res.render('userinfo', {
+    res.render('pages/userinfo', {
       template: req.query.template
     });
   }
 
   // no template?  does not compute!
   if (!req.query.template) {
-    res.render('error', {
+    res.render('pages/error', {
       customError: 'There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo'
     });
   }
@@ -63,7 +63,7 @@ app.get('/launch', (req, res) => {
     return res.redirect(`/deploying/${message.deployId}`);
   }, (mqerr) => {
     logger.error(mqerr);
-    return res.redirect('/error', {
+    return res.redirect('pages/error', {
       customError : mqerr
     });
   });
