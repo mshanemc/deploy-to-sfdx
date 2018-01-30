@@ -119,6 +119,7 @@ Also handles branches on github, like `https://whatever.herokuapp.com/launch?tem
 You can optionally pass in an `email` parameter so that the emails go to someone who's not the hub owner :)
 `https://whatever.herokuapp.com/launch?template=https://github.com/username/reponame&email=shane.mclaughlin@salesforce.com`
 
+You can pass in `&email=required` to force user to a form where they add their email.  This is useful if they need to deal with emails from the org, or password resets, or security challenges, etc.
 ---
 ## Example Repos with orgInit.sh scripts
 
