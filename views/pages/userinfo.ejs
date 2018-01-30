@@ -23,8 +23,10 @@
 		console.log('template is ' + template);
 		const email = document.getElementById('email').value;
 		console.log('email is ' + email);
+		const url = '/launch?template=' + template + '&email=' + email;
+		console.log(url);
 
-		window.location.assign('/launch?template='+template+'&email='+email);
+		// window.location.assign(url);
 	}
 </script>
 
