@@ -19,9 +19,9 @@
 <script>
 	// put the email address from the field into the button link
 	function launch(){
-		const template = document.getElementById('template');
+		const template = document.getElementById('template').innerText;
 		console.log('template is ' + template);
-		const email = document.getElementById('email');
+		const email = document.getElementById('email').value;
 		console.log('email is ' + email);
 
 		window.location.assign('/launch?template='+template+'&email='+email);
