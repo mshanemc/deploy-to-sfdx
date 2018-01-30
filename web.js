@@ -69,7 +69,7 @@ app.get('/launch', (req, res) => {
   });
 });
 
-app.get('userinfo', (req, res) => {
+app.get('/userinfo', (req, res) => {
   res.render('pages/userinfo', {
     template: req.query.template
   });
