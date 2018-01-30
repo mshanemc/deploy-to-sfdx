@@ -33,14 +33,14 @@ app.get('/launch', (req, res) => {
 
   // allow repos to require the email parameter
   if (req.query.email === 'required'){
-    res.render('pages/userinfo', {
+    return res.render('pages/userinfo', {
       template: req.query.template
     });
   }
 
   // no template?  does not compute!
   if (!req.query.template) {
-    res.render('pages/error', {
+    return res.render('pages/error', {
       customError: 'There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo'
     });
   }
