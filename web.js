@@ -31,10 +31,13 @@ app.set('view engine', 'ejs');
 // app.use(cookieParser());
 
 app.post('/launch', (req, res) => {
-  console.log(req.body);
-  return res.redirect('pages/error', {
-    customError: 'Accepted a post!'
-  });
+  console.log(req.body.UserFirstName);
+  console.log(req.body.UserLastName);
+  console.log(req.body.UserEmail);
+  const message = {
+    deployId : 'test-from-form'
+  };
+  return res.redirect(307, `/deploying/${message.deployId}`);
 });
 
 app.get('/launch', (req, res) => {
