@@ -29,6 +29,14 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 // app.use(cookieParser());
+
+app.post('launch', (req, res) => {
+  console.log(req.body);
+  return res.redirect('pages/error', {
+    customError: 'Accepted a post!'
+  });
+});
+
 app.get('/launch', (req, res) => {
 
   // allow repos to require the email parameter
