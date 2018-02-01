@@ -37,7 +37,7 @@ app.post('/launch', (req, res) => {
   const message = {
     deployId : 'test-from-form'
   };
-  return res.redirect(307, `/deploying/${message.deployId}`);
+  return res.redirect(`/deploying/${message.deployId}`);
 });
 
 app.get('/launch', (req, res) => {
