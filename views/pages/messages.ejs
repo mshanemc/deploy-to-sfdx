@@ -1,5 +1,12 @@
 <% include ../partials/head %>
 
+<%if (format == 'trial') { %>
+	<div>
+		This is a trial version of the deployer waiting page
+	</div>
+<% } %>
+
+<%if (format == 'deployer') { %>
 <main class="slds-card">
 	<div id="loaderBlock"><h2 class="slds-text-heading_medium slds-p-top_medium slds-p-bottom_medium sfdx-wrap"><img src="../dist/assets/images/loader.gif" style="width:27px;" /> Deploying <strong id="deployId"><%= deployId %></strong></h2></div>
 
@@ -61,6 +68,11 @@
 	</div>
 
 	<div id="status" class="slds-m-bottom_small sfdx-output"></div>
+
+	<% } %>
+	<!-- end of regular deployer view -->
+
+
 	<script>
 		// works for both http and https
 		const HOST = location.href.replace(/^http/, 'ws');

@@ -30,14 +30,35 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 // app.use(cookieParser());
 
-app.post('/launch', (req, res) => {
-  console.log(req.body.UserFirstName);
-  console.log(req.body.UserLastName);
-  console.log(req.body.UserEmail);
-  const message = {
-    deployId : 'test-from-form'
-  };
-  return res.redirect(`/deploying/${message.deployId}`);
+app.post('/trial', (req, res) => {
+  const message = msgBuilder(req.query);
+  console.log(message);
+
+  // assign the email from the post field because it wasn't in the query string
+  message.email = req.body.UserEmail;
+  // console.log(req.body.UserFirstName);
+  // console.log(req.body.UserLastName);
+
+  const visitor = ua(process.env.UA_ID);
+  visitor.pageview('/trial').send();
+  visitor.event('Repo', req.query.template).send();
+
+  mq.then((mqConn) => {
+    let ok = mqConn.createChannel();
+    ok = ok.then((ch) => {
+      ch.assertQueue('deploys', { durable: true });
+      ch.sendToQueue('deploys', new Buffer(JSON.stringify(message)));
+    });
+    return ok;
+  }).then(() => {
+    return res.redirect(`/deploying/trial/${message.deployId}`);
+  }, (mqerr) => {
+    logger.error(mqerr);
+    return res.redirect('pages/error', {
+      customError: mqerr
+    });
+  });
+
 });
 
 app.get('/launch', (req, res) => {
@@ -71,7 +92,7 @@ app.get('/launch', (req, res) => {
     return ok;
   }).then( () => {
     // return the deployId page
-    return res.redirect(`/deploying/${message.deployId}`);
+    return res.redirect(`/deploying/deployer/${message.deployId}`);
   }, (mqerr) => {
     logger.error(mqerr);
     return res.redirect('pages/error', {
@@ -86,12 +107,14 @@ app.get('/userinfo', (req, res) => {
   });
 });
 
-app.get('/deploying/:deployId', (req, res) => {
-  // show the page with .io to subscribe to a topic
-  res.render('pages/messages', { deployId: req.params.deployId });
+app.get('/deploying/:format/:deployId', (req, res) => {
+  res.render('pages/messages', {
+    deployId: req.params.deployId,
+    format: req.params.format
+  });
 });
 
-app.ws('/deploying/:deployId', (ws, req) => {
+app.ws('/deploying/:format/:deployId', (ws, req) => {
     logger.debug('client connected!');
     // ws.send('welcome to the socket!');
     ws.on('close', () => logger.info('Client disconnected'));
@@ -99,7 +122,6 @@ app.ws('/deploying/:deployId', (ws, req) => {
 );
 
 const port = process.env.PORT || 8443;
-
 
 app.listen(port, () => {
   logger.info(`Example app listening on port ${port}!`);
