@@ -31,6 +31,14 @@ body {
     display: flex;
     flex-direction: column;
 		align-items: center;
-		margin-top: 20px;
+		margin-top: 50px;
 		justify-content: space-around;
+}
+
+.trialContent .imgwrapper {
+	flex-grow: 10;
+}
+
+.trialContent .imgwrapper img {
+	height: 100%;
 }
