@@ -5,7 +5,12 @@ a#loginUrl {
 
 body {
 	margin:0px;
+	font-family: SalesforceSansRegular,Arial,sans-serif;
+	color: #666;
+	font-size: 15px;
+	line-height: 160%;
 }
+
 .sfheader{
 	height: 110px;
 	display: flex;
