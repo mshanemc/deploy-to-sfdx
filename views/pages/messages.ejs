@@ -34,14 +34,14 @@
 
 
 <%if (format == 'trial') { %>
-	<div>
-		We're getting your trial ready...it'll open when it's ready.
-	</div>
+	<% include ../partials/sfdxHead %>
+	<div>We're settingup your Salesforce trial your trial. </div>
+	<img src="https://a.sfdcstatic.com/content/dam/www/ocms-backup/common/assets/images/cloud.loader.gif" alt="loading cloud"	/>
+	<div>You'll be logged in momentarily.</div>
 
 	<script>
 		ws.onmessage = function (event) {
 			msgCounter++;
-			console.log('heard an event');
 			let parsedData;
 			try {
 				parsedData = JSON.parse(event.data);
