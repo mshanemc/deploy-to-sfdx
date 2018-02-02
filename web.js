@@ -30,7 +30,7 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 // app.use(cookieParser());
 
-app.post('/launch', (req, res) => {
+app.post('/trial', (req, res) => {
   const message = msgBuilder(req.query);
   console.log(message);
 
