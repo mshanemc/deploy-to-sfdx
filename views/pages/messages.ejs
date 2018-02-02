@@ -54,12 +54,24 @@
 			if (parsedData) {
 				if (parsedData.deployId === deployId) {
 					console.log(parsedData);
-					displayContent(parsedData.content);
-				} else {
-					console.log('not mine');
-					console.log(parsedData);
+					if (parsedData.content.includes('secur/frontdoor')){
+						console.log('This is the login url in JSON');
+						let goodstuff = JSON.parse(parsedData.content);
+						console.log('url is ' + goodstuff.result.url);
+						window.location.replace(goodstuff.result.url);
+					}
+					//displayContent(parsedData.content);
 				}
 			}
+
+			// if (parsedData.content.includes('secur/frontdoor')) {
+			// 	console.log('This is the login url in JSON');
+			// 	let goodstuff = JSON.parse(content);
+			// 	var link = document.getElementById("loginUrl");
+			// 	link.href = goodstuff.result.url;
+			// 	// link.innerHTML = goodstuff.result.url;
+			// 	document.getElementById("loginBlock").setAttribute("style", "display : block");
+			// }
 		};
 	</script>
 <% } %>
