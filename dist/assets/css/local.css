@@ -36,7 +36,7 @@ body {
 }
 
 .trialContent .imgwrapper {
-	flex-grow: 10;
+	flex-grow: 5;
 }
 
 .trialContent .imgwrapper img {
