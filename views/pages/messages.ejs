@@ -1,7 +1,94 @@
-<% include ../partials/head %>
+<!-- common stuff for all page versions -->
+<div id="common">
 
+	<div id="deployId" style="display:none"><%= deployId %></div>
+
+	<script>
+		const HOST = location.href.replace(/^http/, 'ws');
+		let msgCounter = 0;
+		console.log(HOST);
+
+		const deployIdInput = document.getElementById('deployId');
+		console.log(deployIdInput);
+
+		const deployId = deployIdInput.innerText;
+		console.log(deployId);
+
+		const ws = new WebSocket(HOST);
+		let pinger;
+
+		ws.onopen = function () {
+			console.log('WS is open!');
+			pinger = setInterval(function () {
+				ws.send('ping');
+			}, 5000);
+		};
+
+		ws.onclose = function () {
+			console.log('WS is closing');
+			clearInterval(pinger);
+		}
+	</script>
+
+</div>
+
+
+<%if (format == 'trial') { %>
+	<% include ../partials/sfdcHead %>
+	<header class="sfheader">
+		<img class="sflogo" src="https://c1.sfdcstatic.com/content/dam/web/en_us/www/images/home/logo-salesforce.svg" />
+	</header>
+
+	<div class="bluebar"></div>
+
+	<div class="trialContent">
+		<div class="trialText">We're setting up your Salesforce Plaform trial.</div>
+		<div class="imgwrapper">
+			<img src="https://a.sfdcstatic.com/content/dam/www/ocms-backup/common/assets/images/cloud.loader.gif" alt="loading cloud"	/>
+		</div>
+		<div class="trialText">You'll be logged in momentarily.</div>
+	</div>
+
+	<script>
+		ws.onmessage = function (event) {
+			msgCounter++;
+			let parsedData;
+			try {
+				parsedData = JSON.parse(event.data);
+			} catch (err) {
+				console.log('unparseable message (not JSON)');
+				console.log(event.data);
+			}
+			if (parsedData) {
+				if (parsedData.deployId === deployId) {
+					console.log(parsedData);
+					if (parsedData.content.includes('secur/frontdoor')){
+						console.log('This is the login url in JSON');
+						let goodstuff = JSON.parse(parsedData.content);
+						console.log('url is ' + goodstuff.result.url);
+						window.location.href = goodstuff.result.url;
+					}
+					//displayContent(parsedData.content);
+				}
+			}
+
+			// if (parsedData.content.includes('secur/frontdoor')) {
+			// 	console.log('This is the login url in JSON');
+			// 	let goodstuff = JSON.parse(content);
+			// 	var link = document.getElementById("loginUrl");
+			// 	link.href = goodstuff.result.url;
+			// 	// link.innerHTML = goodstuff.result.url;
+			// 	document.getElementById("loginBlock").setAttribute("style", "display : block");
+			// }
+		};
+	</script>
+<% } %>
+
+
+<%if (format == 'deployer') { %>
+<% include ../partials/head %>
 <main class="slds-card">
-	<div id="loaderBlock"><h2 class="slds-text-heading_medium slds-p-top_medium slds-p-bottom_medium sfdx-wrap"><img src="../dist/assets/images/loader.gif" style="width:27px;" /> Deploying <strong id="deployId"><%= deployId %></strong></h2></div>
+	<div id="loaderBlock"><h2 class="slds-text-heading_medium slds-p-top_medium slds-p-bottom_medium sfdx-wrap"><img src="../../dist/assets/images/loader.gif" style="width:27px;" /> Deploying <strong><%= deployId %></strong></h2></div>
 
 	<div id="loginBlock" style="display: none;">
 		<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
@@ -61,20 +148,12 @@
 	</div>
 
 	<div id="status" class="slds-m-bottom_small sfdx-output"></div>
+
+	<!-- end of regular deployer view -->
+
+
 	<script>
 		// works for both http and https
-		const HOST = location.href.replace(/^http/, 'ws');
-		let msgCounter = 0;
-		console.log(HOST);
-
-		const deployIdInput = document.getElementById('deployId');
-		console.log(deployIdInput);
-
-		const deployId = deployIdInput.innerText;
-		console.log(deployId);
-
-		const ws = new WebSocket(HOST);
-		let pinger;
 
 		// const deployId = deployIdInput.value;
 
@@ -101,17 +180,7 @@
 				}
 			};
 
-		ws.onopen = function () {
-			console.log('WS is open!');
-			pinger = setInterval(function(){
-				ws.send('ping');
-			}, 5000);
-		};
 
-		ws.onclose = function(){
-			console.log('WS is closing');
-			clearInterval(pinger);
-		}
 
 		displayContent = function(content){
 			// the login url
@@ -187,4 +256,9 @@
 	</script>
 
 </main>
+
+
 <% include ../partials/footer %>
+<% } %>
+
+<!-- end normal deployer -->
