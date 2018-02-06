@@ -10,8 +10,6 @@ const msgBuilder = require('./lib/deployMsgBuilder');
 
 const ex = 'deployMsg';
 
-// const http = require('http');
-
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 
 const app = express();
