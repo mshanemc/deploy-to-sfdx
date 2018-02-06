@@ -114,6 +114,10 @@ app.get('/deploying/:format/:deployId', (req, res) => {
   });
 });
 
+app.get('/testform', (req, res) => {
+  res.render('pages/testForm');
+});
+
 app.ws('/deploying/:format/:deployId', (ws, req) => {
     logger.debug('client connected!');
     // ws.send('welcome to the socket!');
