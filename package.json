@@ -32,7 +32,7 @@
     "cookie-parser": "^1.4.3",
     "ejs": "^2.5.6",
     "express": "^4.16.2",
-    "express-ws": "^3.3.1",
+    "express-ws": "^3.0.0",
     "heroku-logger": "^0.3.0",
     "https": "^1.0.0",
     "lodash": "^4.17.5",
