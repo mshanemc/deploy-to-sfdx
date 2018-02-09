@@ -1,9 +1,9 @@
-const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 const exec = require('child-process-promise').exec;
 const fs = require('fs');
 const logger = require('heroku-logger');
 const logResult = require('./lib/logging');
 const deployConsumer = require('./lib/deployConsumer');
+const poolConsumer = require('./lib/poolConsumer');
 
 logger.debug('I am a worker and I am up!');
 
@@ -33,15 +33,11 @@ exec('echo y | sfdx plugins:install sfdx-msm-plugin')
 })  // OK, we've got our environment prepared now.  Let's auth to our org and verify
 .then( (result) => {
 	logResult(result);
-	return mq;
-})
-.then( (mqConn) => {
-	return mqConn.createChannel();
-})
-.then( (ch) => {
+
 	// listens for deploy requests on the deploy queue
-	deployConsumer(ch);
-	return;
+	deployConsumer();
+	poolConsumer();
+	// start prepping pools when the worker loads
 })
 .catch( (reason) => {
 	logger.error(reason);
