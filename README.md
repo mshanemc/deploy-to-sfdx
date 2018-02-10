@@ -36,6 +36,7 @@ https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_de
 * `UA_ID` for google analytics measurement protocol
 * `GITHUB_USERNAME_WHITELIST` lets you whitelist usernames.  It's a comma-separated list.  Ex: `mshanemc,andrew,bebraw`
 * `GITHUB_REPO_WHITELIST` lets you whitelist username/repo combinations.  It's a comma-separated list. Ex: `mshanemc/DF17integrationWorkshops,torvalds/linux`
+* org pools -- see below for details
 
 What's whitelisting do?  Normally, this app will parse your orgInit.sh and throw an error if you're doing any funny business.  BUT if you're on the whitelist, the app owner trusts you and you can do things with bash metacharacters (think &&, |, >) and execute non-sfdx commands  (grep, rm, whatever!) etc.  BE CAREFUL!
 
@@ -66,6 +67,19 @@ Then it listens to the deploy queue and executes jobs
 * delete the local folder and send the ALLDONE message
 
 All the web servers are subscribed to the broadcast exchange.  When they receive messages, they look at the deployID and send the messages down to the matching client.
+
+## Org pools (optional, advanced!)
+
+Building orgs that take too long?  Ever have one that doesn't get its DNS ready in time?  Know you're mostly deploying the same orgs all the time?
+
+Org Pools are the answer.  You tell it which username/repo pairs, and how many orgs you'd like pre-built.  When the user requests one, you simply grab one from the pool.  Orgs in the pool are less than 12 hours old so they stay fresh.
+
+There's a poolworker dyno, off by default.  If you want pools, turn that on.  Then, in your .env/heroku config vars, do this
+`POOL_username.repo` = `desiredQuantity`.
+
+Example usage: I might have `POOL_mshanemc.process-automation-workshop-df17` set to `1` when it's rarely used, or set to `10` during an event like Dreamforce.  The worker checks every minute to see if any pools are below their quantity and issues more deploy requests.  If the pool is empty when a request comes in, the deployer just builds an org the old-fashioned, slow way.
+
+Remember that pool deploys are still handled by the regular worker, so make sure that you have enough workers to be doing pool deploys AND live deploys.
 
 ## Local Setup (Mac...others, who knows?)
 
