@@ -27,6 +27,11 @@
       "type" :"worker",
       "quantity" : 1,
       "size" : "hobby"
+    },
+    {
+      "type": "poolworker",
+      "quantity": 0,
+      "size": "hobby"
     }
   ],
   "buildpacks": [{
