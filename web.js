@@ -10,8 +10,6 @@ const msgBuilder = require('./lib/deployMsgBuilder');
 
 const ex = 'deployMsg';
 
-// const http = require('http');
-
 const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
 
 const app = express();
@@ -86,13 +84,24 @@ app.get('/launch', (req, res) => {
   mq.then( (mqConn) => {
     let ok = mqConn.createChannel();
     ok = ok.then((ch) => {
-      ch.assertQueue('deploys', { durable: true });
-      ch.sendToQueue('deploys', new Buffer(JSON.stringify(message)));
+      if (message.pool){
+        logger.debug('putting in pool deploy queue');
+        ch.assertQueue('poolDeploys', { durable: true });
+        ch.sendToQueue('poolDeploys', new Buffer(JSON.stringify(message)));
+      } else {
+        logger.debug('putting in reqular deploy queue');
+        ch.assertQueue('deploys', { durable: true });
+        ch.sendToQueue('deploys', new Buffer(JSON.stringify(message)));
+      }
     });
     return ok;
   }).then( () => {
     // return the deployId page
-    return res.redirect(`/deploying/deployer/${message.deployId}`);
+    if (message.pool) {
+      return res.send('pool initiated');
+    } else {
+      return res.redirect(`/deploying/deployer/${message.deployId}`);
+    }
   }, (mqerr) => {
     logger.error(mqerr);
     return res.redirect('pages/error', {
