@@ -74,12 +74,13 @@ Building orgs that take too long?  Ever have one that doesn't get its DNS ready 
 
 Org Pools are the answer.  You tell it which username/repo pairs, and how many orgs you'd like pre-built.  When the user requests one, you simply grab one from the pool.  Orgs in the pool are less than 12 hours old so they stay fresh.
 
-There's a poolworker dyno, off by default.  If you want pools, turn that on.  Then, in your .env/heroku config vars, do this
+There's 2 worker dynos, off by default.  If you want pools, turn them on.  Then, in your .env/heroku config vars, do this for each repo that you want to pool:
 `POOL_username.repo` = `desiredQuantity`.
 
 Example usage: I might have `POOL_mshanemc.process-automation-workshop-df17` set to `1` when it's rarely used, or set to `10` during an event like Dreamforce.  The worker checks every minute to see if any pools are below their quantity and issues more deploy requests.  If the pool is empty when a request comes in, the deployer just builds an org the old-fashioned, slow way.
 
-Remember that pool deploys are still handled by the regular worker, so make sure that you have enough workers to be doing pool deploys AND live deploys.
+`poolwatcher` monitors ready and inprogress orgs, comparing them to your config targets, and requests deployments
+`pooldeployer` fulfills those deployments without tying up your regular worker.
 
 ## Local Setup (Mac...others, who knows?)
 
