@@ -75,6 +75,12 @@ app.get('/launch', (req, res) => {
     });
   }
 
+  if (req.query.template.includes('?')){
+    return res.render('pages/error', {
+      customError: `That template has a ? in it, making the url impossible to parse: ${req.query.template}`
+    });
+  }
+
   const message = msgBuilder(req.query);
   // analytics
   const visitor = ua(process.env.UA_ID);
