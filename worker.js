@@ -3,7 +3,6 @@ const fs = require('fs');
 const logger = require('heroku-logger');
 const logResult = require('./lib/logging');
 const deployConsumer = require('./lib/deployConsumer');
-const poolConsumer = require('./lib/poolConsumer');
 
 logger.debug('I am a worker and I am up!');
 
@@ -36,8 +35,6 @@ exec('echo y | sfdx plugins:install sfdx-msm-plugin')
 
 	// listens for deploy requests on the deploy queue
 	deployConsumer();
-	poolConsumer();
-	// start prepping pools when the worker loads
 })
 .catch( (reason) => {
 	logger.error(reason);

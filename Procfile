@@ -1,3 +1,4 @@
 worker: node worker.js
-poolworker: node lib/poolMaintenance.js
 web: node web.js
+poolwatcher: node lib/poolMaintenance.js
+pooldeployer: node lib/poolConsumer.js
