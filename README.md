@@ -110,7 +110,9 @@ You can also run some local integration tests using mocha.  See /tests and use `
 ## Debugging on [non-local] Heroku
 if **hosted-scratch-qa** is the name of your app
 
-`heroku logs --tail -a hosted-scratch-qa` will give you the logs.
+`heroku logs --tail -a hosted-scratch` will give you the logs.
+
+`heroku redis:cli -a hosted-scratch -c hosted-scratch` will lets you look at your redis stuff and see what's in the queue
 
 `heroku ps:exec -a hosted-scratch-qa --dyno=worker.1` lets you ssh into the dyno of your choice and take a look around, clean stuff up, etc.
 
