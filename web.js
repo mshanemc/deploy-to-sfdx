@@ -10,7 +10,10 @@ const msgBuilder = require('./lib/deployMsgBuilder');
 
 const ex = 'deployMsg';
 
-const mq = require('amqplib').connect(process.env.CLOUDAMQP_URL || 'amqp://localhost');
+const Redis = require('ioredis');
+
+const redis = new Redis(process.env.REDIS_URL);
+const redisSub = new Redis(process.env.REDIS_URL);
 
 const app = express();
 const wsInstance = expressWs(app);
@@ -41,21 +44,14 @@ app.post('/trial', (req, res) => {
   visitor.pageview('/trial').send();
   visitor.event('Repo', req.query.template).send();
 
-  mq.then((mqConn) => {
-    let ok = mqConn.createChannel();
-    ok = ok.then((ch) => {
-      ch.assertQueue('deploys', { durable: true });
-      ch.sendToQueue('deploys', new Buffer(JSON.stringify(message)));
+  redis.rpush('deploys', JSON.stringify(message))
+    .then(() => res.redirect(`/deploying/trial/${message.deployId}`))
+    .catch((redisErr) => {
+      logger.error(redisErr);
+      return res.redirect('pages/error', {
+        customError: redisErr
+      });
     });
-    return ok;
-  }).then(() => {
-    return res.redirect(`/deploying/trial/${message.deployId}`);
-  }, (mqerr) => {
-    logger.error(mqerr);
-    return res.redirect('pages/error', {
-      customError: mqerr
-    });
-  });
 
 });
 
@@ -87,33 +83,25 @@ app.get('/launch', (req, res) => {
   visitor.pageview('/launch').send();
   visitor.event('Repo', req.query.template).send();
 
-  mq.then( (mqConn) => {
-    let ok = mqConn.createChannel();
-    ok = ok.then((ch) => {
-      if (message.pool){
+
+  redis.rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
+    .then((rpushResult) => {
+      console.log(rpushResult);
+      if (message.pool) {
         logger.debug('putting in pool deploy queue');
-        ch.assertQueue('poolDeploys', { durable: true });
-        ch.sendToQueue('poolDeploys', new Buffer(JSON.stringify(message)));
+        return res.send('pool initiated');
       } else {
         logger.debug('putting in reqular deploy queue');
-        ch.assertQueue('deploys', { durable: true });
-        ch.sendToQueue('deploys', new Buffer(JSON.stringify(message)));
+        return res.redirect(`/deploying/deployer/${message.deployId}`);
       }
+    })
+    .catch((redisErr) => {
+      logger.error(redisErr);
+      return res.render('pages/error', {
+        customError: redisErr
+      });
     });
-    return ok;
-  }).then( () => {
-    // return the deployId page
-    if (message.pool) {
-      return res.send('pool initiated');
-    } else {
-      return res.redirect(`/deploying/deployer/${message.deployId}`);
-    }
-  }, (mqerr) => {
-    logger.error(mqerr);
-    return res.redirect('pages/error', {
-      customError : mqerr
-    });
-  });
+
 });
 
 app.get('/userinfo', (req, res) => {
@@ -146,40 +134,24 @@ app.listen(port, () => {
   logger.info(`Example app listening on port ${port}!`);
 });
 
-mq.then( (mqConn) => {
-  logger.debug('mq connection good');
-
-	let ok = mqConn.createChannel();
-	ok = ok.then((ch) => {
-    logger.debug('channel created');
-    ch.assertExchange(ex, 'fanout', { durable: false })
-    .then( (exch) => {
-      logger.debug('exchange asserted');
-      return ch.assertQueue('', { exclusive: true });
-    }).then( (q) => {
-      logger.debug('queue asserted');
-      ch.bindQueue(q.queue, ex, '');
-      ch.consume(q.queue, (msg) => {
-        logger.debug('heard a message from the worker');
-        const parsedMsg = JSON.parse(msg.content.toString());
-        logger.debug(parsedMsg);
-        wsInstance.getWss().clients.forEach((client) => {
-          if (client.upgradeReq.url.includes(parsedMsg.deployId)) {
-            client.send(msg.content.toString());
-            // close connection when ALLDONE
-            if (parsedMsg.content === 'ALLDONE') {
-              client.close();
-            }
-          }
-        });
-
-        ch.ack(msg);
-      }, { noAck: false });
-    });
+// subscribe to deploy events to share them with the web clients
+redisSub.subscribe(ex)
+  .then((result) => {
+    logger.debug(`subscribed to Redis channel ${ex}`);
+    console.log(result);
   });
-  return ok;
-})
-.catch( (mqerr) => {
-  logger.error(`MQ error ${mqerr}`);
-});
 
+redisSub.on('message', (channel, message) => {
+  logger.debug('heard a message from the worker:');
+  const msgJSON = JSON.parse(message);
+  console.log(msgJSON);
+  wsInstance.getWss().clients.forEach((client) => {
+    if (client.upgradeReq.url.includes(msgJSON.deployId)) {
+      client.send(JSON.stringify(msgJSON));
+      // close connection when ALLDONE
+      if (msgJSON.content === 'ALLDONE') {
+        client.close();
+      }
+    }
+  });
+});

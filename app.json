@@ -24,12 +24,17 @@
       "size": "hobby"
     },
     {
-      "type" :"worker",
+      "type" :"orgbuilder",
       "quantity" : 1,
       "size" : "hobby"
     },
     {
-      "type": "poolworker",
+      "type": "pooldeployer",
+      "quantity": 0,
+      "size": "hobby"
+    },
+    {
+      "type": "poolwatcher",
       "quantity": 0,
       "size": "hobby"
     }
@@ -42,6 +47,6 @@
     }
   ],
   "addons": [{
-      "plan": "cloudamqp:lemur"
+      "plan": "heroku-redis:hobby-dev"
   }]
 }

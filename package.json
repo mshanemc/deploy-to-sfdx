@@ -23,7 +23,6 @@
   "homepage": "https://github.com/mshanemc/deploy-to-sfdx#readme",
   "dependencies": {
     "@salesforce-ux/design-system": "^2.4.5",
-    "amqplib": "^0.5.1",
     "async": "^2.5.0",
     "body-parser": "^1.18.2",
     "bufferutil": "3.0.2",
@@ -35,7 +34,9 @@
     "express-ws": "^3.0.0",
     "heroku-logger": "^0.3.0",
     "https": "^1.0.0",
+    "ioredis": "^3.2.2",
     "lodash": "^4.17.5",
+    "moment": "^2.20.1",
     "sleep": "^5.1.1",
     "universal-analytics": "^0.4.16",
     "utf-8-validate": "3.0.3",
