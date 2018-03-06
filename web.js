@@ -10,10 +10,8 @@ const msgBuilder = require('./lib/deployMsgBuilder');
 
 const ex = 'deployMsg';
 
-const Redis = require('ioredis');
-
-const redis = new Redis(process.env.REDIS_URL);
-const redisSub = new Redis(process.env.REDIS_URL);
+const redis = require('./lib/redisNormal');
+const redisSub = require('./lib/redisSubscribe');
 
 const app = express();
 const wsInstance = expressWs(app);
