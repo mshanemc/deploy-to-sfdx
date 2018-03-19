@@ -13,6 +13,8 @@ const ex = 'deployMsg';
 const redis = require('./lib/redisNormal');
 const redisSub = require('./lib/redisSubscribe');
 
+const org62LeadCapture = require('./lib/trialLeadCreate');
+
 const app = express();
 const wsInstance = expressWs(app);
 
@@ -37,6 +39,7 @@ app.post('/trial', (req, res) => {
   message.email = req.body.UserEmail;
   // console.log(req.body.UserFirstName);
   // console.log(req.body.UserLastName);
+  org62LeadCapture(req.body);
 
   const visitor = ua(process.env.UA_ID);
   visitor.pageview('/trial').send();
