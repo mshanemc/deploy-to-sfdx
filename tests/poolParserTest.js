@@ -3,6 +3,7 @@ const chai = require('chai');
 
 const expect = chai.expect; // we are using the "expect" style of Chai
 const parser = require('./../lib/poolParse');
+const utilities = require('./../lib/utilities');
 const path = require('path');
 const rimraf = require('rimraf');
 
@@ -10,6 +11,56 @@ const fs = require('fs');
 const exec = require('child-process-promise').exec;
 
 const username = 'mshanemc';
+
+require('dotenv').config({ path: __dirname + '/../.env' });
+
+describe('poolURLTest', function () {
+	this.timeout(500000);
+
+	it('gets an array of objects', async function () {
+		if (process.env.POOLCONFIG_URL){
+
+			// the pool is sane
+			expect(process.env.POOLCONFIG_URL).to.be.a('string');
+
+			const result = await utilities.getPoolConfig();
+			console.log(result);
+
+			expect(result).to.be.an('array');
+			expect(result.length).to.be.above(0);
+			expect(result[0].repo).to.be.a('string');
+			expect(result[0].user).to.be.a('string');
+			expect(result[0].quantity).to.be.a('number');
+			expect(result[0].lifeHours).to.be.a('number');
+			expect(result[0].quantity).to.be.above(0);
+			expect(result[0].lifeHours).to.be.above(0);
+		}
+	});
+
+	it('gets an object from the array', async function () {
+		if (process.env.POOLCONFIG_URL) {
+
+			// the pool is sane
+			expect(process.env.POOLCONFIG_URL).to.be.a('string');
+
+			const result = await utilities.getPoolConfig();
+			console.log(result);
+
+			const pool = await utilities.getPool(result[0].user, result[0].repo);
+
+
+			expect(pool).to.be.an('object');
+			expect(pool.repo).to.be.a('string');
+			expect(pool.user).to.be.a('string');
+			expect(pool.quantity).to.be.a('number');
+			expect(pool.lifeHours).to.be.a('number');
+			expect(pool.quantity).to.be.above(0);
+			expect(pool.lifeHours).to.be.above(0);
+		}
+	});
+});
+
+
 
 describe('poolParserTest', function () {
 
