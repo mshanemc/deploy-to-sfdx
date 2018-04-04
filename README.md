@@ -75,15 +75,31 @@ Building orgs that take too long?  Ever have one that doesn't get its DNS ready 
 
 Org Pools are the answer.  You tell it which username/repo pairs, and how many orgs you'd like pre-built.  When the user requests one, you simply grab one from the pool.  Orgs in the pool are less than 12 hours old so they stay fresh.
 
-There's 2 worker dynos, off by default.  If you want pools, turn them on.  Then, in your .env/heroku config vars, do this for each repo that you want to pool:
-`POOL_username.repo` = `desiredQuantity`.
+There's 2 worker dynos, off by default.  If you want pools, turn them on.
 
-There's more settings for pools
+Then, in your .env/heroku config vars, point the deployer to some url that returns json.
+`POOLCONFIG_URL` = `https://where.yourstuff/is`.
+
+Example code here, but feel free to generate it however you like.
+https://github.com/mshanemc/poolsConfig
+
+```json
+[{
+	user: 'mshanemc', //ex: lives at https://github.com/mshanemc/cg1
+	repo: 'cg1',
+	quantity: 4, //how many of this org to keep handy
+	lifeHours: 12 //how long it should live, in hours
+},
+... //use 1 for each repo
+]
+
+```
+
+There's a few more settings for pools
 * `poolLoopTimeMin` how often the poolwatcher should check the pools (default=1)
 * `skimmerTimeMin` how often the skimmer should run (default 60)
-* `poolOrgLifeLimitHours` how old does an org have to be before the skimmer pulls it out (default 12)
 
-Example usage: I might have `POOL_mshanemc.process-automation-workshop-df17` set to `1` when it's rarely used, or set to `10` during an event like Dreamforce.  The worker checks every minute to see if any pools are below their quantity and issues more deploy requests.  If the pool is empty when a request comes in, the deployer just builds an org the old-fashioned, slow way.
+The worker checks every `poolLoopTimeMin` minutes to see if any pools are below their quantity and issues more deploy requests.  If the pool is empty when a request comes in, the deployer just builds an org the old-fashioned, slow way.
 
 `poolwatcher` monitors ready and inprogress orgs, comparing them to your config targets, requests deployments, and runs the skimmer (checking for expired orgs)
 `pooldeployer` fulfills those deployments without tying up your regular worker.
