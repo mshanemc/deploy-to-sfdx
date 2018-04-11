@@ -69,6 +69,10 @@ Then it listens to the deploy queue and executes jobs
 
 All the web servers are subscribed to the Redis pub/sub.  When they receive messages, they look at the deployID and send the messages down to the matching client.
 
+It runs two plugins that give it powers SFDX doesn't out-of-the-box
+https://github.com/mshanemc/sfdx-msm-plugins
+https://github.com/mshanemc/shane-sfdx-plugins
+
 ## Org pools (optional, advanced!)
 
 Building orgs that take too long?  Ever have one that doesn't get its DNS ready in time?  Know you're mostly deploying the same orgs all the time?
