@@ -41,6 +41,11 @@
       "type": "poolwatcher",
       "quantity": 0,
       "size": "hobby"
+    },
+    {
+      "type": "poolwatcher",
+      "quantity": 0,
+      "size": "hobby"
     }
   ],
   "buildpacks": [
