@@ -24,7 +24,7 @@
   "formation": [
     {
       "type" : "web",
-      "quantity": 1,
+      "quantity": 0,
       "size": "hobby"
     },
     {
@@ -43,8 +43,8 @@
       "size": "hobby"
     },
     {
-      "type": "poolwatcher",
-      "quantity": 0,
+      "type": "test",
+      "quantity": 1,
       "size": "hobby"
     }
   ],
