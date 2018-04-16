@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+set -e
+
+USR_LOCAL_BIN="/usr/local/bin"
+USR_LOCAL_LIB="/usr/local/lib"
+USR_BIN="/usr/bin"
+USR_LIB="/usr/lib"
+
+if [[ -d "$USR_LOCAL_BIN" && -d "$USR_LOCAL_LIB" ]]; then
+  BIN_DIR="$USR_LOCAL_BIN"
+  LIB_DIR="$USR_LOCAL_LIB"
+elif [[ -d "$USR_BIN" && -d "$USR_LIB" ]]; then
+  BIN_DIR="$USR_BIN"
+  LIB_DIR="$USR_LIB"
+else
+  echo "No suitable installation location found; missing one or more of $USR_LOCAL_BIN and $USR_LOCAL_BIN or $USR_BIN and $USR_LIB." 1>&2 && exit 1
+fi
+
+BIN_NAME="sfdx"
+BIN_HOME="$HOME/.local/share/$BIN_NAME"
+BIN_PATH="$BIN_DIR/sfdx"
+LIB_PATH="$LIB_DIR/sfdx"
+SRC_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+if [[ \
+  ! -w "$BIN_DIR" || \
+  ! -w "$LIB_DIR" || \
+  ( -e "$BIN_PATH" && ! -w "$BIN_PATH" ) || \
+  ( -e "$LIB_PATH" && "0" != "$( find "$LIB_PATH" ! -perm -u=w | wc -l | awk '{ print $1 }' )" ) \
+  ]]; then
+  echo "One or more target directories or files are not writeable; sudo permissions required." 1>&2
+  sudo -k # Always prompt for password
+  SUDO="sudo"
+fi
+
+$SUDO rm -rf "${LIB_PATH:?}" "${BIN_PATH:?}"
+$SUDO cp -a "$SRC_PATH" "$LIB_PATH"
+$SUDO chmod 755 "$LIB_PATH/bin/sfdx"
+$SUDO ln -sf "$LIB_PATH/bin/sfdx" "$BIN_PATH"
+$SUDO rm -rf "${BIN_HOME:?}/cli" "${BIN_HOME:?}/client"
+$SUDO mkdir -p "$BIN_HOME"
+
+printf "\e[0msfdx installed to \e[38;5;104m%s\e[0m\n" "$BIN_PATH"
+"$BIN_PATH" version

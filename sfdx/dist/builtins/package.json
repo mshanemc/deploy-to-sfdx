@@ -1,0 +1,8 @@
+{
+  "name": "builtins",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "Salesforce",
+  "license": "BSD-3-Clause"
+}

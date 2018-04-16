@@ -1,0 +1,135 @@
+{
+  "name": "sfdx-cli",
+  "description": "Salesforce CLI",
+  "version": "6.11.0",
+  "author": "Salesforce",
+  "license": "BSD-3-Clause",
+  "bin": {
+    "sfdx": "bin/run"
+  },
+  "engines": {
+    "node": ">=8.4.0"
+  },
+  "cli": {
+    "channel": "stable"
+  },
+  "cli-engine": {
+    "bin": "sfdx",
+    "dirname": "sfdx",
+    "node": "8.9.4",
+    "userPlugins": true,
+    "commands": "./dist/commands",
+    "legacyConverter": "./dist/legacy/converter",
+    "hooks": {
+      "plugins:preinstall": [
+        "./dist/hooks/plugins/verifyInstallVersion.js",
+        "./dist/hooks/plugins/verifyInstallSignature.js"
+      ],
+      "plugins:parse": [
+        "./dist/hooks/plugins/convertFromV5.js"
+      ],
+      "init": [
+        "./dist/hooks/plugins/migrate.js"
+      ],
+      "prerun": [
+        "./dist/hooks/logAnalytics.js"
+      ],
+      "update": [
+        "./dist/experiments/lazyModules/updateHook.js"
+      ]
+    },
+    "plugins": [
+      "../dist/builtins",
+      "salesforcedx",
+      "@salesforce/plugin-generator"
+    ],
+    "s3": {
+      "bucket": "dfc-data-production",
+      "folder": "media/salesforce-cli",
+      "host": "developer.salesforce.com/media/salesforce-cli"
+    },
+    "help": {
+      "plugins": {
+        "salesforcedx": {
+          "version": "41.8.7",
+          "type": "core"
+        }
+      }
+    }
+  },
+  "files": [
+    "bin",
+    "dist/**/*.js",
+    "!dist/**/*.test.js"
+  ],
+  "dependencies": {
+    "ansi-escapes": "3.0.0",
+    "cli-engine": "4.7.4",
+    "cli-engine-command": "9.0.7",
+    "cli-engine-config": "3.5.0",
+    "cli-engine-heroku": "5.0.3",
+    "cli-ux": "2.0.4",
+    "debug": "3.1.0",
+    "fs-extra": "4.0.2",
+    "lodash": "4.17.4",
+    "request": "2.83.0",
+    "salesforcedx": "42.11.0",
+    "@salesforce/plugin-generator": "0.0.5"
+  },
+  "devDependencies": {
+    "@types/chai": "4.0.4",
+    "@types/debug": "0.0.30",
+    "@types/fs-extra": "4.0.2",
+    "@types/lodash": "4.14.76",
+    "@types/mocha": "2.2.43",
+    "@types/node": "8.0.28",
+    "@types/request": "2.0.3",
+    "@types/sinon": "2.3.5",
+    "chai": "4.1.2",
+    "eslint": "3.2.2",
+    "eslint-config-airbnb-base": "5.0.1",
+    "eslint-plugin-import": "1.13.0",
+    "istanbul": "1.0.0-alpha.2",
+    "mocha": "3.5.0",
+    "sinon": "2.3.5",
+    "source-map-support": "0.5.2",
+    "tslint": "5.7.0",
+    "typescript": "2.5.2",
+    "xunit-file": "1.0.0"
+  },
+  "scripts": {
+    "build": "yarn build-standalone",
+    "build-mac": "yarn build-mac-from-archive",
+    "build-mac-from-archive": "bash scripts/build/installers/darwin_from_archive",
+    "build-mac-from-sources": "bash scripts/build/installers/darwin_from_sources",
+    "build-standalone": "bash scripts/build/standalone",
+    "build-windows": "bash scripts/build/installers/windows",
+    "clean": "yarn clean-dist && yarn clean-test",
+    "clean-all": "bash scripts/clean/all",
+    "clean-build": "bash scripts/clean/build",
+    "clean-compile": "yarn clean-all && yarn install --pure-lockfile",
+    "clean-dist": "bash scripts/clean/dist",
+    "clean-test": "bash scripts/clean/test",
+    "compile": "bash scripts/build/compile",
+    "coverage-report": "./node_modules/istanbul/lib/cli.js report --report html json-summary",
+    "lint": "bash scripts/lint/sources",
+    "lint-all": "bash scripts/lint/all",
+    "lint-with-style": "bash scripts/lint/sources_with_style",
+    "prepare": "yarn compile",
+    "release": "yarn release-all",
+    "release-debug": "yarn release-all-debug",
+    "release-all": "bash scripts/release/all",
+    "release-all-debug": "env SKIP_AWS=true yarn release-all",
+    "release-mac": "bash scripts/release/installers/darwin",
+    "release-mac-debug": "env SKIP_AWS=true yarn release-mac",
+    "release-standalone": "bash scripts/release/standalone",
+    "release-standalone-debug": "env SKIP_AWS=true yarn release-standalone",
+    "release-windows": "bash scripts/release/installers/windows_docker",
+    "release-windows-debug": "env SKIP_AWS=true yarn release-windows",
+    "test": "yarn typings && yarn compile && yarn lint && yarn uts",
+    "typings": "bash scripts/test/typings",
+    "unit": "bash scripts/test/unit",
+    "uts": "mocha --require source-map-support/register --recursive \"dist/**/*.test.js\"",
+    "watch": "tsc -w -p tsconfig.json"
+  }
+}
