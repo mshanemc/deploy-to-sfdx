@@ -31,7 +31,7 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 // app.use(cookieParser());
 
-app.post('/trial', (req, res) => {
+app.post('/trial', (req, res, next) => {
   const message = msgBuilder(req.query);
   console.log(message);
 
@@ -48,35 +48,25 @@ app.post('/trial', (req, res) => {
   visitor.event('Repo', req.query.template).send();
 
   redis.rpush('deploys', JSON.stringify(message))
-    .then(() => res.redirect(`/deploying/trial/${message.deployId}`))
-    .catch((redisErr) => {
-      logger.error(redisErr);
-      return res.redirect('pages/error', {
-        customError: redisErr
-      });
-    });
+    .then(() => res.redirect(`/deploying/trial/${message.deployId}`));
 
 });
 
-app.get('/launch', (req, res) => {
+app.get('/launch', (req, res, next) => {
+
+  // no template?  does not compute!
+  if (!req.query.template) {
+    throw ('There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo');
+  }
+
+  if (req.query.template.includes('?')) {
+    throw (`That template has a ? in it, making the url impossible to parse: ${req.query.template}`);
+  }
 
   // allow repos to require the email parameter
   if (req.query.email === 'required'){
     return res.render('pages/userinfo', {
       template: req.query.template
-    });
-  }
-
-  // no template?  does not compute!
-  if (!req.query.template) {
-    return res.render('pages/error', {
-      customError: 'There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo'
-    });
-  }
-
-  if (req.query.template.includes('?')){
-    return res.render('pages/error', {
-      customError: `That template has a ? in it, making the url impossible to parse: ${req.query.template}`
     });
   }
 
@@ -97,30 +87,23 @@ app.get('/launch', (req, res) => {
         logger.debug('putting in reqular deploy queue');
         return res.redirect(`/deploying/deployer/${message.deployId}`);
       }
-    })
-    .catch((redisErr) => {
-      logger.error(redisErr);
-      return res.render('pages/error', {
-        customError: redisErr
-      });
     });
-
 });
 
-app.get('/userinfo', (req, res) => {
+app.get('/userinfo', (req, res, next) => {
   res.render('pages/userinfo', {
     template: req.query.template
   });
 });
 
-app.get('/deploying/:format/:deployId', (req, res) => {
+app.get('/deploying/:format/:deployId', (req, res, next) => {
   res.render('pages/messages', {
     deployId: req.params.deployId,
     format: req.params.format
   });
 });
 
-app.get('/testform', (req, res) => {
+app.get('/testform', (req, res, next) => {
   res.render('pages/testForm');
 });
 
@@ -130,6 +113,21 @@ app.ws('/deploying/:format/:deployId', (ws, req) => {
     ws.on('close', () => logger.info('Client disconnected'));
   }
 );
+
+app.get('/', (req, res, next) => {
+  res.json({ message: 'There is nothing at /.  See the docs for valid paths.' });
+});
+
+app.use( (error, req, res, next) => {
+  // Any request to this server will get here, and will send an HTTP
+  // response with the error message 'woops'
+  const visitor = ua(process.env.UA_ID);
+  logger.error(`request failed: ${req.url}`);
+  visitor.event('Error', req.query.template).send();
+  return res.render('pages/error', {
+    customError: error
+  });
+});
 
 const port = process.env.PORT || 8443;
 
@@ -157,4 +155,6 @@ redisSub.on('message', (channel, message) => {
       }
     }
   });
+
+
 });
