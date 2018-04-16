@@ -118,6 +118,10 @@ app.get('/', (req, res, next) => {
   res.json({ message: 'There is nothing at /.  See the docs for valid paths.' });
 });
 
+app.get('*', (req, res, next) => {
+  setImmediate(() => { next(new Error('Route not found')); });
+});
+
 app.use( (error, req, res, next) => {
   // Any request to this server will get here, and will send an HTTP
   // response with the error message 'woops'
