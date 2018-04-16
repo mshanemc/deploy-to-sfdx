@@ -41,11 +41,6 @@
       "type": "poolwatcher",
       "quantity": 0,
       "size": "hobby"
-    },
-    {
-      "type": "test",
-      "quantity": 1,
-      "size": "hobby"
     }
   ],
   "buildpacks": [
