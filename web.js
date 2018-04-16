@@ -55,7 +55,7 @@ app.post('/trial', (req, res, next) => {
 app.get('/launch', (req, res, next) => {
 
   // no template?  does not compute!
-  if (!req.query.template) {
+  if (!req.query.template || !req.query.template.includes('https://github.com/')) {
     throw ('There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo');
   }
 
