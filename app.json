@@ -24,12 +24,12 @@
   "formation": [
     {
       "type" : "web",
-      "quantity": 0,
+      "quantity": 1,
       "size": "hobby"
     },
     {
       "type" :"orgbuilder",
-      "quantity" : 0,
+      "quantity" : 1,
       "size" : "hobby"
     },
     {
