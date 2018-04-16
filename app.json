@@ -39,8 +39,9 @@
       "size": "hobby"
     }
   ],
-  "buildpacks": [{
-      "url": "https://github.com/heroku/salesforce-cli-buildpack#v2"
+  "buildpacks": [
+    {
+      "url": "https://github.com/mshanemc/salesforce-cli-buildpack"
     },
     {
       "url": "heroku/nodejs"
