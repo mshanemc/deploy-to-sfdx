@@ -15,10 +15,6 @@
     "JWTKEY": {
       "description": "The server.key file from your connected app",
       "value": ""
-    },
-    "CLI_URL": {
-      "value" : "https://developer.salesforce.com/media/salesforce-cli/sfdx-cli/channels/stable/sfdx-cli-linux-x64.tar.xz",
-      "description" : "where to download the linux version of the cli"
     }
   },
   "formation": [
@@ -44,6 +40,9 @@
     }
   ],
   "buildpacks": [
+    {
+      "url": "https://github.com/mshanemc/salesforce-cli-buildpack"
+    },
     {
       "url": "heroku/nodejs"
     }
