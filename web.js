@@ -53,13 +53,23 @@ app.post('/trial', (req, res, next) => {
 });
 
 app.post('/delete', (req, res, next) => {
+  logger.debug('in the delete post action');
   const message = {
     username: req.body.username,
     delete: true
   };
 
   redis.rpush('deploys', JSON.stringify(message))
-    .then(() => res.redirect('/deleteConfirm'));
+    .then(() => {
+      console.log('message created');
+      res.redirect('/deleteConfirm');
+    })
+    .catch((e) => {
+      logger.error(e);
+      return res.render('pages/error', {
+        customError: e
+      });
+    });
 });
 
 app.get('/deleteConfirm', (req, res, next) => {
