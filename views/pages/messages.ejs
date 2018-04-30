@@ -266,10 +266,10 @@
 
 			xhttp.open("POST", "/delete", true);
 			xhttp.setRequestHeader("Content-type", "application/json");
-			xhttp.send({
+			xhttp.send(JSON.stringify({
 				username: document.getElementById("username").innerHTML,
 				delete: true
-			});
+			}));
 		});
 
 	</script>
