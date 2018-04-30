@@ -270,9 +270,6 @@
 			xhttp.open("POST", "/delete", true);
 			xhttp.setRequestHeader("Content-type", "application/json");
 			xhttp.onreadystatechange = function () {
-				console.log(xhttp.response);
-				console.log(xhttp.status);
-				console.log(xhttp.responseText);
 				if (xhttp.readyState == 4 && xhttp.status == 302) {
 					console.log(xhttp.response);
 					console.log(xhttp.status);
