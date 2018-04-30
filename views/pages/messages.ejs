@@ -101,9 +101,11 @@
 				<div class="slds-notify__content">
 					<h2 class="slds-text-heading_small slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
 						Your org is ready!
-						<a id="loginUrl" target="_blank" href="" class="slds-button slds-button_neutral">Launch</a></h2>
-						<a id="deleteButton" href="" class="slds-button slds-button_destructive">Delete</a>
-						</h2>
+						<div>
+							<a id="loginUrl" target="_blank" href="" class="slds-button slds-button_neutral">Launch</a>
+							<a id="deleteButton" href="" class="slds-button slds-button_destructive">Delete</a>
+						</div>
+					</h2>
 				</div>
 			</div>
 
@@ -258,7 +260,7 @@
 		//deleteButton
 		document.getElementById("deleteButton").addEventListener("click", function () {
 			//document.getElementById("demo").innerHTML = "Hello World";
-			xhttp.open("POST", "delete", true);
+			xhttp.open("POST", "/delete", true);
 			xhttp.setRequestHeader("Content-type", "application/json");
 			xhttp.send({
 				username: document.getElementById("username").innerHTML,

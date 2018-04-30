@@ -1,4 +1,7 @@
+a#loginUrl, a#deleteButton{
+	text-decoration: initial;
+}
+
 a#loginUrl {
 	color: initial;
-	text-decoration: initial;
 }
