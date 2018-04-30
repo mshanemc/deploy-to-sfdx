@@ -271,7 +271,10 @@
 				console.log(xhttp.status);
 				console.log(xhttp.responseText);
 				if (xhttp.readyState == 4 && xhttp.status == 302) {
-					window.location = xhttp.responseText;
+					console.log(xhttp.response);
+					console.log(xhttp.status);
+					console.log(xhttp.responseText);
+					// window.location = xhttp.responseText;
 				}
 			}
 			xhttp.send(JSON.stringify({
