@@ -52,6 +52,31 @@ app.post('/trial', (req, res, next) => {
 
 });
 
+app.post('/delete', (req, res, next) => {
+  logger.debug('in the delete post action with body:');
+  logger.debug(req.body);
+
+  const message = {
+    username: req.body.username,
+    delete: true
+  };
+
+  redis.rpush('deploys', JSON.stringify(message))
+    .then(() => {
+      console.log('message created');
+      res.status(302).send('/deleteConfirm');
+    })
+    .catch((e) => {
+      logger.error('An error occurred in the redis rpush');
+      logger.error(e);
+      res.status(500).send(e);
+    });
+});
+
+app.get('/deleteConfirm', (req, res, next) => {
+  return res.render('pages/deleteConfirm');
+});
+
 app.get('/launch', (req, res, next) => {
 
   // no template?  does not compute!
