@@ -260,7 +260,10 @@
 
 
 		//deleteButton
-		document.getElementById("deleteButton").addEventListener("click", function () {
+		document.getElementById("deleteButton").addEventListener("click", function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+
 			//document.getElementById("demo").innerHTML = "Hello World";
 			var xhttp = new XMLHttpRequest();
 
@@ -281,7 +284,7 @@
 				username: document.getElementById("username").innerHTML,
 				delete: true
 			}));
-			return false;
+
 		});
 
 	</script>
