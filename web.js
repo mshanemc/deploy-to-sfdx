@@ -52,6 +52,20 @@ app.post('/trial', (req, res, next) => {
 
 });
 
+app.post('/delete', (req, res, next) => {
+  const message = {
+    username: req.body.username,
+    delete: true
+  };
+
+  redis.rpush('deploys', JSON.stringify(message))
+    .then(() => res.redirect('/deleteConfirm'));
+});
+
+app.get('/deleteConfirm', (req, res, next) => {
+  return res.render('pages/deleteConfirm');
+});
+
 app.get('/launch', (req, res, next) => {
 
   // no template?  does not compute!
