@@ -67,6 +67,7 @@ app.post('/delete', (req, res, next) => {
       res.redirect('/deleteConfirm');
     })
     .catch((e) => {
+      logger.error('An error occurred in the redis rpush');
       logger.error(e);
       return res.render('pages/error', {
         customError: e
