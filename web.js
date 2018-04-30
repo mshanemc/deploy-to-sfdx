@@ -53,7 +53,9 @@ app.post('/trial', (req, res, next) => {
 });
 
 app.post('/delete', (req, res, next) => {
-  logger.debug('in the delete post action');
+  logger.debug('in the delete post action with body:');
+  logger.debug(req.body);
+
   const message = {
     username: req.body.username,
     delete: true
