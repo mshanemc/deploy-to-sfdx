@@ -277,14 +277,14 @@
 					console.log(xhttp.response);
 					console.log(xhttp.status);
 					console.log(xhttp.responseText);
-					// window.location = xhttp.responseText;
+					window.location = xhttp.responseText;
 				}
 			}
 			xhttp.send(JSON.stringify({
 				username: document.getElementById("username").innerHTML,
 				delete: true
 			}));
-
+			return false;
 		});
 
 	</script>

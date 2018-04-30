@@ -64,7 +64,7 @@ app.post('/delete', (req, res, next) => {
   redis.rpush('deploys', JSON.stringify(message))
     .then(() => {
       console.log('message created');
-      res.redirect('/deleteConfirm');
+      res.status(302).send('/deleteConfirm');
     })
     .catch((e) => {
       logger.error('An error occurred in the redis rpush');
