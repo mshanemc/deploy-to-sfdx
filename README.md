@@ -37,6 +37,7 @@ https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_de
 * `GITHUB_USERNAME_WHITELIST` lets you whitelist usernames.  It's a comma-separated list.  Ex: `mshanemc,andrew,bebraw`
 * `GITHUB_REPO_WHITELIST` lets you whitelist username/repo combinations.  It's a comma-separated list. Ex: `mshanemc/DF17integrationWorkshops,torvalds/linux`
 * `cycleTime` when the deploy queue is empty, how long, in seconds, to wait before checking again
+* `HEROKU_API_KEY` lets you comine the deployer with my sfdx plugin to deploy heroku apps to a team.  If you're note using org pools, be sure to delete these heroku apps.  See [the plugin docs](https://github.com/mshanemc/shane-sfdx-plugins#sfdx-shaneherokurepodeploy) for how to use this
 * org pools -- see below for details
 
 What's whitelisting do?  Normally, this app will parse your orgInit.sh and throw an error if you're doing any funny business.  BUT if you're on the whitelist, the app owner trusts you and you can do things with bash metacharacters (think &&, |, >) and execute non-sfdx commands  (grep, rm, whatever!) etc.  BE CAREFUL!
