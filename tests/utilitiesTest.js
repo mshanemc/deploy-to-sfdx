@@ -23,5 +23,15 @@ describe('Utilities: getArg', function () {
     expect(utilities.getArg(cmd, '--days')).to.equal('500');
   });
 
+  it('handles getArg with ` after single param', function () {
+    const cmd = 'sfdx shane:heroku:repo:deploy -f --name `basename "${PWD}"` --json --days 500';
+    expect(utilities.getArg(cmd, '--name')).to.equal('`basename "${PWD}"`');
+  });
+
+  it('handles getArg with ` after single param with more string after that', function () {
+    const cmd = 'sfdx shane:heroku:repo:deploy -f --name `basename "${PWD}"`-stg --json --days 500';
+    expect(utilities.getArg(cmd, '--name')).to.equal('`basename "${PWD}"`-stg');
+  });
+
 
 });
