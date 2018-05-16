@@ -36,6 +36,12 @@ describe('argStripperTest', function () {
 		expect(argStripper(cmd2, '-n', false)).to.equal('cd tmp;cd mshanemc-cg2-1526490058681;sfdx shane:heroku:repo:deploy -g mshanemc -r ducati-demo-server --envUser SFDC_USERNAME --envPassword SFDC_PASSWORD -t autodeployed-demos');
 	});
 
+	it('handles backtick for bash characters with more string after the closing tick', function () {
+		const cmd2 = 'cd tmp;cd mshanemc-cg2-1526490058681;sfdx shane:heroku:repo:deploy -g mshanemc -r ducati-demo-server -n `basename "${PWD}"`-stg --envUser SFDC_USERNAME --envPassword SFDC_PASSWORD -t autodeployed-demos';
+
+		expect(argStripper(cmd2, '-n', false)).to.equal('cd tmp;cd mshanemc-cg2-1526490058681;sfdx shane:heroku:repo:deploy -g mshanemc -r ducati-demo-server --envUser SFDC_USERNAME --envPassword SFDC_PASSWORD -t autodeployed-demos');
+	});
+
 	it('handles backtick for bash characters not present with value', function () {
 		const cmd2 = 'cd tmp;cd mshanemc-cg2-1526490058681;sfdx shane:heroku:repo:deploy -g mshanemc -r ducati-demo-server -n `basename "${PWD}"` --envUser SFDC_USERNAME --envPassword SFDC_PASSWORD -t autodeployed-demos';
 
