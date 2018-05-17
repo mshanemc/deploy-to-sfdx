@@ -8,7 +8,7 @@ const path = require('path');
 const rimraf = require('rimraf');
 
 const fs = require('fs');
-const exec = require('child-process-promise').exec;
+const exec = require('child-process-es6-promise').exec;
 
 const username = 'mshanemc';
 
