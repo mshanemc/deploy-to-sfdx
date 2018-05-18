@@ -61,7 +61,7 @@ app.post('/delete', (req, res, next) => {
     delete: true
   };
 
-  redis.rpush('deploys', JSON.stringify(message))
+  redis.rpush('poolDeploys', JSON.stringify(message))
     .then(() => {
       console.log('message created');
       res.status(302).send('/deleteConfirm');
