@@ -152,10 +152,6 @@
 						<div id="secondaryUserBlock" style="display: none;">
 							<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
 
-								<p class="slds-m-around_large">
-									Additional users created
-								</p>
-
 								<div class="slds-notify slds-notify_toast" role="alert">
 									<span class="slds-assistive-text">warning</span>
 
@@ -245,6 +241,8 @@
 										para.classList.add('slds-text-heading_small');
 										var node = document.createTextNode(`User named ${goodstuff.result.fields.firstname} ${goodstuff.result.fields.lastname} created with username ${goodstuff.result.fields.username} and password ${goodstuff.result.password}`);
 										para.appendChild(node);
+										var element = document.getElementById("secondaryUserArray");
+										element.appendChild(para);
 									} else {
 										// primary user password generated/set
 										document.getElementById("password").innerHTML = goodstuff.result.password;
