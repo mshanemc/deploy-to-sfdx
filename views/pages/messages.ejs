@@ -1,7 +1,9 @@
 <!-- common stuff for all page versions -->
 <div id="common">
 
-	<div id="deployId" style="display:none"><%= deployId %></div>
+	<div id="deployId" style="display:none">
+		<%= deployId %>
+	</div>
 
 	<script>
 		const HOST = location.href.replace(/^http/, 'ws');
@@ -35,261 +37,303 @@
 
 <%if (format == 'trial') { %>
 	<% include ../partials/sfdcHead %>
-	<header class="sfheader">
-		<img class="sflogo" src="https://c1.sfdcstatic.com/content/dam/web/en_us/www/images/home/logo-salesforce.svg" width="89px"/>
-	</header>
+		<header class="sfheader">
+			<img class="sflogo" src="https://c1.sfdcstatic.com/content/dam/web/en_us/www/images/home/logo-salesforce.svg" width="89px"
+			/>
+		</header>
 
-	<div class="bluebar"></div>
+		<div class="bluebar"></div>
 
-	<div class="trialContent">
-		<div class="trialText">We're setting up your Lightning Plaform trial.</div>
-		<div class="imgwrapper">
-			<img src="https://a.sfdcstatic.com/content/dam/www/ocms-backup/common/assets/images/cloud.loader.gif" alt="loading cloud"	/>
+		<div class="trialContent">
+			<div class="trialText">We're setting up your Lightning Plaform trial.</div>
+			<div class="imgwrapper">
+				<img src="https://a.sfdcstatic.com/content/dam/www/ocms-backup/common/assets/images/cloud.loader.gif" alt="loading cloud"
+				/>
+			</div>
+			<div class="trialText">You'll be logged in momentarily.</div>
 		</div>
-		<div class="trialText">You'll be logged in momentarily.</div>
-	</div>
 
-	<script>
-		ws.onmessage = function (event) {
-			msgCounter++;
-			let parsedData;
-			try {
-				parsedData = JSON.parse(event.data);
-			} catch (err) {
-				console.log('unparseable message (not JSON)');
-				console.log(event.data);
-			}
-			if (parsedData) {
-				if (parsedData.deployId === deployId) {
-					console.log(parsedData);
-					if (parsedData.content.includes('secur/frontdoor')){
-						console.log('This is the login url in JSON');
-						let goodstuff = JSON.parse(parsedData.content);
-						console.log('url is ' + goodstuff.result.url);
-						window.location.href = goodstuff.result.url;
-					}
-					//displayContent(parsedData.content);
+		<script>
+			ws.onmessage = function (event) {
+				msgCounter++;
+				let parsedData;
+				try {
+					parsedData = JSON.parse(event.data);
+				} catch (err) {
+					console.log('unparseable message (not JSON)');
+					console.log(event.data);
 				}
-			}
-
-			// if (parsedData.content.includes('secur/frontdoor')) {
-			// 	console.log('This is the login url in JSON');
-			// 	let goodstuff = JSON.parse(content);
-			// 	var link = document.getElementById("loginUrl");
-			// 	link.href = goodstuff.result.url;
-			// 	// link.innerHTML = goodstuff.result.url;
-			// 	document.getElementById("loginBlock").setAttribute("style", "display : block");
-			// }
-		};
-	</script>
-<% } %>
-
-
-<%if (format == 'deployer') { %>
-<% include ../partials/head %>
-<main class="slds-card">
-	<div id="loaderBlock"><h2 class="slds-text-heading_medium slds-p-top_medium slds-p-bottom_medium sfdx-wrap"><img src="../../dist/assets/images/loader.gif" style="width:27px;" /> Deploying <strong><%= deployId %></strong></h2></div>
-
-	<div id="loginBlock" style="display: none;">
-		<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
-
-			<p class="slds-m-around_large"><strong>Note:</strong> It can take up to 5 minutes for the my domain DNS to propogate. If the scratch org doesn't load, refresh it in a few minutes.</p>
-
-			<div class="slds-notify slds-notify_toast slds-theme_success" role="alert">
-				<span class="slds-assistive-text">warning</span>
-
-				<div class="slds-notify__content">
-					<h2 class="slds-text-heading_small slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
-						Your org is ready!
-						<div>
-							<a id="deleteButton" href="" class="slds-button slds-button_destructive">Delete</a>
-							<a id="loginUrl" target="_blank" href="" class="slds-button slds-button_neutral">Launch</a>
-						</div>
-					</h2>
-				</div>
-			</div>
-
-
-		</div>
-	</div>
-
-	<div id="passwordBlock" style="display: none;">
-		<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
-
-			<p class="slds-m-around_large">
-				<strong>Note:</strong> Use the button above to login for the first time.  These credentials are for other uses (mobile app, integrations).  Be sure that you're logging in via sandbox (test.salesforce.com) and not production.
-			</p>
-
-			<div class="slds-notify slds-notify_toast" role="alert">
-				<span class="slds-assistive-text">warning</span>
-
-				<div class="slds-notify__content">
-					<h2 class="slds-text-heading_small ">Your username is
-						<strong id="username"></strong>
-						 and your password is
-						<strong id="password"></strong>
-					</h2>
-				</div>
-			</div>
-
-		</div>
-	</div>
-
-	<div id="errorBlock" style="display: none;">
-		<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
-
-			<div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
-				<span class="slds-assistive-text">Error</span>
-
-				<div class="slds-notify__content">
-					<h2 class="slds-text-heading_small ">
-						<strong id="errorTest">An error occurred while deploying.</strong>&nbsp;See the browser console logs for more information.
-					</h2>
-				</div>
-			</div>
-
-		</div>
-	</div>
-
-	<div id="status" class="slds-m-bottom_small sfdx-output"></div>
-
-	<!-- end of regular deployer view -->
-
-
-	<script>
-		// works for both http and https
-
-		// const deployId = deployIdInput.value;
-
-		// console.log(deployId);
-
-		ws.onmessage = function (event) {
-			msgCounter++;
-			// console.log(event);
-			let parsedData;
-			try {
-				parsedData = JSON.parse(event.data);
-			} catch (err) {
-				console.log('unparseable message (not JSON)');
-				console.log(event.data);
-			}
-			if (parsedData){
-				if (parsedData.deployId === deployId) {
+				if (parsedData) {
+					if (parsedData.deployId === deployId) {
 						console.log(parsedData);
-						displayContent(parsedData.content);
-					} else {
-						console.log('not mine');
-						console.log(parsedData);
+						if (parsedData.content.includes('secur/frontdoor')) {
+							console.log('This is the login url in JSON');
+							let goodstuff = JSON.parse(parsedData.content);
+							console.log('url is ' + goodstuff.result.url);
+							window.location.href = goodstuff.result.url;
+						}
+						//displayContent(parsedData.content);
 					}
 				}
-			};
 
-
-
-		displayContent = function(content){
-			// the login url
-			if (content.includes('ERROR')){
-				console.log('an error occurred');
-				console.log(content);
-				document.getElementById("errorBlock").setAttribute("style", "display : block");
-			} else if (content.includes('secur/frontdoor')){
-				console.log('This is the login url in JSON');
-				let goodstuff = JSON.parse(content);
-				var link = document.getElementById("loginUrl");
-				link.href = goodstuff.result.url;
-				// link.innerHTML = goodstuff.result.url;
-				document.getElementById("loginBlock").setAttribute("style", "display : block");
-			} else if (content.includes('password')) {
-				let goodstuff = JSON.parse(content);
-				document.getElementById("password").innerHTML = goodstuff.result.password;
-				document.getElementById("passwordBlock").setAttribute("style", "display : block");
-				defaultContent('Password Generated');
-			} else if (content.includes('pushedSource')) {
-
-				defaultContent('Source Pushed');
-				// // let's create an array to share
-				// var element = document.getElementById("status");
-				// var para = document.createElement("p");
-				// para.classList.add('slds-m-vertical_medium');
-				// var ul = document.createElement("ul");
-				// ul.classList.add('slds-list_vertical');
-
-				// let goodstuff = JSON.parse(content);
-				// for (let line of goodstuff.result.pushedSource){
-				// 	var li = document.createElement("li");
-				// 	var node = document.createTextNode(line.state + ' ' + line.fullName + ' (' + line.type + ')' );
-				// 	li.appendChild(node);
-				// 	ul.appendChild(li);
+				// if (parsedData.content.includes('secur/frontdoor')) {
+				// 	console.log('This is the login url in JSON');
+				// 	let goodstuff = JSON.parse(content);
+				// 	var link = document.getElementById("loginUrl");
+				// 	link.href = goodstuff.result.url;
+				// 	// link.innerHTML = goodstuff.result.url;
+				// 	document.getElementById("loginBlock").setAttribute("style", "display : block");
 				// }
-				// para.appendChild(ul);
-				// var element = document.getElementById("status");
-				// element.appendChild(para);
-				//refId
-			} else if (content.includes('Permsets Assigned')) {
-				defaultContent('Assigned Perm Sets (see console logs for details)');
-			} else if (content.includes('Import Results')) {
-				defaultContent('Loaded some data (see console logs for details)');
-			} else if (content.includes('EXECUTION_FINISHED')) {
-				defaultContent('Executed Apex (see console logs for details)');
-			} else if (content.includes('username') && content.includes('orgId')) {
-				let goodstuff = JSON.parse(content);
-				document.getElementById("username").innerHTML = goodstuff.result.username;
-				// document.getElementById("passwordBlock").setAttribute("style", "display : block");
-				defaultContent('Scratch org created with username ' + goodstuff.result.username);
-			} else if (content.includes('ALLDONE')) {
-				document.getElementById("loaderBlock").setAttribute("style", "display : none");
-				// document.getElementById("passwordBlock").setAttribute("style", "display : block");
-			} else {
-				// everything unspecified
-				defaultContent(content);
-			}
-
-		}
+			};
+		</script>
+		<% } %>
 
 
-		defaultContent = function(content){
-			var para = document.createElement("p");
-			para.classList.add('slds-m-vertical_medium');
-			var node = document.createTextNode(msgCounter + '. ' + content);
-			para.appendChild(node);
+			<%if (format == 'deployer') { %>
+				<% include ../partials/head %>
+					<main class="slds-card">
+						<div id="loaderBlock">
+							<h2 class="slds-text-heading_medium slds-p-top_medium slds-p-bottom_medium sfdx-wrap">
+								<img src="../../dist/assets/images/loader.gif" style="width:27px;" /> Deploying
+								<strong>
+									<%= deployId %>
+								</strong>
+							</h2>
+						</div>
 
-			var element = document.getElementById("status");
-			element.appendChild(para);
-		}
+						<div id="loginBlock" style="display: none;">
+							<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
 
+								<p class="slds-m-around_large">
+									<strong>Note:</strong> It can take up to 5 minutes for the my domain DNS to propogate. If the scratch org doesn't load,
+									refresh it in a few minutes.</p>
 
+								<div class="slds-notify slds-notify_toast slds-theme_success" role="alert">
+									<span class="slds-assistive-text">warning</span>
 
-		//deleteButton
-		document.getElementById("deleteButton").addEventListener("click", function (e) {
-			e.preventDefault();
-			e.stopPropagation();
-
-			//document.getElementById("demo").innerHTML = "Hello World";
-			var xhttp = new XMLHttpRequest();
-
-			xhttp.open("POST", "/delete", true);
-			xhttp.setRequestHeader("Content-type", "application/json");
-			xhttp.onreadystatechange = function () {
-				if (xhttp.readyState == 4 && xhttp.status == 302) {
-					console.log(xhttp.response);
-					console.log(xhttp.status);
-					console.log(xhttp.responseText);
-					window.location = xhttp.responseText;
-				}
-			}
-			xhttp.send(JSON.stringify({
-				username: document.getElementById("username").innerHTML,
-				delete: true
-			}));
-			return false;
-		});
-
-	</script>
-
-</main>
+									<div class="slds-notify__content">
+										<h2 class="slds-text-heading_small slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+											Your org is ready!
+											<div>
+												<a id="deleteButton" href="" class="slds-button slds-button_destructive">Delete</a>
+												<a id="loginUrl" target="_blank" href="" class="slds-button slds-button_neutral">Launch</a>
+											</div>
+										</h2>
+									</div>
+								</div>
 
 
-<% include ../partials/footer %>
-<% } %>
+							</div>
+						</div>
 
-<!-- end normal deployer -->
+						<div id="passwordBlock" style="display: none;">
+							<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
+
+								<p class="slds-m-around_large">
+									<strong>Note:</strong> Use the button above to login for the first time. These credentials are for other uses (mobile app,
+									integrations). Be sure that you're logging in via sandbox (test.salesforce.com) and not production.
+								</p>
+
+								<div class="slds-notify slds-notify_toast" role="alert">
+									<span class="slds-assistive-text">warning</span>
+
+									<div class="slds-notify__content">
+										<h2 class="slds-text-heading_small ">Your username is
+											<strong id="username"></strong>
+											and your password is
+											<strong id="password"></strong>
+										</h2>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+						<div id="secondaryUserBlock" style="display: none;">
+							<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
+
+								<p class="slds-m-around_large">
+									Additional users created
+								</p>
+
+								<div class="slds-notify slds-notify_toast" role="alert">
+									<span class="slds-assistive-text">warning</span>
+
+									<div class="slds-notify__content" id="secondaryUserArray">
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+						<div id="errorBlock" style="display: none;">
+							<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
+
+								<div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+									<span class="slds-assistive-text">Error</span>
+
+									<div class="slds-notify__content">
+										<h2 class="slds-text-heading_small ">
+											<strong id="errorTest">An error occurred while deploying.</strong>&nbsp;See the browser console logs for more information.
+										</h2>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+						<div id="status" class="slds-m-bottom_small sfdx-output"></div>
+
+						<!-- end of regular deployer view -->
+
+
+						<script>
+							// works for both http and https
+
+							// const deployId = deployIdInput.value;
+
+							// console.log(deployId);
+
+							ws.onmessage = function (event) {
+								msgCounter++;
+								// console.log(event);
+								let parsedData;
+								try {
+									parsedData = JSON.parse(event.data);
+								} catch (err) {
+									console.log('unparseable message (not JSON)');
+									console.log(event.data);
+								}
+								if (parsedData) {
+									if (parsedData.deployId === deployId) {
+										console.log(parsedData);
+										displayContent(parsedData.content);
+									} else {
+										console.log('not mine');
+										console.log(parsedData);
+									}
+								}
+							};
+
+
+
+							displayContent = function (content) {
+								// the login url
+								if (content.includes('ERROR')) {
+									console.log('an error occurred');
+									console.log(content);
+									document.getElementById("errorBlock").setAttribute("style", "display : block");
+								} else if (content.includes('secur/frontdoor')) {
+									console.log('This is the login url in JSON');
+									let goodstuff = JSON.parse(content);
+									var link = document.getElementById("loginUrl");
+									link.href = goodstuff.result.url;
+									// link.innerHTML = goodstuff.result.url;
+									document.getElementById("loginBlock").setAttribute("style", "display : block");
+								} else if (content.includes('password')) {
+									let goodstuff = JSON.parse(content);
+									if (result.fields) {
+										// secondary user generated with password.  Show the block
+										document.getElementById("secondaryUserBlock").setAttribute("style", "display : block");
+										// add to the secondaryUserArray
+										var para = document.createElement("p");
+										para.classList.add('slds-m-vertical_medium');
+										para.classList.add('slds-text-heading_small');
+										var node = document.createTextNode(`User named ${goodstuff.result.fields.firstname} ${goodstuff.result.fields.lastname} created with username ${goodstuff.result.fields.username} and password ${goodstuff.result.password}`);
+										para.appendChild(node);
+									} else {
+										// primary user password generated/set
+										document.getElementById("password").innerHTML = goodstuff.result.password;
+										document.getElementById("passwordBlock").setAttribute("style", "display : block");
+										defaultContent('Password Generated');
+									}
+
+								} else if (content.includes('pushedSource')) {
+
+									defaultContent('Source Pushed');
+									// // let's create an array to share
+									// var element = document.getElementById("status");
+									// var para = document.createElement("p");
+									// para.classList.add('slds-m-vertical_medium');
+									// var ul = document.createElement("ul");
+									// ul.classList.add('slds-list_vertical');
+
+									// let goodstuff = JSON.parse(content);
+									// for (let line of goodstuff.result.pushedSource){
+									// 	var li = document.createElement("li");
+									// 	var node = document.createTextNode(line.state + ' ' + line.fullName + ' (' + line.type + ')' );
+									// 	li.appendChild(node);
+									// 	ul.appendChild(li);
+									// }
+									// para.appendChild(ul);
+									// var element = document.getElementById("status");
+									// element.appendChild(para);
+									//refId
+								} else if (content.includes('Permsets Assigned')) {
+									defaultContent('Assigned Perm Sets (see console logs for details)');
+								} else if (content.includes('Import Results')) {
+									defaultContent('Loaded some data (see console logs for details)');
+								} else if (content.includes('EXECUTION_FINISHED')) {
+									defaultContent('Executed Apex (see console logs for details)');
+								} else if (content.includes('username') && content.includes('orgId') && !content.includes('"fields":{')) {
+									let goodstuff = JSON.parse(content);
+									document.getElementById("username").innerHTML = goodstuff.result.username;
+									// document.getElementById("passwordBlock").setAttribute("style", "display : block");
+									defaultContent('Scratch org created with username ' + goodstuff.result.username);
+								} else if (content.includes('ALLDONE')) {
+									document.getElementById("loaderBlock").setAttribute("style", "display : none");
+									// document.getElementById("passwordBlock").setAttribute("style", "display : block");
+								} else {
+									// everything unspecified
+									defaultContent(content);
+								}
+
+							}
+
+
+							defaultContent = function (content) {
+								var para = document.createElement("p");
+								para.classList.add('slds-m-vertical_medium');
+								var node = document.createTextNode(msgCounter + '. ' + content);
+								para.appendChild(node);
+
+								var element = document.getElementById("status");
+								element.appendChild(para);
+							}
+
+
+
+							//deleteButton
+							document.getElementById("deleteButton").addEventListener("click", function (e) {
+								e.preventDefault();
+								e.stopPropagation();
+
+								//document.getElementById("demo").innerHTML = "Hello World";
+								var xhttp = new XMLHttpRequest();
+
+								xhttp.open("POST", "/delete", true);
+								xhttp.setRequestHeader("Content-type", "application/json");
+								xhttp.onreadystatechange = function () {
+									if (xhttp.readyState == 4 && xhttp.status == 302) {
+										console.log(xhttp.response);
+										console.log(xhttp.status);
+										console.log(xhttp.responseText);
+										window.location = xhttp.responseText;
+									}
+								}
+								xhttp.send(JSON.stringify({
+									username: document.getElementById("username").innerHTML,
+									delete: true
+								}));
+								return false;
+							});
+
+						</script>
+
+					</main>
+
+
+					<% include ../partials/footer %>
+						<% } %>
+
+							<!-- end normal deployer -->
