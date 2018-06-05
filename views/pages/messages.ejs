@@ -152,7 +152,7 @@
 						<div id="secondaryUserBlock" style="display: none;">
 							<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
 
-								<div class="slds-notify slds-notify_toast" role="alert">
+								<div class="slds-notify slds-notify_toast theme_warning" role="alert">
 									<span class="slds-assistive-text">warning</span>
 
 									<div class="slds-notify__content" id="secondaryUserArray">
@@ -236,13 +236,9 @@
 										// secondary user generated with password.  Show the block
 										document.getElementById("secondaryUserBlock").setAttribute("style", "display : block");
 										// add to the secondaryUserArray
-										var para = document.createElement("p");
-										para.classList.add('slds-m-vertical_medium');
-										para.classList.add('slds-text-heading_small');
-										var node = document.createTextNode(`User named ${goodstuff.result.fields.firstname} ${goodstuff.result.fields.lastname} created with username ${goodstuff.result.fields.username} and password ${goodstuff.result.password}`);
-										para.appendChild(node);
+										var html = `<p class="slds-m-vertical_medium slds-text-heading_small">User named <b>${goodstuff.result.fields.firstname} ${goodstuff.result.fields.lastname}</b> created with username <b>${goodstuff.result.fields.username}</b> and password <b>${goodstuff.result.password}</b></p>`;
 										var element = document.getElementById("secondaryUserArray");
-										element.appendChild(para);
+										element.insertAdjacentHTML('beforeend', html.trim());
 									} else {
 										// primary user password generated/set
 										document.getElementById("password").innerHTML = goodstuff.result.password;
