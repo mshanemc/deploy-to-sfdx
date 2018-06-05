@@ -25,7 +25,7 @@
     "@salesforce-ux/design-system": "^2.4.5",
     "async": "^2.5.0",
     "body-parser": "^1.18.2",
-    "bufferutil": "3.0.2",
+    "bufferutil": "3.0.5",
     "child-process-es6-promise": "^1.2.0",
     "child_process": "^1.0.2",
     "cookie-parser": "^1.4.3",
