@@ -190,7 +190,7 @@
 						<script>
 							// works for both http and https
 
-							const deployId = deployIdInput.value;
+							// const deployId = deployIdInput.value;
 
 							console.log(deployId);
 
@@ -205,7 +205,7 @@
 									console.log(event.data);
 								}
 								if (parsedData) {
-									if (parsedData.deployId === deployId) {
+									if (parsedData.deployId.trim() === deployId.trim()) {
 										console.log(parsedData);
 										displayContent(parsedData.content);
 									} else {
