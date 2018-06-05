@@ -207,7 +207,11 @@
 								if (parsedData) {
 									if (parsedData.deployId.trim() === deployId.trim()) {
 										console.log(parsedData);
-										displayContent(parsedData.content);
+										if (parsedData.content){
+											displayContent(parsedData.content);
+										} else {
+											console.log('no content!');
+										}
 									} else {
 										console.log('not mine');
 										console.log(parsedData);
@@ -232,7 +236,7 @@
 									document.getElementById("loginBlock").setAttribute("style", "display : block");
 								} else if (content.includes('password')) {
 									let goodstuff = JSON.parse(content);
-									if (result.fields) {
+									if (goodstuff.result.fields) {
 										// secondary user generated with password.  Show the block
 										document.getElementById("secondaryUserBlock").setAttribute("style", "display : block");
 										// add to the secondaryUserArray
