@@ -74,6 +74,8 @@ It runs two plugins that give it powers SFDX doesn't out-of-the-box
 https://github.com/mshanemc/sfdx-msm-plugins
 https://github.com/mshanemc/shane-sfdx-plugins
 
+These plugins are in the package.json dependencies, then linked from source in lib/hubAuth.js.  Feel free to add additional plugins using npm install some-plugin-of-yours and then add it in hubAuth.js.
+
 ## Org pools (optional, advanced!)
 
 Building orgs that take too long?  Ever have one that doesn't get its DNS ready in time?  Know you're mostly deploying the same orgs all the time?
