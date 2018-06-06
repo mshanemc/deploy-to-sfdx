@@ -82,7 +82,7 @@ Building orgs that take too long?  Ever have one that doesn't get its DNS ready 
 
 Org Pools are the answer.  You tell it which username/repo pairs, and how many orgs you'd like pre-built.  When the user requests one, you simply grab one from the pool.  Orgs in the pool are less than 12 hours old so they stay fresh.
 
-There's 2 worker dynos, off by default.  If you want pools, turn them on.
+There's 2 worker dynos, off by default.  If you want pools, turn on poolwatcher.  Don't turn on pooldeployer (see below)
 
 Then, in your .env/heroku config vars, point the deployer to some url that returns json.
 `POOLCONFIG_URL` = `https://where.yourstuff/is`.
@@ -109,7 +109,8 @@ There's a few more settings for pools
 The worker checks every `poolLoopTimeMin` minutes to see if any pools are below their quantity and issues more deploy requests.  If the pool is empty when a request comes in, the deployer just builds an org the old-fashioned, slow way.
 
 `poolwatcher` monitors ready and inprogress orgs, comparing them to your config targets, requests deployments, and runs the skimmer (checking for expired orgs)
-`pooldeployer` fulfills those deployments without tying up your regular worker.
+
+`pooldeployer` should have 0 dynos running.  It runs as a one-off dyno called by *** poolwatcher* *
 
 ## Local Setup (Mac...others, who knows?)
 
