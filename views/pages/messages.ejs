@@ -64,7 +64,7 @@
 					console.log(event.data);
 				}
 				if (parsedData) {
-					if (parsedData.deployId === deployId) {
+					if (parsedData.deployId.trim() === deployId.trim()) {
 						console.log(parsedData);
 						if (parsedData.content.includes('secur/frontdoor')) {
 							console.log('This is the login url in JSON');
