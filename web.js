@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 const logger = require('heroku-logger');
 const exec = require('child_process').exec;
 
-// const cookieParser = require('cookie-parser');
 const msgBuilder = require('./lib/deployMsgBuilder');
 
 const ex = 'deployMsg';
