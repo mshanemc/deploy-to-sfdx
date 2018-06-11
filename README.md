@@ -49,10 +49,11 @@ Here's a heroku button so you can have your own instance of the Deployer
 ---
 ## Heroku setup
 
-The button will start this on free hobby dynos.  For real life, I'd recommend a pair of web 1x and a pair of workers at 1x.
+The button will start this on free hobby dynos.  For real life, I'd recommend a pair of web 1x and a pair of workers (orgbuilder) at 1x.
 
 If you're going to be doing a lot of users (imagine a workshop where lots of people are pushing the button at the same time) you can scale out more workers so the people last in line don't have to wait so long.  Otherwise, it'll spin while the workers are busy processing the deploy request queue.
 
+The oneoffbuilder is the same as the orgbuilder but exits when it's finished with its queue item.  They do take about 30 seconds to spin up before starting to build an org, so having "live workers" is better.  These give you the ability to scale out work horizontally (booting up a new dyno will be faster than waiting in line behind several other deploys on the always-live workers)
 ---
 
 ## Architectural overview

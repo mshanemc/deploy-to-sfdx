@@ -4,6 +4,8 @@ export PATH=$PATH:/app
 echo "Updating PATH to include Salesforce CLI ..."
 export PATH=$PATH:/app/.local/share/sfdx/cli/bin/
 
+# do not autoupdate
+export SFDX_AUTOUPDATE_DISABLE=true
 echo "Creating local resources ..."
 mkdir /app/tmp
 
