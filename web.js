@@ -5,7 +5,8 @@ const express = require('express');
 const expressWs = require('express-ws');
 const bodyParser = require('body-parser');
 const logger = require('heroku-logger');
-// const cookieParser = require('cookie-parser');
+const exec = require('child_process').exec;
+
 const msgBuilder = require('./lib/deployMsgBuilder');
 
 const ex = 'deployMsg';
@@ -47,6 +48,8 @@ app.post('/trial', (req, res, next) => {
   visitor.pageview('/trial').send();
   visitor.event('Repo', req.query.template).send();
 
+  exec(`heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`);
+
   redis.rpush('deploys', JSON.stringify(message))
     .then(() => res.redirect(`/deploying/trial/${message.deployId}`));
 
@@ -60,6 +63,8 @@ app.post('/delete', (req, res, next) => {
     username: req.body.username,
     delete: true
   };
+
+  exec(`heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`);
 
   redis.rpush('poolDeploys', JSON.stringify(message))
     .then(() => {
@@ -101,6 +106,7 @@ app.get('/launch', (req, res, next) => {
   visitor.pageview('/launch').send();
   visitor.event('Repo', req.query.template).send();
 
+  exec(`heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`);
 
   redis.rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
     .then((rpushResult) => {
