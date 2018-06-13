@@ -42,6 +42,11 @@
       "type": "oneoffbuilder",
       "quantity": 0,
       "size": "hobby"
+    },
+    {
+      "type":"poolskimmer",
+      "quantity": 0,
+      "size": "hobby"
     }
   ],
   "buildpacks": [
