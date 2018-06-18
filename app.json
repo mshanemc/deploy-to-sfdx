@@ -47,6 +47,11 @@
       "type":"poolskimmer",
       "quantity": 0,
       "size": "hobby"
+    },
+    {
+      "type": "dynoskimmer",
+      "quantity": 0,
+      "size": "hobby"
     }
   ],
   "buildpacks": [
