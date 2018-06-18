@@ -4,3 +4,4 @@ poolwatcher: node lib/poolMaintenance.js
 pooldeployer: node lib/poolConsumer.js
 oneoffbuilder: node lib/deployOneOff.js
 poolskimmer: node lib/skimmer.js
+dynoskimmer: node lib/dynoskimmer.js
