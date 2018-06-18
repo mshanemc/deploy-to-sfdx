@@ -29,6 +29,7 @@
     "ejs": "^2.5.6",
     "express": "^4.16.3",
     "express-ws": "^3.0.0",
+    "heroku-client": "^3.0.6",
     "heroku-logger": "^0.3.1",
     "https": "^1.0.0",
     "ioredis": "^3.2.2",
