@@ -51,7 +51,7 @@ app.post('/trial', (req, res, next) => {
   exec(`heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`);
 
   redis.rpush('deploys', JSON.stringify(message))
-    .then(() => res.redirect(`/deploying/trial/${message.deployId}`));
+    .then(() => res.redirect(`/deploying/trial/${message.deployId.trim()}`));
 
 });
 
@@ -116,7 +116,7 @@ app.get('/launch', (req, res, next) => {
         return res.send('pool initiated');
       } else {
         logger.debug('putting in reqular deploy queue');
-        return res.redirect(`/deploying/deployer/${message.deployId}`);
+        return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
       }
     });
 });
@@ -129,7 +129,7 @@ app.get('/userinfo', (req, res, next) => {
 
 app.get('/deploying/:format/:deployId', (req, res, next) => {
   res.render('pages/messages', {
-    deployId: req.params.deployId,
+    deployId: req.params.deployId.trim(),
     format: req.params.format
   });
 });
@@ -182,7 +182,7 @@ redisSub.on('message', (channel, message) => {
   const msgJSON = JSON.parse(message);
   console.log(msgJSON);
   wsInstance.getWss().clients.forEach((client) => {
-    if (client.upgradeReq.url.includes(msgJSON.deployId)) {
+    if (client.upgradeReq.url.includes(msgJSON.deployId.trim())) {
       client.send(JSON.stringify(msgJSON));
       // close connection when ALLDONE
       if (msgJSON.content === 'ALLDONE') {
