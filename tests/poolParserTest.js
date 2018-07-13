@@ -12,7 +12,7 @@ const exec = require('child-process-es6-promise').exec;
 
 const username = 'mshanemc';
 
-require('dotenv').config({ path: __dirname + '/../.env' });
+require('dotenv').config({ path: `${__dirname}/../.env` });
 
 describe('poolURLTest', function () {
 	this.timeout(500000);
@@ -134,7 +134,7 @@ describe('poolParserTest3', function () {
 		console.log(result);
 		expect(result);
 		expect(result.openLine).to.include('sfdx force:org:open');
-		expect(result.passwordLine).to.equal('sfdx msm:user:password:set -l User -g User -p sfdx1234 --json');
+		expect(result.passwordLine).to.equal('sfdx shane:user:password:set -l User -g User -p sfdx1234 --json');
 	});
 
 	after(function () {

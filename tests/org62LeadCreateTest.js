@@ -1,12 +1,12 @@
 /* globals it, describe */
 
-const chai = require('chai');
+// const chai = require('chai');
 
-const assert = chai.assert;
-const expect = chai.expect; // we are using the "expect" style of Chai
+// const assert = chai.assert;
+// const expect = chai.expect; // we are using the "expect" style of Chai
 const leadCreate = require('./../lib/trialLeadCreate.js');
 
-describe('org62LeadCreate', function () {
+describe('org62LeadCreate', () => {
 
 	const formBody = {
 		UserFirstName: 'Tr7ial',
@@ -25,7 +25,7 @@ describe('org62LeadCreate', function () {
 		DriverCampaignId: '70130000000sUVb'
 	};
 
-	it('sends the lead', function () {
+	it('sends the lead', () => {
 		const result = leadCreate(formBody);
 		console.log(result);
 
