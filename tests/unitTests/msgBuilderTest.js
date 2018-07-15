@@ -4,10 +4,10 @@ const chai = require('chai');
 
 const assert = chai.assert;
 const expect = chai.expect; // we are using the "expect" style of Chai
-const msgBuilder = require('./../lib/deployMsgBuilder');
+const msgBuilder = require('./../../lib/deployMsgBuilder');
 
-describe('urlTestsMaster', function () {
-	it('handles master repos', function () {
+describe('urlTestsMaster', () => {
+	it('handles master repos', () => {
 
 		const req = {
 			template: 'https://github.com/mshanemc/cg4Integrate'
@@ -27,8 +27,8 @@ describe('urlTestsMaster', function () {
 	});
 });
 
-describe('urlTestsBranch', function () {
-	it('handles branch repos', function () {
+describe('urlTestsBranch', () => {
+	it('handles branch repos', () => {
 
 		const req = {
 			template: 'https://github.com/mshanemc/cg4Integrate/tree/passwordSet'
@@ -51,8 +51,8 @@ describe('urlTestsBranch', function () {
 	});
 });
 
-describe('userinfo', function () {
-	it('handles email, firstname, lastname', function () {
+describe('userinfo', () => {
+	it('handles email, firstname, lastname', () => {
 
 		const req = {
 			template: 'https://github.com/mshanemc/cg4Integrate/tree/passwordSet',

@@ -4,7 +4,7 @@
 
 // const assert = chai.assert;
 // const expect = chai.expect; // we are using the "expect" style of Chai
-const leadCreate = require('./../lib/trialLeadCreate.js');
+const leadCreate = require('./../../lib/trialLeadCreate.js');
 
 describe('org62LeadCreate', () => {
 
