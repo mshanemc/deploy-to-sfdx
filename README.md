@@ -157,6 +157,17 @@ if **hosted-scratch-qa** is the name of your app
 
 ---
 
+## Testing
+
+There's unit tests in tests/unitTests.  Run these to not break stuff.
+Integration (tests/integrationTests) are harder.  You'll need some dynos running in your test environment.  Then
+`export DEPLOYER_TESTING_ENDPOINT=[the url of your dev environment]`
+`mocha tests/integrationTests/*Test.js`
+
+This is deploying actual repos from github.  They're defined in the top of deployTest.js.  If you have repos you really care about, add them!
+
+NOTE: This is using up your scratch org quotas.  The tests delete the orgs, so it's minimally wastefuly, but still expect it to take a while AND watch your daily limit.
+
 ## Setting up a repo (optional)
 
 So you need a target repo to deploy (see examples below).  If your repo is simple, the tool will do the default behavior (create, push source, open).
