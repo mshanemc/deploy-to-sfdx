@@ -1,50 +1,65 @@
-/* globals it, describe */
+/* globals it, describe, document */
 const Nightmare = require('nightmare');
 const chai = require('chai');
 
 const expect = chai.expect;
 const testEnv = process.env.DEPLOYER_TESTING_ENDPOINT;
-const waitTimeout = 300000;
+const waitTimeout = 1000 * 60 * 15;
+
+const testRepos = [
+  {
+    username: 'mshanemc',
+    repo: 'df17IntegrationWorkshops'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'cg1'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'codeForClicks'
+  },
+  {
+    username: 'mshanemc',
+    repo: 'cg4Integrate'
+  },
+  {
+    username: 'mshanemc',
+    repo: 'process-automation-workshop-df17'
+  },
+  {
+    username: 'mshanemc',
+    repo: 'platformTrial'
+  }
+];
 
 if (!testEnv){
   throw new Error('export DEPLOYER_TESTING_ENDPOINT=[the url of your dev environment]');
 }
 
-describe('deploys actual repos', () => {
-  it('deploys https://github.com/mshanemc/df17IntegrationWorkshops', function (done) {
-    const repo = 'https://github.com/mshanemc/df17IntegrationWorkshops';
+const deployCheck = async (user, repo) => {
+  const url = `https://github.com/${user}/${repo}`;
+  const nightmare = new Nightmare({ show: true, waitTimeout });
 
-    const nightmare = new Nightmare({ show: true, waitTimeout });
-    nightmare
-      .goto(`${process.env.DEPLOYER_TESTING_ENDPOINT}/launch?template=${repo}`)
-      .then((page) => {
-        expect(page.url).to.include('deploying/deployer/mshanemc-df17IntegrationWorkshops-');
-        console.log(page);
-        return nightmare
-          .wait('a#loginURL[href*="https:"]')
-          .evaluate(function () {
-            return document.querySelector('#loginUrl').href;
-          });
-      })
-      .then((result) => {
-        console.log(result);
-        expect(result).to.include('my.salesforce.com/secur/frontdoor.jsp');
-        return nightmare
-          .click('#deleteButton')
-          .wait('h2#deleteConfirmMessage')
-          .wait(500)
-          .end();
-      })
-      .then((result) => {
-        console.log(result);
-        done();
-      });
-      // .wait('#loginUrl')
-      // .end()
-      // .evaluate(() => document.querySelector('#loginUrl').href)
-      // .then(link => {
-      //   expect(link).to.include('my.salesforce.com/secur/frontdoor.jsp');
-      //   done();
-      // });
-  }).timeout(1000*60*5);
+  const page = await nightmare.goto(`${process.env.DEPLOYER_TESTING_ENDPOINT}/launch?template=${url}`);
+
+  expect(page.url).to.include(`deploying/deployer/${user}-${repo}-`);
+
+  await nightmare.wait('a#loginURL[href*="https:"]');
+  const href = await nightmare.evaluate( () => document.querySelector('#loginUrl').href );
+
+  expect(href).to.include('my.salesforce.com/secur/frontdoor.jsp');
+
+  return nightmare.click('#deleteButton').wait(1000).end();
+
+};
+
+describe('deploys all the test repos', () => {
+  for (const testRepo of testRepos){
+    it(`deploys https://github.com/${testRepo.username}/${testRepo.repo}`, async () => {
+      await deployCheck(testRepo.username, testRepo.repo);
+    }).timeout(waitTimeout);
+  }
 });

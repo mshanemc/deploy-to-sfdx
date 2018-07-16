@@ -9,7 +9,9 @@
   "scripts": {
     "start": "node .",
     "css-build": "mkdirp dist/assets/css && mkdirp dist/assets/fonts && ncp src/assets dist/assets && ncp src/assets/favicons dist/assets/favicons && node-sass src/scss -o dist/assets/css && ncp node_modules/@salesforce-ux/design-system/assets/fonts dist/assets/fonts",
-    "css-watch": "node-sass --watch src/scss -o dist/assets/css"
+    "css-watch": "node-sass --watch src/scss -o dist/assets/css",
+    "test": "./node_modules/mocha/bin/mocha tests/unitTests/*Test.js --reporter spec",
+    "integration-test": "./node_modules/mocha/bin/mocha tests/integrationTests/*Test.js --reporter spec"
   },
   "repository": {
     "type": "git",
