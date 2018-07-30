@@ -35,7 +35,6 @@
     "https": "^1.0.0",
     "ioredis": "^3.2.2",
     "moment": "^2.22.2",
-    "npm": "^6.2.0",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
     "shane-sfdx-plugins": "^0.22.0",
