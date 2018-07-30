@@ -38,7 +38,7 @@
     "npm": "^6.2.0",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
-    "shane-sfdx-plugins": "^0.20.0",
+    "shane-sfdx-plugins": "^0.22.0",
     "universal-analytics": "^0.4.17"
   },
   "devDependencies": {
