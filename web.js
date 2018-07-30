@@ -174,7 +174,6 @@ app.listen(port, () => {
 redisSub.subscribe(ex)
   .then((result) => {
     logger.debug(`subscribed to Redis channel ${ex}`);
-    console.log(result);
   });
 
 redisSub.on('message', (channel, message) => {
