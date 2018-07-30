@@ -6,14 +6,21 @@
   "env": {
     "CONSUMERKEY": {
       "description": "The consumer key for your Connected App.",
-      "value": ""
+      "value": "",
+      "required": true
     },
     "HUB_USERNAME": {
       "description": "The username for your connected app",
-      "value": ""
+      "value": "",
+      "required": true
     },
     "JWTKEY": {
       "description": "The server.key file from your connected app",
+      "value": "",
+      "required": true
+    },
+    "HEROKU_API_KEY": {
+      "description": "Get from account settings in the UI (https://dashboard.heroku.com/account) or by running 'heroku auth:token' on the cli",
       "value": ""
     },
     "LOG_LEVEL": {
