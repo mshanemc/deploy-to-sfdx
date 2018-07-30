@@ -15,6 +15,9 @@
     "JWTKEY": {
       "description": "The server.key file from your connected app",
       "value": ""
+    },
+    "LOG_LEVEL": {
+      "value" : "debug"
     }
   },
   "formation": [
