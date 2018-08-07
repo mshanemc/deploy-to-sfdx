@@ -104,14 +104,14 @@ Then, in your .env/heroku config vars, point the deployer to some url that retur
 Example code here, but feel free to generate it however you like.
 <https://github.com/mshanemc/poolsConfig>
 
-```json
+```
 [{
-    user: 'mshanemc', //ex: lives at https://github.com/mshanemc/cg1
-    repo: 'cg1',
-    quantity: 4, //how many of this org to keep handy
-    lifeHours: 12 //how long it should live, in hours
+    "user": "mshanemc", //ex: lives at https://github.com/mshanemc/cg1
+    "repo": "cg1",
+    "quantity": 4, //how many of this org to keep handy
+    "lifeHours": 12 //how long it should live, in hours
 },
-... //use 1 for each repo
+// ... use 1 for each repo
 ]
 
 ```
