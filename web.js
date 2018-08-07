@@ -5,9 +5,9 @@ const express = require('express');
 const expressWs = require('express-ws');
 const bodyParser = require('body-parser');
 const logger = require('heroku-logger');
-const exec = require('child_process').exec;
 
 const msgBuilder = require('./lib/deployMsgBuilder');
+const runHerokuBuilder = require('./lib/utilities').runHerokuBuilder;
 
 const ex = 'deployMsg';
 
@@ -48,7 +48,7 @@ app.post('/trial', (req, res, next) => {
   visitor.pageview('/trial').send();
   visitor.event('Repo', req.query.template).send();
 
-  exec(`heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`);
+  runHerokuBuilder();
 
   redis.rpush('deploys', JSON.stringify(message))
     .then(() => res.redirect(`/deploying/trial/${message.deployId.trim()}`));
@@ -64,7 +64,7 @@ app.post('/delete', (req, res, next) => {
     delete: true
   };
 
-  exec(`heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`);
+  runHerokuBuilder();
 
   redis.rpush('poolDeploys', JSON.stringify(message))
     .then(() => {
@@ -106,7 +106,7 @@ app.get('/launch', (req, res, next) => {
   visitor.pageview('/launch').send();
   visitor.event('Repo', req.query.template).send();
 
-  exec(`heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`);
+  runHerokuBuilder();
 
   redis.rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
     .then((rpushResult) => {
@@ -174,7 +174,6 @@ app.listen(port, () => {
 redisSub.subscribe(ex)
   .then((result) => {
     logger.debug(`subscribed to Redis channel ${ex}`);
-    console.log(result);
   });
 
 redisSub.on('message', (channel, message) => {
