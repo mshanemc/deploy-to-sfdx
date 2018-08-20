@@ -101,6 +101,8 @@ There's 3 worker dynos, both off by default (leave them that way).
 Then, in your .env/heroku config vars, point the deployer to some url that returns json.
 `POOLCONFIG_URL` = `https://where.yourstuff/is`.
 
+Finally, since poolwatcher is starting dynos to handle this pool stuff, you want to enable a heroku Labs setting for getting dyno metadata `heroku labs:enable runtime-dyno-metadata -a `.  This lets heroku start more heroku with the name of your app being dynamicly fed into the environment variables without you having to 1) set that up 2) maintain different names for each instance/stage
+
 Example code here, but feel free to generate it however you like.
 <https://github.com/mshanemc/poolsConfig>
 
@@ -115,15 +117,6 @@ Example code here, but feel free to generate it however you like.
 ]
 
 ```
-
-There's a few more settings for pools
-
-* `poolLoopTimeMin` how often the poolwatcher should check the pools (default=1)
-* `skimmerTimeMin` how often the skimmer should run (default 60)
-
-The worker checks every `poolLoopTimeMin` minutes to see if any pools are below their quantity and issues more deploy requests.  If the pool is empty when a request comes in, the deployer just builds an org the old-fashioned, slow way.
-
-`poolwatcher` monitors ready and inprogress orgs, comparing them to your config targets, requests deployments, and runs the skimmer (checking for expired orgs)
 
 `pooldeployer` should have 0 dynos running.  It runs as a one-off dyno called by *** poolwatcher* *
 
