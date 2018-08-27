@@ -177,9 +177,9 @@ redisSub.subscribe(ex)
   });
 
 redisSub.on('message', (channel, message) => {
-  logger.debug('heard a message from the worker:');
+  // logger.debug('heard a message from the worker:');
   const msgJSON = JSON.parse(message);
-  console.log(msgJSON);
+  // console.log(msgJSON);
   wsInstance.getWss().clients.forEach((client) => {
     if (client.upgradeReq.url.includes(msgJSON.deployId.trim())) {
       client.send(JSON.stringify(msgJSON));
