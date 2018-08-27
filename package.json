@@ -37,7 +37,7 @@
     "moment": "^2.22.2",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
-    "shane-sfdx-plugins": "^0.28.0",
+    "shane-sfdx-plugins": "^0.28.1",
     "universal-analytics": "^0.4.17"
   },
   "devDependencies": {
