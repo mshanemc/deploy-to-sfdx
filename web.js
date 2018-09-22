@@ -140,7 +140,8 @@ app.get('/pools', async (req, res, next) => {
   for (const key of keys){
     const size = await redis.llen(key);
     output.push({
-      key: size
+      repo: key,
+      size
     });
   }
   res.send(output);
