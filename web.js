@@ -134,6 +134,19 @@ app.get('/deploying/:format/:deployId', (req, res, next) => {
   });
 });
 
+app.get('/pools', async (req, res, next) => {
+  const keys = await redis.keys('*');
+  const output = [];
+  for (const key of keys){
+    const size = await redis.llen(key);
+    output.push({
+      repo: key,
+      size
+    });
+  }
+  res.send(output);
+});
+
 app.get('/testform', (req, res, next) => {
   res.render('pages/testForm');
 });
