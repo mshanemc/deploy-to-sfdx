@@ -1,5 +1,3 @@
-// https://hosted-scratch-qa.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops
-
 const ua = require('universal-analytics');
 const express = require('express');
 const expressWs = require('express-ws');
@@ -185,7 +183,7 @@ app.listen(port, () => {
 
 // subscribe to deploy events to share them with the web clients
 redisSub.subscribe(ex)
-  .then((result) => {
+  .then(() => {
     logger.debug(`subscribed to Redis channel ${ex}`);
   });
 
