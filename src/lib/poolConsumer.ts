@@ -1,11 +1,14 @@
-const util = require('util');
-const fs = require('fs');
-const logger = require('heroku-logger');
-const path = require('path');
-const utilities = require('./utilities');
-const poolParse = require('./poolParse');
-const hubAuth = require('./hubAuth');
-const redis = require('./redisNormal');
+import * as util from 'util';
+import * as fs from 'fs';
+import * as logger from 'heroku-logger';
+import * as path from 'path';
+
+
+import * as utilities from './utilities';
+import * as poolParse from './poolParse';
+import * as hubAuth from './hubAuth';
+import * as redis from './redisNormal';
+
 
 const exec = util.promisify(require('child_process').exec);
 const execFile = util.promisify(require('child_process').execFile);
@@ -18,7 +21,7 @@ async function runAll(){
 	const msg = await redis.lpop('poolDeploys');
 	if (msg) {
 		const keypath = await hubAuth();
-		const msgJSON = JSON.parse(msg);
+		const msgJSON:deployRequest = JSON.parse(msg);
 		// handling deletes
 		if (msgJSON.delete) {
 			logger.debug(`deleting org with username ${msgJSON.username}`);
@@ -59,11 +62,12 @@ async function runAll(){
 				// console.log(`cloneDir is ${cloneDir}`);
 				// console.log(`tmpDir is ${tmpDir}`);
 
-				const poolMessage = {
+				const poolMessage: poolOrg = {
 					'repo': msgJSON.repo,
 					'githubUsername': msgJSON.username,
 					'openCommand': 'placeholder',
-					'displayResults': 'placeholder'
+					'displayResults': 'placeholder',
+					'createdDate': new Date()
 				};
 				if (msgJSON.branch) {
 					poolMessage.branch = msgJSON.branch;
@@ -78,7 +82,7 @@ async function runAll(){
 					logger.debug('orgInit exists!');
 				}
 
-				const parseResults = await (poolParse(path.join(cloneDir, 'orgInit.sh')));
+				const parseResults: lineParserResult = await (poolParse(path.join(cloneDir, 'orgInit.sh')));
 
 				// a few things we have to do post-org-creation so we can still return it to the end user
 				logger.debug(`open command is ${parseResults.openLine}`);
@@ -92,7 +96,6 @@ async function runAll(){
 				const displayResults = await exec('sfdx force:org:display --json', { 'cwd': cloneDir });
 				poolMessage.displayResults = JSON.parse(displayResults.stdout).result;
 				const key = await utilities.getKey(msgJSON);
-				poolMessage.createdDate = new Date();
 				await redis.rpush(key, JSON.stringify(poolMessage));
 				await exec(`rm -rf ${msgJSON.deployId}`, { 'cwd': tmpDir });
 				process.exit(0);

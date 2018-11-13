@@ -1,7 +1,9 @@
-const logger = require('heroku-logger');
-const redis = require('./redisNormal');
-const utilities = require('./utilities');
-const util = require('util');
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const logger = require("heroku-logger");
+const util = require("util");
+const utilities = require("./utilities");
+const redis = require("./redisNormal");
 const exec = util.promisify(require('child_process').exec);
 utilities.checkHerokuAPI();
 // one-off dynos to flush anything in the queue already
@@ -29,14 +31,16 @@ const preparePoolByName = async (pool) => {
         const needed = (targetQuantity - actualQuantity);
         logger.debug(`pool ${poolname} has ${actualQuantity} ready out of ${targetQuantity}...`);
         for (let x = 0; x < needed; x++) {
+            const username = poolname.split('.')[0];
+            const repo = poolname.split('.')[1];
+            const deployId = encodeURIComponent(`${username}-${repo}-${new Date().valueOf()}`);
             const message = {
                 pool: true,
-                username: poolname.split('.')[0],
-                repo: poolname.split('.')[1],
-                whitelisted: true
+                username,
+                repo,
+                deployId,
+                whitelisted: true,
             };
-            // timestamp to make deploys unique
-            message.deployId = encodeURIComponent(`${message.username}-${message.repo}-${new Date().valueOf()}`);
             // branch support
             if (poolname.split('.')[2]) {
                 message.branch = poolname.split('.')[2];

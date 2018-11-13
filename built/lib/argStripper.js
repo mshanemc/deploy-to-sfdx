@@ -1,9 +1,7 @@
-const logger = require('heroku-logger');
-// takes a command line command and removes a parameter.  Make noarg true if it's a flag (parameter with no arguments), like sfdx force:org:create -s
-// ex:
-// cmd = 'sfdx force:org:create -f config/project-scratch-def.json -s -a vol -d 1';
-// parameter = '-a'
-module.exports = function (cmd, parameter, noarg) {
+"use strict";
+// import * as logger from 'heroku-logger';
+const logger = require("heroku-logger");
+const argStripper = function (cmd, parameter, noarg) {
     // add a space to the end to simplify things
     cmd = cmd.concat(' ');
     // quickly return if it doesn't exist
@@ -49,3 +47,4 @@ module.exports = function (cmd, parameter, noarg) {
         return output.trim();
     }
 };
+module.exports = argStripper;

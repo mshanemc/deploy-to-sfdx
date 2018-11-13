@@ -1,11 +1,13 @@
-const util = require('util');
-const fs = require('fs');
-const logger = require('heroku-logger');
-const path = require('path');
-const utilities = require('./utilities');
-const poolParse = require('./poolParse');
-const hubAuth = require('./hubAuth');
-const redis = require('./redisNormal');
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const util = require("util");
+const fs = require("fs");
+const logger = require("heroku-logger");
+const path = require("path");
+const utilities = require("./utilities");
+const poolParse = require("./poolParse");
+const hubAuth = require("./hubAuth");
+const redis = require("./redisNormal");
 const exec = util.promisify(require('child_process').exec);
 const execFile = util.promisify(require('child_process').execFile);
 logger.debug('I am a pool consumer and I am up!');
@@ -56,7 +58,8 @@ async function runAll() {
                     'repo': msgJSON.repo,
                     'githubUsername': msgJSON.username,
                     'openCommand': 'placeholder',
-                    'displayResults': 'placeholder'
+                    'displayResults': 'placeholder',
+                    'createdDate': new Date()
                 };
                 if (msgJSON.branch) {
                     poolMessage.branch = msgJSON.branch;
@@ -82,7 +85,6 @@ async function runAll() {
                 const displayResults = await exec('sfdx force:org:display --json', { 'cwd': cloneDir });
                 poolMessage.displayResults = JSON.parse(displayResults.stdout).result;
                 const key = await utilities.getKey(msgJSON);
-                poolMessage.createdDate = new Date();
                 await redis.rpush(key, JSON.stringify(poolMessage));
                 await exec(`rm -rf ${msgJSON.deployId}`, { 'cwd': tmpDir });
                 process.exit(0);

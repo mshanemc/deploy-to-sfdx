@@ -1,18 +1,16 @@
-const ua = require('universal-analytics');
-const express = require('express');
-const expressWs = require('express-ws');
-const bodyParser = require('body-parser');
-const logger = require('heroku-logger');
+import * as logger from 'heroku-logger';
+import * as express from 'express';
+import * as expressWs from 'express-ws';
+import ua from 'universal-analytics';
+import * as bodyParser from 'body-parser';
 
-const msgBuilder = require('./lib/deployMsgBuilder');
-const runHerokuBuilder = require('./lib/utilities').runHerokuBuilder;
+import * as redis from './lib/redisNormal';
+import * as redisSub from './lib/redisSubscribe';
+import * as msgBuilder from './lib/deployMsgBuilder';
+import * as utilities from './lib/utilities';
+import * as org62LeadCapture from './lib/trialLeadCreate';
 
 const ex = 'deployMsg';
-
-const redis = require('./lib/redisNormal');
-const redisSub = require('./lib/redisSubscribe');
-
-const org62LeadCapture = require('./lib/trialLeadCreate');
 
 const app = express();
 const wsInstance = expressWs(app);
@@ -46,7 +44,7 @@ app.post('/trial', (req, res, next) => {
   visitor.pageview('/trial').send();
   visitor.event('Repo', req.query.template).send();
 
-  runHerokuBuilder();
+  utilities.runHerokuBuilder();
 
   redis.rpush('deploys', JSON.stringify(message))
     .then(() => res.redirect(`/deploying/trial/${message.deployId.trim()}`));
@@ -62,7 +60,7 @@ app.post('/delete', (req, res, next) => {
     delete: true
   };
 
-  runHerokuBuilder();
+  utilities.runHerokuBuilder();
 
   redis.rpush('poolDeploys', JSON.stringify(message))
     .then(() => {
@@ -104,7 +102,7 @@ app.get('/launch', (req, res, next) => {
   visitor.pageview('/launch').send();
   visitor.event('Repo', req.query.template).send();
 
-  runHerokuBuilder();
+  utilities.runHerokuBuilder();
 
   redis.rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
     .then((rpushResult) => {
@@ -191,8 +189,9 @@ redisSub.on('message', (channel, message) => {
   // logger.debug('heard a message from the worker:');
   const msgJSON = JSON.parse(message);
   // console.log(msgJSON);
+
   wsInstance.getWss().clients.forEach((client) => {
-    if (client.upgradeReq.url.includes(msgJSON.deployId.trim())) {
+    if (client.url.includes(msgJSON.deployId.trim())) {
       client.send(JSON.stringify(msgJSON));
       // close connection when ALLDONE
       if (msgJSON.content === 'ALLDONE') {

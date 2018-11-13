@@ -1,17 +1,15 @@
-const logger = require('heroku-logger');
-const util = require('util');
+import * as logger from 'heroku-logger';
+import * as util from 'util';
+
+import * as utilities from './utilities';
+import * as redis from './redisNormal';
+import * as argStripper from './argStripper';
 
 const exec = util.promisify(require('child_process').exec);
 
-const bufferKey = require('./utilities').bufferKey;
-const argStripper = require('./argStripper');
-const utilities = require('./utilities');
-
-const redis = require('./redisNormal');
-
 const ex = 'deployMsg';
 
-module.exports = function (msgJSON, lines, redisPub, visitor) {
+const lines = function (msgJSON, lines, redisPub, visitor) {
 	this.msgJSON = msgJSON;
 	this.lines = lines;
 	this.redisPub = redisPub;
@@ -86,11 +84,11 @@ module.exports = function (msgJSON, lines, redisPub, visitor) {
 
 					if (err.stderr.includes('The Lightning Experience-enabled custom domain is unavailable.')){
 						logger.error(`Custom Domain Timed out.  Retrying '${localLine}'...`);
-						redisPub.publish(ex, bufferKey('The domain is taking longer than usual.  Retrying the org open command', msgJSON.deployId));
+						redisPub.publish(ex, utilities.bufferKey('The domain is taking longer than usual.  Retrying the org open command', msgJSON.deployId));
 					} else {
 						// a real error
 						console.error('Error (lines.js): ', err);
-						redisPub.publish(ex, bufferKey(`ERROR: ${err}`, msgJSON.deployId));
+						redisPub.publish(ex, utilities.bufferKey(`ERROR: ${err}`, msgJSON.deployId));
 						visitor.event('deploy error', this.msgJSON.template, err).send();
 						keepTrying = false;
 					}
@@ -105,12 +103,12 @@ module.exports = function (msgJSON, lines, redisPub, visitor) {
 				}
 				if (lineResult.stdout) {
 					logger.debug(lineResult.stdout);
-					redisPub.publish(ex, bufferKey(lineResult.stdout, msgJSON.deployId));
+					redisPub.publish(ex, utilities.bufferKey(lineResult.stdout, msgJSON.deployId));
 				}
 
 				if (lineResult.stderr && !lineResult.stderr.includes('sfdx-cli: update available')) {
 					logger.error(lineResult.stderr);
-					redisPub.publish(ex, bufferKey(`ERROR ${lineResult.stderr}`, msgJSON.deployId));
+					redisPub.publish(ex, utilities.bufferKey(`ERROR ${lineResult.stderr}`, msgJSON.deployId));
 					visitor.event('deploy error', this.msgJSON.template, lineResult.stderr).send();
 				}
 			}
@@ -120,3 +118,5 @@ module.exports = function (msgJSON, lines, redisPub, visitor) {
 	};
 
 };
+
+export = lines;

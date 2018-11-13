@@ -1,9 +1,12 @@
-const logger = require('heroku-logger');
-const utilities = require('./utilities');
-const moment = require('moment');
-const redis = require('./redisNormal');
-const request = require('request-promise-native');
-const util = require('util');
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const logger = require("heroku-logger");
+const moment = require("moment");
+const request = require("request-promise-native");
+const util = require("util");
+const redis = require("./redisNormal");
+const utilities = require("./utilities");
+// const utilities = require('./utilities');
 const exec = util.promisify(require('child_process').exec);
 utilities.checkHerokuAPI();
 const checkExpiration = async (pool) => {

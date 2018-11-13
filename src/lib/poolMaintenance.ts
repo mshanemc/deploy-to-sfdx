@@ -1,8 +1,9 @@
-const logger = require('heroku-logger');
-const redis = require('./redisNormal');
-const utilities = require('./utilities');
+import * as logger from 'heroku-logger';
+import * as util from 'util';
 
-const util = require('util');
+import * as utilities from './utilities';
+import * as redis from './redisNormal';
+
 const exec = util.promisify(require('child_process').exec);
 
 utilities.checkHerokuAPI();
@@ -38,16 +39,18 @@ const preparePoolByName = async (pool) => {
 		logger.debug(`pool ${poolname} has ${actualQuantity} ready out of ${targetQuantity}...`);
 
 		for (let x = 0; x < needed; x++) {
+			const username = poolname.split('.')[0];
+			const repo = poolname.split('.')[1];
+			const deployId = encodeURIComponent(`${username}-${repo}-${new Date().valueOf()}`);
 
-			const message = {
+			const message: poolRequest = {
 				pool: true,
-				username: poolname.split('.')[0],
-				repo: poolname.split('.')[1],
-				whitelisted: true
-			};
+				username,
+				repo,
+				deployId,
+				whitelisted: true,
 
-			// timestamp to make deploys unique
-			message.deployId = encodeURIComponent(`${message.username}-${message.repo}-${new Date().valueOf()}`);
+			};
 
 			// branch support
 			if (poolname.split('.')[2]) {

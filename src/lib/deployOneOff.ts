@@ -1,4 +1,4 @@
-const logger = require('heroku-logger');
+import * as logger from 'heroku-logger';
 
 const checkQueue = require('./deployQueueCheck');
 const hubAuth = require('./hubAuth');

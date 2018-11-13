@@ -1,14 +1,14 @@
-const logger = require('heroku-logger');
-const redis = require('./redisNormal');
-const util = require('util');
-const fs = require('fs');
-const path = require('path');
+"use strict";
+const logger = require("heroku-logger");
+const util = require("util");
+const fs = require("fs");
+const path = require("path");
+const utilities = require("./utilities");
+const redis = require("./redisNormal");
+const argStripper = require("./argStripper");
 const exec = util.promisify(require('child_process').exec);
-const utilities = require('./utilities');
-const argStripper = require('./argStripper');
-const bufferKey = require('./utilities').bufferKey;
 const deployMsgChannel = 'deployMsg';
-module.exports = async function (deployReq) {
+const pooledOrgFinder = async function (deployReq) {
     const poolsPath = path.join(__dirname, '../tmp', 'pools');
     // is this a template that we prebuild?  uses the utilities.getPoolConfig
     const foundPool = await utilities.getPool(deployReq.username, deployReq.repo);
@@ -56,14 +56,15 @@ module.exports = async function (deployReq) {
                 }
             };
             await Promise.all([
-                redis.publish(deployMsgChannel, bufferKey(JSON.stringify(usernameMessage), deployReq.deployId)),
-                redis.publish(deployMsgChannel, bufferKey(passwordSetResult.stdout, deployReq.deployId))
+                redis.publish(deployMsgChannel, utilities.bufferKey(JSON.stringify(usernameMessage), deployReq.deployId)),
+                redis.publish(deployMsgChannel, utilities.bufferKey(passwordSetResult.stdout, deployReq.deployId))
             ]);
         }
     }
     const openResult = await exec(`${msgJSON.openCommand} --json -r`, { 'cwd': uniquePath });
     logger.debug(`opened : ${openResult.stdout}`);
-    await redis.publish(deployMsgChannel, bufferKey(openResult.stdout, deployReq.deployId));
-    await redis.publish(deployMsgChannel, bufferKey('ALLDONE', deployReq.deployId));
+    await redis.publish(deployMsgChannel, utilities.bufferKey(openResult.stdout, deployReq.deployId));
+    await redis.publish(deployMsgChannel, utilities.bufferKey('ALLDONE', deployReq.deployId));
     return true;
 };
+module.exports = pooledOrgFinder;

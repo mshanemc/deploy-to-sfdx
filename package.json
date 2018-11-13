@@ -26,10 +26,12 @@
   "dependencies": {
     "@salesforce-ux/design-system": "^2.7.4",
     "body-parser": "^1.18.3",
+    "chai": "^4.2.0",
     "child_process": "^1.0.2",
+    "dotenv": "^6.1.0",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
-    "express-ws": "^3.0.0",
+    "express-ws": "^4.0.0",
     "heroku-client": "^3.0.6",
     "heroku-logger": "^0.3.3",
     "https": "^1.0.0",
@@ -37,12 +39,19 @@
     "moment": "^2.22.2",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
+    "rimraf": "^2.6.2",
     "shane-sfdx-plugins": "^0.33.3",
     "universal-analytics": "^0.4.20"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "dotenv": "^5.0.1",
+    "@types/express": "^4.16.0",
+    "@types/express-ws": "^3.0.0",
+    "@types/heroku-logger": "^0.1.0",
+    "@types/ioredis": "^4.0.4",
+    "@types/moment": "^2.13.0",
+    "@types/request": "^2.48.1",
+    "@types/request-promise-native": "^1.0.15",
+    "@types/universal-analytics": "^0.4.2",
     "eslint": "^3.17.1",
     "eslint-config-airbnb-base": "^11.1.1",
     "eslint-plugin-import": "^2.14.0",
@@ -51,6 +60,7 @@
     "ncp": "^2.0.0",
     "nightmare": "^3.0.1",
     "node-sass": "^4.10.0",
-    "rimraf": "^2.6.2"
+    "tslint": "^5.11.0",
+    "typescript": "^3.1.6"
   }
 }

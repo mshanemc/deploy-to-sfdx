@@ -2,7 +2,10 @@
   "compilerOptions": {
     "outDir": "./built",
     "allowJs": true,
-    "target": "es2017"
+    "target": "es2017",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "module": "none"
   },
   "include": [
     "./src/**/*"

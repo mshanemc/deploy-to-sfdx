@@ -1,6 +1,8 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /* globals it, describe, document */
 const Nightmare = require('nightmare');
-const chai = require('chai');
+const chai = require("chai");
 const expect = chai.expect;
 const testEnv = process.env.DEPLOYER_TESTING_ENDPOINT;
 const waitTimeout = 1000 * 60 * 15;

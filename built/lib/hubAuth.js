@@ -1,9 +1,10 @@
-const logger = require('heroku-logger');
-const util = require('util');
-const fs = require('fs');
+"use strict";
+const logger = require("heroku-logger");
+const util = require("util");
+const fs = require("fs");
+const utilities = require("./utilities");
 const exec = util.promisify(require('child_process').exec);
-const loggerFunction = require('../lib/utilities').loggerFunction;
-module.exports = async function () {
+const hubAuth = async function () {
     // where will our cert live?
     let keypath;
     if (process.env.LOCAL_ONLY_KEY_PATH) {
@@ -27,7 +28,7 @@ module.exports = async function () {
     }
     try {
         const results = await Promise.all(setupCommands);
-        results.forEach(result => loggerFunction(result));
+        results.forEach(result => utilities.loggerFunction(result));
         await exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile ${keypath} --setdefaultdevhubusername -a deployBotHub`);
     }
     catch (err) {
@@ -36,3 +37,4 @@ module.exports = async function () {
     }
     return keypath;
 };
+module.exports = hubAuth;

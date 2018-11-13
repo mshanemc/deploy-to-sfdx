@@ -1,9 +1,18 @@
-const logger = require('heroku-logger');
-module.exports = function (query) {
+"use strict";
+const logger = require("heroku-logger");
+const deployMsgBuilder = function (query) {
     const template = query.template;
+    const path = template.replace('https://github.com/', '');
+    const username = path.split('/')[0];
+    const repo = path.split('/')[1];
+    const deployId = encodeURIComponent(`${username}-${repo}-${new Date().valueOf()}`);
     logger.debug(`template is ${template}`);
     const message = {
-        template
+        template,
+        path,
+        username,
+        repo,
+        deployId
     };
     if (query.email) {
         message.email = query.email;
@@ -17,15 +26,10 @@ module.exports = function (query) {
     if (query.pool) {
         message.pool = true;
     }
-    const path = template.replace('https://github.com/', '');
-    message.path = path;
-    message.username = path.split('/')[0];
-    message.repo = path.split('/')[1];
     if (path.includes('/tree/')) {
         // we're dealing with a branch
         message.branch = path.split('/tree/')[1];
     }
-    message.deployId = encodeURIComponent(`${message.username}-${message.repo}-${new Date().valueOf()}`);
     // checking for whitelisting
     const whitelist1 = process.env.GITHUB_USERNAME_WHITELIST; // comma separated list of username
     const whitelist2 = process.env.GITHUB_REPO_WHITELIST; // comma separated list of username/repo
@@ -52,3 +56,4 @@ module.exports = function (query) {
     logger.debug(JSON.stringify(message));
     return message;
 };
+module.exports = deployMsgBuilder;

@@ -1,9 +1,10 @@
-const request = require('request-promise-native');
-const logger = require('heroku-logger');
+import * as logger from 'heroku-logger';
+import * as request from 'request-promise-native';
+
 const exec = require('child_process').exec;
 
-module.exports = {
-	getKey: async (msgJSON) => {
+const utilities = {
+	getKey: async (msgJSON:deployRequest) => {
 
 		if (!msgJSON.username) {
 			throw new Error('msg does not have username');
@@ -135,3 +136,5 @@ module.exports = {
 	}
 
 };
+
+export = utilities;

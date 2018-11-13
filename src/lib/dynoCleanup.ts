@@ -1,9 +1,9 @@
 // uses the heroku API to look for one-off dynos that have been up too long (whatever that is defined as)
-const Heroku = require('heroku-client');
-const logger = require('heroku-logger');
-const moment = require('moment');
+import * as Heroku from 'heroku-client'
+import * as logger from 'heroku-logger';
+import * as moment from 'moment';
 
-const utilities = require('../lib/utilities');
+import * as utilities from './utilities';
 
 utilities.checkHerokuAPI();
 

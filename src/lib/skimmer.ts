@@ -1,9 +1,12 @@
-const logger = require('heroku-logger');
-const utilities = require('./utilities');
-const moment = require('moment');
-const redis = require('./redisNormal');
-const request = require('request-promise-native');
-const util = require('util');
+import * as logger from 'heroku-logger';
+import * as moment from 'moment';
+import * as request from 'request-promise-native';
+import * as util from 'util';
+import * as redis from './redisNormal';
+
+import * as utilities from './utilities';
+
+// const utilities = require('./utilities');
 const exec = util.promisify(require('child_process').exec);
 
 utilities.checkHerokuAPI();

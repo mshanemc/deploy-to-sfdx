@@ -1,4 +1,6 @@
-const logger = require('heroku-logger');
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const logger = require("heroku-logger");
 const checkQueue = require('./deployQueueCheck');
 const hubAuth = require('./hubAuth');
 logger.debug('A one-off deploy consumer dyno is up!');

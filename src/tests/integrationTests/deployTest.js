@@ -1,6 +1,6 @@
 /* globals it, describe, document */
 const Nightmare = require('nightmare');
-const chai = require('chai');
+import * as chai from 'chai';
 
 const expect = chai.expect;
 const testEnv = process.env.DEPLOYER_TESTING_ENDPOINT;

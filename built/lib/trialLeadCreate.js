@@ -1,10 +1,12 @@
+"use strict";
 // asynchronously posts the lead form back to org62
-const request = require('request');
+// const request = require('request');
+const request = require("request");
 const sfdcLeadCaptureServlet = process.env.sfdcLeadCaptureServlet;
 const requestPage = '/form.html';
 const resultPage = '/conf.html';
 const requestHost = 'www.salesforce.com';
-module.exports = function (incoming) {
+const leadCreate = function (incoming) {
     console.log(incoming);
     const formPostBody = {
         UserFirstName: incoming.UserFirstName,
@@ -45,21 +47,4 @@ module.exports = function (incoming) {
         };
     });
 };
-// requestHost=www.salesforce.com
-// requestPage=/form.html
-// resultPage=/conf.html
-// Lead.LeadSource=Qualified+leads
-// UserFirstName=Ned
-// UserLastName=Leonard
-// CompanyName=Enormoco
-// UserTitle=developer
-// UserEmail=nleonard%40salesforce.com
-// UserPhone=5555555555
-// CompanyState=CA
-// CompanyPostalCode=94111
-// CompanyEmployees=5
-// CompanyCountry=US
-// mcloudFormName=GLOB_MAIN_T2L1_OCMS_LCS1
-// Lead.LeadSource=Organic+Search
-// FormCampaignId=7010M000000nQr6QAE
-// DriverCampaignId=70130000000sUVb
+module.exports = leadCreate;

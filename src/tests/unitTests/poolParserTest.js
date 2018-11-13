@@ -1,5 +1,5 @@
 /* globals it, describe, before, after */
-const chai = require('chai');
+import * as chai from 'chai';
 
 const expect = chai.expect; // we are using the "expect" style of Chai
 const parser = require('./../../lib/poolParse');
@@ -7,8 +7,8 @@ const utilities = require('./../../lib/utilities');
 const path = require('path');
 const rimraf = require('rimraf');
 
-const fs = require('fs');
-const util = require('util');
+import * as fs from 'fs';
+import * as util from 'util';
 const exec = util.promisify(require('child_process').exec);
 
 const username = 'mshanemc';

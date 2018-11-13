@@ -1,10 +1,9 @@
-const logger = require('heroku-logger');
-const util = require('util');
+import * as logger from 'heroku-logger';
+import * as util from 'util';
+import * as hubAuth from './hubAuth';
+import * as checkQueue from './deployQueueCheck';
 
 const setTimeoutPromise = util.promisify(setTimeout);
-
-const checkQueue = require('./deployQueueCheck');
-const hubAuth = require('./hubAuth');
 
 logger.debug('I am a deploy (non-pool) consumer and I am up!');
 

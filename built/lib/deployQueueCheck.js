@@ -1,16 +1,17 @@
+"use strict";
 // checks the deploy queue and runs the process.  Can be run as a one-off dyno, or on a setInterval.
-const util = require('util');
-const ua = require('universal-analytics');
-const fs = require('fs');
-const logger = require('heroku-logger');
+const util = require("util");
+const ua = require("universal-analytics");
+const fs = require("fs");
+const logger = require("heroku-logger");
+const redis = require("./redisNormal");
+const utilities = require("./utilities");
+const lineParse = require("./lineParse");
+const lineRunner = require("./lines");
+const pooledOrgFinder = require("./pooledOrgFinder");
 const exec = util.promisify(require('child_process').exec);
-const bufferKey = require('./utilities').bufferKey;
-const lineParse = require('./lineParse');
-const lineRunner = require('./lines');
-const pooledOrgFinder = require('./pooledOrgFinder');
-const redis = require('./redisNormal');
 const ex = 'deployMsg';
-module.exports = async () => {
+const check = async () => {
     // pull the oldest thing on the queue
     const msg = await redis.lpop('deploys');
     // if it's empty, sleep a while and check again
@@ -19,8 +20,8 @@ module.exports = async () => {
     }
     console.log(msg);
     const msgJSON = JSON.parse(msg);
-    const visitor = ua(process.env.UA_ID || 0);
-    logger.debug(msgJSON);
+    const visitor = ua(process.env.UA_ID || '0');
+    // logger.debug(msgJSON);
     logger.debug(msgJSON.deployId);
     logger.debug(msgJSON.template);
     visitor.event('Deploy Request', msgJSON.template).send();
@@ -41,7 +42,7 @@ module.exports = async () => {
         const gitCloneResult = await exec(gitCloneCmd);
         // git outputs to stderr for unfathomable reasons
         logger.debug(gitCloneResult.stderr);
-        await redis.publish(ex, bufferKey(gitCloneResult.stderr, msgJSON.deployId));
+        await redis.publish(ex, utilities.bufferKey(gitCloneResult.stderr, msgJSON.deployId));
         // if you passed in a custom email address, we need to edit the config file and add the adminEmail property
         if (msgJSON.email) {
             console.log('write a file for custom email address');
@@ -65,12 +66,13 @@ module.exports = async () => {
             parsedLines = await lineParse(msgJSON, visitor);
         }
         logger.debug('these are the parsed lines:');
-        logger.debug(parsedLines);
+        logger.debug(JSON.stringify(parsedLines));
         const localLineRunner = new lineRunner(msgJSON, parsedLines, redis, visitor);
         await localLineRunner.runLines();
-        await redis.publish(ex, bufferKey('ALLDONE', msgJSON.deployId));
+        await redis.publish(ex, utilities.bufferKey('ALLDONE', msgJSON.deployId));
         visitor.event('deploy complete', msgJSON.template).send();
     }
     await exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
     return true;
 };
+module.exports = check;

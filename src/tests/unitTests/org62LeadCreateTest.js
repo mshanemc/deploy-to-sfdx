@@ -1,6 +1,6 @@
 /* globals it, describe */
 
-// const chai = require('chai');
+// import * as chai from 'chai';
 
 // const assert = chai.assert;
 // const expect = chai.expect; // we are using the "expect" style of Chai

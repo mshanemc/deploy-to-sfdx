@@ -1,4 +1,4 @@
-module.exports = function shellSanitize(input) {
+const shellSanitize = function (input) {
 	const evilCharacters = [';', '<', '>', '|', '?', '*', '[', ']', '$', '\\', '(', ')', '{', '}', '\'', '&&', '||', '&', '='];
 	let ok = true;
 	evilCharacters.forEach( (punk) => {
@@ -8,3 +8,5 @@ module.exports = function shellSanitize(input) {
 	});
 	return ok;
 };
+
+export = shellSanitize;

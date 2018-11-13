@@ -1,14 +1,16 @@
-const ua = require('universal-analytics');
-const express = require('express');
-const expressWs = require('express-ws');
-const bodyParser = require('body-parser');
-const logger = require('heroku-logger');
-const msgBuilder = require('./lib/deployMsgBuilder');
-const runHerokuBuilder = require('./lib/utilities').runHerokuBuilder;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const logger = require("heroku-logger");
+const express = require("express");
+const expressWs = require("express-ws");
+const universal_analytics_1 = require("universal-analytics");
+const bodyParser = require("body-parser");
+const redis = require("./lib/redisNormal");
+const redisSub = require("./lib/redisSubscribe");
+const msgBuilder = require("./lib/deployMsgBuilder");
+const utilities = require("./lib/utilities");
+const org62LeadCapture = require("./lib/trialLeadCreate");
 const ex = 'deployMsg';
-const redis = require('./lib/redisNormal');
-const redisSub = require('./lib/redisSubscribe');
-const org62LeadCapture = require('./lib/trialLeadCreate');
 const app = express();
 const wsInstance = expressWs(app);
 // const router = express.Router();
@@ -30,10 +32,10 @@ app.post('/trial', (req, res, next) => {
     if (process.env.sfdcLeadCaptureServlet) {
         org62LeadCapture(req.body);
     }
-    const visitor = ua(process.env.UA_ID);
+    const visitor = universal_analytics_1.default(process.env.UA_ID);
     visitor.pageview('/trial').send();
     visitor.event('Repo', req.query.template).send();
-    runHerokuBuilder();
+    utilities.runHerokuBuilder();
     redis.rpush('deploys', JSON.stringify(message))
         .then(() => res.redirect(`/deploying/trial/${message.deployId.trim()}`));
 });
@@ -44,7 +46,7 @@ app.post('/delete', (req, res, next) => {
         username: req.body.username,
         delete: true
     };
-    runHerokuBuilder();
+    utilities.runHerokuBuilder();
     redis.rpush('poolDeploys', JSON.stringify(message))
         .then(() => {
         console.log('message created');
@@ -75,10 +77,10 @@ app.get('/launch', (req, res, next) => {
     }
     const message = msgBuilder(req.query);
     // analytics
-    const visitor = ua(process.env.UA_ID);
+    const visitor = universal_analytics_1.default(process.env.UA_ID);
     visitor.pageview('/launch').send();
     visitor.event('Repo', req.query.template).send();
-    runHerokuBuilder();
+    utilities.runHerokuBuilder();
     redis.rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
         .then((rpushResult) => {
         console.log(rpushResult);
@@ -132,7 +134,7 @@ app.get('*', (req, res, next) => {
 app.use((error, req, res, next) => {
     // Any request to this server will get here, and will send an HTTP
     // response with the error message 'woops'
-    const visitor = ua(process.env.UA_ID);
+    const visitor = universal_analytics_1.default(process.env.UA_ID);
     logger.error(`request failed: ${req.url}`);
     visitor.event('Error', req.query.template).send();
     return res.render('pages/error', {
@@ -153,7 +155,7 @@ redisSub.on('message', (channel, message) => {
     const msgJSON = JSON.parse(message);
     // console.log(msgJSON);
     wsInstance.getWss().clients.forEach((client) => {
-        if (client.upgradeReq.url.includes(msgJSON.deployId.trim())) {
+        if (client.url.includes(msgJSON.deployId.trim())) {
             client.send(JSON.stringify(msgJSON));
             // close connection when ALLDONE
             if (msgJSON.content === 'ALLDONE') {

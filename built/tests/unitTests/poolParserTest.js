@@ -1,12 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /* globals it, describe, before, after */
-const chai = require('chai');
+const chai = require("chai");
 const expect = chai.expect; // we are using the "expect" style of Chai
 const parser = require('./../../lib/poolParse');
 const utilities = require('./../../lib/utilities');
 const path = require('path');
 const rimraf = require('rimraf');
-const fs = require('fs');
-const util = require('util');
+const fs = require("fs");
+const util = require("util");
 const exec = util.promisify(require('child_process').exec);
 const username = 'mshanemc';
 require('dotenv').config({ path: `${__dirname}/../.env` });

@@ -1,21 +1,20 @@
 // checks the deploy queue and runs the process.  Can be run as a one-off dyno, or on a setInterval.
+import * as util from 'util';
+import * as ua from 'universal-analytics';
+import * as fs from 'fs';
+import * as logger from 'heroku-logger';
 
-const util = require('util');
-const ua = require('universal-analytics');
-const fs = require('fs');
-const logger = require('heroku-logger');
+import * as redis from './redisNormal';
+import * as utilities from './utilities';
+import * as lineParse from './lineParse';
+import * as lineRunner from './lines';
+import * as pooledOrgFinder from './pooledOrgFinder';
 
 const exec = util.promisify(require('child_process').exec);
 
-const bufferKey = require('./utilities').bufferKey;
-const lineParse = require('./lineParse');
-const lineRunner = require('./lines');
-const pooledOrgFinder = require('./pooledOrgFinder');
-const redis = require('./redisNormal');
-
 const ex = 'deployMsg';
 
-module.exports = async () => {
+const check = async () => {
   // pull the oldest thing on the queue
   const msg = await redis.lpop('deploys');
       // if it's empty, sleep a while and check again
@@ -25,11 +24,11 @@ module.exports = async () => {
 
   console.log(msg);
 
-  const msgJSON = JSON.parse(msg);
+  const msgJSON: deployRequest = JSON.parse(msg);
 
-  const visitor = ua(process.env.UA_ID || 0);
+  const visitor = ua(process.env.UA_ID || '0');
 
-  logger.debug(msgJSON);
+  // logger.debug(msgJSON);
   logger.debug(msgJSON.deployId);
   logger.debug(msgJSON.template);
 
@@ -55,7 +54,7 @@ module.exports = async () => {
 
             // git outputs to stderr for unfathomable reasons
     logger.debug(gitCloneResult.stderr);
-    await redis.publish(ex, bufferKey(gitCloneResult.stderr, msgJSON.deployId));
+    await redis.publish(ex, utilities.bufferKey(gitCloneResult.stderr, msgJSON.deployId));
 
     // if you passed in a custom email address, we need to edit the config file and add the adminEmail property
     if (msgJSON.email) {
@@ -83,11 +82,11 @@ module.exports = async () => {
     }
 
     logger.debug('these are the parsed lines:');
-    logger.debug(parsedLines);
+    logger.debug(JSON.stringify(parsedLines));
 
     const localLineRunner = new lineRunner(msgJSON, parsedLines, redis, visitor);
     await localLineRunner.runLines();
-    await redis.publish(ex, bufferKey('ALLDONE', msgJSON.deployId));
+    await redis.publish(ex, utilities.bufferKey('ALLDONE', msgJSON.deployId));
 
     visitor.event('deploy complete', msgJSON.template).send();
 
@@ -95,3 +94,5 @@ module.exports = async () => {
   await exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
   return true;
 };
+
+export = check;

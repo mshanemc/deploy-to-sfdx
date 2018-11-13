@@ -1,5 +1,7 @@
+"use strict";
 /* globals it, describe */
-const chai = require('chai');
+Object.defineProperty(exports, "__esModule", { value: true });
+const chai = require("chai");
 // const assert = chai.assert;
 const expect = chai.expect; // we are using the "expect" style of Chai
 const utilities = require('./../../lib/utilities.js');
