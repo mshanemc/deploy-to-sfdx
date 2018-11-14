@@ -1,10 +1,14 @@
 /* globals it, describe */
 
-// import * as chai from 'chai';
+import * as chai from 'chai';
+import * as dotenv from 'dotenv';
 
 // const assert = chai.assert;
-// const expect = chai.expect; // we are using the "expect" style of Chai
-const leadCreate = require('./../../lib/trialLeadCreate.js');
+const expect = chai.expect; // we are using the "expect" style of Chai
+
+import * as leadCreate from '../../src/lib/trialLeadCreate';
+
+dotenv.config();
 
 describe('org62LeadCreate', () => {
 
@@ -26,9 +30,10 @@ describe('org62LeadCreate', () => {
 	};
 
 	it('sends the lead', () => {
-		const result = leadCreate(formBody);
-		console.log(result);
+		expect(process.env.sfdcLeadCaptureServlet).to.be.a('string');
 
+		// console.log(`sending to ${ process.env.sfdcLeadCaptureServlet }`);
+		const result = leadCreate(formBody);
 		// expect(argStripper(cmd, '-a', false)).to.equal('sfdx force:org:create -f config/project-scratch-def.json -s -d 1');
 	});
 

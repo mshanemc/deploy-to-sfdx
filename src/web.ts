@@ -1,8 +1,9 @@
 import * as logger from 'heroku-logger';
 import * as express from 'express';
-import * as expressWs from 'express-ws';
 import ua from 'universal-analytics';
 import * as bodyParser from 'body-parser';
+import * as WebSocket from 'ws';
+import * as path from 'path';
 
 import * as redis from './lib/redisNormal';
 import * as redisSub from './lib/redisSubscribe';
@@ -13,12 +14,17 @@ import * as org62LeadCapture from './lib/trialLeadCreate';
 const ex = 'deployMsg';
 
 const app = express();
-const wsInstance = expressWs(app);
 
-// const router = express.Router();
+const port = process.env.PORT || 8443;
 
-app.use('/scripts', express.static(`${__dirname}/scripts`));
-app.use('/dist', express.static(`${__dirname}/dist`));
+const server = app.listen(port, () => {
+  logger.info(`Example app listening on port ${port}!`);
+});
+
+const wss = new WebSocket.Server({ server, clientTracking: true});
+
+// app.use('/scripts', express.static(`${__dirname}/scripts`));
+app.use(express.static('built/assets'));
 
 app.use(bodyParser.urlencoded({
   extended: true
@@ -26,6 +32,7 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '/views'));
 // app.use(cookieParser());
 
 app.post('/trial', (req, res, next) => {
@@ -40,9 +47,11 @@ app.post('/trial', (req, res, next) => {
     org62LeadCapture(req.body);
   }
 
-  const visitor = ua(process.env.UA_ID);
-  visitor.pageview('/trial').send();
-  visitor.event('Repo', req.query.template).send();
+  if (process.env.UA_ID){
+    const visitor = ua(process.env.UA_ID);
+    visitor.pageview('/trial').send();
+    visitor.event('Repo', req.query.template).send();
+  }
 
   utilities.runHerokuBuilder();
 
@@ -98,10 +107,11 @@ app.get('/launch', (req, res, next) => {
 
   const message = msgBuilder(req.query);
   // analytics
-  const visitor = ua(process.env.UA_ID);
-  visitor.pageview('/launch').send();
-  visitor.event('Repo', req.query.template).send();
-
+  if (process.env.UA_ID) {
+    const visitor = ua(process.env.UA_ID);
+    visitor.pageview('/launch').send();
+    visitor.event('Repo', req.query.template).send();
+  }
   utilities.runHerokuBuilder();
 
   redis.rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
@@ -147,12 +157,7 @@ app.get('/testform', (req, res, next) => {
   res.render('pages/testForm');
 });
 
-app.ws('/deploying/:format/:deployId', (ws, req) => {
-    logger.debug('client connected!');
-    // ws.send('welcome to the socket!');
-    ws.on('close', () => logger.info('Client disconnected'));
-  }
-);
+
 
 app.get('/', (req, res, next) => {
   res.json({ message: 'There is nothing at /.  See the docs for valid paths.' });
@@ -165,18 +170,31 @@ app.get('*', (req, res, next) => {
 app.use( (error, req, res, next) => {
   // Any request to this server will get here, and will send an HTTP
   // response with the error message 'woops'
-  const visitor = ua(process.env.UA_ID);
+  if (process.env.UA_ID) {
+    const visitor = ua(process.env.UA_ID);
+    visitor.event('Error', req.query.template).send();
+  }
   logger.error(`request failed: ${req.url}`);
-  visitor.event('Error', req.query.template).send();
   return res.render('pages/error', {
     customError: error
   });
 });
 
-const port = process.env.PORT || 8443;
 
-app.listen(port, () => {
-  logger.info(`Example app listening on port ${port}!`);
+// app.ws('/deploying/:format/:deployId', (ws, req) => {
+//   logger.debug('client connected!');
+//   // ws.send('welcome to the socket!');
+//   ws.on('close', () => logger.info('Client disconnected'));
+// }
+// );
+wss.on('connection', (ws: WebSocket, req) => {
+  logger.debug(`connection on url ${req.url}`);
+
+  // for future use tracking clients
+  ws.url = req.url;
+
+  // for the client to know it's connected
+  ws.send('connected to the socket');
 });
 
 // subscribe to deploy events to share them with the web clients
@@ -189,8 +207,7 @@ redisSub.on('message', (channel, message) => {
   // logger.debug('heard a message from the worker:');
   const msgJSON = JSON.parse(message);
   // console.log(msgJSON);
-
-  wsInstance.getWss().clients.forEach((client) => {
+  wss.clients.forEach( client => {
     if (client.url.includes(msgJSON.deployId.trim())) {
       client.send(JSON.stringify(msgJSON));
       // close connection when ALLDONE
@@ -199,6 +216,15 @@ redisSub.on('message', (channel, message) => {
       }
     }
   });
+  // wsInstance.getWss().clients.forEach((client) => {
+  //   if (client.url.includes(msgJSON.deployId.trim())) {
+  //     client.send(JSON.stringify(msgJSON));
+  //     // close connection when ALLDONE
+  //     if (msgJSON.content === 'ALLDONE') {
+  //       client.close();
+  //     }
+  //   }
+  // });
 
 
 });

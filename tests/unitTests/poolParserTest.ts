@@ -1,24 +1,27 @@
 /* globals it, describe, before, after */
 import * as chai from 'chai';
+import * as fs from 'fs-extra';
+import * as util from 'util';
+import * as path from 'path';
+import * as rimraf from 'rimraf';
+import * as dotenv from 'dotenv';
+
+import * as parser from '../../src/lib/poolParse';
+import * as utilities from '../../src/lib/utilities';
 
 const expect = chai.expect; // we are using the "expect" style of Chai
-const parser = require('./../../lib/poolParse');
-const utilities = require('./../../lib/utilities');
-const path = require('path');
-const rimraf = require('rimraf');
 
-import * as fs from 'fs';
-import * as util from 'util';
 const exec = util.promisify(require('child_process').exec);
 
 const username = 'mshanemc';
 
-require('dotenv').config({ path: `${__dirname}/../.env` });
+dotenv.config({ path: `${__dirname}/../.env` });
 
 describe('poolURLTest', function () {
 	this.timeout(500000);
 
 	it('gets an array of objects', async () => {
+
 		if (process.env.POOLCONFIG_URL){
 
 			// the pool is sane
@@ -61,7 +64,7 @@ describe('poolURLTest', function () {
 	});
 });
 
-describe('poolParserTest', function () {
+describe('tests the crash course workshop', function () {
 
 	this.timeout(500000);
 
@@ -71,14 +74,13 @@ describe('poolParserTest', function () {
 	const cloneDirPath = path.join(__dirname, '../../tmp', repo);
 
 	before(async () => {
-		const test = exec(`git clone https://github.com/${username}/${repo}`, { 'cwd': tmpDir });
-		return test;
+		fs.ensureDirSync(tmpDir);
+		await exec(`git clone https://github.com/${username}/${repo}`, { 'cwd': tmpDir });
 	});
 
 	it('works for a org:open only file', async () => {
 		expect(fs.existsSync(filepath));
 		const result = await parser(filepath);
-		console.log(result);
 		expect(result);
 		expect(result.openLine).to.equal('sfdx force:org:open');
 	});
@@ -88,7 +90,7 @@ describe('poolParserTest', function () {
 	});
 });
 
-describe('poolParserTest2', function () {
+describe('tests the trial', function () {
 
 	this.timeout(500000);
 
@@ -97,12 +99,14 @@ describe('poolParserTest2', function () {
 	const filepath = path.join(__dirname, '../../tmp', repo, 'orgInit.sh');
 	const cloneDirPath = path.join(__dirname, '../../tmp', repo);
 
-	before(async () =>  exec(`git clone https://github.com/${username}/${repo}`, { 'cwd': tmpDir }));
+	before(async () => {
+		fs.ensureDirSync(tmpDir);
+		await exec(`git clone https://github.com/${username}/${repo}`, { 'cwd': tmpDir });
+	});
 
 	it('works for a org:open with a path', async () => {
 		expect(fs.existsSync(filepath));
 		const result = await parser(filepath);
-		console.log(result);
 		expect(result);
 		expect(result.openLine).to.include('sfdx force:org:open');
 		expect(result.openLine).to.include('-p');
@@ -110,10 +114,11 @@ describe('poolParserTest2', function () {
 
 	after(() => {
 		rimraf.sync(cloneDirPath);
+		rimraf.sync(tmpDir);
 	});
 });
 
-describe('poolParserTest3', function () {
+describe('tests the integration workshop', function () {
 
 	this.timeout(500000);
 
@@ -122,12 +127,14 @@ describe('poolParserTest3', function () {
 	const filepath = path.join(__dirname, '../../tmp', repo, 'orgInit.sh');
 	const cloneDirPath = path.join(__dirname, '../../tmp', repo);
 
-	before(async () => exec(`git clone https://github.com/${username}/${repo}`, { 'cwd': tmpDir }));
+	before(async () => {
+		fs.ensureDirSync(tmpDir);
+		await exec(`git clone https://github.com/${username}/${repo}`, { 'cwd': tmpDir });
+	});
 
 	it('works with custom user password set', async () => {
 		expect(fs.existsSync(filepath));
 		const result = await parser(filepath);
-		console.log(result);
 		expect(result);
 		expect(result.openLine).to.include('sfdx force:org:open');
 		expect(result.passwordLine).to.equal('sfdx shane:user:password:set -l User -g User -p sfdx1234 --json');
@@ -135,5 +142,6 @@ describe('poolParserTest3', function () {
 
 	after(() => {
 		rimraf.sync(cloneDirPath);
+		rimraf.sync(tmpDir);
 	});
 });

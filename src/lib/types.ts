@@ -1,4 +1,4 @@
-interface deployMessage {
+export interface deployMessage {
   username?: string;
   repo: string;
   pool?: boolean;
@@ -7,7 +7,7 @@ interface deployMessage {
   branch?: string;
 }
 
-interface deployRequest extends deployMessage {
+export interface deployRequest extends deployMessage {
   path?: string;
   template: string;
   email?: string;
@@ -16,11 +16,11 @@ interface deployRequest extends deployMessage {
   delete?: boolean;
 }
 
-interface poolRequest extends deployMessage {
+export interface poolRequest extends deployMessage {
 
 }
 
-interface poolOrg {
+export interface poolOrg {
   createdDate: Date;
   repo: string;
   githubUsername: string;
@@ -33,7 +33,7 @@ interface poolOrg {
   }
 }
 
-interface lineParserResult {
+export interface lineParserResult {
   openLine?: string;
   passwordLine?: string;
 }

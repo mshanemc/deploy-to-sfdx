@@ -7,10 +7,11 @@
     "node": "8.9.0"
   },
   "scripts": {
+    "build": "tsc && cp -R ./src/views ./built/ && npm run css-build",
     "start": "node .",
     "css-build": "mkdirp built/assets/css && mkdirp built/assets/fonts && ncp src/assets built/assets && ncp src/assets/favicons built/assets/favicons && node-sass src/scss -o built/assets/css && ncp node_modules/@salesforce-ux/design-system/assets/fonts built/assets/fonts",
     "css-watch": "node-sass --watch src/scss -o built/assets/css",
-    "test": "./node_modules/mocha/bin/mocha tests/unitTests/*Test.js --reporter spec",
+    "unit-test": "./node_modules/mocha/bin/mocha -r ts-node/register tests/unitTests/*Test.ts --reporter spec",
     "integration-test": "./node_modules/mocha/bin/mocha tests/integrationTests/*Test.js --reporter spec"
   },
   "repository": {
@@ -26,7 +27,6 @@
   "dependencies": {
     "@salesforce-ux/design-system": "^2.7.4",
     "body-parser": "^1.18.3",
-    "chai": "^4.2.0",
     "child_process": "^1.0.2",
     "dotenv": "^6.1.0",
     "ejs": "^2.6.1",
@@ -39,19 +39,24 @@
     "moment": "^2.22.2",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
-    "rimraf": "^2.6.2",
     "shane-sfdx-plugins": "^0.33.3",
-    "universal-analytics": "^0.4.20"
+    "universal-analytics": "^0.4.20",
+    "ws": "^6.1.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/dotenv": "^6.1.0",
     "@types/express": "^4.16.0",
     "@types/express-ws": "^3.0.0",
+    "@types/fs-extra": "^5.0.4",
     "@types/heroku-logger": "^0.1.0",
     "@types/ioredis": "^4.0.4",
+    "@types/mocha": "^5.2.5",
     "@types/moment": "^2.13.0",
     "@types/request": "^2.48.1",
     "@types/request-promise-native": "^1.0.15",
     "@types/universal-analytics": "^0.4.2",
+    "chai": "^4.2.0",
     "eslint": "^3.17.1",
     "eslint-config-airbnb-base": "^11.1.1",
     "eslint-plugin-import": "^2.14.0",
@@ -60,6 +65,8 @@
     "ncp": "^2.0.0",
     "nightmare": "^3.0.1",
     "node-sass": "^4.10.0",
+    "rimraf": "^2.6.2",
+    "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "typescript": "^3.1.6"
   }

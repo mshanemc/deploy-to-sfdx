@@ -2,9 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger = require("heroku-logger");
 const express = require("express");
-const expressWs = require("express-ws");
 const universal_analytics_1 = require("universal-analytics");
 const bodyParser = require("body-parser");
+const WebSocket = require("ws");
+const path = require("path");
 const redis = require("./lib/redisNormal");
 const redisSub = require("./lib/redisSubscribe");
 const msgBuilder = require("./lib/deployMsgBuilder");
@@ -12,15 +13,19 @@ const utilities = require("./lib/utilities");
 const org62LeadCapture = require("./lib/trialLeadCreate");
 const ex = 'deployMsg';
 const app = express();
-const wsInstance = expressWs(app);
-// const router = express.Router();
-app.use('/scripts', express.static(`${__dirname}/scripts`));
-app.use('/dist', express.static(`${__dirname}/dist`));
+const port = process.env.PORT || 8443;
+const server = app.listen(port, () => {
+    logger.info(`Example app listening on port ${port}!`);
+});
+const wss = new WebSocket.Server({ server, clientTracking: true });
+// app.use('/scripts', express.static(`${__dirname}/scripts`));
+app.use(express.static('built/assets'));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '/views'));
 // app.use(cookieParser());
 app.post('/trial', (req, res, next) => {
     const message = msgBuilder(req.query);
@@ -32,9 +37,11 @@ app.post('/trial', (req, res, next) => {
     if (process.env.sfdcLeadCaptureServlet) {
         org62LeadCapture(req.body);
     }
-    const visitor = universal_analytics_1.default(process.env.UA_ID);
-    visitor.pageview('/trial').send();
-    visitor.event('Repo', req.query.template).send();
+    if (process.env.UA_ID) {
+        const visitor = universal_analytics_1.default(process.env.UA_ID);
+        visitor.pageview('/trial').send();
+        visitor.event('Repo', req.query.template).send();
+    }
     utilities.runHerokuBuilder();
     redis.rpush('deploys', JSON.stringify(message))
         .then(() => res.redirect(`/deploying/trial/${message.deployId.trim()}`));
@@ -77,9 +84,11 @@ app.get('/launch', (req, res, next) => {
     }
     const message = msgBuilder(req.query);
     // analytics
-    const visitor = universal_analytics_1.default(process.env.UA_ID);
-    visitor.pageview('/launch').send();
-    visitor.event('Repo', req.query.template).send();
+    if (process.env.UA_ID) {
+        const visitor = universal_analytics_1.default(process.env.UA_ID);
+        visitor.pageview('/launch').send();
+        visitor.event('Repo', req.query.template).send();
+    }
     utilities.runHerokuBuilder();
     redis.rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
         .then((rpushResult) => {
@@ -120,11 +129,6 @@ app.get('/pools', async (req, res, next) => {
 app.get('/testform', (req, res, next) => {
     res.render('pages/testForm');
 });
-app.ws('/deploying/:format/:deployId', (ws, req) => {
-    logger.debug('client connected!');
-    // ws.send('welcome to the socket!');
-    ws.on('close', () => logger.info('Client disconnected'));
-});
 app.get('/', (req, res, next) => {
     res.json({ message: 'There is nothing at /.  See the docs for valid paths.' });
 });
@@ -134,16 +138,27 @@ app.get('*', (req, res, next) => {
 app.use((error, req, res, next) => {
     // Any request to this server will get here, and will send an HTTP
     // response with the error message 'woops'
-    const visitor = universal_analytics_1.default(process.env.UA_ID);
+    if (process.env.UA_ID) {
+        const visitor = universal_analytics_1.default(process.env.UA_ID);
+        visitor.event('Error', req.query.template).send();
+    }
     logger.error(`request failed: ${req.url}`);
-    visitor.event('Error', req.query.template).send();
     return res.render('pages/error', {
         customError: error
     });
 });
-const port = process.env.PORT || 8443;
-app.listen(port, () => {
-    logger.info(`Example app listening on port ${port}!`);
+// app.ws('/deploying/:format/:deployId', (ws, req) => {
+//   logger.debug('client connected!');
+//   // ws.send('welcome to the socket!');
+//   ws.on('close', () => logger.info('Client disconnected'));
+// }
+// );
+wss.on('connection', (ws, req) => {
+    logger.debug(`connection on url ${req.url}`);
+    // for future use tracking clients
+    ws.url = req.url;
+    // for the client to know it's connected
+    ws.send('connected to the socket');
 });
 // subscribe to deploy events to share them with the web clients
 redisSub.subscribe(ex)
@@ -154,7 +169,7 @@ redisSub.on('message', (channel, message) => {
     // logger.debug('heard a message from the worker:');
     const msgJSON = JSON.parse(message);
     // console.log(msgJSON);
-    wsInstance.getWss().clients.forEach((client) => {
+    wss.clients.forEach(client => {
         if (client.url.includes(msgJSON.deployId.trim())) {
             client.send(JSON.stringify(msgJSON));
             // close connection when ALLDONE
@@ -163,4 +178,13 @@ redisSub.on('message', (channel, message) => {
             }
         }
     });
+    // wsInstance.getWss().clients.forEach((client) => {
+    //   if (client.url.includes(msgJSON.deployId.trim())) {
+    //     client.send(JSON.stringify(msgJSON));
+    //     // close connection when ALLDONE
+    //     if (msgJSON.content === 'ALLDONE') {
+    //       client.close();
+    //     }
+    //   }
+    // });
 });

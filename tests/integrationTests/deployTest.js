@@ -1,6 +1,7 @@
 /* globals it, describe, document */
-const Nightmare = require('nightmare');
 import * as chai from 'chai';
+import * as Nightmare from 'nightmare';
+
 
 const expect = chai.expect;
 const testEnv = process.env.DEPLOYER_TESTING_ENDPOINT;
@@ -57,6 +58,7 @@ const deployCheck = async (user, repo) => {
 };
 
 describe('deploys all the test repos', () => {
+  // eslint-disable-next-line no-restricted-syntax
   for (const testRepo of testRepos){
     it(`deploys https://github.com/${testRepo.username}/${testRepo.repo}`, async () => {
       await deployCheck(testRepo.username, testRepo.repo);

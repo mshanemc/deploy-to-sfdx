@@ -6,6 +6,8 @@ import * as utilities from './utilities';
 import * as redisPub from './redisNormal';
 import * as shellSanitize from './shellSanitize';
 
+import { deployRequest } from './types';
+
 const ex = 'deployMsg';
 
 const lineParse = function (msgJSON: deployRequest, visitor): Promise<string[]>{

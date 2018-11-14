@@ -4,6 +4,8 @@ import * as util from 'util';
 import * as utilities from './utilities';
 import * as redis from './redisNormal';
 
+import { poolRequest } from './types';
+
 const exec = util.promisify(require('child_process').exec);
 
 utilities.checkHerokuAPI();

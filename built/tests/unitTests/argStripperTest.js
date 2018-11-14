@@ -2,9 +2,9 @@
 /* globals it, describe */
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai = require("chai");
+const argStripper = require("./../../lib/argStripper");
 // const assert = chai.assert;
 const expect = chai.expect; // we are using the "expect" style of Chai
-const argStripper = require('./../../lib/argStripper.js');
 describe('argStripperTest', () => {
     const cmd = 'sfdx force:org:create -f config/project-scratch-def.json -s -a vol -d 1';
     it('handles create -a', () => {

@@ -9,6 +9,7 @@ import * as poolParse from './poolParse';
 import * as hubAuth from './hubAuth';
 import * as redis from './redisNormal';
 
+import { deployRequest, lineParserResult, poolOrg } from './types';
 
 const exec = util.promisify(require('child_process').exec);
 const execFile = util.promisify(require('child_process').execFile);

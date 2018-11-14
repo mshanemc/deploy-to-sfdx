@@ -10,6 +10,8 @@ import * as lineParse from './lineParse';
 import * as lineRunner from './lines';
 import * as pooledOrgFinder from './pooledOrgFinder';
 
+import { deployRequest } from './types';
+
 const exec = util.promisify(require('child_process').exec);
 
 const ex = 'deployMsg';

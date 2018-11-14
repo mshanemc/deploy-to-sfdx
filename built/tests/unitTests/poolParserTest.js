@@ -2,16 +2,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 /* globals it, describe, before, after */
 const chai = require("chai");
-const expect = chai.expect; // we are using the "expect" style of Chai
-const parser = require('./../../lib/poolParse');
-const utilities = require('./../../lib/utilities');
-const path = require('path');
-const rimraf = require('rimraf');
 const fs = require("fs");
 const util = require("util");
+const path = require("path");
+const rimraf = require("rimraf");
+const dotenv = require("dotenv");
+const parser = require("../../lib/poolParse");
+const utilities = require("../../lib/utilities");
+const expect = chai.expect; // we are using the "expect" style of Chai
 const exec = util.promisify(require('child_process').exec);
 const username = 'mshanemc';
-require('dotenv').config({ path: `${__dirname}/../.env` });
+dotenv.config({ path: `${__dirname}/../.env` });
 describe('poolURLTest', function () {
     this.timeout(500000);
     it('gets an array of objects', async () => {
@@ -54,7 +55,7 @@ describe('poolParserTest', function () {
     const filepath = path.join(__dirname, '../../tmp', repo, 'orgInit.sh');
     const cloneDirPath = path.join(__dirname, '../../tmp', repo);
     before(async () => {
-        const test = exec(`git clone https://github.com/${username}/${repo}`, { 'cwd': tmpDir });
+        const test = await exec(`git clone https://github.com/${username}/${repo}`, { 'cwd': tmpDir });
         return test;
     });
     it('works for a org:open only file', async () => {
@@ -74,7 +75,7 @@ describe('poolParserTest2', function () {
     const tmpDir = path.join(__dirname, '../../tmp');
     const filepath = path.join(__dirname, '../../tmp', repo, 'orgInit.sh');
     const cloneDirPath = path.join(__dirname, '../../tmp', repo);
-    before(async () => exec(`git clone https://github.com/${username}/${repo}`, { 'cwd': tmpDir }));
+    before(async () => await exec(`git clone https://github.com/${username}/${repo}`, { 'cwd': tmpDir }));
     it('works for a org:open with a path', async () => {
         expect(fs.existsSync(filepath));
         const result = await parser(filepath);
@@ -93,7 +94,7 @@ describe('poolParserTest3', function () {
     const tmpDir = path.join(__dirname, '../../tmp');
     const filepath = path.join(__dirname, '../../tmp', repo, 'orgInit.sh');
     const cloneDirPath = path.join(__dirname, '../../tmp', repo);
-    before(async () => exec(`git clone https://github.com/${username}/${repo}`, { 'cwd': tmpDir }));
+    before(async () => await exec(`git clone https://github.com/${username}/${repo}`, { 'cwd': tmpDir }));
     it('works with custom user password set', async () => {
         expect(fs.existsSync(filepath));
         const result = await parser(filepath);

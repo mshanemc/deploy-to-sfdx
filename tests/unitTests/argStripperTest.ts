@@ -1,10 +1,10 @@
 /* globals it, describe */
 
 import * as chai from 'chai';
+import * as argStripper from '../../src/lib/argStripper';
 
 // const assert = chai.assert;
 const expect = chai.expect; // we are using the "expect" style of Chai
-const argStripper = require('./../../lib/argStripper.js');
 
 describe('argStripperTest', () => {
 	const cmd = 'sfdx force:org:create -f config/project-scratch-def.json -s -a vol -d 1';

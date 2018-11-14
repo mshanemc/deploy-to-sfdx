@@ -1,6 +1,8 @@
 import * as logger from 'heroku-logger';
 import * as request from 'request-promise-native';
 
+import { deployRequest } from './types';
+
 const exec = require('child_process').exec;
 
 const utilities = {

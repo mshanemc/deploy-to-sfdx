@@ -1,4 +1,5 @@
 import * as logger from 'heroku-logger';
+import { deployRequest } from './types';
 
 const deployMsgBuilder = function (query) {
 	const template = query.template;

@@ -1,10 +1,10 @@
 /* globals it, describe */
 
 import * as chai from 'chai';
+import * as msgBuilder from '../../src/lib/deployMsgBuilder';
 
 const assert = chai.assert;
 const expect = chai.expect; // we are using the "expect" style of Chai
-const msgBuilder = require('./../../lib/deployMsgBuilder');
 
 describe('urlTestsMaster', () => {
 	it('handles master repos', () => {

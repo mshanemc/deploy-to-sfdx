@@ -1,10 +1,10 @@
 /* globals it, describe */
 
 import * as chai from 'chai';
+import * as utilities from '../../src/lib/utilities';
+import * as types from '../../src/lib/types';
 
-// const assert = chai.assert;
 const expect = chai.expect; // we are using the "expect" style of Chai
-const utilities = require('./../../lib/utilities.js');
 
 describe('Utilities: getArg', () => {
 

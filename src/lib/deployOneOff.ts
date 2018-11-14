@@ -1,7 +1,7 @@
 import * as logger from 'heroku-logger';
+import * as checkQueue from './deployQueueCheck';
+import * as hubAuth from './hubAuth';
 
-const checkQueue = require('./deployQueueCheck');
-const hubAuth = require('./hubAuth');
 
 logger.debug('A one-off deploy consumer dyno is up!');
 
