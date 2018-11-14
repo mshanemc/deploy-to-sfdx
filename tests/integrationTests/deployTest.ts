@@ -49,9 +49,9 @@ const deployCheck = async (user, repo) => {
   expect(page.url).to.include(`deploying/deployer/${user}-${repo}-`);
 
   await nightmare.wait('a#loginURL[href*="https:"]');
-  const href = await nightmare.evaluate( () => document.querySelector('#loginUrl').href );
+  const loginUrl = await nightmare.evaluate( () => document.querySelector('#loginUrl'));
 
-  expect(href).to.include('my.salesforce.com/secur/frontdoor.jsp');
+  expect(loginUrl.href).to.include('my.salesforce.com/secur/frontdoor.jsp');
 
   return nightmare.click('#deleteButton').wait(1000).end();
 
