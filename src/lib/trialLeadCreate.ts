@@ -32,7 +32,7 @@ const leadCreate = function (incoming) {
 		requestHost
 	};
 
-	console.log(formPostBody);
+	// console.log(formPostBody);
 
 	request({
 		url: sfdcLeadCaptureServlet,

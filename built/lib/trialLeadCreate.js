@@ -27,7 +27,7 @@ const leadCreate = function (incoming) {
         resultPage,
         requestHost
     };
-    console.log(formPostBody);
+    // console.log(formPostBody);
     request({
         url: sfdcLeadCaptureServlet,
         method: 'POST',
