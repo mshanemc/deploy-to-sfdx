@@ -95,16 +95,10 @@ const utilities = {
 
 	// fix double // inside a url by sfdx cli force:org:open
 	urlFix: (input) => {
-		logger.debug(input);
-		if (input.result) {
-			logger.debug('it is json');
-		} else {
-			logger.debug('not json');
-		}
-
 		try {
 			let jsonInput = JSON.parse(input);
 			if (jsonInput.result.url && jsonInput.result.url.includes('.com//secur/')){
+				logger.warn(`multiple slash in open url ${jsonInput.result.url}`);
 				jsonInput.result.url = jsonInput.result.url.replace('.com//secur/', '.com/secur/');
 			}
 			return JSON.stringify(jsonInput);
