@@ -1,6 +1,6 @@
 // asynchronously posts the lead form back to org62
 // const request = require('request');
-import * as request from 'request';
+import * as request from 'request-promise-native';
 
 const sfdcLeadCaptureServlet = process.env.sfdcLeadCaptureServlet;
 const requestPage = '/form.html';
@@ -8,7 +8,7 @@ const resultPage = '/conf.html';
 const requestHost = 'www.salesforce.com';
 
 
-const leadCreate = function (incoming) {
+const leadCreate = async function (incoming) {
 
 	console.log(incoming);
 
@@ -34,28 +34,13 @@ const leadCreate = function (incoming) {
 
 	// console.log(formPostBody);
 
-	request({
+	const result = request({
 		url: sfdcLeadCaptureServlet,
 		method: 'POST',
 		strictSSL : false,
 		headers: { 'content-type': 'application/x-www-form-urlencoded' },
 		form: formPostBody
-	},
-		(err, httpResponse, body) => {
-			console.log('*** org62capture info');
-			if (err){
-				console.log('*** here is an error');
-				console.log(err);
-			}
-
-			return {
-				err,
-				httpResponse,
-				body
-			};
-
-		}
-	);
+	});
 
 };
 
