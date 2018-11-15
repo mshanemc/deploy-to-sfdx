@@ -149,6 +149,16 @@ describe('deploys all the test repos', () => {
 
     const page = await nightmare.goto(`${process.env.DEPLOYER_TESTING_ENDPOINT}/launch?template=${url}`);
     expect(page.url).to.include(`deploying/deployer/${user}-${repo}-`);
+    await nightmare.wait('#errorBlock');
+
+    const style = await nightmare.evaluate(() => {
+      return (<HTMLElement>document.querySelector('#errorBlock')).style;
+    });
+    expect(style).to.be.an('object');
+    expect(style).to.have.property('display', 'none');
+
+    // return nightmare.click('#deleteButton').wait(1000).end();
+
 
   }).timeout(waitTimeout);
 });

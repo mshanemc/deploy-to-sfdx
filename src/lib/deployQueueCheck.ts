@@ -60,6 +60,8 @@ const check = async () => {
     } catch (err){
       logger.warn(`bad repo: https://github.com/${msgJSON.username}/${msgJSON.repo}.git}`);
       await redis.publish(ex, utilities.bufferKey(`There was an error cloning https://github.com/${msgJSON.username}/${msgJSON.repo}.git}`, msgJSON.deployId));
+      await redis.publish(ex, utilities.bufferKey('ALLDONE', msgJSON.deployId));
+      return false;
     }
 
     // git outputs to stderr for unfathomable reasons
