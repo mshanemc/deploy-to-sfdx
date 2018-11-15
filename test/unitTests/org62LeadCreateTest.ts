@@ -1,12 +1,11 @@
 /* globals it, describe */
+import * as leadCreate from '../../src/lib/trialLeadCreate';
 
 import * as chai from 'chai';
 import * as dotenv from 'dotenv';
 
 // const assert = chai.assert;
 const expect = chai.expect; // we are using the "expect" style of Chai
-
-import * as leadCreate from '../../src/lib/trialLeadCreate';
 
 dotenv.config();
 
@@ -29,11 +28,11 @@ describe('org62LeadCreate', () => {
 		DriverCampaignId: '70130000000sUVb'
 	};
 
-	it('sends the lead', () => {
+	it('sends the lead', async () => {
 		expect(process.env.sfdcLeadCaptureServlet).to.be.a('string');
-
+		// console.log(process.env.sfdcLeadCaptureServlet);
 		// console.log(`sending to ${ process.env.sfdcLeadCaptureServlet }`);
-		const result = leadCreate(formBody);
+		const result = await leadCreate(formBody);
 		// expect(argStripper(cmd, '-a', false)).to.equal('sfdx force:org:create -f config/project-scratch-def.json -s -d 1');
 	});
 

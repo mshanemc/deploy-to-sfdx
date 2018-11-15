@@ -1,12 +1,12 @@
 "use strict";
 // asynchronously posts the lead form back to org62
 // const request = require('request');
-const request = require("request");
+const request = require("request-promise-native");
 const sfdcLeadCaptureServlet = process.env.sfdcLeadCaptureServlet;
 const requestPage = '/form.html';
 const resultPage = '/conf.html';
 const requestHost = 'www.salesforce.com';
-const leadCreate = function (incoming) {
+const leadCreate = async function (incoming) {
     console.log(incoming);
     const formPostBody = {
         UserFirstName: incoming.UserFirstName,
@@ -28,23 +28,12 @@ const leadCreate = function (incoming) {
         requestHost
     };
     // console.log(formPostBody);
-    request({
+    const result = request({
         url: sfdcLeadCaptureServlet,
         method: 'POST',
         strictSSL: false,
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
         form: formPostBody
-    }, (err, httpResponse, body) => {
-        console.log('*** org62capture info');
-        if (err) {
-            console.log('*** here is an error');
-            console.log(err);
-        }
-        return {
-            err,
-            httpResponse,
-            body
-        };
     });
 };
 module.exports = leadCreate;

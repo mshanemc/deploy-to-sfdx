@@ -10,7 +10,7 @@ const requestHost = 'www.salesforce.com';
 
 const leadCreate = async function (incoming) {
 
-	console.log(incoming);
+	// console.log(incoming);
 
 	const formPostBody = {
 		UserFirstName: incoming.UserFirstName,
@@ -33,8 +33,9 @@ const leadCreate = async function (incoming) {
 	};
 
 	// console.log(formPostBody);
+	console.log(sfdcLeadCaptureServlet);
 
-	const result = request({
+	const result = await request({
 		url: sfdcLeadCaptureServlet,
 		method: 'POST',
 		strictSSL : false,

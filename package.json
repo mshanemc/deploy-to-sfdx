@@ -11,8 +11,8 @@
     "start": "node .",
     "css-build": "mkdirp built/assets/css && mkdirp built/assets/fonts && ncp src/assets built/assets && ncp src/assets/favicons built/assets/favicons && node-sass src/scss -o built/assets/css && ncp node_modules/@salesforce-ux/design-system/assets/fonts built/assets/fonts",
     "css-watch": "node-sass --watch src/scss -o built/assets/css",
-    "unit-test": "./node_modules/mocha/bin/mocha -r ts-node/register tests/unitTests/*Test.ts --reporter spec",
-    "integration-test": "./node_modules/mocha/bin/mocha tests/integrationTests/*Test.js --reporter spec"
+    "unit-test": "./node_modules/mocha/bin/mocha test/unitTests/*Test.ts",
+    "integration-test": "./node_modules/mocha/bin/mocha tests/integrationTests/*Test.js"
   },
   "repository": {
     "type": "git",
@@ -51,6 +51,7 @@
     "@types/ioredis": "^4.0.4",
     "@types/mocha": "^5.2.5",
     "@types/moment": "^2.13.0",
+    "@types/nightmare": "^2.10.4",
     "@types/request": "^2.48.1",
     "@types/request-promise-native": "^1.0.15",
     "@types/universal-analytics": "^0.4.2",

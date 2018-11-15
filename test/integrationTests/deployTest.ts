@@ -115,7 +115,7 @@ const deployCheck = async (user, repo) => {
   const url = `https://github.com/${user}/${repo}`;
   const nightmare = new Nightmare({ show: true, waitTimeout });
 
-  const page = await nightmare.goto(`${process.env.DEPLOYER_TESTING_ENDPOINT}/launch?template=${url}`);
+  const page = <NightmarePage> await nightmare.goto(`${process.env.DEPLOYER_TESTING_ENDPOINT}/launch?template=${url}`);
   expect(page.url).to.include(`deploying/deployer/${user}-${repo}-`);
 
   await nightmare.wait('a#loginURL[href*="https:"]');
@@ -147,7 +147,7 @@ describe('deploys all the test repos', () => {
     const url = `https://github.com/${user}/${repo}`;
     const nightmare = new Nightmare({ show: true, waitTimeout });
 
-    const page = await nightmare.goto(`${process.env.DEPLOYER_TESTING_ENDPOINT}/launch?template=${url}`);
+    const page = <NightmarePage> await nightmare.goto(`${process.env.DEPLOYER_TESTING_ENDPOINT}/launch?template=${url}`);
     expect(page.url).to.include(`deploying/deployer/${user}-${repo}-`);
     await nightmare.wait('#errorBlock');
 
@@ -163,3 +163,7 @@ describe('deploys all the test repos', () => {
 
   }).timeout(waitTimeout);
 });
+
+interface NightmarePage {
+  url?: string;
+}
