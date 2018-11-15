@@ -151,11 +151,12 @@ describe('deploys all the test repos', () => {
     expect(page.url).to.include(`deploying/deployer/${user}-${repo}-`);
     await nightmare.wait('#errorBlock');
 
+    await nightmare.wait(1000*60);
     const style = await nightmare.evaluate(() => {
       return (<HTMLElement>document.querySelector('#errorBlock')).style;
     });
     expect(style).to.be.an('object');
-    expect(style).to.have.property('display', 'none');
+    expect(style).to.have.property('display', 'block');
 
     // return nightmare.click('#deleteButton').wait(1000).end();
 

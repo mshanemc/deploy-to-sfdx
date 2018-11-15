@@ -45,10 +45,10 @@ const check = async () => {
             await redis.publish(ex, utilities.bufferKey(gitCloneResult.stderr, msgJSON.deployId));
         }
         catch (err) {
-            logger.warn(`bad repo: https://github.com/${msgJSON.username}/${msgJSON.repo}.git}`);
+            logger.warn(`bad repo: https://github.com/${msgJSON.username}/${msgJSON.repo}.git`);
             await redis.publish(ex, utilities.bufferKey(`ERROR: There was an error cloning https://github.com/${msgJSON.username}/${msgJSON.repo}.git`, msgJSON.deployId));
             await redis.publish(ex, utilities.bufferKey('ALLDONE', msgJSON.deployId));
-            return false;
+            return true;
         }
         // git outputs to stderr for unfathomable reasons
         // if you passed in a custom email address, we need to edit the config file and add the adminEmail property
