@@ -74,6 +74,7 @@ const lines = function (msgJSON, lines, redisPub, visitor) {
 			let lineResult;
 			let keepTrying = true;
 
+			// errors that we want to handle
 			while (keepTrying) {
 				try {
 					logger.debug(`running line-- ${localLine}`);

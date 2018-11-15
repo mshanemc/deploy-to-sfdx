@@ -95,6 +95,13 @@ const utilities = {
 
 	// fix double // inside a url by sfdx cli force:org:open
 	urlFix: (input) => {
+		console.log(input);
+		if (input.result) {
+			console.log('it is json');
+		} else {
+			console.log('not json');
+		}
+
 		try {
 			let jsonInput = JSON.parse(input);
 			if (jsonInput.result.url && jsonInput.result.url.includes('.com//secur/')){
@@ -104,7 +111,6 @@ const utilities = {
 		} catch (err) {
 			return input;
 		}
-		return input;
 	},
 
 	getArg: (cmd, parameter) => {
