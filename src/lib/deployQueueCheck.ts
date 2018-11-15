@@ -52,11 +52,17 @@ const check = async () => {
       gitCloneCmd = `cd tmp;git clone -b ${msgJSON.branch} --single-branch https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
       // logger.debug(gitCloneCmd);
     }
-    const gitCloneResult = await exec(gitCloneCmd);
 
-            // git outputs to stderr for unfathomable reasons
-    logger.debug(gitCloneResult.stderr);
-    await redis.publish(ex, utilities.bufferKey(gitCloneResult.stderr, msgJSON.deployId));
+    try {
+      const gitCloneResult = await exec(gitCloneCmd);
+      logger.debug(gitCloneResult.stderr);
+      await redis.publish(ex, utilities.bufferKey(gitCloneResult.stderr, msgJSON.deployId));
+    } catch (err){
+      logger.warn(`bad repo: https://github.com/${msgJSON.username}/${msgJSON.repo}.git}`);
+      await redis.publish(ex, utilities.bufferKey(`There was an error cloning https://github.com/${msgJSON.username}/${msgJSON.repo}.git}`, msgJSON.deployId));
+    }
+
+    // git outputs to stderr for unfathomable reasons
 
     // if you passed in a custom email address, we need to edit the config file and add the adminEmail property
     if (msgJSON.email) {
