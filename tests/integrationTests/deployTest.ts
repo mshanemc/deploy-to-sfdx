@@ -15,28 +15,28 @@ const testRepos = [
     username: 'mshanemc',
     repo: 'df17IntegrationWorkshops'
   }
-  // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'cg1'
-  // }
-  // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'codeForClicks'
-  // },
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'cg4Integrate'
-  // },
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'process-automation-workshop-df17'
-  // },
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'platformTrial'
-  // }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'cg1'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'codeForClicks'
+  },
+  {
+    username: 'mshanemc',
+    repo: 'cg4Integrate'
+  },
+  {
+    username: 'mshanemc',
+    repo: 'process-automation-workshop-df17'
+  },
+  {
+    username: 'mshanemc',
+    repo: 'platformTrial'
+  }
 ];
 
 if (!testEnv){
