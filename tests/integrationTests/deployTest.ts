@@ -11,100 +11,100 @@ const testEnv = process.env.DEPLOYER_TESTING_ENDPOINT;
 const waitTimeout = 1000 * 60 * 15;
 
 const testRepos = [
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'df17IntegrationWorkshops'
-  // }
-  // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'codeForClicks'
-  // }
-  // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'df17AppBuilding'
-  // }
-  // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'process-automation-workshop-df17'
-  // }
-  // ,
-  // // adoption
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'adoption-sales'
-  // }
-  // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'adoption-service'
-  // }
-  // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'reporting-workshop'
-  // }
-  // // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'lightning-go-live'
-  // }
-  // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'lightning-vf'
-  // }
-  // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'js-buttons'
-  // }
-  // ,
-  // //df 17
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'cg1'
-  // }
-  // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'cg4Integrate'
-  // }
-  // ,
-  // //df18
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'cg6-lea'
-  // },
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'cg4'
-  // },
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'cg1-lowcode'
-  // }
+  {
+    username: 'mshanemc',
+    repo: 'df17IntegrationWorkshops'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'codeForClicks'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'df17AppBuilding'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'process-automation-workshop-df17'
+  }
+  ,
+  // adoption
+  {
+    username: 'mshanemc',
+    repo: 'adoption-sales'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'adoption-service'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'reporting-workshop'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'lightning-go-live'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'lightning-vf'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'js-buttons'
+  }
+  ,
+  //df 17
+  {
+    username: 'mshanemc',
+    repo: 'cg1'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'cg4Integrate'
+  }
+  ,
+  //df18
+  {
+    username: 'mshanemc',
+    repo: 'cg6-lea'
+  },
+  {
+    username: 'mshanemc',
+    repo: 'cg4'
+  },
+  {
+    username: 'mshanemc',
+    repo: 'cg1-lowcode'
+  }
   // other
-  // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'platformTrial'
-  // },
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'rviot'
-  // },
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'easy-spaces'
-  // }
-  // ,
-  // {
-  //   username: 'mshanemc',
-  //   repo: 'mobileWebinar'
-  // }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'platformTrial'
+  },
+  {
+    username: 'mshanemc',
+    repo: 'rviot'
+  },
+  {
+    username: 'mshanemc',
+    repo: 'easy-spaces'
+  }
+  ,
+  {
+    username: 'mshanemc',
+    repo: 'mobileWebinar'
+  }
 ];
 
 if (!testEnv){
@@ -151,7 +151,7 @@ describe('deploys all the test repos', () => {
     expect(page.url).to.include(`deploying/deployer/${user}-${repo}-`);
     await nightmare.wait('#errorBlock');
 
-    await nightmare.wait(1000*60);
+    await nightmare.wait(1000*5);
     const style = await nightmare.evaluate(() => {
       return (<HTMLElement>document.querySelector('#errorBlock')).style;
     });

@@ -8,13 +8,13 @@
 	<script>
 		const HOST = location.href.replace(/^http/, 'ws');
 		let msgCounter = 0;
-		console.log(HOST);
+		// console.log(HOST);
 
 		const deployIdInput = document.getElementById('deployId');
-		console.log(deployIdInput);
+		// console.log(deployIdInput);
 
 		const deployId = deployIdInput.innerText;
-		console.log(deployId);
+		// console.log(deployId);
 
 		const ws = new WebSocket(HOST);
 		let pinger;
