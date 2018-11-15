@@ -95,11 +95,11 @@ const utilities = {
 
 	// fix double // inside a url by sfdx cli force:org:open
 	urlFix: (input) => {
-		console.log(input);
+		logger.debug(input);
 		if (input.result) {
-			console.log('it is json');
+			logger.debug('it is json');
 		} else {
-			console.log('not json');
+			logger.debug('not json');
 		}
 
 		try {
