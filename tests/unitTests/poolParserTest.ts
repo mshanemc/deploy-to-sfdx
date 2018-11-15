@@ -15,7 +15,7 @@ const exec = util.promisify(require('child_process').exec);
 
 const username = 'mshanemc';
 
-dotenv.config({ path: `${__dirname}/../.env` });
+dotenv.config();
 
 describe('poolURLTest', function () {
 	this.timeout(500000);

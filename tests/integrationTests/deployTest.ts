@@ -1,6 +1,9 @@
 /* globals it, describe, document */
 import * as chai from 'chai';
 import * as Nightmare from 'nightmare';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 
 const expect = chai.expect;
@@ -12,28 +15,28 @@ const testRepos = [
     username: 'mshanemc',
     repo: 'df17IntegrationWorkshops'
   }
-  ,
-  {
-    username: 'mshanemc',
-    repo: 'cg1'
-  }
-  ,
-  {
-    username: 'mshanemc',
-    repo: 'codeForClicks'
-  },
-  {
-    username: 'mshanemc',
-    repo: 'cg4Integrate'
-  },
-  {
-    username: 'mshanemc',
-    repo: 'process-automation-workshop-df17'
-  },
-  {
-    username: 'mshanemc',
-    repo: 'platformTrial'
-  }
+  // ,
+  // {
+  //   username: 'mshanemc',
+  //   repo: 'cg1'
+  // }
+  // ,
+  // {
+  //   username: 'mshanemc',
+  //   repo: 'codeForClicks'
+  // },
+  // {
+  //   username: 'mshanemc',
+  //   repo: 'cg4Integrate'
+  // },
+  // {
+  //   username: 'mshanemc',
+  //   repo: 'process-automation-workshop-df17'
+  // },
+  // {
+  //   username: 'mshanemc',
+  //   repo: 'platformTrial'
+  // }
 ];
 
 if (!testEnv){
@@ -45,15 +48,15 @@ const deployCheck = async (user, repo) => {
   const nightmare = new Nightmare({ show: true, waitTimeout });
 
   const page = await nightmare.goto(`${process.env.DEPLOYER_TESTING_ENDPOINT}/launch?template=${url}`);
-
   expect(page.url).to.include(`deploying/deployer/${user}-${repo}-`);
 
   await nightmare.wait('a#loginURL[href*="https:"]');
-  const loginUrl = await nightmare.evaluate( () => document.querySelector('#loginUrl'));
+  const href = await nightmare.evaluate(() => {
+    return (<HTMLAnchorElement> document.querySelector('#loginUrl')).href;
+  });
+  expect(href).to.include('my.salesforce.com/secur/frontdoor.jsp');
 
-  expect(loginUrl.href).to.include('my.salesforce.com/secur/frontdoor.jsp');
-
-  return nightmare.click('#deleteButton').wait(1000).end();
+  // return nightmare.click('#deleteButton').wait(1000).end();
 
 };
 

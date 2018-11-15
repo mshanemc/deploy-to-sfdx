@@ -102,8 +102,9 @@ const lines = function (msgJSON, lines, redisPub, visitor) {
 					lineResult.stderr = tempOut;
 				}
 				if (lineResult.stdout) {
-					logger.debug(lineResult.stdout);
-					redisPub.publish(ex, utilities.bufferKey(lineResult.stdout, msgJSON.deployId));
+					const fixedStdout = utilities.urlFix(lineResult.stdout);
+					logger.debug(fixedStdout);
+					redisPub.publish(ex, utilities.bufferKey(fixedStdout, msgJSON.deployId));
 				}
 
 				if (lineResult.stderr && !lineResult.stderr.includes('sfdx-cli: update available')) {
