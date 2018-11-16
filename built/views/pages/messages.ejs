@@ -27,103 +27,107 @@
 	<div class="trialText">You'll be logged in momentarily.</div>
 </div>
 
-<script src="/scripts/trial-messages-script.js" />
+<script src="/scripts/trial-messages-script.js"  type="text/javascript"/>
 
 <% } %>
 </div>
 
 <div id="normal">
-	<%if (format == 'deployer') { %>
-		<% include ../partials/head %>
-		<main class="slds-card">
-			<div id="loaderBlock">
-				<h2 class="slds-text-heading_medium slds-p-top_medium slds-p-bottom_medium sfdx-wrap">
-					<img src="/images/loader.gif" style="width:27px;" /> Deploying
-					<strong>
-						<%= deployId %>
-					</strong>
-				</h2>
-			</div>
 
-			<div id="loginBlock" style="display: none;">
-				<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
+	<% include ../partials/head %>
+	<main class="slds-card">
+		<div id="loaderBlock">
+			<h2 class="slds-text-heading_medium slds-p-top_medium slds-p-bottom_medium sfdx-wrap">
+				<img src="/images/loader.gif" style="width:27px;" /> Deploying
+				<strong>
+					<%= deployId %>
+				</strong>
+			</h2>
+		</div>
 
-					<p class="slds-m-around_large">
-						<strong>Note:</strong> It can take up to 5 minutes for the my domain DNS to propogate. If the scratch org doesn't load,
-						refresh it in a few minutes.</p>
+		<div id="loginBlock" style="display: none;">
+			<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
 
-					<div class="slds-notify slds-notify_toast slds-theme_success" role="alert">
+				<p class="slds-m-around_large">
+					<strong>Note:</strong> It can take up to 5 minutes for the my domain DNS to propogate. If the scratch org doesn't load,
+					refresh it in a few minutes.</p>
 
-						<div class="slds-notify__content">
-							<h2 class="slds-text-heading_small slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
-								Your org is ready!
-								<div>
-									<a id="deleteButton" href="" class="slds-button slds-button_destructive">Delete</a>
-									<a id="loginUrl" target="_blank" href="" class="slds-button slds-button_neutral">Launch</a>
-								</div>
-							</h2>
-						</div>
+				<div class="slds-notify slds-notify_toast slds-theme_success" role="alert">
+
+					<div class="slds-notify__content">
+						<h2 class="slds-text-heading_small slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+							Your org is ready!
+							<div>
+								<a id="deleteButton" href="" class="slds-button slds-button_destructive">Delete</a>
+								<a id="loginUrl" target="_blank" href="" class="slds-button slds-button_neutral">Launch</a>
+							</div>
+						</h2>
 					</div>
-
-
 				</div>
+
+
 			</div>
+		</div>
 
-			<div id="passwordBlock" style="display: none;">
-				<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
+		<div id="passwordBlock" style="display: none;">
+			<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
 
-					<p class="slds-m-around_large">
-						<strong>Note:</strong> Use the button above to login for the first time. These credentials are for other uses (mobile app,
-						integrations). Be sure that you're logging in via sandbox (test.salesforce.com) and not production.
-					</p>
+				<p class="slds-m-around_large">
+					<strong>Note:</strong> Use the button above to login for the first time. These credentials are for other uses (mobile app,
+					integrations). Be sure that you're logging in via sandbox (test.salesforce.com) and not production.
+				</p>
 
-					<div class="slds-notify slds-notify_toast" role="alert">
+				<div class="slds-notify slds-notify_toast" role="alert">
 
-						<div class="slds-notify__content">
-							<h2 class="slds-text-heading_small ">Your username is
-								<strong id="username"></strong>
-								and your password is
-								<strong id="password"></strong>
-							</h2>
-						</div>
+					<div class="slds-notify__content">
+						<h2 class="slds-text-heading_small ">Your username is
+							<strong id="username"></strong>
+							and your password is
+							<strong id="password"></strong>
+						</h2>
 					</div>
-
 				</div>
+
 			</div>
+		</div>
 
-			<div id="secondaryUserBlock" style="display: none;">
-				<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
+		<div id="secondaryUserBlock" style="display: none;">
+			<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
 
-					<div class="slds-notify slds-notify_toast slds-theme_warning" role="alert">
+				<div class="slds-notify slds-notify_toast slds-theme_warning" role="alert">
 
-						<div class="slds-notify__content" id="secondaryUserArray">
-						</div>
+					<div class="slds-notify__content" id="secondaryUserArray">
 					</div>
-
 				</div>
+
 			</div>
+		</div>
 
-			<div id="errorBlock" style="display: none;">
-				<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
+		<div id="errorBlock" style="display: none;">
+			<div class="slds-notify_container slds-is-relative slds-m-bottom_large sfdx-wrap">
 
-					<div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+				<div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
 
-						<div class="slds-notify__content">
-							<h2 class="slds-text-heading_small ">
-								<strong id="errorTest">An error occurred while deploying.</strong>&nbsp;See the browser console logs for more information.
-							</h2>
-						</div>
+					<div class="slds-notify__content">
+						<h2 class="slds-text-heading_small ">
+							<strong id="errorTest">An error occurred while deploying.</strong>&nbsp;See the browser console logs for more information.
+						</h2>
 					</div>
-
 				</div>
+
 			</div>
+		</div>
 
-			<div id="status" class="slds-m-bottom_small sfdx-output"></div>
+		<div id="status" class="slds-m-bottom_small sfdx-output"></div>
 
-		</main>
-		<script src="/scripts/regular-messages-script.js" />
+	</main>
+	<script src="/scripts/regular-messages-script.js" type="text/javascript"></script>
 
-		<% include ../partials/footer %>
-	<% } %>
+</div>
+
+<%if (format == 'deployer') { %>
+	<% include ../partials/footer %>
+<% } %>
+
 
 							<!-- end normal deployer -->
