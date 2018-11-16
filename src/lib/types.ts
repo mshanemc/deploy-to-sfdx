@@ -37,3 +37,34 @@ export interface lineParserResult {
   openLine?: string;
   passwordLine?: string;
 }
+
+export interface clientDataStructure {
+
+  complete: boolean;
+
+  completeTimestamp?: Date;
+  browserStartTime?: Date;
+
+  mainUser?: {
+    username: string;
+    password?: string;
+    loginUrl: string;
+  }
+
+  additionalUsers?: [{
+    username: string;
+    password: string;
+  }];
+
+  errors?: [{
+    command: string;
+    error: any;
+  }];
+
+  commandResults: [{
+    command: string;
+    summary?: string; // ex: instead of outputting all the apex class stuff, just summarize that apex was executed.
+    raw: string; // goes to logs
+  }];
+
+}

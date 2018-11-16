@@ -12,7 +12,7 @@
     "css-build": "mkdirp built/assets/css && mkdirp built/assets/fonts && ncp src/assets built/assets && ncp src/assets/favicons built/assets/favicons && node-sass src/scss -o built/assets/css && ncp node_modules/@salesforce-ux/design-system/assets/fonts built/assets/fonts",
     "css-watch": "node-sass --watch src/scss -o built/assets/css",
     "unit-test": "./node_modules/mocha/bin/mocha test/unitTests/*Test.ts",
-    "integration-test": "./node_modules/mocha/bin/mocha tests/integrationTests/*Test.js"
+    "integration-test": "./node_modules/mocha/bin/mocha test/integrationTests/*Test.ts"
   },
   "repository": {
     "type": "git",

@@ -134,11 +134,11 @@ const deployCheck = async (user, repo) => {
 
 describe('deploys all the test repos', () => {
   // eslint-disable-next-line no-restricted-syntax
-  for (const testRepo of testRepos){
-    it(`deploys https://github.com/${testRepo.username}/${testRepo.repo}`, async () => {
-      await deployCheck(testRepo.username, testRepo.repo);
-    }).timeout(waitTimeout);
-  }
+  // for (const testRepo of testRepos){
+  //   it(`deploys https://github.com/${testRepo.username}/${testRepo.repo}`, async () => {
+  //     await deployCheck(testRepo.username, testRepo.repo);
+  //   }).timeout(waitTimeout);
+  // }
 
   // something about a repo that ain't there
   it(`fails to deploy a bad repo, with good error messages`, async () => {
@@ -149,9 +149,8 @@ describe('deploys all the test repos', () => {
 
     const page = <NightmarePage> await nightmare.goto(`${process.env.DEPLOYER_TESTING_ENDPOINT}/launch?template=${url}`);
     expect(page.url).to.include(`deploying/deployer/${user}-${repo}-`);
-    await nightmare.wait('#errorBlock');
 
-    await nightmare.wait(1000*5);
+    await nightmare.wait(1000*15);
     const style = await nightmare.evaluate(() => {
       return (<HTMLElement>document.querySelector('#errorBlock')).style;
     });
