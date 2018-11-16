@@ -1,4 +1,4 @@
-/* globals window, document, location, WebSocket, XMLHttpRequest */
+/* globals window, document, location, WebSocket, XMLHttpRequest, Vue */
 
 // works for both http and https
 
@@ -92,6 +92,13 @@ const displayContent = function (content) {
   }
 
 };
+
+const display = new Vue({
+  el: '#regular_display_area',
+  data: {
+    message: deployId.trim()
+  }
+});
 
 ws.onopen = function () {
   console.log('WS is open!');

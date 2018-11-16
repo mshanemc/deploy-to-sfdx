@@ -40,6 +40,7 @@ export interface lineParserResult {
 
 export interface clientDataStructure {
 
+  deployId: string;
   complete: boolean;
 
   completeTimestamp?: Date;
