@@ -10,11 +10,10 @@ const exec = util.promisify(require('child_process').exec);
 const deployMsgChannel = 'deployMsg';
 const pooledOrgFinder = async function (deployReq) {
     const poolsPath = path.join(__dirname, '../tmp', 'pools');
-    // is this a template that we prebuild?  uses the utilities.getPoolConfig
     const foundPool = await utilities.getPool(deployReq.username, deployReq.repo);
     if (!foundPool) {
         logger.debug('not a pooled repo');
-        return false; // go back and build it the normal way!
+        return false;
     }
     logger.debug('this is a pooled repo');
     const key = await utilities.getKey(deployReq);
@@ -46,7 +45,6 @@ const pooledOrgFinder = async function (deployReq) {
     if (msgJSON.passwordCommand) {
         const stripped = argStripper(msgJSON.passwordCommand, '--json', true);
         const passwordSetResult = await exec(`${stripped} --json`, { 'cwd': uniquePath });
-        // may not have returned anything if it wasn't used
         if (passwordSetResult) {
             logger.debug(`password set results:  ${passwordSetResult.stdout}`);
             const usernameMessage = {

@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "tsc && cp -R ./src/views ./built/ && npm run css-build",
+    "local": "npm run build && export HEROKU_API_KEY=`heroku auth:token` && heroku local web=1,orgbuilder=1",
     "start": "node .",
     "css-build": "mkdirp built/assets/css && mkdirp built/assets/fonts && ncp src/assets built/assets && ncp src/assets/favicons built/assets/favicons && node-sass src/scss -o built/assets/css && ncp node_modules/@salesforce-ux/design-system/assets/fonts built/assets/fonts",
     "css-watch": "node-sass --watch src/scss -o built/assets/css",
@@ -37,7 +38,7 @@
     "ioredis": "^3.2.2",
     "moment": "^2.22.2",
     "request-promise-native": "^1.0.5",
-    "shane-sfdx-plugins": "^0.33.3",
+    "shane-sfdx-plugins": "^0.37.1",
     "universal-analytics": "^0.4.20",
     "ws": "^6.1.0"
   },

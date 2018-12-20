@@ -6,7 +6,6 @@ const request = require("request-promise-native");
 const util = require("util");
 const redis = require("./redisNormal");
 const utilities = require("./utilities");
-// const utilities = require('./utilities');
 const exec = util.promisify(require('child_process').exec);
 utilities.checkHerokuAPI();
 const checkExpiration = async (pool) => {
@@ -17,8 +16,6 @@ const checkExpiration = async (pool) => {
     }
     const msgJSON = JSON.parse(poolOrg);
     if (moment().diff(moment(msgJSON.createdDate)) > pool.lifeHours * 60 * 60 * 1000) {
-        // it's gone if we don't put it back
-        // create the delete message
         if (msgJSON.displayResults && msgJSON.displayResults.username) {
             await redis.rpush('poolDeploys', JSON.stringify({
                 username: msgJSON.displayResults.username,

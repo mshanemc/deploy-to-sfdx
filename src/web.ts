@@ -11,6 +11,8 @@ import * as msgBuilder from './lib/deployMsgBuilder';
 import * as utilities from './lib/utilities';
 import * as org62LeadCapture from './lib/trialLeadCreate';
 
+import { clientDataStructure } from './lib/types';
+
 const ex = 'deployMsg';
 
 const app = express();
@@ -21,14 +23,16 @@ const server = app.listen(port, () => {
   logger.info(`Example app listening on port ${port}!`);
 });
 
-const wss = new WebSocket.Server({ server, clientTracking: true});
+const wss = new WebSocket.Server({ server, clientTracking: true });
 
 // app.use('/scripts', express.static(`${__dirname}/scripts`));
 app.use(express.static('built/assets'));
 
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(
+  bodyParser.urlencoded({
+    extended: true
+  })
+);
 
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
@@ -37,32 +41,33 @@ app.set('views', path.join(__dirname, '/views'));
 
 app.post('/trial', (req, res, next) => {
   const message = msgBuilder(req.query);
-  console.log(message);
+  logger.debug('trial request', message);
 
   // assign the email from the post field because it wasn't in the query string
   message.email = req.body.UserEmail;
-  // console.log(req.body.UserFirstName);
-  // console.log(req.body.UserLastName);
-  if (process.env.sfdcLeadCaptureServlet){
+  // logger.debug(req.body.UserFirstName);
+  // logger.debug(req.body.UserLastName);
+  if (process.env.sfdcLeadCaptureServlet) {
     org62LeadCapture(req.body);
   }
 
-  if (process.env.UA_ID){
+  if (process.env.UA_ID) {
     const visitor = ua(process.env.UA_ID);
     visitor.pageview('/trial').send();
     visitor.event('Repo', req.query.template).send();
+    message.visitor = visitor;
   }
 
   utilities.runHerokuBuilder();
 
-  redis.rpush('deploys', JSON.stringify(message))
+  redis
+    .rpush('deploys', JSON.stringify(message))
     .then(() => res.redirect(`/deploying/trial/${message.deployId.trim()}`));
-
 });
 
 app.post('/delete', (req, res, next) => {
-  logger.debug('in the delete post action with body:');
-  logger.debug(req.body);
+  // logger.debug('in the delete post action with body:');
+  // logger.debug(req.body);
 
   const message = {
     username: req.body.username,
@@ -71,35 +76,40 @@ app.post('/delete', (req, res, next) => {
 
   utilities.runHerokuBuilder();
 
-  redis.rpush('poolDeploys', JSON.stringify(message))
+  redis
+    .rpush('poolDeploys', JSON.stringify(message))
     .then(() => {
-      console.log('message created');
+      // logger.debug('message created');
       res.status(302).send('/deleteConfirm');
     })
     .catch((e) => {
-      logger.error('An error occurred in the redis rpush');
+      logger.error(
+        `An error occurred in the redis rpush to the delete queue: ${req.body}`
+      );
       logger.error(e);
       res.status(500).send(e);
     });
 });
 
-app.get('/deleteConfirm', (req, res, next) => {
-  return res.render('pages/deleteConfirm');
-});
+app.get('/deleteConfirm', (req, res, next) => res.render('pages/deleteConfirm'));
 
 app.get('/launch', (req, res, next) => {
-
   // no template?  does not compute!
-  if (!req.query.template || !req.query.template.includes('https://github.com/')) {
-    throw ('There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo');
+  if (
+    !req.query.template ||
+    !req.query.template.includes('https://github.com/')
+  ) {
+    throw 'There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo';
   }
 
   if (req.query.template.includes('?')) {
-    throw (`That template has a ? in it, making the url impossible to parse: ${req.query.template}`);
+    throw `That template has a ? in it, making the url impossible to parse: ${
+      req.query.template
+    }`;
   }
 
   // allow repos to require the email parameter
-  if (req.query.email === 'required'){
+  if (req.query.email === 'required') {
     return res.render('pages/userinfo', {
       template: req.query.template
     });
@@ -114,9 +124,10 @@ app.get('/launch', (req, res, next) => {
   }
   utilities.runHerokuBuilder();
 
-  redis.rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
+  redis
+    .rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
     .then((rpushResult) => {
-      console.log(rpushResult);
+      logger.debug(rpushResult);
       if (message.pool) {
         logger.debug('putting in pool deploy queue');
         return res.send('pool initiated');
@@ -136,14 +147,14 @@ app.get('/userinfo', (req, res, next) => {
 app.get('/deploying/:format/:deployId', (req, res, next) => {
   res.render('pages/messages', {
     deployId: req.params.deployId.trim(),
-    format: req.params.format
+    format: req.params.format.trim()
   });
 });
 
 app.get('/pools', async (req, res, next) => {
   const keys = await redis.keys('*');
   const output = [];
-  for (const key of keys){
+  for (const key of keys) {
     const size = await redis.llen(key);
     output.push({
       repo: key,
@@ -157,17 +168,19 @@ app.get('/testform', (req, res, next) => {
   res.render('pages/testForm');
 });
 
-
-
 app.get('/', (req, res, next) => {
-  res.json({ message: 'There is nothing at /.  See the docs for valid paths.' });
+  res.json({
+    message: 'There is nothing at /.  See the docs for valid paths.'
+  });
 });
 
 app.get('*', (req, res, next) => {
-  setImmediate(() => { next(new Error('Route not found')); });
+  setImmediate(() => {
+    next(new Error('Route not found'));
+  });
 });
 
-app.use( (error, req, res, next) => {
+app.use((error, req, res, next) => {
   // Any request to this server will get here, and will send an HTTP
   // response with the error message 'woops'
   if (process.env.UA_ID) {
@@ -180,51 +193,30 @@ app.use( (error, req, res, next) => {
   });
 });
 
-
-// app.ws('/deploying/:format/:deployId', (ws, req) => {
-//   logger.debug('client connected!');
-//   // ws.send('welcome to the socket!');
-//   ws.on('close', () => logger.info('Client disconnected'));
-// }
-// );
 wss.on('connection', (ws: WebSocket, req) => {
   logger.debug(`connection on url ${req.url}`);
 
   // for future use tracking clients
   ws.url = req.url;
-
-  // for the client to know it's connected
-  ws.send('connected to the socket');
 });
 
 // subscribe to deploy events to share them with the web clients
-redisSub.subscribe(ex)
-  .then(() => {
-    logger.debug(`subscribed to Redis channel ${ex}`);
-  });
+redisSub.subscribe(ex).then(() => {
+  logger.info(`subscribed to Redis channel ${ex}`);
+});
 
 redisSub.on('message', (channel, message) => {
   // logger.debug('heard a message from the worker:');
-  const msgJSON = JSON.parse(message);
-  // console.log(msgJSON);
-  wss.clients.forEach( client => {
+  const msgJSON = <clientDataStructure>JSON.parse(message);
+
+  // logger.debug(msgJSON);
+  wss.clients.forEach((client) => {
     if (client.url.includes(msgJSON.deployId.trim())) {
       client.send(JSON.stringify(msgJSON));
       // close connection when ALLDONE
-      if (msgJSON.content === 'ALLDONE') {
+      if (msgJSON.complete) {
         client.close();
       }
     }
   });
-  // wsInstance.getWss().clients.forEach((client) => {
-  //   if (client.url.includes(msgJSON.deployId.trim())) {
-  //     client.send(JSON.stringify(msgJSON));
-  //     // close connection when ALLDONE
-  //     if (msgJSON.content === 'ALLDONE') {
-  //       client.close();
-  //     }
-  //   }
-  // });
-
-
 });

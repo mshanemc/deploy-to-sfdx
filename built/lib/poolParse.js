@@ -1,7 +1,6 @@
 "use strict";
 const fs = require("fs");
 const readline = require("readline");
-// returns the open command after making changes to local FS (removing the line from the file)
 const poolParse = function (path) {
     let parsedLines = [];
     let openLine;

@@ -34,30 +34,28 @@ describe('Utilities: getArg', () => {
   });
 
   it('parses url with double //', () => {
-    const input = JSON.stringify({
+    const input = {
       status: 0,
       result: {
         url: 'https://momentum-energy-6867-dev-ed.cs16.my.salesforce.com//secur/frontdoor.jsp?sid=00Df0000003cblj!ARcAQClJTaxfz4XB9AJPE7HqAjbE3Lv4jE_Upzg..AEE25gDiV.Ko7kW25VoKu0TFKyTSZsPSmnWNatW8CeWWCuDH73DIqXJ',
         orgId: '00Df0000003cbljEAA',
         username: 'int532@work.shop'
       }
-    });
-    const result = utilities.urlFix(input);
-    const jsonResult = JSON.parse(result);
+    };
+    const jsonResult = utilities.urlFix(input);
     expect(jsonResult.result.url).to.equal('https://momentum-energy-6867-dev-ed.cs16.my.salesforce.com/secur/frontdoor.jsp?sid=00Df0000003cblj!ARcAQClJTaxfz4XB9AJPE7HqAjbE3Lv4jE_Upzg..AEE25gDiV.Ko7kW25VoKu0TFKyTSZsPSmnWNatW8CeWWCuDH73DIqXJ')
   });
 
   it('parses url without double //', () => {
-    const input = JSON.stringify({
+    const input = {
       status: 0,
       result: {
         url: 'https://momentum-energy-6867-dev-ed.cs16.my.salesforce.com/secur/frontdoor.jsp?sid=00Df0000003cblj!ARcAQClJTaxfz4XB9AJPE7HqAjbE3Lv4jE_Upzg..AEE25gDiV.Ko7kW25VoKu0TFKyTSZsPSmnWNatW8CeWWCuDH73DIqXJ',
         orgId: '00Df0000003cbljEAA',
         username: 'int532@work.shop'
       }
-    });
-    const result = utilities.urlFix(input);
-    const jsonResult = JSON.parse(result);
+    };
+    const jsonResult = utilities.urlFix(input);
     expect(jsonResult.result.url).to.equal('https://momentum-energy-6867-dev-ed.cs16.my.salesforce.com/secur/frontdoor.jsp?sid=00Df0000003cblj!ARcAQClJTaxfz4XB9AJPE7HqAjbE3Lv4jE_Upzg..AEE25gDiV.Ko7kW25VoKu0TFKyTSZsPSmnWNatW8CeWWCuDH73DIqXJ')
   });
 

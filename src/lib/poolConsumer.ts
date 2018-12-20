@@ -60,8 +60,6 @@ async function runAll(){
 				}
 				const cloneDir = path.join(__dirname, '../tmp', msgJSON.deployId);
 				const tmpDir = path.join(__dirname, '../tmp');
-				// console.log(`cloneDir is ${cloneDir}`);
-				// console.log(`tmpDir is ${tmpDir}`);
 
 				const poolMessage: poolOrg = {
 					'repo': msgJSON.repo,

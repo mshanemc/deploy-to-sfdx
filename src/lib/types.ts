@@ -1,3 +1,5 @@
+import * as ua from 'universal-analytics';
+
 export interface deployMessage {
   username?: string;
   repo: string;
@@ -13,6 +15,7 @@ export interface deployRequest extends deployMessage {
   email?: string;
   firstname?: string;
   lastname?: string;
+  visitor?: ua.Visitor;
   delete?: boolean;
 }
 
@@ -45,6 +48,7 @@ export interface clientDataStructure {
 
   completeTimestamp?: Date;
   browserStartTime?: Date;
+  orgId?: string;
 
   mainUser?: {
     username: string;
@@ -52,20 +56,40 @@ export interface clientDataStructure {
     loginUrl: string;
   }
 
-  additionalUsers?: [{
-    username: string;
-    password: string;
-  }];
+  additionalUsers?: additionalUser[];
+  errors?: clientError[];
+  commandResults: clientResult[];
 
-  errors?: [{
-    command: string;
-    error: any;
-  }];
+}
 
-  commandResults: [{
-    command: string;
-    summary?: string; // ex: instead of outputting all the apex class stuff, just summarize that apex was executed.
-    raw: string; // goes to logs
-  }];
+interface clientError {
+  command: string;
+  error: string;
+  raw: any;
+}
 
+interface clientResult {
+  command: string;
+  summary?: commandSummary; // ex: instead of outputting all the apex class stuff, just summarize that apex was executed.
+  shortForm?: string;
+  raw: string; // goes to logs
+}
+
+interface additionalUser {
+  username: string;
+  password?: string;
+}
+
+export enum commandSummary {
+  HEROKU_DEPLOY = 'deploying a heroku app',
+  OPEN = 'opening org',
+  PASSWORD_GEN = 'generating a password',
+  ORG_CREATE = 'creating an org',
+  PUSH = 'pushing source',
+  APEX_EXEC = 'executing some apex',
+  PERMSET = 'assigning a permset',
+  DATA = 'loading some data',
+  USER_CREATE = 'creating a user',
+  PACKAGE = 'installing a package',
+  DEPLOY = 'deploying via metadata api'
 }

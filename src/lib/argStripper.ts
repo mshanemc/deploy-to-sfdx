@@ -9,7 +9,7 @@ const argStripper = function(cmd, parameter, noarg?){
 	// quickly return if it doesn't exist
 	const bufferedParam = ' '.concat(parameter).concat(' ');
 	if (!cmd.includes(bufferedParam)){
-		logger.debug('param not in command');
+		// logger.debug('param not in command');
 		return cmd.trim();
 	} else {
 		let output = cmd;
@@ -20,11 +20,8 @@ const argStripper = function(cmd, parameter, noarg?){
 			// find the string
 			const paramStartIndex = cmd.indexOf(' '.concat(parameter).concat(' ')) + 1;
 
-			// console.log(`param starts at ${paramStartIndex}`);
 			const paramEndIndex = paramStartIndex + parameter.length - 1; // because there'll be a space, and because origin
-			// console.log(`param ends at ${paramEndIndex}`);
 			const paramValueStart = paramEndIndex + 2;
-			// console.log(`value starts at ${paramValueStart}`);
 			let paramValueEnd;
 			// if it starts with a ` or ' or " we need to find the other end.  Otherwise, it's a space
 			if (cmd.charAt(paramValueStart) === '"' || cmd.charAt(paramValueStart) === '\'' || cmd.charAt(paramValueStart) === '`'){
@@ -39,7 +36,6 @@ const argStripper = function(cmd, parameter, noarg?){
 				// normal type with a space
 				paramValueEnd = cmd.indexOf(' ', paramValueStart)-1;
 			}
-			// console.log(`value ends at ${paramValueEnd}`);
 			output = cmd.slice(0, paramStartIndex-1).concat(' ').concat(cmd.slice(paramValueEnd+2));
 
 		}

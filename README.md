@@ -203,3 +203,6 @@ You can pass in `&email=required` to force user to a form where they add their e
 
 email example:
 <http://localhost:8543/launch?template=https://github.com/mshanemc/df17IntegrationWorkshops&email=shane.mclaughlin@salesforce.com>
+
+
+http://localhost:8443/launch?template=https://github.com/mshanemc/df17AppBuilding

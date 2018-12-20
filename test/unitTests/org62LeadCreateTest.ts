@@ -30,8 +30,6 @@ describe('org62LeadCreate', () => {
 
 	it('sends the lead', async () => {
 		expect(process.env.sfdcLeadCaptureServlet).to.be.a('string');
-		// console.log(process.env.sfdcLeadCaptureServlet);
-		// console.log(`sending to ${ process.env.sfdcLeadCaptureServlet }`);
 		const result = await leadCreate(formBody);
 		// expect(argStripper(cmd, '-a', false)).to.equal('sfdx force:org:create -f config/project-scratch-def.json -s -d 1');
 	});

@@ -1,7 +1,9 @@
 // checks the deploy queue and runs the process.  Can be run as a one-off dyno, or on a setInterval.
+// testing: http://localhost:8443/launch?template=https://github.com/mshanemc/df17AppBuilding
+
 import * as util from 'util';
 import * as ua from 'universal-analytics';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as logger from 'heroku-logger';
 
 import * as redis from './redisNormal';
@@ -10,7 +12,7 @@ import * as lineParse from './lineParse';
 import * as lineRunner from './lines';
 import * as pooledOrgFinder from './pooledOrgFinder';
 
-import { deployRequest } from './types';
+import { clientDataStructure, deployRequest } from './types';
 
 const exec = util.promisify(require('child_process').exec);
 
@@ -23,8 +25,6 @@ const check = async () => {
   if (!msg) {
     return false;
   }
-
-  console.log(msg);
 
   const msgJSON: deployRequest = JSON.parse(msg);
 
@@ -43,32 +43,48 @@ const check = async () => {
     // already published appropriate messages for the page to handle from the pooledOrgFinder
     logger.debug('using a pooled org');	// throw an error to break out of the rest of the promise chain and ack
   } else {
+    fs.ensureDirSync('tmp');
+
+    const clientResult = <clientDataStructure>{
+      deployId: msgJSON.deployId,
+      complete: false,
+      errors: [],
+      commandResults: [],
+      additionalUsers: [],
+      mainUser: {}
+    }
+
     // checkout only the specified branch, if specified
-    let gitCloneCmd = `cd tmp;git clone https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
+    let gitCloneCmd = `git clone https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
 
     // special handling for branches
     if (msgJSON.branch) {
-      // logger.debug('It is a branch!');
-      gitCloneCmd = `cd tmp;git clone -b ${msgJSON.branch} --single-branch https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
-      // logger.debug(gitCloneCmd);
+      gitCloneCmd = `git clone -b ${msgJSON.branch} --single-branch https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
     }
 
     try {
-      const gitCloneResult = await exec(gitCloneCmd);
+      const gitCloneResult = await exec(gitCloneCmd, { cwd: 'tmp'});
       logger.debug(gitCloneResult.stderr);
-      await redis.publish(ex, utilities.bufferKey(gitCloneResult.stderr, msgJSON.deployId));
+      clientResult.commandResults.push({
+        command: gitCloneCmd,
+        raw: gitCloneResult.stderr
+      });
+      await redis.publish(ex, JSON.stringify(clientResult));
     } catch (err){
       logger.warn(`bad repo: https://github.com/${msgJSON.username}/${msgJSON.repo}.git`);
-      await redis.publish(ex, utilities.bufferKey(`ERROR: There was an error cloning https://github.com/${msgJSON.username}/${msgJSON.repo}.git`, msgJSON.deployId));
-      await redis.publish(ex, utilities.bufferKey('ALLDONE', msgJSON.deployId));
+      clientResult.errors.push({
+        command: gitCloneCmd,
+        error: err.stderr,
+        raw: err
+      });
+      clientResult.complete = true;
+      await redis.publish(ex, JSON.stringify(clientResult));
       return true;
     }
 
-    // git outputs to stderr for unfathomable reasons
-
     // if you passed in a custom email address, we need to edit the config file and add the adminEmail property
     if (msgJSON.email) {
-      console.log('write a file for custom email address');
+      logger.debug('write a file for custom email address', msgJSON);
       const location = `tmp/${msgJSON.deployId}/config/project-scratch-def.json`;
       const configFileJSON = JSON.parse(fs.readFileSync(location, 'utf8'));
       configFileJSON.adminEmail = msgJSON.email;
@@ -83,25 +99,30 @@ const check = async () => {
     // use the default file if there's not one
     if (!fs.existsSync(`tmp/${msgJSON.deployId}/orgInit.sh`)) {
       logger.debug('no orgInit.sh.  Will use default');
-      parsedLines.push(`cd tmp;cd ${msgJSON.deployId};sfdx force:org:create -f config/project-scratch-def.json -s -d 1`);
-      parsedLines.push(`cd tmp;cd ${msgJSON.deployId};sfdx force:source:push`);
-      parsedLines.push(`cd tmp;cd ${msgJSON.deployId};sfdx force:org:open`);
-    } else { // read the lines from the file
-      logger.debug('found a orgInit.sh');
-      parsedLines = await lineParse(msgJSON, visitor);
+      fs.writeFileSync(`tmp/${msgJSON.deployId}/orgInit.sh`,
+        `sfdx force:org:create -f config/project-scratch-def.json -s -d 1
+        sfdx force:source:push
+        sfdx force:org:open`
+      );
     }
 
-    logger.debug('these are the parsed lines:');
-    logger.debug(JSON.stringify(parsedLines));
+    try {
+      parsedLines = await lineParse(msgJSON, visitor);
+      logger.debug('these are the parsed lines:');
+      logger.debug(JSON.stringify(parsedLines));
+    } catch (err){
 
-    const localLineRunner = new lineRunner(msgJSON, parsedLines, redis, visitor);
+    }
+
+    const localLineRunner = new lineRunner(msgJSON, parsedLines, redis, clientResult);
     await localLineRunner.runLines();
-    await redis.publish(ex, utilities.bufferKey('ALLDONE', msgJSON.deployId));
 
     visitor.event('deploy complete', msgJSON.template).send();
 
   }
-  await exec(`cd tmp;rm -rf ${msgJSON.deployId}`);
+
+  // TODO: change to rimraf for simplicity
+  await exec(`rm -rf tmp/${msgJSON.deployId}`);
   return true;
 };
 

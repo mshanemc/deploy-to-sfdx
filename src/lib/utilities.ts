@@ -95,16 +95,11 @@ const utilities = {
 
 	// fix double // inside a url by sfdx cli force:org:open
 	urlFix: (input) => {
-		try {
-			let jsonInput = JSON.parse(input);
-			if (jsonInput.result.url && jsonInput.result.url.includes('.com//secur/')){
-				logger.warn(`multiple slash in open url ${jsonInput.result.url}`);
-				jsonInput.result.url = jsonInput.result.url.replace('.com//secur/', '.com/secur/');
-			}
-			return JSON.stringify(jsonInput);
-		} catch (err) {
-			return input;
+		if (input.result.url && input.result.url.includes('.com//secur/')){
+			logger.warn(`multiple slash in open url ${input.result.url}`);
+			input.result.url = input.result.url.replace('.com//secur/', '.com/secur/');
 		}
+		return input;
 	},
 
 	getArg: (cmd, parameter) => {
@@ -118,17 +113,13 @@ const utilities = {
 
 			// quickly return if it doesn't exist
 		if (!cmd.includes(bufferedParam)) {
-				console.log('param not in command');
 				return false;
 			} else {
 				// find the string
 				const paramStartIndex = cmd.indexOf(' '.concat(parameter).concat(' ')) + 1;
 
-				// console.log(`param starts at ${paramStartIndex}`);
 				const paramEndIndex = (paramStartIndex + parameter.length) - 1; // because there'll be a space, and because origin
-				// console.log(`param ends at ${paramEndIndex}`);
 				const paramValueStart = paramEndIndex + 2;
-				// console.log(`value starts at ${paramValueStart}`);
 				let paramValueEnd;
 				// if it starts with a ` or ' or " we need to find the other end.  Otherwise, it's a space
 				if (cmd.charAt(paramValueStart) === '"' || cmd.charAt(paramValueStart) === '\'' || cmd.charAt(paramValueStart) === '`') {
@@ -143,9 +134,7 @@ const utilities = {
 					// normal type with a space
 					paramValueEnd = cmd.indexOf(' ', paramValueStart) - 1;
 				}
-				// console.log(`value ends at ${paramValueEnd}`);
 				return cmd.substring(paramValueStart, paramValueEnd+1).trim();
-				// output = cmd.slice(0, paramStartIndex - 1).concat(' ').concat(cmd.slice(paramValueEnd + 2));
 
 			}
 

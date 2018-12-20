@@ -5,8 +5,10 @@
     "target": "es2017",
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "module": "none"
+    "module": "none",
+    "removeComments": true
   },
+  "compileOnSave": true,
   "include": [
     "./src/**/*"
   ]

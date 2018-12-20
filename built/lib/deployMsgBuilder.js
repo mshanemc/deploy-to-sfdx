@@ -27,12 +27,10 @@ const deployMsgBuilder = function (query) {
         message.pool = true;
     }
     if (path.includes('/tree/')) {
-        // we're dealing with a branch
         message.branch = path.split('/tree/')[1];
     }
-    // checking for whitelisting
-    const whitelist1 = process.env.GITHUB_USERNAME_WHITELIST; // comma separated list of username
-    const whitelist2 = process.env.GITHUB_REPO_WHITELIST; // comma separated list of username/repo
+    const whitelist1 = process.env.GITHUB_USERNAME_WHITELIST;
+    const whitelist2 = process.env.GITHUB_REPO_WHITELIST;
     logger.debug(`whitelist1 is ${whitelist1}`);
     logger.debug(`whitelist2 is ${whitelist2}`);
     if (whitelist1) {

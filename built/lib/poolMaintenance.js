@@ -6,7 +6,6 @@ const utilities = require("./utilities");
 const redis = require("./redisNormal");
 const exec = util.promisify(require('child_process').exec);
 utilities.checkHerokuAPI();
-// one-off dynos to flush anything in the queue already
 const existingQFlush = async () => {
     const currentNeed = await redis.llen('poolDeploys');
     if (currentNeed > 0) {
@@ -41,12 +40,9 @@ const preparePoolByName = async (pool) => {
                 deployId,
                 whitelisted: true,
             };
-            // branch support
             if (poolname.split('.')[2]) {
                 message.branch = poolname.split('.')[2];
             }
-            // await redis.rpush('poolDeploys', JSON.stringify(message));
-            // await exec(`heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`);
             messages.push(redis.rpush('poolDeploys', JSON.stringify(message)));
             execs.push(exec(`heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`));
         }

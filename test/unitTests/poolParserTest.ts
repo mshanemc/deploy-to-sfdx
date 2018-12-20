@@ -28,7 +28,6 @@ describe('poolURLTest', function () {
 			expect(process.env.POOLCONFIG_URL).to.be.a('string');
 
 			const result = await utilities.getPoolConfig();
-			console.log(result);
 
 			expect(result).to.be.an('array');
 			expect(result.length).to.be.above(0);
@@ -48,7 +47,6 @@ describe('poolURLTest', function () {
 			expect(process.env.POOLCONFIG_URL).to.be.a('string');
 
 			const result = await utilities.getPoolConfig();
-			console.log(result);
 
 			const pool = await utilities.getPool(result[0].user, result[0].repo);
 

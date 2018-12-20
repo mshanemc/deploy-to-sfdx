@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-// uses the heroku API to look for one-off dynos that have been up too long (whatever that is defined as)
 const Heroku = require("heroku-client");
 const logger = require("heroku-logger");
 const moment = require("moment");

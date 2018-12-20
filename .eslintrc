@@ -138,7 +138,7 @@
     "operator-assignment": [0, "always"],
     "padded-blocks": 0,
     "quote-props": 0,
-    "quotes": "error",
+    "quotes": ["error", "single"],
     "radix": 0,
     "semi": 2,
     "semi-spacing": [0, {"before": false, "after": true}],

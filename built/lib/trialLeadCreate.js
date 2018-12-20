@@ -1,13 +1,10 @@
 "use strict";
-// asynchronously posts the lead form back to org62
-// const request = require('request');
 const request = require("request-promise-native");
 const sfdcLeadCaptureServlet = process.env.sfdcLeadCaptureServlet;
 const requestPage = '/form.html';
 const resultPage = '/conf.html';
 const requestHost = 'www.salesforce.com';
 const leadCreate = async function (incoming) {
-    // console.log(incoming);
     const formPostBody = {
         UserFirstName: incoming.UserFirstName,
         UserLastName: incoming.UserLastName,
@@ -27,8 +24,6 @@ const leadCreate = async function (incoming) {
         resultPage,
         requestHost
     };
-    // console.log(formPostBody);
-    console.log(sfdcLeadCaptureServlet);
     const result = await request({
         url: sfdcLeadCaptureServlet,
         method: 'POST',
