@@ -73,7 +73,7 @@ const lines = function (msgJSON, lines, redisPub, output) {
                     });
                 }
                 summary = types_1.commandSummary.HEROKU_DEPLOY;
-                const days = utilities.getArg(localLine, '-d') || utilities.getArg(localLine, '--days') || 7;
+                const days = parseInt(utilities.getArg(localLine, '-d'), 10) || parseInt(utilities.getArg(localLine, '--days'), 10) || 7;
                 const herokuDeleteMessage = {
                     herokuDelete: true,
                     appName: utilities.getArg(localLine, '-n') || utilities.getArg(localLine, '--name'),

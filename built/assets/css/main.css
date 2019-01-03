@@ -1,5 +1,5 @@
 @charset "UTF-8";
-/*! Lightning Design System 2.7.4 */
+/*! Lightning Design System 2.7.5 */
 /*!
  * Copyright (c) 2015-present, Salesforce.com, Inc. - All rights reserved.
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -5834,6 +5834,9 @@ a.slds-button--inverse:focus {
  * @restrict .slds-form-element label, .slds-form-element span, .slds-form-element legend, .slds-form-element div, [class*='slds-checkbox'] span, [class*='slds-radio'] span
  */
 .slds-form-element__label {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
   display: inline-block;
   color: #3e3e3c;
   font-size: 0.75rem;
@@ -16057,6 +16060,9 @@ a.slds-button--inverse:focus {
     cursor: help; }
   .slds-rich-text-editor__textarea table,
   .slds-rich-text-editor__output table {
+    overflow-wrap: normal;
+    word-wrap: normal;
+    word-break: normal;
     width: auto; }
     .slds-rich-text-editor__textarea table caption,
     .slds-rich-text-editor__output table caption {

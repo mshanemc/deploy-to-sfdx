@@ -25,7 +25,7 @@ const utilities = {
     },
     getPoolConfig: async () => {
         if (!process.env.POOLCONFIG_URL) {
-            return {};
+            return;
         }
         try {
             return JSON.parse(await request(process.env.POOLCONFIG_URL));
@@ -37,11 +37,11 @@ const utilities = {
     getPool: async (username, repo) => {
         const pools = await module.exports.getPoolConfig();
         if (!pools || !pools.find) {
-            return false;
+            return;
         }
         const foundPool = pools.find(pool => pool.user === username && pool.repo === repo);
         if (!foundPool) {
-            return false;
+            return;
         }
         else {
             return foundPool;
@@ -82,7 +82,7 @@ const utilities = {
         cmd = cmd.concat(' ');
         const bufferedParam = ' '.concat(parameter).concat(' ');
         if (!cmd.includes(bufferedParam)) {
-            return false;
+            return;
         }
         else {
             const paramStartIndex = cmd.indexOf(' '.concat(parameter).concat(' ')) + 1;

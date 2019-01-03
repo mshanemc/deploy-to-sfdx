@@ -33,18 +33,20 @@ const pooledOrgFinder = async function (deployReq) {
         fs.mkdirSync(uniquePath);
     }
     const keypath = process.env.LOCAL_ONLY_KEY_PATH || '/app/tmp/server.key';
-    const loginResult = await exec(`sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${msgJSON.displayResults.username} --jwtkeyfile ${keypath} --instanceurl https://test.salesforce.com -s`, { 'cwd': uniquePath });
+    const loginResult = await exec(`sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${msgJSON.displayResults.username} --jwtkeyfile ${keypath} --instanceurl https://test.salesforce.com -s`, { cwd: uniquePath });
     logger.debug(`auth completed ${loginResult.stdout}`);
     if (deployReq.email) {
         logger.debug(`changing email to ${deployReq.email}`);
-        const emailResult = await exec(`sfdx force:data:record:update -s User -w "username='${msgJSON.displayResults.username}'" -v "email='${deployReq.email}'"`, { 'cwd': uniquePath });
+        const emailResult = await exec(`sfdx force:data:record:update -s User -w "username='${msgJSON.displayResults.username}'" -v "email='${deployReq.email}'"`, { cwd: uniquePath });
         if (emailResult) {
             logger.debug(`updated email: ${emailResult.stdout}`);
         }
     }
     if (msgJSON.passwordCommand) {
         const stripped = argStripper(msgJSON.passwordCommand, '--json', true);
-        const passwordSetResult = await exec(`${stripped} --json`, { 'cwd': uniquePath });
+        const passwordSetResult = await exec(`${stripped} --json`, {
+            cwd: uniquePath
+        });
         if (passwordSetResult) {
             logger.debug(`password set results:  ${passwordSetResult.stdout}`);
             const usernameMessage = {
@@ -59,7 +61,9 @@ const pooledOrgFinder = async function (deployReq) {
             ]);
         }
     }
-    const openResult = await exec(`${msgJSON.openCommand} --json -r`, { 'cwd': uniquePath });
+    const openResult = await exec(`${msgJSON.openCommand} --json -r`, {
+        cwd: uniquePath
+    });
     logger.debug(`opened : ${openResult.stdout}`);
     await redis.publish(deployMsgChannel, utilities.bufferKey(openResult.stdout, deployReq.deployId));
     await redis.publish(deployMsgChannel, utilities.bufferKey('ALLDONE', deployReq.deployId));
