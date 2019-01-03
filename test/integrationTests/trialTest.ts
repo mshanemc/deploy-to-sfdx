@@ -81,7 +81,6 @@ describe('runs the trial', async () => {
 
   before(async () => {
     await clearQueues();
-    console.log('clearing queues');
   });
 
   after(async() => {
