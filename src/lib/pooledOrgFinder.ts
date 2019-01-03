@@ -48,8 +48,6 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
     msgJSON.displayResults.id
   );
 
-  fs.ensureDirSync(path.join(__dirname, '../tmp'));
-  fs.ensureDirSync(path.join(__dirname, '../tmp', 'pools'));
   fs.ensureDirSync(uniquePath);
 
   const keypath = process.env.LOCAL_ONLY_KEY_PATH || '/app/tmp/server.key';

@@ -39,7 +39,6 @@ async function poolBuild() {
             }
             const cloneDir = path.join(__dirname, '../tmp', msgJSON.deployId);
             const tmpDir = path.join(__dirname, '../tmp');
-            fs.ensureDirSync(tmpDir);
             fs.ensureDirSync(cloneDir);
             const poolMessage = {
                 repo: msgJSON.repo,

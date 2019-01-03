@@ -29,8 +29,6 @@ const pooledOrgFinder = async function (deployReq) {
         fs.mkdirSync(poolsPath);
     }
     const uniquePath = path.join(__dirname, '../tmp/pools', msgJSON.displayResults.id);
-    fs.ensureDirSync(path.join(__dirname, '../tmp'));
-    fs.ensureDirSync(path.join(__dirname, '../tmp', 'pools'));
     fs.ensureDirSync(uniquePath);
     const keypath = process.env.LOCAL_ONLY_KEY_PATH || '/app/tmp/server.key';
     const loginResult = await exec(`sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${msgJSON.displayResults.username} --jwtkeyfile ${keypath} --instanceurl https://test.salesforce.com -s`, { cwd: uniquePath });
