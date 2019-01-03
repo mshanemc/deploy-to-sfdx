@@ -1,5 +1,11 @@
 import * as ua from 'universal-analytics';
 
+// list of repos used for testing.  See testRepos.ts
+export interface testRepo {
+  username: string;
+  repo: string;
+}
+
 export interface deployMessage {
   username?: string;
   repo: string;
@@ -19,8 +25,13 @@ export interface deployRequest extends deployMessage {
   delete?: boolean;
 }
 
-export interface poolRequest extends deployMessage {
+export interface poolRequest extends deployMessage {}
 
+export interface poolConfig {
+  user: string;
+  repo: string;
+  lifeHours: number;
+  quantity: number;
 }
 
 export interface poolOrg {
@@ -29,11 +40,14 @@ export interface poolOrg {
   githubUsername: string;
   openCommand: string;
   passwordCommand?: string;
-  branch?:string;
+  branch?: string;
 
-  displayResults: {
+  displayResults?: sfdxDisplayResult;
+}
 
-  }
+export interface sfdxDisplayResult {
+  username: string;
+  id: string;
 }
 
 export interface lineParserResult {
@@ -41,25 +55,26 @@ export interface lineParserResult {
   passwordLine?: string;
 }
 
+// emitted to the messages page via websocket.  Structure drives the vue app on the client
 export interface clientDataStructure {
-
   deployId: string;
   complete: boolean;
 
-  completeTimestamp?: Date;
-  browserStartTime?: Date;
+  completeTimestamp?: Date; // when the job completed
+  browserStartTime?: Date; // when the job began
+  openTimestamp?: Date; // when the open button became visible, even if more scripts were still running
+
   orgId?: string;
 
   mainUser?: {
     username: string;
     password?: string;
     loginUrl: string;
-  }
+  };
 
   additionalUsers?: additionalUser[];
   errors?: clientError[];
   commandResults: clientResult[];
-
 }
 
 interface clientError {
@@ -80,6 +95,7 @@ interface additionalUser {
   password?: string;
 }
 
+// definitions used for parsing the messages from common commands to a more user friendly format
 export enum commandSummary {
   HEROKU_DEPLOY = 'deploying a heroku app',
   OPEN = 'opening org',

@@ -17,12 +17,7 @@ const lineParse = function (msgJSON, visitor) {
             logger.debug(`Line: ${line}`);
             if (msgJSON.whitelisted) {
                 if (line && line.includes('sfdx ') && !line.startsWith('#!/bin/bash') && !line.startsWith('#')) {
-                    if (line.endsWith(' &')) {
-                        line = line.substr(0, line.length);
-                    }
-                    else {
-                        line = `${argStripper(line, '--json', true)} --json`;
-                    }
+                    line = `${argStripper(line, '--json', true)} --json`;
                     parsedLines.push(line);
                 }
             }

@@ -28,10 +28,10 @@ describe('org62LeadCreate', () => {
 		DriverCampaignId: '70130000000sUVb'
 	};
 
-	it('sends the lead', async () => {
-		expect(process.env.sfdcLeadCaptureServlet).to.be.a('string');
-		const result = await leadCreate(formBody);
-		// expect(argStripper(cmd, '-a', false)).to.equal('sfdx force:org:create -f config/project-scratch-def.json -s -d 1');
-	});
+	// it('sends the lead', async () => {
+	// 	expect(process.env.sfdcLeadCaptureServlet).to.be.a('string');
+	// 	const result = await leadCreate(formBody);
+	// 	// expect(argStripper(cmd, '-a', false)).to.equal('sfdx force:org:create -f config/project-scratch-def.json -s -d 1');
+	// });
 
 });

@@ -7,7 +7,6 @@ import * as fs from 'fs-extra';
 import * as logger from 'heroku-logger';
 
 import * as redis from './redisNormal';
-import * as utilities from './utilities';
 import * as lineParse from './lineParse';
 import * as lineRunner from './lines';
 import * as pooledOrgFinder from './pooledOrgFinder';
@@ -51,7 +50,8 @@ const check = async () => {
       errors: [],
       commandResults: [],
       additionalUsers: [],
-      mainUser: {}
+      mainUser: {},
+      browserStartTime: new Date()
     }
 
     // checkout only the specified branch, if specified
@@ -115,7 +115,11 @@ const check = async () => {
     }
 
     const localLineRunner = new lineRunner(msgJSON, parsedLines, redis, clientResult);
-    await localLineRunner.runLines();
+    try {
+      await localLineRunner.runLines();
+    } catch (e) {
+      logger.error(e, msgJSON);
+    }
 
     visitor.event('deploy complete', msgJSON.template).send();
 

@@ -61,7 +61,7 @@ const lines = function (msgJSON: deployRequest, lines, redisPub, output:clientDa
 			} else if (localLine.includes('sfdx force:mdapi:deploy')) {
 				summary = commandSummary.DEPLOY;
 			} else {
-				logger.warn('unhandled command may dump garbage to the UI', {
+				logger.info('unhandled command will show up directly in the UI', {
 					command: localLine,
 					repo: `${msgJSON.username}/${msgJSON.repo}`
 				})
@@ -117,13 +117,14 @@ const lines = function (msgJSON: deployRequest, lines, redisPub, output:clientDa
 					response = utilities.urlFix(response);
 					output.mainUser.loginUrl = response.result.url;
 					output.mainUser.username = response.result.username;
+					output.openTimestamp = new Date();
 				} else if (summary === commandSummary.ORG_CREATE){
 					output.orgId = response.result.orgId;
 					output.mainUser.username = response.result.username;
 					shortForm = `created org ${response.result.orgId} with username ${response.result.username}`
 				} else if (summary === commandSummary.PASSWORD_GEN) {
-					output.mainUser.password = response.password;
-					shortForm = `set password to ${response.password}`;
+					output.mainUser.password = response.result.password;
+					shortForm = `set password to ${response.result.password} for user ${response.result.username || output.mainUser.username}`;
 				} else if (summary === commandSummary.USER_CREATE) {
 					output.additionalUsers.push({ username: response.result.fields.username });
 					shortForm = `created user with username ${response.result.fields.username}`;
@@ -152,6 +153,7 @@ const lines = function (msgJSON: deployRequest, lines, redisPub, output:clientDa
 
 		// we're done here
 		output.complete = true;
+		output.completeTimestamp = new Date();
 		redisPub.publish(ex, JSON.stringify(output));
 		return output;
 	};

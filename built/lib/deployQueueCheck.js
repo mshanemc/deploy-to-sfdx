@@ -31,7 +31,8 @@ const check = async () => {
             errors: [],
             commandResults: [],
             additionalUsers: [],
-            mainUser: {}
+            mainUser: {},
+            browserStartTime: new Date()
         };
         let gitCloneCmd = `git clone https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
         if (msgJSON.branch) {
@@ -80,7 +81,12 @@ const check = async () => {
         catch (err) {
         }
         const localLineRunner = new lineRunner(msgJSON, parsedLines, redis, clientResult);
-        await localLineRunner.runLines();
+        try {
+            await localLineRunner.runLines();
+        }
+        catch (e) {
+            logger.error(e, msgJSON);
+        }
         visitor.event('deploy complete', msgJSON.template).send();
     }
     await exec(`rm -rf tmp/${msgJSON.deployId}`);

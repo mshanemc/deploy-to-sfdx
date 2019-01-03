@@ -56,7 +56,7 @@ const utilities = {
         }
     },
     checkHerokuAPI: () => {
-        if (process.env.HEROKU_API_KEY) {
+        if (process.env.HEROKU_API_KEY || process.env.DEPLOYER_TESTING_ENDPOINT) {
             return true;
         }
         else {
@@ -86,10 +86,12 @@ const utilities = {
         }
         else {
             const paramStartIndex = cmd.indexOf(' '.concat(parameter).concat(' ')) + 1;
-            const paramEndIndex = (paramStartIndex + parameter.length) - 1;
+            const paramEndIndex = paramStartIndex + parameter.length - 1;
             const paramValueStart = paramEndIndex + 2;
             let paramValueEnd;
-            if (cmd.charAt(paramValueStart) === '"' || cmd.charAt(paramValueStart) === '\'' || cmd.charAt(paramValueStart) === '`') {
+            if (cmd.charAt(paramValueStart) === '"' ||
+                cmd.charAt(paramValueStart) === '\'' ||
+                cmd.charAt(paramValueStart) === '`') {
                 const quoteEnd = cmd.indexOf(cmd.charAt(paramValueStart), paramValueStart + 1);
                 if (cmd.charAt(quoteEnd + 1) === ' ') {
                     paramValueEnd = quoteEnd;

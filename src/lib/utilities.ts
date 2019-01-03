@@ -1,12 +1,12 @@
 import * as logger from 'heroku-logger';
 import * as request from 'request-promise-native';
 
-import { deployRequest } from './types';
+import { deployRequest, poolConfig } from './types';
 
 const exec = require('child_process').exec;
 
 const utilities = {
-  getKey: async (msgJSON: deployRequest) => {
+  getKey: async (msgJSON: deployRequest): Promise<string> => {
     if (!msgJSON.username) {
       throw new Error('msg does not have username');
     }
@@ -21,7 +21,7 @@ const utilities = {
     return key;
   },
 
-  bufferKey: (content, deployId) => {
+  bufferKey: (content, deployId: string):string => {
     const message = {
       deployId,
       content
@@ -37,10 +37,10 @@ const utilities = {
   //	lifeHours: 12
   // }]
 
-  getPoolConfig: async () => {
+  getPoolConfig: async (): Promise<poolConfig[]> => {
     // TODO: fallback as a singleton?
     if (!process.env.POOLCONFIG_URL) {
-      return {};
+      return undefined;
     }
     try {
       return JSON.parse(await request(process.env.POOLCONFIG_URL));
@@ -49,23 +49,23 @@ const utilities = {
     }
   },
 
-  getPool: async (username, repo) => {
+  getPool: async (username: string, repo: string): Promise<poolConfig> => {
     const pools = await module.exports.getPoolConfig();
     if (!pools || !pools.find) {
-      return false;
+      return undefined;
     }
 
     const foundPool = pools.find(
       pool => pool.user === username && pool.repo === repo
     );
     if (!foundPool) {
-      return false; // go back and build it the normal way!
+      return undefined; // go back and build it the normal way!
     } else {
       return foundPool;
     }
   },
 
-  runHerokuBuilder: () => {
+  runHerokuBuilder: ():void => {
     if (process.env.HEROKU_API_KEY) {
       exec(
         `heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`
@@ -75,7 +75,7 @@ const utilities = {
     }
   },
 
-  checkHerokuAPI: () => {
+  checkHerokuAPI: ():boolean => {
     // we allow not to exist if running locally
     if (process.env.HEROKU_API_KEY || process.env.DEPLOYER_TESTING_ENDPOINT) {
       return true;
@@ -84,7 +84,7 @@ const utilities = {
     }
   },
 
-  loggerFunction: (result) => {
+  loggerFunction: (result):void => {
     if (result.stdout) {
       logger.debug(result.stdout);
     }
@@ -94,7 +94,7 @@ const utilities = {
   },
 
   // fix double // inside a url by sfdx cli force:org:open
-  urlFix: (input) => {
+  urlFix: (input):string => {
     if (input.result.url && input.result.url.includes('.com//secur/')) {
       logger.warn(`multiple slash in open url ${input.result.url}`);
       input.result.url = input.result.url.replace(
@@ -105,7 +105,7 @@ const utilities = {
     return input;
   },
 
-  getArg: (cmd, parameter) => {
+  getArg: (cmd:string, parameter:string) => {
     cmd = cmd.concat(' ');
     const bufferedParam = ' '.concat(parameter).concat(' ');
     // takes a command line command and removes a parameter.  Make noarg true if it's a flag (parameter with no arguments), like sfdx force:org:create -s
