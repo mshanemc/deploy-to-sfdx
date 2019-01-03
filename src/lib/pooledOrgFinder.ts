@@ -14,7 +14,6 @@ const exec = util.promisify(require('child_process').exec);
 const deployMsgChannel = 'deployMsg';
 
 const pooledOrgFinder = async function(deployReq: deployRequest) {
-  const poolsPath = path.join(__dirname, '../tmp', 'pools');
 
   // is this a template that we prebuild?  uses the utilities.getPoolConfig
   const foundPool = await utilities.getPool(deployReq.username, deployReq.repo);
@@ -37,10 +36,6 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 
   logger.debug('getting messages from the pool');
   const msgJSON = <poolOrg>JSON.parse(poolMsg);
-
-  if (!fs.existsSync(poolsPath)) {
-    fs.mkdirSync(poolsPath);
-  }
 
   const uniquePath = path.join(
     __dirname,

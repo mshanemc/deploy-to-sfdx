@@ -10,6 +10,7 @@ export SFDX_AUTOUPDATE_DISABLE=true
 export SFDX_JSON_TO_STDOUT=true
 
 echo "Creating local resources ..."
+mkdir /app/built/tmp
 mkdir /app/tmp
 
 echo "Completed!"

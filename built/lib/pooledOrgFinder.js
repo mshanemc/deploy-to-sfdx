@@ -9,7 +9,6 @@ const argStripper = require("./argStripper");
 const exec = util.promisify(require('child_process').exec);
 const deployMsgChannel = 'deployMsg';
 const pooledOrgFinder = async function (deployReq) {
-    const poolsPath = path.join(__dirname, '../tmp', 'pools');
     const foundPool = await utilities.getPool(deployReq.username, deployReq.repo);
     if (!foundPool) {
         logger.debug('not a pooled repo');
@@ -25,9 +24,6 @@ const pooledOrgFinder = async function (deployReq) {
     }
     logger.debug('getting messages from the pool');
     const msgJSON = JSON.parse(poolMsg);
-    if (!fs.existsSync(poolsPath)) {
-        fs.mkdirSync(poolsPath);
-    }
     const uniquePath = path.join(__dirname, '../tmp/pools', msgJSON.displayResults.id);
     fs.ensureDirSync(uniquePath);
     const keypath = process.env.LOCAL_ONLY_KEY_PATH || '/app/tmp/server.key';
