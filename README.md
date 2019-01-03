@@ -83,6 +83,8 @@ It runs a plugin that give it powers SFDX doesn't out-of-the-box
 
 Put plugins in the package.json dependencies, then linked from source in lib/hubAuth.js.  Feel free to add additional plugins using npm install some-plugin-of-yours and then add it in hubAuth.js.
 
+---
+
 ## Org pools (optional, advanced!)
 
 Building orgs that take too long?  Ever have one that doesn't get its DNS ready in time?  Know you're mostly deploying the same orgs all the time?
@@ -115,6 +117,8 @@ Example code here, but feel free to generate it however you like.
 ```
 
 `pooldeployer` should have 0 dynos running.  It runs as a one-off dyno called by *** poolwatcher* *
+
+---
 
 ## Local Setup (Mac...others, who knows?)
 
@@ -165,6 +169,8 @@ Integration (tests/integrationTests) are slower/harder.
 
 NOTE: This is using up your scratch org quotas.  The tests delete the orgs, so it's minimally wastefuly, but still expect it to take a while AND watch your daily limit.
 
+---
+
 ## Contributing
 
 I'm using typescript...
@@ -175,6 +181,8 @@ I'm using typescript...
 ... and scss, which also gets compiled via `npm build`
 
 finally, the front end app is mostly pug/jade, but that messages page is running vue.
+
+---
 
 ## Launcher URLs
 
