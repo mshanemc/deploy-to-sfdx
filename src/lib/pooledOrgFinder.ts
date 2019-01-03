@@ -1,6 +1,6 @@
 import * as logger from 'heroku-logger';
 import * as util from 'util';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 
 import * as utilities from './utilities';
@@ -13,7 +13,7 @@ const exec = util.promisify(require('child_process').exec);
 
 const deployMsgChannel = 'deployMsg';
 
-const pooledOrgFinder = async function (deployReq: deployRequest) {
+const pooledOrgFinder = async function(deployReq: deployRequest) {
   const poolsPath = path.join(__dirname, '../tmp', 'pools');
 
   // is this a template that we prebuild?  uses the utilities.getPoolConfig
@@ -36,7 +36,7 @@ const pooledOrgFinder = async function (deployReq: deployRequest) {
   }
 
   logger.debug('getting messages from the pool');
-	const msgJSON = <poolOrg> JSON.parse(poolMsg);
+  const msgJSON = <poolOrg>JSON.parse(poolMsg);
 
   if (!fs.existsSync(poolsPath)) {
     fs.mkdirSync(poolsPath);
@@ -47,9 +47,10 @@ const pooledOrgFinder = async function (deployReq: deployRequest) {
     '../tmp/pools',
     msgJSON.displayResults.id
   );
-  if (!fs.existsSync(uniquePath)) {
-    fs.mkdirSync(uniquePath);
-  }
+
+  fs.ensureDirSync(path.join(__dirname, '../tmp'));
+  fs.ensureDirSync(path.join(__dirname, '../tmp', 'pools'));
+  fs.ensureDirSync(uniquePath);
 
   const keypath = process.env.LOCAL_ONLY_KEY_PATH || '/app/tmp/server.key';
 
