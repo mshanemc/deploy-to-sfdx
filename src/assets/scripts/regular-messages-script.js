@@ -64,7 +64,7 @@ ws.onclose = function () {
 };
 
 ws.onmessage = function (event) {
-  const newData =JSON.parse(event.data);
+  const newData = JSON.parse(event.data);
   console.log(newData);
   try {
     // display.data = JSON.parse(event.data);

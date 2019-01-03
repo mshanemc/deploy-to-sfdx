@@ -78,14 +78,20 @@ const check = async () => {
             logger.debug('these are the parsed lines:');
             logger.debug(JSON.stringify(parsedLines));
         }
-        catch (err) {
-        }
+        catch (err) { }
         const localLineRunner = new lineRunner(msgJSON, parsedLines, redis, clientResult);
         try {
-            await localLineRunner.runLines();
+            const output = await localLineRunner.runLines();
+            visitor
+                .event('deploy complete', msgJSON.template, 'deploytime', output.completeTimestamp.getTime() - output.browserStartTime.getTime())
+                .send();
+            visitor
+                .event('deploy complete', msgJSON.template, 'opentime', output.openTimestamp.getTime() - output.browserStartTime.getTime())
+                .send();
         }
         catch (e) {
             logger.error(e, msgJSON);
+            visitor.event('deploy fail', msgJSON.template).send();
         }
         visitor.event('deploy complete', msgJSON.template).send();
     }

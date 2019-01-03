@@ -9,6 +9,9 @@ body {
 	color: #666;
 	font-size: 15px;
 	line-height: 160%;
+	width: 100%;
+	background-color: white;
+	height: 100vh;
 }
 
 .sfheader{
@@ -40,8 +43,14 @@ body {
 		justify-content: space-around;
 }
 
+.trialText {
+	font-size: 2em;
+	padding: 1 em;
+}
+
 .trialContent .imgwrapper {
 	flex-grow: 5;
+	margin: 2em;
 }
 
 .trialContent .imgwrapper img {

@@ -39,18 +39,17 @@ app.post('/trial', (req, res, next) => {
         message.visitor = visitor;
     }
     utilities.runHerokuBuilder();
-    redis
-        .rpush('deploys', JSON.stringify(message))
-        .then(() => res.redirect(`/deploying/trial/${message.deployId.trim()}`));
+    redis.rpush('deploys', JSON.stringify(message)).then(() => {
+        res.redirect(`/deploying/trial/${message.deployId.trim()}`);
+    });
 });
 app.post('/delete', (req, res, next) => {
-    const message = {
-        username: req.body.username,
-        delete: true
-    };
     utilities.runHerokuBuilder();
     redis
-        .rpush('poolDeploys', JSON.stringify(message))
+        .rpush('poolDeploys', JSON.stringify({
+        username: req.body.username,
+        delete: true
+    }))
         .then(() => {
         res.status(302).send('/deleteConfirm');
     })
@@ -90,20 +89,25 @@ app.get('/launch', (req, res, next) => {
             return res.send('pool initiated');
         }
         else {
-            logger.debug('putting in reqular deploy queue');
             return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
         }
     });
 });
+app.get('/deploying/:format/:deployId', (req, res, next) => {
+    if (req.params.format === 'deployer') {
+        res.render('pages/messages', {
+            deployId: req.params.deployId.trim()
+        });
+    }
+    else if (req.params.format === 'trial') {
+        res.render('pages/trialLoading', {
+            deployId: req.params.deployId.trim()
+        });
+    }
+});
 app.get('/userinfo', (req, res, next) => {
     res.render('pages/userinfo', {
         template: req.query.template
-    });
-});
-app.get('/deploying/:format/:deployId', (req, res, next) => {
-    res.render('pages/messages', {
-        deployId: req.params.deployId.trim(),
-        format: req.params.format.trim()
     });
 });
 app.get('/pools', async (req, res, next) => {

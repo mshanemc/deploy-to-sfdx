@@ -7,7 +7,10 @@ body {
   font-family: SalesforceSansRegular,Arial,sans-serif;
   color: #666;
   font-size: 15px;
-  line-height: 160%; }
+  line-height: 160%;
+  width: 100%;
+  background-color: white;
+  height: 100vh; }
 
 .sfheader {
   height: 110px;
@@ -34,8 +37,13 @@ body {
   margin-top: 50px;
   justify-content: space-around; }
 
+.trialText {
+  font-size: 2em;
+  padding: 1 em; }
+
 .trialContent .imgwrapper {
-  flex-grow: 5; }
+  flex-grow: 5;
+  margin: 2em; }
 
 .trialContent .imgwrapper img {
   height: 100%; }

@@ -1,7 +1,7 @@
 import * as logger from 'heroku-logger';
 import { deployRequest } from './types';
 
-const deployMsgBuilder = function (query) {
+const deployMsgBuilder = function (query): deployRequest {
 	const template = query.template;
 	const path = template.replace('https://github.com/', '');
 	const username = path.split('/')[0];

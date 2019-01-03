@@ -11,7 +11,7 @@ import * as msgBuilder from './lib/deployMsgBuilder';
 import * as utilities from './lib/utilities';
 import * as org62LeadCapture from './lib/trialLeadCreate';
 
-import { clientDataStructure } from './lib/types';
+import { clientDataStructure, deployRequest } from './lib/types';
 
 const ex = 'deployMsg';
 
@@ -45,8 +45,7 @@ app.post('/trial', (req, res, next) => {
 
   // assign the email from the post field because it wasn't in the query string
   message.email = req.body.UserEmail;
-  // logger.debug(req.body.UserFirstName);
-  // logger.debug(req.body.UserLastName);
+
   if (process.env.sfdcLeadCaptureServlet) {
     org62LeadCapture(req.body);
   }
@@ -60,26 +59,25 @@ app.post('/trial', (req, res, next) => {
 
   utilities.runHerokuBuilder();
 
-  redis
-    .rpush('deploys', JSON.stringify(message))
-    .then(() => res.redirect(`/deploying/trial/${message.deployId.trim()}`));
+  redis.rpush('deploys', JSON.stringify(message)).then(() => {
+    res.redirect(`/deploying/trial/${message.deployId.trim()}`);
+  });
 });
 
 app.post('/delete', (req, res, next) => {
   // logger.debug('in the delete post action with body:');
   // logger.debug(req.body);
-
-  const message = {
-    username: req.body.username,
-    delete: true
-  };
-
   utilities.runHerokuBuilder();
 
   redis
-    .rpush('poolDeploys', JSON.stringify(message))
+    .rpush(
+      'poolDeploys',
+      JSON.stringify({
+        username: req.body.username,
+        delete: true
+      })
+    )
     .then(() => {
-      // logger.debug('message created');
       res.status(302).send('/deleteConfirm');
     })
     .catch((e) => {
@@ -91,7 +89,9 @@ app.post('/delete', (req, res, next) => {
     });
 });
 
-app.get('/deleteConfirm', (req, res, next) => res.render('pages/deleteConfirm'));
+app.get('/deleteConfirm', (req, res, next) =>
+  res.render('pages/deleteConfirm')
+);
 
 app.get('/launch', (req, res, next) => {
   // no template?  does not compute!
@@ -115,7 +115,7 @@ app.get('/launch', (req, res, next) => {
     });
   }
 
-  const message = msgBuilder(req.query);
+  const message: deployRequest = msgBuilder(req.query);
   // analytics
   if (process.env.UA_ID) {
     const visitor = ua(process.env.UA_ID);
@@ -132,22 +132,26 @@ app.get('/launch', (req, res, next) => {
         logger.debug('putting in pool deploy queue');
         return res.send('pool initiated');
       } else {
-        logger.debug('putting in reqular deploy queue');
         return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
       }
     });
 });
 
+app.get('/deploying/:format/:deployId', (req, res, next) => {
+  if (req.params.format === 'deployer') {
+    res.render('pages/messages', {
+      deployId: req.params.deployId.trim()
+    });
+  } else if (req.params.format === 'trial') {
+    res.render('pages/trialLoading', {
+      deployId: req.params.deployId.trim()
+    });
+  }
+});
+
 app.get('/userinfo', (req, res, next) => {
   res.render('pages/userinfo', {
     template: req.query.template
-  });
-});
-
-app.get('/deploying/:format/:deployId', (req, res, next) => {
-  res.render('pages/messages', {
-    deployId: req.params.deployId.trim(),
-    format: req.params.format.trim()
   });
 });
 
@@ -209,7 +213,6 @@ redisSub.on('message', (channel, message) => {
   // logger.debug('heard a message from the worker:');
   const msgJSON = <clientDataStructure>JSON.parse(message);
 
-  // logger.debug(msgJSON);
   wss.clients.forEach((client) => {
     if (client.url.includes(msgJSON.deployId.trim())) {
       client.send(JSON.stringify(msgJSON));

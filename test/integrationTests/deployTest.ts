@@ -6,6 +6,7 @@ import * as fs from 'fs-extra';
 import * as rimraf from 'rimraf';
 
 import { testRepos } from './../testRepos';
+import { clearQueues } from '../helpers/clearRedis';
 
 dotenv.config();
 
@@ -22,7 +23,11 @@ if (!testEnv) {
 
 const deployCheck = async (user, repo) => {
   const url = `https://github.com/${user}/${repo}`;
-  const nightmare = new Nightmare({ show: true, waitTimeout });
+  const nightmare = new Nightmare({
+    show: true,
+    waitTimeout,
+    openDevTools: { mode: 'detach' }
+  });
 
   const page = <NightmarePage>(
     await nightmare.goto(
@@ -50,12 +55,16 @@ const deployCheck = async (user, repo) => {
   const hasError = await nightmare.exists('#errorBlock');
   expect(hasError).to.be.false;
 
-  // return nightmare.click('#deleteButton').wait(1000).end();
+  return nightmare
+    .click('#deleteButton')
+    .wait(1000)
+    .end();
 };
 
 describe('deploys all the test repos', () => {
   // eslint-disable-next-line no-restricted-syntax
   before(async () => {
+    await clearQueues();
     rimraf.sync(tmpDir);
     fs.ensureDirSync(tmpDir);
   });
@@ -122,7 +131,7 @@ describe('deploys all the test repos', () => {
 
       return nightmare.wait(1000).end();
     }).timeout(waitTimeout);
-  })
+  });
 
   after(() => {
     rimraf.sync(tmpDir);
