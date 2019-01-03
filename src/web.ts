@@ -4,6 +4,7 @@ import ua from 'universal-analytics';
 import * as bodyParser from 'body-parser';
 import * as WebSocket from 'ws';
 import * as path from 'path';
+import * as favicon from 'serve-favicon';
 
 import * as redis from './lib/redisNormal';
 import * as redisSub from './lib/redisSubscribe';
@@ -25,6 +26,7 @@ const server = app.listen(port, () => {
 
 const wss = new WebSocket.Server({ server, clientTracking: true });
 
+app.use(favicon(path.join(__dirname, 'assets/favicons', 'favicon.ico')));
 // app.use('/scripts', express.static(`${__dirname}/scripts`));
 app.use(express.static('built/assets'));
 

@@ -6,6 +6,7 @@ const universal_analytics_1 = require("universal-analytics");
 const bodyParser = require("body-parser");
 const WebSocket = require("ws");
 const path = require("path");
+const favicon = require("serve-favicon");
 const redis = require("./lib/redisNormal");
 const redisSub = require("./lib/redisSubscribe");
 const msgBuilder = require("./lib/deployMsgBuilder");
@@ -18,6 +19,7 @@ const server = app.listen(port, () => {
     logger.info(`Example app listening on port ${port}!`);
 });
 const wss = new WebSocket.Server({ server, clientTracking: true });
+app.use(favicon(path.join(__dirname, 'assets/favicons', 'favicon.ico')));
 app.use(express.static('built/assets'));
 app.use(bodyParser.urlencoded({
     extended: true
