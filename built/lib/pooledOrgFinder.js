@@ -24,6 +24,12 @@ const pooledOrgFinder = async function (deployReq) {
     }
     logger.debug('getting messages from the pool');
     const msgJSON = JSON.parse(poolMsg);
+    const cds = {
+        deployId: deployReq.deployId,
+        browserStartTime: new Date(),
+        complete: true,
+        commandResults: [],
+    };
     const uniquePath = path.join(__dirname, '../tmp/pools', msgJSON.displayResults.id);
     fs.ensureDirSync(uniquePath);
     const keypath = process.env.LOCAL_ONLY_KEY_PATH || '/app/tmp/server.key';
@@ -36,31 +42,30 @@ const pooledOrgFinder = async function (deployReq) {
             logger.debug(`updated email: ${emailResult.stdout}`);
         }
     }
+    let password;
     if (msgJSON.passwordCommand) {
         const stripped = argStripper(msgJSON.passwordCommand, '--json', true);
         const passwordSetResult = await exec(`${stripped} --json`, {
             cwd: uniquePath
         });
         if (passwordSetResult) {
-            logger.debug(`password set results:  ${passwordSetResult.stdout}`);
-            const usernameMessage = {
-                result: {
-                    username: msgJSON.displayResults.username,
-                    orgId: msgJSON.displayResults.id
-                }
-            };
-            await Promise.all([
-                redis.publish(deployMsgChannel, utilities.bufferKey(JSON.stringify(usernameMessage), deployReq.deployId)),
-                redis.publish(deployMsgChannel, utilities.bufferKey(passwordSetResult.stdout, deployReq.deployId))
-            ]);
+            logger.debug(`password set results: ${passwordSetResult.stdout}`);
+            password = JSON.parse(passwordSetResult.stdout).password;
         }
     }
     const openResult = await exec(`${msgJSON.openCommand} --json -r`, {
         cwd: uniquePath
     });
+    cds.openTimestamp = new Date();
+    cds.completeTimestamp = new Date();
+    cds.orgId = msgJSON.displayResults.id;
+    cds.mainUser = {
+        username: msgJSON.displayResults.username,
+        loginUrl: utilities.urlFix(JSON.parse(openResult.stdout)).result.url,
+        password
+    };
     logger.debug(`opened : ${openResult.stdout}`);
-    await redis.publish(deployMsgChannel, utilities.bufferKey(openResult.stdout, deployReq.deployId));
-    await redis.publish(deployMsgChannel, utilities.bufferKey('ALLDONE', deployReq.deployId));
+    await redis.publish(deployMsgChannel, JSON.stringify(cds));
     return true;
 };
 module.exports = pooledOrgFinder;

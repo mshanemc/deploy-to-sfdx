@@ -7,7 +7,7 @@ import * as utilities from './utilities';
 import * as redis from './redisNormal';
 import * as argStripper from './argStripper';
 
-import { deployRequest, poolOrg } from './types';
+import { deployRequest, poolOrg, clientDataStructure } from './types';
 
 const exec = util.promisify(require('child_process').exec);
 
@@ -37,6 +37,13 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
   logger.debug('getting messages from the pool');
   const msgJSON = <poolOrg>JSON.parse(poolMsg);
 
+  const cds: clientDataStructure = {
+    deployId: deployReq.deployId,
+    browserStartTime: new Date(),
+    complete: true,
+    commandResults: [],
+  }
+
   const uniquePath = path.join(
     __dirname,
     '../tmp/pools',
@@ -45,6 +52,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 
   fs.ensureDirSync(uniquePath);
 
+  // let's auth to the org from the pool
   const keypath = process.env.LOCAL_ONLY_KEY_PATH || '/app/tmp/server.key';
 
   const loginResult = await exec(
@@ -58,6 +66,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 
   logger.debug(`auth completed ${loginResult.stdout}`);
 
+  // we may need to put the user's email on it
   if (deployReq.email) {
     logger.debug(`changing email to ${deployReq.email}`);
     const emailResult = await exec(
@@ -71,6 +80,8 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
     }
   }
 
+  let password:string;
+
   if (msgJSON.passwordCommand) {
     const stripped = argStripper(msgJSON.passwordCommand, '--json', true);
     const passwordSetResult = await exec(`${stripped} --json`, {
@@ -79,40 +90,28 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 
     // may not have returned anything if it wasn't used
     if (passwordSetResult) {
-      logger.debug(`password set results:  ${passwordSetResult.stdout}`);
-      const usernameMessage = {
-        result: {
-          username: msgJSON.displayResults.username,
-          orgId: msgJSON.displayResults.id
-        }
-      };
-      await Promise.all([
-        redis.publish(
-          deployMsgChannel,
-          utilities.bufferKey(
-            JSON.stringify(usernameMessage),
-            deployReq.deployId
-          )
-        ),
-        redis.publish(
-          deployMsgChannel,
-          utilities.bufferKey(passwordSetResult.stdout, deployReq.deployId)
-        )
-      ]);
+      logger.debug(`password set results: ${passwordSetResult.stdout}`);
+      password = JSON.parse(passwordSetResult.stdout).password;
     }
   }
 
   const openResult = await exec(`${msgJSON.openCommand} --json -r`, {
     cwd: uniquePath
   });
+
+  cds.openTimestamp = new Date();
+  cds.completeTimestamp = new Date();
+  cds.orgId = msgJSON.displayResults.id;
+  cds.mainUser = {
+    username: msgJSON.displayResults.username,
+    loginUrl: utilities.urlFix(JSON.parse(openResult.stdout)).result.url,
+    password
+  };
+
   logger.debug(`opened : ${openResult.stdout}`);
   await redis.publish(
     deployMsgChannel,
-    utilities.bufferKey(openResult.stdout, deployReq.deployId)
-  );
-  await redis.publish(
-    deployMsgChannel,
-    utilities.bufferKey('ALLDONE', deployReq.deployId)
+    JSON.stringify(cds)
   );
 
   return true;

@@ -77,8 +77,8 @@ export interface clientDataStructure {
 
   mainUser?: {
     username: string;
-    password?: string;
     loginUrl: string;
+    password?: string;
   };
 
   additionalUsers?: additionalUser[];
