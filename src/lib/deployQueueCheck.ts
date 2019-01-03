@@ -20,7 +20,7 @@ const ex = 'deployMsg';
 const check = async () => {
   // pull the oldest thing on the queue
   const msg = await redis.lpop('deploys');
-      // if it's empty, sleep a while and check again
+  // if it's empty, sleep a while and check again
   if (!msg) {
     return false;
   }
@@ -35,12 +35,11 @@ const check = async () => {
 
   visitor.event('Deploy Request', msgJSON.template).send();
 
-
   const pooledOrg = await pooledOrgFinder(msgJSON);
 
   if (pooledOrg) {
     // already published appropriate messages for the page to handle from the pooledOrgFinder
-    logger.debug('using a pooled org');	// throw an error to break out of the rest of the promise chain and ack
+    logger.debug('using a pooled org'); // throw an error to break out of the rest of the promise chain and ack
   } else {
     fs.ensureDirSync('tmp');
 
@@ -52,26 +51,34 @@ const check = async () => {
       additionalUsers: [],
       mainUser: {},
       browserStartTime: new Date()
-    }
+    };
 
     // checkout only the specified branch, if specified
-    let gitCloneCmd = `git clone https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
+    let gitCloneCmd = `git clone https://github.com/${msgJSON.username}/${
+      msgJSON.repo
+    }.git ${msgJSON.deployId}`;
 
     // special handling for branches
     if (msgJSON.branch) {
-      gitCloneCmd = `git clone -b ${msgJSON.branch} --single-branch https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
+      gitCloneCmd = `git clone -b ${
+        msgJSON.branch
+      } --single-branch https://github.com/${msgJSON.username}/${
+        msgJSON.repo
+      }.git ${msgJSON.deployId}`;
     }
 
     try {
-      const gitCloneResult = await exec(gitCloneCmd, { cwd: 'tmp'});
+      const gitCloneResult = await exec(gitCloneCmd, { cwd: 'tmp' });
       logger.debug(gitCloneResult.stderr);
       clientResult.commandResults.push({
         command: gitCloneCmd,
         raw: gitCloneResult.stderr
       });
       await redis.publish(ex, JSON.stringify(clientResult));
-    } catch (err){
-      logger.warn(`bad repo: https://github.com/${msgJSON.username}/${msgJSON.repo}.git`);
+    } catch (err) {
+      logger.warn(
+        `bad repo: https://github.com/${msgJSON.username}/${msgJSON.repo}.git`
+      );
       clientResult.errors.push({
         command: gitCloneCmd,
         error: err.stderr,
@@ -85,21 +92,26 @@ const check = async () => {
     // if you passed in a custom email address, we need to edit the config file and add the adminEmail property
     if (msgJSON.email) {
       logger.debug('write a file for custom email address', msgJSON);
-      const location = `tmp/${msgJSON.deployId}/config/project-scratch-def.json`;
+      const location = `tmp/${
+        msgJSON.deployId
+      }/config/project-scratch-def.json`;
       const configFileJSON = JSON.parse(fs.readFileSync(location, 'utf8'));
       configFileJSON.adminEmail = msgJSON.email;
       fs.writeFileSync(location, JSON.stringify(configFileJSON), 'utf8');
     }
 
     // grab the deploy script from the repo
-    logger.debug(`going to look in the directory tmp/${msgJSON.deployId}/orgInit.sh`);
+    logger.debug(
+      `going to look in the directory tmp/${msgJSON.deployId}/orgInit.sh`
+    );
 
     let parsedLines = [];
 
     // use the default file if there's not one
     if (!fs.existsSync(`tmp/${msgJSON.deployId}/orgInit.sh`)) {
       logger.debug('no orgInit.sh.  Will use default');
-      fs.writeFileSync(`tmp/${msgJSON.deployId}/orgInit.sh`,
+      fs.writeFileSync(
+        `tmp/${msgJSON.deployId}/orgInit.sh`,
         `sfdx force:org:create -f config/project-scratch-def.json -s -d 1
         sfdx force:source:push
         sfdx force:org:open`
@@ -110,19 +122,39 @@ const check = async () => {
       parsedLines = await lineParse(msgJSON, visitor);
       logger.debug('these are the parsed lines:');
       logger.debug(JSON.stringify(parsedLines));
-    } catch (err){
+    } catch (err) {}
 
-    }
-
-    const localLineRunner = new lineRunner(msgJSON, parsedLines, redis, clientResult);
+    const localLineRunner = new lineRunner(
+      msgJSON,
+      parsedLines,
+      redis,
+      clientResult
+    );
     try {
-      await localLineRunner.runLines();
+      const output = <clientDataStructure> await localLineRunner.runLines();
+      visitor
+        .event(
+          'deploy complete',
+          msgJSON.template,
+          'deploytime',
+          output.completeTimestamp.getTime() - output.browserStartTime.getTime()
+        )
+        .send();
+      visitor
+        .event(
+          'deploy complete',
+          msgJSON.template,
+          'opentime',
+          output.openTimestamp.getTime() - output.browserStartTime.getTime()
+        )
+        .send();
     } catch (e) {
       logger.error(e, msgJSON);
+      visitor.event('deploy fail', msgJSON.template).send();
+
     }
 
     visitor.event('deploy complete', msgJSON.template).send();
-
   }
 
   // TODO: change to rimraf for simplicity
