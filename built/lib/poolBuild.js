@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const util = require("util");
-const fs = require("fs");
+const fs = require("fs-extra");
 const logger = require("heroku-logger");
 const path = require("path");
 const utilities = require("./utilities");
@@ -39,6 +39,8 @@ async function poolBuild() {
             }
             const cloneDir = path.join(__dirname, '../tmp', msgJSON.deployId);
             const tmpDir = path.join(__dirname, '../tmp');
+            fs.ensureDirSync(tmpDir);
+            fs.ensureDirSync(cloneDir);
             const poolMessage = {
                 repo: msgJSON.repo,
                 githubUsername: msgJSON.username,

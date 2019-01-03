@@ -1,5 +1,5 @@
 import * as util from 'util';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as logger from 'heroku-logger';
 import * as path from 'path';
 
@@ -68,6 +68,9 @@ export async function poolBuild() {
       }
       const cloneDir = path.join(__dirname, '../tmp', msgJSON.deployId);
       const tmpDir = path.join(__dirname, '../tmp');
+
+      fs.ensureDirSync(tmpDir);
+      fs.ensureDirSync(cloneDir);
 
       const poolMessage: poolOrg = {
         repo: msgJSON.repo,
