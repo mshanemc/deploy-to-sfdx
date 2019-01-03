@@ -36,7 +36,7 @@ ws.onmessage = function (event) {
       if (parsedData.content.includes('secur/frontdoor')) {
         console.log('This is the login url in JSON');
         const goodstuff = JSON.parse(parsedData.content);
-        console.log('url is ' + goodstuff.result.url);
+        console.log(`url is ${goodstuff.result.url}`);
         window.location.href = goodstuff.result.url;
       }
     }
