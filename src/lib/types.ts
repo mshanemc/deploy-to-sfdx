@@ -45,6 +45,15 @@ export interface poolOrg {
   displayResults?: sfdxDisplayResult;
 }
 
+export interface openResult {
+  status: number;
+  result: {
+    url: string;
+    orgId: string;
+    username: string;
+  }
+}
+
 export interface sfdxDisplayResult {
   username: string;
   id: string;

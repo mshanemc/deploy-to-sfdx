@@ -82,7 +82,7 @@ const lines = function (msgJSON: deployRequest, lines, redisPub, output:clientDa
 				// visitor.event('sfdx event', 'heroku app deploy', this.msgJSON.template).send();
 				// push an object to the herokuDeletes queue
 
-				const days = utilities.getArg(localLine, '-d') || utilities.getArg(localLine, '--days') || 7;
+				const days = parseInt(utilities.getArg(localLine, '-d'), 10) || parseInt(utilities.getArg(localLine, '--days'), 10) || 7;
 
 				const herokuDeleteMessage = {
 					herokuDelete: true,

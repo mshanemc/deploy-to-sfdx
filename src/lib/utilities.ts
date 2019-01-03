@@ -1,7 +1,7 @@
 import * as logger from 'heroku-logger';
 import * as request from 'request-promise-native';
 
-import { deployRequest, poolConfig } from './types';
+import { deployRequest, poolConfig, openResult } from './types';
 
 const exec = require('child_process').exec;
 
@@ -21,7 +21,7 @@ const utilities = {
     return key;
   },
 
-  bufferKey: (content, deployId: string):string => {
+  bufferKey: (content, deployId: string): string => {
     const message = {
       deployId,
       content
@@ -40,7 +40,7 @@ const utilities = {
   getPoolConfig: async (): Promise<poolConfig[]> => {
     // TODO: fallback as a singleton?
     if (!process.env.POOLCONFIG_URL) {
-      return undefined;
+      return;
     }
     try {
       return JSON.parse(await request(process.env.POOLCONFIG_URL));
@@ -52,20 +52,20 @@ const utilities = {
   getPool: async (username: string, repo: string): Promise<poolConfig> => {
     const pools = await module.exports.getPoolConfig();
     if (!pools || !pools.find) {
-      return undefined;
+      return;
     }
 
     const foundPool = pools.find(
       pool => pool.user === username && pool.repo === repo
     );
     if (!foundPool) {
-      return undefined; // go back and build it the normal way!
+      return; // go back and build it the normal way!
     } else {
       return foundPool;
     }
   },
 
-  runHerokuBuilder: ():void => {
+  runHerokuBuilder: (): void => {
     if (process.env.HEROKU_API_KEY) {
       exec(
         `heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`
@@ -75,7 +75,7 @@ const utilities = {
     }
   },
 
-  checkHerokuAPI: ():boolean => {
+  checkHerokuAPI: (): boolean => {
     // we allow not to exist if running locally
     if (process.env.HEROKU_API_KEY || process.env.DEPLOYER_TESTING_ENDPOINT) {
       return true;
@@ -84,7 +84,7 @@ const utilities = {
     }
   },
 
-  loggerFunction: (result):void => {
+  loggerFunction: (result): void => {
     if (result.stdout) {
       logger.debug(result.stdout);
     }
@@ -94,7 +94,7 @@ const utilities = {
   },
 
   // fix double // inside a url by sfdx cli force:org:open
-  urlFix: (input):string => {
+  urlFix: (input: openResult): openResult => {
     if (input.result.url && input.result.url.includes('.com//secur/')) {
       logger.warn(`multiple slash in open url ${input.result.url}`);
       input.result.url = input.result.url.replace(
@@ -105,7 +105,7 @@ const utilities = {
     return input;
   },
 
-  getArg: (cmd:string, parameter:string) => {
+  getArg: (cmd: string, parameter: string):string => {
     cmd = cmd.concat(' ');
     const bufferedParam = ' '.concat(parameter).concat(' ');
     // takes a command line command and removes a parameter.  Make noarg true if it's a flag (parameter with no arguments), like sfdx force:org:create -s
@@ -116,7 +116,7 @@ const utilities = {
 
     // quickly return if it doesn't exist
     if (!cmd.includes(bufferedParam)) {
-      return false;
+      return;
     } else {
       // find the string
       const paramStartIndex =
