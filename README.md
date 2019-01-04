@@ -120,7 +120,7 @@ Example code here, but feel free to generate it however you like.
 
 ---
 
-## Local Setup (Mac...others, who knows?)
+## Local Setup and Build (Mac...others, who knows?)
 
 in your `.env` add
 
