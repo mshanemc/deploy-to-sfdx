@@ -8,9 +8,10 @@ utilities.checkHerokuAPI();
 const heroku = new Heroku({ token: process.env.HEROKU_API_KEY });
 const commands = [];
 const stopOldDynos = async () => {
-    const runDynos = await heroku.get(`/apps/${process.env.HEROKU_APP_NAME}/dynos`);
+    const runDynos = (await heroku.get(`/apps/${process.env.HEROKU_APP_NAME}/dynos`));
     runDynos.forEach((dyno) => {
-        if (dyno.type === 'run' && moment(dyno.created_at).isBefore(moment().subtract(20, 'minutes'))) {
+        if (dyno.type === 'run' &&
+            moment(dyno.created_at).isBefore(moment().subtract(20, 'minutes'))) {
             logger.debug(`stopping a run dyno started at ${dyno.created_at} with command ${dyno.command}`);
             commands.push(heroku.post(`/apps/${process.env.HEROKU_APP_NAME}/dynos/${dyno.id}/actions/stop`));
         }

@@ -16,8 +16,7 @@ const check = async () => {
     }
     const msgJSON = JSON.parse(msg);
     const visitor = ua(process.env.UA_ID || '0');
-    logger.debug(msgJSON.deployId);
-    logger.debug(msgJSON.template);
+    logger.debug(msgJSON.deployId, msgJSON);
     visitor.event('Deploy Request', msgJSON.template).send();
     const pooledOrg = await pooledOrgFinder(msgJSON);
     if (pooledOrg) {
