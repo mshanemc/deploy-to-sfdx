@@ -25,8 +25,7 @@ export interface deployRequest extends deployMessage {
   delete?: boolean;
 }
 
-export interface poolRequest extends deployMessage {}
-
+// tells how a pool should be built.  Used in an array from a url like POOLCONFIG_URL=https://deployer-pools.herokuapp.com/pools-dev
 export interface poolConfig {
   user: string;
   repo: string;
@@ -34,6 +33,7 @@ export interface poolConfig {
   quantity: number;
 }
 
+// an org that's already built
 export interface poolOrg {
   createdDate: Date;
   repo: string;
@@ -45,18 +45,19 @@ export interface poolOrg {
   displayResults?: sfdxDisplayResult;
 }
 
+interface sfdxDisplayResult {
+  username: string;
+  id: string;
+}
+
+// result of force:org:open --json
 export interface openResult {
   status: number;
   result: {
     url: string;
     orgId: string;
     username: string;
-  }
-}
-
-export interface sfdxDisplayResult {
-  username: string;
-  id: string;
+  };
 }
 
 export interface lineParserResult {
@@ -119,6 +120,7 @@ export enum commandSummary {
   DEPLOY = 'deploying via metadata api'
 }
 
+// devcenter.heroku.com/articles/platform-api-reference#dyno
 export interface herokuDyno {
   type: string;
   created_at: Date;

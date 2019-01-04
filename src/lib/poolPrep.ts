@@ -4,7 +4,7 @@ import * as util from 'util';
 import * as utilities from './utilities';
 import * as redis from './redisNormal';
 
-import { poolRequest, poolConfig } from './types';
+import { deployMessage, poolConfig } from './types';
 
 const exec = util.promisify(require('child_process').exec);
 
@@ -30,7 +30,7 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
         `${username}-${repo}-${new Date().valueOf()}`
       );
 
-      const message: poolRequest = {
+      const message: deployMessage = {
         pool: true,
         username,
         repo,
