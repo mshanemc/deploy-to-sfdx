@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 import * as fs from 'fs-extra';
 import * as rimraf from 'rimraf';
 
-import { testRepos } from './../testRepos';
+import { testRepos } from '../testRepos';
 import { clearQueues } from '../helpers/clearRedis';
 
 dotenv.config();

@@ -2,8 +2,6 @@
 import * as chai from 'chai';
 import * as Nightmare from 'nightmare';
 import * as dotenv from 'dotenv';
-import * as fs from 'fs-extra';
-import * as rimraf from 'rimraf';
 import { clearQueues } from '../helpers/clearRedis';
 
 dotenv.config();
