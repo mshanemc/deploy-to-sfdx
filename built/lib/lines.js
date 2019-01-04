@@ -144,7 +144,10 @@ const lines = function (msgJSON, lines, redisPub, output) {
         }
         output.complete = true;
         output.completeTimestamp = new Date();
-        redisPub.publish(ex, JSON.stringify(output));
+        await Promise.all([
+            redisPub.publish(ex, JSON.stringify(output)),
+            exec('sfdx force:auth:logout -p', { cwd: `tmp/${msgJSON.deployId}` })
+        ]);
         return output;
     };
 };
