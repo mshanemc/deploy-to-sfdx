@@ -74,7 +74,6 @@ describe('runs the trial', async () => {
 
     await nightmare.wait('div.cTrialWelcome2');
     const trialUrl = await nightmare.url();
-    console.log(`trial page is loaded at url ${trialUrl}`);
 
     expect(trialUrl).to.include('lightning.force');
   }).timeout(waitTimeout);

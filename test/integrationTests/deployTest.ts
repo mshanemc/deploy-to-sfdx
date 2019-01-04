@@ -111,26 +111,28 @@ describe('deploys all the test repos', () => {
 
   describe('tests error handling', () => {
     // something about a repo that ain't there
-    it('fails to deploy a bad repo, with good error messages', async () => {
-      const user = 'mshanemc';
-      const repo = 'this-aint-nothin';
-      const url = `https://github.com/${user}/${repo}`;
-      const nightmare = new Nightmare({ show: true, waitTimeout });
+    it(
+      'fails to deploy a bad repo, with good error messages',
+      async () => {
+        const user = 'mshanemc';
+        const repo = 'this-aint-nothin';
+        const url = `https://github.com/${user}/${repo}`;
+        const nightmare = new Nightmare({ show: true, waitTimeout });
 
-      const page = <NightmarePage>(
-        await nightmare.goto(
-          `${process.env.DEPLOYER_TESTING_ENDPOINT}/launch?template=${url}`
-        )
-      );
-      expect(page.url).to.include(`deploying/deployer/${user}-${repo}-`);
+        const page = <NightmarePage>(
+          await nightmare.goto(
+            `${process.env.DEPLOYER_TESTING_ENDPOINT}/launch?template=${url}`
+          )
+        );
+        expect(page.url).to.include(`deploying/deployer/${user}-${repo}-`);
 
-      await nightmare.wait(1000 * 8);
+        await nightmare.wait('div#errorBlock');;
+        const hasError = await nightmare.exists('div#errorBlock');
+        expect(hasError).to.be.true;
 
-      const hasError = await nightmare.exists('#errorBlock');
-      expect(hasError).to.be.true;
-
-      return nightmare.wait(1000).end();
-    }).timeout(waitTimeout);
+        return nightmare.wait(1000).end();
+      }
+    ).timeout(waitTimeout);
   });
 
   after(() => {
