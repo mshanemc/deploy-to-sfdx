@@ -39,7 +39,7 @@
     "moment": "^2.23.0",
     "request-promise-native": "^1.0.5",
     "serve-favicon": "^2.5.0",
-    "shane-sfdx-plugins": "^0.37.1",
+    "shane-sfdx-plugins": "^0.38.3",
     "universal-analytics": "^0.4.20",
     "ws": "^6.1.2"
   },
