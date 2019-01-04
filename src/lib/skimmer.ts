@@ -5,13 +5,14 @@ import * as util from 'util';
 import * as redis from './redisNormal';
 
 import * as utilities from './utilities';
+import { poolOrg, poolConfig } from './types';
 
 // const utilities = require('./utilities');
 const exec = util.promisify(require('child_process').exec);
 
 utilities.checkHerokuAPI();
 
-const checkExpiration = async (pool) => {
+const checkExpiration = async (pool: poolConfig):Promise<string> => {
 
   const poolname = `${pool.user}.${pool.repo}`;
   const poolOrg = await redis.lpop(poolname);
@@ -20,7 +21,7 @@ const checkExpiration = async (pool) => {
     return `pool ${poolname} is empty`;
   }
 
-  const msgJSON = JSON.parse(poolOrg);
+  const msgJSON = <poolOrg> JSON.parse(poolOrg);
   if (moment().diff(moment(msgJSON.createdDate)) > pool.lifeHours * 60 * 60 * 1000) {
     // it's gone if we don't put it back
 
@@ -31,8 +32,7 @@ const checkExpiration = async (pool) => {
         delete: true
       }));
     } else {
-      logger.warn('pool org did not have a username');
-      logger.warn(msgJSON);
+      logger.warn('pool org did not have a username', msgJSON);
     }
     await exec(`heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`);
     return `removed an expired org from pool ${poolname}`;

@@ -118,3 +118,10 @@ export enum commandSummary {
   PACKAGE = 'installing a package',
   DEPLOY = 'deploying via metadata api'
 }
+
+export interface herokuDyno {
+  type: string;
+  created_at: Date;
+  id: string;
+  command: string;
+}

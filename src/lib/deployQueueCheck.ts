@@ -30,8 +30,7 @@ const check = async () => {
   const visitor = ua(process.env.UA_ID || '0');
 
   // logger.debug(msgJSON);
-  logger.debug(msgJSON.deployId);
-  logger.debug(msgJSON.template);
+  logger.debug(msgJSON.deployId, msgJSON);
 
   visitor.event('Deploy Request', msgJSON.template).send();
 
