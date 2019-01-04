@@ -76,14 +76,13 @@ const requestBuildPool = async (testRepo: testRepo, deleteIt: boolean) => {
   expect(poolOrg.openCommand).to.be.a('string');
   expect(poolOrg.displayResults.username).to.be.a('string');
 
-  if (deleteIt){
+  if (deleteIt) {
     // clean up after ourselves by deleting the org
     const deleteResult = await exec(
       `sfdx force:org:delete -p -u ${poolOrg.displayResults.username} --json`
     );
     expect(JSON.parse(deleteResult.stdout).status).to.equal(0);
   }
-
 };
 
 const requestOrgFromPool = async (testRepo: testRepo) => {
@@ -118,7 +117,9 @@ describe('tests that each repo works in a pooled scenario', () => {
         testRepo.repo
       }`, async () => {
         await requestBuildPool(testRepo, true);
-      }).timeout(waitTimeout);
+      })
+        .timeout(waitTimeout)
+        .retries(2);
     }
   });
 
@@ -130,15 +131,17 @@ describe('tests that each repo works in a pooled scenario', () => {
     for (const testRepo of testRepos.adoptionWorkshops) {
       it(`adds ${testRepo.username}/${
         testRepo.repo
-        } to the poolDeploys queue`, async () => {
-          await requestAddToPool(testRepo);
-        });
+      } to the poolDeploys queue`, async () => {
+        await requestAddToPool(testRepo);
+      });
 
       it(`builds a pooled org for ${testRepo.username}/${
         testRepo.repo
-        }`, async () => {
-          await requestBuildPool(testRepo, true);
-        }).timeout(waitTimeout);
+      }`, async () => {
+        await requestBuildPool(testRepo, true);
+      })
+        .timeout(waitTimeout)
+        .retries(2);
     }
   });
 
@@ -150,15 +153,17 @@ describe('tests that each repo works in a pooled scenario', () => {
     for (const testRepo of testRepos.campground) {
       it(`adds ${testRepo.username}/${
         testRepo.repo
-        } to the poolDeploys queue`, async () => {
-          await requestAddToPool(testRepo);
-        });
+      } to the poolDeploys queue`, async () => {
+        await requestAddToPool(testRepo);
+      });
 
       it(`builds a pooled org for ${testRepo.username}/${
         testRepo.repo
-        }`, async () => {
-          await requestBuildPool(testRepo, true);
-        }).timeout(waitTimeout);
+      }`, async () => {
+        await requestBuildPool(testRepo, true);
+      })
+        .timeout(waitTimeout)
+        .retries(2);
     }
   });
 
@@ -170,15 +175,17 @@ describe('tests that each repo works in a pooled scenario', () => {
     for (const testRepo of testRepos.other) {
       it(`adds ${testRepo.username}/${
         testRepo.repo
-        } to the poolDeploys queue`, async () => {
-          await requestAddToPool(testRepo);
-        });
+      } to the poolDeploys queue`, async () => {
+        await requestAddToPool(testRepo);
+      });
 
       it(`builds a pooled org for ${testRepo.username}/${
         testRepo.repo
-        }`, async () => {
-          await requestBuildPool(testRepo, true);
-        }).timeout(waitTimeout);
+      }`, async () => {
+        await requestBuildPool(testRepo, true);
+      })
+        .timeout(waitTimeout)
+        .retries(2);
     }
   });
 

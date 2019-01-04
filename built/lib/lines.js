@@ -21,7 +21,8 @@ const lines = function (msgJSON, lines, redisPub, output) {
                 throw new Error(`Every line should have included --json by this point.  Cannot process ${localLine}`);
             }
             logger.debug(localLine);
-            if (localLine.includes('sfdx force:org:open') && !localLine.includes(' -r')) {
+            if (localLine.includes('sfdx force:org:open') &&
+                !localLine.includes(' -r')) {
                 summary = types_1.commandSummary.OPEN;
                 localLine = `${localLine} -r`;
             }
@@ -73,55 +74,73 @@ const lines = function (msgJSON, lines, redisPub, output) {
                     });
                 }
                 summary = types_1.commandSummary.HEROKU_DEPLOY;
-                const days = parseInt(utilities.getArg(localLine, '-d'), 10) || parseInt(utilities.getArg(localLine, '--days'), 10) || 7;
+                const days = parseInt(utilities.getArg(localLine, '-d'), 10) ||
+                    parseInt(utilities.getArg(localLine, '--days'), 10) ||
+                    7;
                 const herokuDeleteMessage = {
                     herokuDelete: true,
-                    appName: utilities.getArg(localLine, '-n') || utilities.getArg(localLine, '--name'),
-                    expiration: Date.now() + (days * 24 * 60 * 60 * 1000)
+                    appName: utilities.getArg(localLine, '-n') ||
+                        utilities.getArg(localLine, '--name'),
+                    expiration: Date.now() + days * 24 * 60 * 60 * 1000
                 };
                 redis.rpush('herokuDeletes', JSON.stringify(herokuDeleteMessage));
             }
             let lineResult;
             logger.debug(`running line-- ${localLine}`);
-            lineResult = await exec(localLine, { 'cwd': `tmp/${msgJSON.deployId}` });
-            let response = JSON.parse(lineResult.stdout);
-            if (response.status !== 0) {
+            lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}` });
+            try {
+                let response = JSON.parse(lineResult.stdout);
+                if (response.status !== 0) {
+                    output.errors.push({
+                        command: localLine,
+                        error: response.message,
+                        raw: response
+                    });
+                    logger.error(`error running line ${localLine} from ${msgJSON.username}/${msgJSON.repo}: ${response.message}`);
+                    this.msgJSON.visitor
+                        .event('deploy error', this.msgJSON.template, response.message)
+                        .send();
+                }
+                else {
+                    if (summary === types_1.commandSummary.OPEN) {
+                        response = utilities.urlFix(response);
+                        output.mainUser.loginUrl = response.result.url;
+                        output.mainUser.username = response.result.username;
+                        output.openTimestamp = new Date();
+                    }
+                    else if (summary === types_1.commandSummary.ORG_CREATE) {
+                        output.orgId = response.result.orgId;
+                        output.mainUser.username = response.result.username;
+                        shortForm = `created org ${response.result.orgId} with username ${response.result.username}`;
+                    }
+                    else if (summary === types_1.commandSummary.PASSWORD_GEN) {
+                        output.mainUser.password = response.result.password;
+                        shortForm = `set password to ${response.result.password} for user ${response.result.username || output.mainUser.username}`;
+                    }
+                    else if (summary === types_1.commandSummary.USER_CREATE) {
+                        output.additionalUsers.push({
+                            username: response.result.fields.username
+                        });
+                        shortForm = `created user with username ${response.result.fields.username}`;
+                    }
+                    output.commandResults.push({
+                        command: line,
+                        summary,
+                        raw: response,
+                        shortForm
+                    });
+                }
+                redisPub.publish(ex, JSON.stringify(output));
+            }
+            catch (e) {
+                logger.error(`error running line ${localLine} from ${msgJSON.username}/${msgJSON.repo}: ${lineResult.stdout}`);
                 output.errors.push({
                     command: localLine,
-                    error: response.message,
-                    raw: response
+                    error: e,
+                    raw: lineResult.stdout
                 });
-                logger.error(`error running line ${localLine} from ${msgJSON.username}/${msgJSON.repo}: ${response.message}`);
-                this.msgJSON.visitor.event('deploy error', this.msgJSON.template, response.message).send();
+                redisPub.publish(ex, JSON.stringify(output));
             }
-            else {
-                if (summary === types_1.commandSummary.OPEN) {
-                    response = utilities.urlFix(response);
-                    output.mainUser.loginUrl = response.result.url;
-                    output.mainUser.username = response.result.username;
-                    output.openTimestamp = new Date();
-                }
-                else if (summary === types_1.commandSummary.ORG_CREATE) {
-                    output.orgId = response.result.orgId;
-                    output.mainUser.username = response.result.username;
-                    shortForm = `created org ${response.result.orgId} with username ${response.result.username}`;
-                }
-                else if (summary === types_1.commandSummary.PASSWORD_GEN) {
-                    output.mainUser.password = response.result.password;
-                    shortForm = `set password to ${response.result.password} for user ${response.result.username || output.mainUser.username}`;
-                }
-                else if (summary === types_1.commandSummary.USER_CREATE) {
-                    output.additionalUsers.push({ username: response.result.fields.username });
-                    shortForm = `created user with username ${response.result.fields.username}`;
-                }
-                output.commandResults.push({
-                    command: line,
-                    summary: summary,
-                    raw: response,
-                    shortForm
-                });
-            }
-            redisPub.publish(ex, JSON.stringify(output));
         }
         output.complete = true;
         output.completeTimestamp = new Date();
