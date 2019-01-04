@@ -82,7 +82,7 @@ export interface clientDataStructure {
   };
 
   additionalUsers?: additionalUser[];
-  errors?: clientError[];
+  errors: clientError[];
   commandResults: clientResult[];
 }
 

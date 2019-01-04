@@ -42,6 +42,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
     browserStartTime: new Date(),
     complete: true,
     commandResults: [],
+    errors: []
   }
 
   const uniquePath = path.join(

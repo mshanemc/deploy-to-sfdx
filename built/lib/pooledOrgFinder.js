@@ -29,6 +29,7 @@ const pooledOrgFinder = async function (deployReq) {
         browserStartTime: new Date(),
         complete: true,
         commandResults: [],
+        errors: []
     };
     const uniquePath = path.join(__dirname, '../tmp/pools', msgJSON.displayResults.id);
     fs.ensureDirSync(uniquePath);
