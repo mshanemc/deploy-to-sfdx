@@ -24,20 +24,17 @@ const hubAuth = async function () {
 
 	logger.debug('updating plugin');
 
-	// array of any sfdx or heroku stuff you need, like plugins, updates.
-	const setupCommands = [];
-	if (process.env.JWTKEY){
-		// not local, so link the plugin.  local runs will hae it already linked.
-		exec('sfdx plugins:link node_modules/shane-sfdx-plugins')
-	}
 
-	if (process.env.HEROKU_API_KEY){
-		setupCommands.push(exec('heroku update'));
-	}
 
 	try {
-		const results = await Promise.all(setupCommands);
-		results.forEach(result => utilities.loggerFunction(result));
+		if (process.env.JWTKEY) {
+			// not local, so link the plugin.  local runs will hae it already linked.
+			await exec('sfdx plugins:link node_modules/shane-sfdx-plugins')
+		}
+
+		if (process.env.HEROKU_API_KEY) {
+			await exec('heroku update');
+		}
 		await exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile ${keypath} --setdefaultdevhubusername -a hub`);
 	} catch (err) {
 		logger.error(err);
