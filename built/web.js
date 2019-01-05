@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger = require("heroku-logger");
 const express = require("express");
-const universal_analytics_1 = require("universal-analytics");
+const ua = require("universal-analytics");
 const bodyParser = require("body-parser");
 const WebSocket = require("ws");
 const path = require("path");
@@ -35,7 +35,7 @@ app.post('/trial', (req, res, next) => {
         org62LeadCapture(req.body);
     }
     if (process.env.UA_ID) {
-        const visitor = universal_analytics_1.default(process.env.UA_ID);
+        const visitor = ua(process.env.UA_ID);
         visitor.pageview('/trial').send();
         visitor.event('Repo', req.query.template).send();
         message.visitor = visitor;
@@ -77,7 +77,7 @@ app.get('/launch', (req, res, next) => {
     }
     const message = msgBuilder(req.query);
     if (process.env.UA_ID) {
-        const visitor = universal_analytics_1.default(process.env.UA_ID);
+        const visitor = ua(process.env.UA_ID);
         visitor.pageview('/launch').send();
         visitor.event('Repo', req.query.template).send();
     }
@@ -139,7 +139,7 @@ app.get('*', (req, res, next) => {
 });
 app.use((error, req, res, next) => {
     if (process.env.UA_ID) {
-        const visitor = universal_analytics_1.default(process.env.UA_ID);
+        const visitor = ua(process.env.UA_ID);
         visitor.event('Error', req.query.template).send();
     }
     logger.error(`request failed: ${req.url}`);

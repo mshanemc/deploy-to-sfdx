@@ -1,6 +1,6 @@
 import * as logger from 'heroku-logger';
 import * as express from 'express';
-import ua from 'universal-analytics';
+import * as ua from 'universal-analytics';
 import * as bodyParser from 'body-parser';
 import * as WebSocket from 'ws';
 import * as path from 'path';
