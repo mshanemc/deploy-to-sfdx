@@ -26,10 +26,7 @@ Create a connected app for JWT auth, with certificates, per the SFDX setup guide
 
 * `HUB_USERNAME` the username from your dev hub
 * `CONSUMERKEY` from your connected app
-
-### Cloud only
-
-* `REDIS_URL` starts with `redis://`
+* `REDIS_URL` starts with `redis://` (probably set up automatically when you use the heroku button)
 
 ### Plus one of the following, depending on where you're running
 
@@ -45,7 +42,6 @@ Create a connected app for JWT auth, with certificates, per the SFDX setup guide
 * `UA_ID` for google analytics measurement protocol
 * `GITHUB_USERNAME_WHITELIST` lets you whitelist usernames.  It's a comma-separated list.  Ex: `mshanemc,andrew,bebraw`
 * `GITHUB_REPO_WHITELIST` lets you whitelist username/repo combinations.  It's a comma-separated list. Ex: `mshanemc/DF17integrationWorkshops,torvalds/linux`
-* `cycleTime` when the deploy queue is empty, how long, in seconds, to wait before checking again
 * org pools -- see below for details
 
 What's whitelisting do?  Normally, this app will parse your orgInit.sh and throw an error if you're doing any funny business.  BUT if you're on the whitelist, the app owner trusts you and you can do things with bash metacharacters (think &&, |, >) and execute non-sfdx commands  (grep, rm, whatever!) etc.  BE CAREFUL!
@@ -87,6 +83,8 @@ It runs a plugin that give it powers SFDX doesn't out-of-the-box
 
 Put plugins in the package.json dependencies, then linked from source in lib/hubAuth.js.  Feel free to add additional plugins using npm install some-plugin-of-yours and then add it in hubAuth.js.
 
+---
+
 ## Org pools (optional, advanced!)
 
 Building orgs that take too long?  Ever have one that doesn't get its DNS ready in time?  Know you're mostly deploying the same orgs all the time?
@@ -101,12 +99,12 @@ There's 3 worker dynos, both off by default (leave them that way).
 Then, in your .env/heroku config vars, point the deployer to some url that returns json.
 `POOLCONFIG_URL` = `https://where.yourstuff/is`.
 
-Finally, since poolwatcher is starting dynos to handle this pool stuff, you want to enable a heroku Labs setting for getting dyno metadata `heroku labs:enable runtime-dyno-metadata -a `.  This lets heroku start more heroku with the name of your app being dynamicly fed into the environment variables without you having to 1) set that up 2) maintain different names for each instance/stage
+Finally, since poolwatcher is starting dynos to handle this pool stuff, you want to enable a heroku Labs setting for getting dyno metadata `heroku labs:enable runtime-dyno-metadata -a`.  This lets heroku start more heroku with the name of your app being dynamicly fed into the environment variables without you having to 1) set that up 2) maintain different names for each instance/stage
 
 Example code here, but feel free to generate it however you like.
 <https://github.com/mshanemc/poolsConfig>
 
-```
+```json
 [{
     "user": "mshanemc", //ex: lives at https://github.com/mshanemc/cg1
     "repo": "cg1",
@@ -120,24 +118,17 @@ Example code here, but feel free to generate it however you like.
 
 `pooldeployer` should have 0 dynos running.  It runs as a one-off dyno called by *** poolwatcher* *
 
-## Local Setup (Mac...others, who knows?)
+---
 
-You'll need to have a local filesystem structure that kinda replicates what we're doing on the heroku dyno.
+## Local Setup and Build (Mac...others, who knows?)
 
-```shell
-mkdir tmp
-```
+in your `.env` add
 
-NOTE: This will overwrite your dev hub default.  If you go back to doing other sfdx local work, be sure to re-auth to your hub.
-
-Then put your JWT server.key file from the connected app in the /app/tmp folder.  (In heroku cloud, this'll load from the environment variable **JWTKEY** but heroku local doesn't load multiline variables easily, so that's why the manual placement of the key file is needed).
-
-in your `process.env` file, put the Heroku Redis url (it can be the same as you're using in the cloud).  Don't commit this file to your repo.
-
-then start this app with
-`heroku local`
-
-You can also run some local integration tests using mocha.  See /tests and use `mocha --watch tests/`
+* `LOCAL_ONLY_KEY_PATH=/Users/shane.mclaughlin/code/certificates/server.key` or your equivalent to where your cert for jwt is
+* in your `process.env` file, put the Heroku Redis url (it can be the same as you're using in the cloud. **Don't commit this file to your repo.**
+* `npm install` will get all your modules installed, including my plugin.
+* `npm build` will get the typescript from /src to /built, which is where the executables go.
+* then start this app with `npm run local`
 
 ---
 
@@ -153,17 +144,6 @@ if **hosted-scratch-qa** is the name of your app
 
 ---
 
-## Testing
-
-There's unit tests in tests/unitTests.  Run these to not break stuff.
-Integration (tests/integrationTests) are harder.  You'll need some dynos running in your test environment.  Then
-`export DEPLOYER_TESTING_ENDPOINT=[the url of your dev environment]`
-`mocha tests/integrationTests/*Test.js`
-
-This is deploying actual repos from github.  They're defined in the top of deployTest.js.  If you have repos you really care about, add them!
-
-NOTE: This is using up your scratch org quotas.  The tests delete the orgs, so it's minimally wastefuly, but still expect it to take a while AND watch your daily limit.
-
 ## Setting up a repo (optional)
 
 So you need a target repo to deploy (see examples below).  If your repo is simple, the tool will do the default behavior (create, push source, open).
@@ -171,6 +151,36 @@ So you need a target repo to deploy (see examples below).  If your repo is simpl
 But with an orgInit.sh file, you can list out all your sfdx commands and they'll be executed by the deployer.  Remember, no bash metacharacters and only sfdx commands are allowed (We can't let anyone run any arbitrary command on our servers...security, yo!)
 
 That lets you create records, assign permsets, create users, install packages, run tests, generate passwords, and do anything you can do with an SFDX command
+
+---
+
+## Testing
+
+There's unit tests in tests/unitTests.  Run these to not break stuff.
+Run them with `npm run unit-test`
+
+Integration (tests/integrationTests) are slower/harder.
+
+* `deployTest.ts` runs against a server.  It can be local--just edit `/test/helpers/init.ts` to set the location either in the cloud or locally.  If locally, run `npm run local` to get the web and orgbuilder dynos running
+* `poolRepoTest.ts` runs against a redis queue, using your local sfdx instance (which you'll need!).  It can run against the REDIS_URL of your dotenv file, OR you can also override this using `/test/helpers/init.ts`
+* once your local servers are running, you can run all the tests with npm run-integration-test
+
+`deployTest.ts` is deploying actual repos from github.  They're defined in `test/testRepos.ts`.  You should probably remove all of mine, and if you have repos you really care about, add them!
+
+NOTE: This is using up your scratch org quotas.  The tests delete the orgs, so it's minimally wastefuly, but still expect it to take a while AND watch your daily limit.
+
+---
+
+## Contributing
+
+I'm using typescript...
+
+* `npm install` will get all your modules installed, including my plugin.
+* `npm build` will get any typescript changes from /src to /built, which is where the executables go.
+
+... and scss, which also gets compiled via `npm build`
+
+finally, the front end app is mostly pug/jade, but that messages page is running vue.
 
 ---
 

@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "./built",
+    "allowJs": true,
+    "target": "es2017",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "module": "none",
+    "removeComments": true
+  },
+  "compileOnSave": true,
+  "include": [
+    "./src/**/*"
+  ]
+}
