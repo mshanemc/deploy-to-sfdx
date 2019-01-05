@@ -51,7 +51,7 @@ const pooledOrgFinder = async function (deployReq) {
         });
         if (passwordSetResult) {
             logger.debug(`password set results: ${passwordSetResult.stdout}`);
-            password = JSON.parse(passwordSetResult.stdout).password;
+            password = JSON.parse(passwordSetResult.stdout).result.password;
         }
     }
     const openResult = await exec(`${msgJSON.openCommand} --json -r`, {
