@@ -24,9 +24,22 @@ it('displays pools', async () => {
     url: `${testEnv}/pools`,
     json: true
   });
+  // expect(response.statusCode).to.equal('200');
   expect(response).to.be.an('array');
 });
 
-it('returns the testform');
+it('returns the testform', async () => {
+  const response = await request.get({
+    url: `${testEnv}/testform`,
+    resolveWithFullResponse: true
+  });
+  expect(response.statusCode).to.equal(200);
+});
 
-it('returns the userinfo form');
+it('returns the userinfo form', async () => {
+  const response = await request.get({
+    url: `${testEnv}/userinfo`,
+    resolveWithFullResponse: true
+  });
+  expect(response.statusCode).to.equal(200);
+});
