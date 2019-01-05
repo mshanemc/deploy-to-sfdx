@@ -1,15 +1,12 @@
-import * as logger from 'heroku-logger';
-
-import * as util from 'util';
 import * as fs from 'fs';
-
-import * as utilities from './utilities';
+import * as logger from 'heroku-logger';
+import * as util from 'util';
 
 const exec = util.promisify(require('child_process').exec);
 
 const hubAuth = async function () {
 	// where will our cert live?
-	let keypath;
+	let keypath: string;
 
 	if (process.env.LOCAL_ONLY_KEY_PATH) {
 		// I'm fairly local
