@@ -148,9 +148,14 @@ const check = async () => {
         )
         .send();
     } catch (e) {
-      logger.error(e, msgJSON);
+      logger.error('Deployment error', { request: msgJSON, error: e });
       visitor.event('deploy fail', msgJSON.template).send();
 
+      // don't need that org anymore!
+      await redis.publish(ex, JSON.stringify(<deployRequest> {
+        username : msgJSON.username,
+        delete : true
+      }));
     }
 
     visitor.event('deploy complete', msgJSON.template).send();

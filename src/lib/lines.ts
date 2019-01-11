@@ -183,6 +183,7 @@ const lines = function(
           raw: e
         });
         redisPub.publish(ex, JSON.stringify(output));
+
         // and throw so the requester can do the rest of logging to heroku logs and GA
         throw new Error(e);
       }
