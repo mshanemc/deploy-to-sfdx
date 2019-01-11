@@ -20,6 +20,7 @@ const hubAuth = async function () {
             await exec('sfdx plugins:link node_modules/shane-sfdx-plugins');
         }
         if (process.env.SFDX_PRERELEASE) {
+            logger.debug('installing pre-release plugin for sfdx');
             await exec('sfdx plugins:install salesforcedx@pre-release');
         }
         if (process.env.HEROKU_API_KEY) {

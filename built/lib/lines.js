@@ -87,8 +87,8 @@ const lines = function (msgJSON, lines, redisPub, output) {
             }
             let lineResult;
             logger.debug(`running line-- ${localLine}`);
-            lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}` });
             try {
+                lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}` });
                 let response = JSON.parse(lineResult.stdout);
                 if (response.status !== 0) {
                     output.errors.push({
@@ -133,13 +133,13 @@ const lines = function (msgJSON, lines, redisPub, output) {
                 redisPub.publish(ex, JSON.stringify(output));
             }
             catch (e) {
-                logger.error(`error running line ${localLine} from ${msgJSON.username}/${msgJSON.repo}: ${lineResult.stdout}`);
                 output.errors.push({
                     command: localLine,
                     error: e,
                     raw: lineResult.stdout
                 });
                 redisPub.publish(ex, JSON.stringify(output));
+                throw new Error(e);
             }
         }
         output.complete = true;

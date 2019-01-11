@@ -28,7 +28,8 @@ const hubAuth = async function() {
     }
 
     if (process.env.SFDX_PRERELEASE) {
-      // not local, so link the plugin.  local runs will hae it already linked.
+			// not local, so link the plugin.  local runs will hae it already linked.
+			logger.debug('installing pre-release plugin for sfdx');
 			await exec('sfdx plugins:install salesforcedx@pre-release');
 		}
 
