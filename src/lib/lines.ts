@@ -176,10 +176,11 @@ const lines = function(
         redisPub.publish(ex, JSON.stringify(output));
       } catch (e) {
         // a more serious error...tell the client
+        output.complete = true;
         output.errors.push({
           command: localLine,
           error: `${e.name}: ${e.message}`,
-          raw: e.stack
+          raw: e
         });
         redisPub.publish(ex, JSON.stringify(output));
         // and throw so the requester can do the rest of logging to heroku logs and GA
