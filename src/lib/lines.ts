@@ -114,10 +114,12 @@ const lines = function(
       // errors that we want to handle
 
       logger.debug(`running line-- ${localLine}`);
-      lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}` });
 
       try {
+        lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}` });
+
         let response = JSON.parse(lineResult.stdout);
+        // returned a reasonable error but not a full-on throw
 
         if (response.status !== 0) {
           // you fail!
@@ -173,19 +175,15 @@ const lines = function(
         // finally, emit the entire new data structure back to the web server to forward to the client after each line
         redisPub.publish(ex, JSON.stringify(output));
       } catch (e) {
-        // sometims the json fails to deserialize properly
-        logger.error(
-          `error running line ${localLine} from ${msgJSON.username}/${
-            msgJSON.repo
-          }: ${lineResult.stdout}`
-        );
-
+        // a more serious error...tell the client
         output.errors.push({
           command: localLine,
           error: e,
           raw: lineResult.stdout
         });
         redisPub.publish(ex, JSON.stringify(output));
+        // and throw so the requester can do the rest of logging to heroku logs and GA
+        throw new Error(e);
       }
 
       // if (localLine.includes('heroku ')){
