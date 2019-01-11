@@ -81,7 +81,7 @@
 				<div class="slds-notify__content">
 					<h2 class="slds-text-heading_small ">
 						<strong id="errorTest">An error occurred while deploying.</strong>&nbsp;See the browser console logs for more information.
-							<div v-for="(e, index) in commandResults">
+							<div v-for="(e, index) in errors">
 								<p>{{ index +1 }}. {{ e.error }}</p>
 							</div>
 					</h2>
