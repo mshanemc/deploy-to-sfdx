@@ -72,12 +72,8 @@ const check = async () => {
         sfdx force:source:push
         sfdx force:org:open`);
         }
-        try {
-            parsedLines = await lineParse(msgJSON, visitor);
-            logger.debug('these are the parsed lines:');
-            logger.debug(JSON.stringify(parsedLines));
-        }
-        catch (err) { }
+        parsedLines = await lineParse(msgJSON, visitor);
+        logger.debug('these are the parsed lines', parsedLines);
         const localLineRunner = new lineRunner(msgJSON, parsedLines, redis, clientResult);
         try {
             const output = await localLineRunner.runLines();

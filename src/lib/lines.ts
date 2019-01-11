@@ -122,6 +122,7 @@ const lines = function(
         // returned a reasonable error but not a full-on throw
 
         if (response.status !== 0) {
+
           // you fail!
           output.errors.push({
             command: localLine,
@@ -137,6 +138,7 @@ const lines = function(
             .event('deploy error', this.msgJSON.template, response.message)
             .send();
         } else {
+          logger.debug('line returned status 0');
           if (summary === commandSummary.OPEN) {
             // temporary
             response = utilities.urlFix(response);
@@ -175,6 +177,7 @@ const lines = function(
         // finally, emit the entire new data structure back to the web server to forward to the client after each line
         redisPub.publish(ex, JSON.stringify(output));
       } catch (e) {
+        logger.error('a very serious error occurred on this line...in the catch section', e);
         // a more serious error...tell the client
         output.complete = true;
         output.errors.push({
@@ -182,6 +185,7 @@ const lines = function(
           error: `${e.name}: ${e.message}`,
           raw: e
         });
+
         redisPub.publish(ex, JSON.stringify(output));
 
         // and throw so the requester can do the rest of logging to heroku logs and GA

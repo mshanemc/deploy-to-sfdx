@@ -102,6 +102,7 @@ const lines = function (msgJSON, lines, redisPub, output) {
                         .send();
                 }
                 else {
+                    logger.debug('line returned status 0');
                     if (summary === types_1.commandSummary.OPEN) {
                         response = utilities.urlFix(response);
                         output.mainUser.loginUrl = response.result.url;
@@ -133,6 +134,7 @@ const lines = function (msgJSON, lines, redisPub, output) {
                 redisPub.publish(ex, JSON.stringify(output));
             }
             catch (e) {
+                logger.error('a very serious error occurred on this line...in the catch section', e);
                 output.complete = true;
                 output.errors.push({
                     command: localLine,

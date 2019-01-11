@@ -117,11 +117,8 @@ const check = async () => {
       );
     }
 
-    try {
-      parsedLines = await lineParse(msgJSON, visitor);
-      logger.debug('these are the parsed lines:');
-      logger.debug(JSON.stringify(parsedLines));
-    } catch (err) {}
+    parsedLines = await lineParse(msgJSON, visitor);
+    logger.debug('these are the parsed lines', parsedLines);
 
     const localLineRunner = new lineRunner(
       msgJSON,

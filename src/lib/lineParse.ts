@@ -2,14 +2,9 @@ import * as fs from 'fs';
 import * as logger from 'heroku-logger';
 import * as readline from 'readline';
 
-import * as utilities from './utilities';
-import * as redisPub from './redisNormal';
 import * as shellSanitize from './shellSanitize';
 import * as argStripper from './argStripper';
-
 import { deployRequest } from './types';
-
-const ex = 'deployMsg';
 
 const lineParse = function (msgJSON: deployRequest, visitor): Promise<string[]>{
 	logger.debug('line parsing started');
@@ -59,8 +54,7 @@ const lineParse = function (msgJSON: deployRequest, visitor): Promise<string[]>{
 			}
 		}).on('close', () => {
 			// you have all the parsed lines
-			logger.debug('in the close event');
-			logger.debug(JSON.stringify(parsedLines));
+			logger.debug('line parser closed with lines', parsedLines);
 			if (!errorMessage) {
 				resolve(parsedLines);
 			} else {

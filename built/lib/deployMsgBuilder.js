@@ -50,8 +50,7 @@ const deployMsgBuilder = function (query) {
             }
         });
     }
-    logger.debug('deploy message built');
-    logger.debug(JSON.stringify(message));
+    logger.debug('deploy message built', message);
     return message;
 };
 module.exports = deployMsgBuilder;

@@ -4,7 +4,6 @@ const logger = require("heroku-logger");
 const readline = require("readline");
 const shellSanitize = require("./shellSanitize");
 const argStripper = require("./argStripper");
-const ex = 'deployMsg';
 const lineParse = function (msgJSON, visitor) {
     logger.debug('line parsing started');
     return new Promise((resolve, reject) => {
@@ -49,8 +48,7 @@ const lineParse = function (msgJSON, visitor) {
                 parsedLines.push(line);
             }
         }).on('close', () => {
-            logger.debug('in the close event');
-            logger.debug(JSON.stringify(parsedLines));
+            logger.debug('line parser closed with lines', parsedLines);
             if (!errorMessage) {
                 resolve(parsedLines);
             }
