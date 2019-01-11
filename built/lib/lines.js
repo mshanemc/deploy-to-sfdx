@@ -135,8 +135,8 @@ const lines = function (msgJSON, lines, redisPub, output) {
             catch (e) {
                 output.errors.push({
                     command: localLine,
-                    error: e,
-                    raw: lineResult.stdout
+                    error: `${e.name}: ${e.message}`,
+                    raw: e.stack
                 });
                 redisPub.publish(ex, JSON.stringify(output));
                 throw new Error(e);
