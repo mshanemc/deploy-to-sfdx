@@ -19,13 +19,16 @@ const hubAuth = async function () {
         if (process.env.JWTKEY) {
             await exec('sfdx plugins:link node_modules/shane-sfdx-plugins');
         }
+        if (process.env.SFDX_PRERELEASE) {
+            await exec('sfdx plugins:install salesforcedx@pre-release');
+        }
         if (process.env.HEROKU_API_KEY) {
             await exec('heroku update');
         }
         await exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${process.env.HUB_USERNAME} --jwtkeyfile ${keypath} --setdefaultdevhubusername -a hub`);
     }
     catch (err) {
-        logger.error(err);
+        logger.error('error in hubAuth', err);
         process.exit(1);
     }
     return keypath;
