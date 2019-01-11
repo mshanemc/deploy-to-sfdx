@@ -148,7 +148,7 @@ const check = async () => {
         )
         .send();
     } catch (e) {
-      logger.error('Deployment error', { request: msgJSON, error: e });
+      logger.error('Deployment error', { request: msgJSON, error: JSON.stringify(e) });
       visitor.event('deploy fail', msgJSON.template).send();
 
       // don't need that org anymore!
