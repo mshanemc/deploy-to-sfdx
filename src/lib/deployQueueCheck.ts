@@ -128,7 +128,6 @@ const check = async () => {
     }
   }
 
-  await redis.quit();
   await rmfr(`tmp/${msgJSON.deployId}`);
   return true;
 
