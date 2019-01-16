@@ -17,7 +17,6 @@ const argStripper = function (cmd, parameter, noarg) {
             const paramValueStart = paramEndIndex + 2;
             let paramValueEnd;
             if (cmd.charAt(paramValueStart) === '"' || cmd.charAt(paramValueStart) === '\'' || cmd.charAt(paramValueStart) === '`') {
-                logger.debug(`it is a quoted string starting with ${cmd.charAt(paramValueStart)}`);
                 const quoteEnd = cmd.indexOf(cmd.charAt(paramValueStart), paramValueStart + 1);
                 if (cmd.charAt(quoteEnd + 1) === ' ') {
                     paramValueEnd = quoteEnd;
@@ -31,7 +30,7 @@ const argStripper = function (cmd, parameter, noarg) {
             }
             output = cmd.slice(0, paramStartIndex - 1).concat(' ').concat(cmd.slice(paramValueEnd + 2));
         }
-        logger.debug(`converted ${cmd} to ${output}`);
+        logger.debug(`argStripper: converted ${cmd} to ${output}`);
         return output.trim();
     }
 };

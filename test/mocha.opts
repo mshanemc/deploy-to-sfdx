@@ -1,3 +1,4 @@
 --require ts-node/register
 --require test/helpers/init.ts
 --reporter spec
+--bail

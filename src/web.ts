@@ -6,15 +6,18 @@ import * as WebSocket from 'ws';
 import * as path from 'path';
 import * as favicon from 'serve-favicon';
 
-import * as redis from './lib/redisNormal';
+import {
+  cdsExchange,
+  putDeployRequest,
+  getKeys,
+  deleteOrg
+} from './lib/redisNormal';
 import * as redisSub from './lib/redisSubscribe';
 import * as msgBuilder from './lib/deployMsgBuilder';
 import * as utilities from './lib/utilities';
 import * as org62LeadCapture from './lib/trialLeadCreate';
 
 import { clientDataStructure, deployRequest } from './lib/types';
-
-const ex = 'deployMsg';
 
 const app = express();
 
@@ -60,8 +63,7 @@ app.post('/trial', (req, res, next) => {
   }
 
   utilities.runHerokuBuilder();
-
-  redis.rpush('deploys', JSON.stringify(message)).then(() => {
+  putDeployRequest(message).then(() => {
     res.redirect(`/deploying/trial/${message.deployId.trim()}`);
   });
 });
@@ -70,15 +72,7 @@ app.post('/delete', (req, res, next) => {
   // logger.debug('in the delete post action with body:');
   // logger.debug(req.body);
   utilities.runHerokuBuilder();
-
-  redis
-    .rpush(
-      'poolDeploys',
-      JSON.stringify({
-        username: req.body.username,
-        delete: true
-      })
-    )
+  deleteOrg(req.body.username)
     .then(() => {
       res.status(302).send('/deleteConfirm');
     })
@@ -95,7 +89,7 @@ app.get('/deleteConfirm', (req, res, next) =>
   res.render('pages/deleteConfirm')
 );
 
-app.get('/launch', (req, res, next) => {
+app.get('/launch', async (req, res, next) => {
   // no template?  does not compute!
   if (
     !req.query.template ||
@@ -126,17 +120,9 @@ app.get('/launch', (req, res, next) => {
   }
   utilities.runHerokuBuilder();
 
-  redis
-    .rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
-    .then((rpushResult) => {
-      logger.debug(rpushResult);
-      if (message.pool) {
-        logger.debug('putting in pool deploy queue');
-        return res.send('pool initiated');
-      } else {
-        return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
-      }
-    });
+  await putDeployRequest(message);
+  return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
+
 });
 
 app.get('/deploying/:format/:deployId', (req, res, next) => {
@@ -158,16 +144,8 @@ app.get('/userinfo', (req, res, next) => {
 });
 
 app.get('/pools', async (req, res, next) => {
-  const keys = await redis.keys('*');
-  const output = [];
-  for (const key of keys) {
-    const size = await redis.llen(key);
-    output.push({
-      repo: key,
-      size
-    });
-  }
-  res.send(output);
+  const keys = await getKeys();
+  res.send(keys);
 });
 
 app.get('/testform', (req, res, next) => {
@@ -207,8 +185,8 @@ wss.on('connection', (ws: WebSocket, req) => {
 });
 
 // subscribe to deploy events to share them with the web clients
-redisSub.subscribe(ex).then(() => {
-  logger.info(`subscribed to Redis channel ${ex}`);
+redisSub.subscribe(cdsExchange).then(() => {
+  logger.info(`subscribed to Redis channel ${cdsExchange}`);
 });
 
 redisSub.on('message', (channel, message) => {

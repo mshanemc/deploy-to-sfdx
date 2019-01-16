@@ -1,20 +1,19 @@
+import { exec } from 'child_process';
 import * as logger from 'heroku-logger';
 import * as util from 'util';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
 import * as utilities from './utilities';
-import * as redis from './redisNormal';
+import { getPooledOrg, cdsPublish } from './redisNormal';
+import { getKeypath } from './hubAuth';
 import * as argStripper from './argStripper';
 
-import { deployRequest, poolOrg, clientDataStructure } from './types';
+import { deployRequest, clientDataStructure } from './types';
 
-const exec = util.promisify(require('child_process').exec);
-
-const deployMsgChannel = 'deployMsg';
+const execProm = util.promisify(exec);
 
 const pooledOrgFinder = async function(deployReq: deployRequest) {
-
   // is this a template that we prebuild?  uses the utilities.getPoolConfig
   const foundPool = await utilities.getPool(deployReq.username, deployReq.repo);
 
@@ -25,17 +24,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 
   logger.debug('this is a pooled repo');
 
-  const key = await utilities.getKey(deployReq);
-  logger.debug(`queue will be called ${key}`);
-  const poolMsg = await redis.lpop(key);
-
-  if (!poolMsg) {
-    logger.warn(`no queued orgs for ${key}`);
-    return false;
-  }
-
-  logger.debug('getting messages from the pool');
-  const msgJSON = <poolOrg>JSON.parse(poolMsg);
+  const msgJSON = await getPooledOrg(await utilities.getKey(deployReq), true);
 
   const cds: clientDataStructure = {
     deployId: deployReq.deployId,
@@ -43,7 +32,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
     complete: true,
     commandResults: [],
     errors: []
-  }
+  };
 
   const uniquePath = path.join(
     __dirname,
@@ -54,14 +43,12 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
   fs.ensureDirSync(uniquePath);
 
   // let's auth to the org from the pool
-  const keypath = process.env.LOCAL_ONLY_KEY_PATH || '/app/tmp/server.key';
-
-  const loginResult = await exec(
+  const loginResult = await execProm(
     `sfdx force:auth:jwt:grant --json --clientid ${
       process.env.CONSUMERKEY
     } --username ${
       msgJSON.displayResults.username
-    } --jwtkeyfile ${keypath} --instanceurl https://test.salesforce.com -s`,
+    } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`,
     { cwd: uniquePath }
   );
 
@@ -70,7 +57,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
   // we may need to put the user's email on it
   if (deployReq.email) {
     logger.debug(`changing email to ${deployReq.email}`);
-    const emailResult = await exec(
+    const emailResult = await execProm(
       `sfdx force:data:record:update -s User -w "username='${
         msgJSON.displayResults.username
       }'" -v "email='${deployReq.email}'"`,
@@ -81,11 +68,11 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
     }
   }
 
-  let password:string;
+  let password: string;
 
   if (msgJSON.passwordCommand) {
     const stripped = argStripper(msgJSON.passwordCommand, '--json', true);
-    const passwordSetResult = await exec(`${stripped} --json`, {
+    const passwordSetResult = await execProm(`${stripped} --json`, {
       cwd: uniquePath
     });
 
@@ -96,7 +83,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
     }
   }
 
-  const openResult = await exec(`${msgJSON.openCommand} --json -r`, {
+  const openResult = await execProm(`${msgJSON.openCommand} --json -r`, {
     cwd: uniquePath
   });
 
@@ -110,10 +97,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
   };
 
   logger.debug(`opened : ${openResult.stdout}`);
-  await redis.publish(
-    deployMsgChannel,
-    JSON.stringify(cds)
-  );
+  await cdsPublish(cds);
 
   return true;
 };

@@ -2,7 +2,7 @@ import * as logger from 'heroku-logger';
 import * as moment from 'moment';
 import * as request from 'request-promise-native';
 import * as util from 'util';
-import * as redis from './redisNormal';
+import { redis } from './redisNormal';
 
 import * as utilities from './utilities';
 import { poolOrg, poolConfig } from './types';
@@ -10,10 +10,7 @@ import { poolOrg, poolConfig } from './types';
 // const utilities = require('./utilities');
 const exec = util.promisify(require('child_process').exec);
 
-utilities.checkHerokuAPI();
-
-const checkExpiration = async (pool: poolConfig):Promise<string> => {
-
+const checkExpiration = async (pool: poolConfig): Promise<string> => {
   const poolname = `${pool.user}.${pool.repo}`;
   const poolOrg = await redis.lpop(poolname);
 
@@ -21,20 +18,28 @@ const checkExpiration = async (pool: poolConfig):Promise<string> => {
     return `pool ${poolname} is empty`;
   }
 
-  const msgJSON = <poolOrg> JSON.parse(poolOrg);
-  if (moment().diff(moment(msgJSON.createdDate)) > pool.lifeHours * 60 * 60 * 1000) {
+  const msgJSON = <poolOrg>JSON.parse(poolOrg);
+  if (
+    moment().diff(moment(msgJSON.createdDate)) >
+    pool.lifeHours * 60 * 60 * 1000
+  ) {
     // it's gone if we don't put it back
 
     // create the delete message
     if (msgJSON.displayResults && msgJSON.displayResults.username) {
-      await redis.rpush('poolDeploys', JSON.stringify({
-        username: msgJSON.displayResults.username,
-        delete: true
-      }));
+      await redis.rpush(
+        'poolDeploys',
+        JSON.stringify({
+          username: msgJSON.displayResults.username,
+          delete: true
+        })
+      );
     } else {
       logger.warn('pool org did not have a username', msgJSON);
     }
-    await exec(`heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`);
+    await exec(
+      `heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`
+    );
     return `removed an expired org from pool ${poolname}`;
   } else {
     await redis.lpush(poolname, JSON.stringify(msgJSON));
@@ -52,11 +57,9 @@ const skimmer = async () => {
 
   const results = await Promise.all(promises);
   results.forEach(result => logger.debug(result));
-
 };
 
 const herokuExpirationCheck = async () => {
-
   const herokuDeletes = await redis.lrange('herokuDeletes', 0, -1);
   await redis.del('herokuDeletes');
 
@@ -75,26 +78,32 @@ const herokuExpirationCheck = async () => {
         const herokuDelete = JSON.parse(raw);
         if (moment(herokuDelete.expiration).isBefore(moment())) {
           logger.debug(`deleting heroku app: ${herokuDelete.appName}`);
-          execs.push(request.delete({
-            url: `https://api.heroku.com/apps/${herokuDelete.appName}`,
-            headers,
-            json: true
-          }));
+          execs.push(
+            request.delete({
+              url: `https://api.heroku.com/apps/${herokuDelete.appName}`,
+              headers,
+              json: true
+            })
+          );
         } else {
-          execs.push(redis.rpush('herokuDeletes', JSON.stringify(herokuDelete)));
+          execs.push(
+            redis.rpush('herokuDeletes', JSON.stringify(herokuDelete))
+          );
         }
       });
 
       const results = await Promise.all(execs);
-      results.forEach( result => logger.debug(result));
-
+      results.forEach(result => logger.debug(result));
     }
-
   }
-
 };
 
-
-Promise.all([skimmer(), herokuExpirationCheck()])
-.then( () => process.exit(0) )
-.catch( err => logger.error(err));
+(async () => {
+  try {
+    if (utilities.checkHerokuAPI()){
+      await Promise.all([skimmer(), herokuExpirationCheck()]);
+    }
+  } catch (err){
+    logger.error(err);
+  }
+})();

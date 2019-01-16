@@ -1,61 +1,62 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const logger = require("heroku-logger");
 const readline = require("readline");
 const shellSanitize = require("./shellSanitize");
 const argStripper = require("./argStripper");
-const lineParse = function (msgJSON, visitor) {
-    logger.debug('line parsing started');
+const lineParse = function (msgJSON) {
+    logger.debug('lineParse: started');
     return new Promise((resolve, reject) => {
         const parsedLines = [];
-        let errorMessage;
-        const rl = readline.createInterface({
+        const rl = readline
+            .createInterface({
             input: fs.createReadStream(`tmp/${msgJSON.deployId}/orgInit.sh`),
             terminal: false
-        }).on('line', (line) => {
-            logger.debug(`Line: ${line}`);
-            if (msgJSON.whitelisted) {
-                if (line && line.includes('sfdx ') && !line.startsWith('#!/bin/bash') && !line.startsWith('#')) {
+        })
+            .on('line', (line) => {
+            line = line.trim();
+            if (line && line.length > 0 && !line.startsWith('#!/bin/bash') && !line.startsWith('#')) {
+                logger.debug(`lineParse: Line: ${line}`);
+                if (msgJSON.whitelisted) {
+                    parsedLines.push(jsonify(line));
+                }
+                else if (!shellSanitize(line)) {
+                    const errorMessage = `ERROR: Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${line}`;
+                    logger.error(errorMessage, msgJSON);
+                    reject(errorMessage);
+                }
+                else if (line.includes('-u ')) {
+                    logger.debug('lineParse: found a -u in a command line');
+                    const errorMessage = `ERROR: Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${line}`;
+                    logger.error(errorMessage, msgJSON);
+                    reject(errorMessage);
+                }
+                else if (!line.startsWith('sfdx') && !line.startsWith('#')) {
+                    const errorMessage = `ERROR: Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`;
+                    logger.error(errorMessage, msgJSON);
+                    reject(errorMessage);
+                }
+                else {
+                    logger.debug('lineParse: line pushed');
                     line = `${argStripper(line, '--json', true)} --json`;
-                    parsedLines.push(line);
+                    parsedLines.push(jsonify(line));
                 }
             }
-            else if (!shellSanitize(line)) {
-                errorMessage = `ERROR: Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${line}`;
-                visitor.event('Repo Problems', 'line with semicolons', msgJSON.template).send();
-                rl.close();
-            }
-            else if (!line) {
-                logger.debug('empty line');
-            }
-            else if (line.startsWith('#!/bin/bash')) {
-                logger.debug('bash line.  Ignoring!');
-            }
-            else if (line.includes('-u ') && !line.includes('sfdx shane:org:create')) {
-                logger.debug('found a -u in a command line');
-                errorMessage = `ERROR: Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${line}`;
-                visitor.event('Repo Problems', 'line with -u', msgJSON.template).send();
-                rl.close();
-            }
-            else if (!line.startsWith('sfdx') && !line.startsWith('#')) {
-                errorMessage = `ERROR: Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`;
-                visitor.event('Repo Problems', 'non-sfdx line', msgJSON.template).send();
-                rl.close();
-            }
-            else {
-                logger.debug('line pushed');
-                line = `${argStripper(line, '--json', true)} --json`;
-                parsedLines.push(line);
-            }
-        }).on('close', () => {
-            logger.debug('line parser closed with lines', parsedLines);
-            if (!errorMessage) {
-                resolve(parsedLines);
-            }
-            else {
-                reject(errorMessage);
-            }
+        })
+            .on('close', () => {
+            logger.debug('lineParse: closed with lines', parsedLines);
+            resolve(parsedLines.filter(line => line !== ''));
         });
     });
 };
-module.exports = lineParse;
+exports.lineParse = lineParse;
+const jsonify = (line) => {
+    if (line.includes('sfdx ')) {
+        return `${argStripper(line, '--json', true)} --json`;
+    }
+    else {
+        return line;
+    }
+};
+exports.jsonify = jsonify;

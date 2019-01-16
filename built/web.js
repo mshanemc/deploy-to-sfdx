@@ -7,12 +7,11 @@ const bodyParser = require("body-parser");
 const WebSocket = require("ws");
 const path = require("path");
 const favicon = require("serve-favicon");
-const redis = require("./lib/redisNormal");
+const redisNormal_1 = require("./lib/redisNormal");
 const redisSub = require("./lib/redisSubscribe");
 const msgBuilder = require("./lib/deployMsgBuilder");
 const utilities = require("./lib/utilities");
 const org62LeadCapture = require("./lib/trialLeadCreate");
-const ex = 'deployMsg';
 const app = express();
 const port = process.env.PORT || 8443;
 const server = app.listen(port, () => {
@@ -41,17 +40,13 @@ app.post('/trial', (req, res, next) => {
         message.visitor = visitor;
     }
     utilities.runHerokuBuilder();
-    redis.rpush('deploys', JSON.stringify(message)).then(() => {
+    redisNormal_1.putDeployRequest(message).then(() => {
         res.redirect(`/deploying/trial/${message.deployId.trim()}`);
     });
 });
 app.post('/delete', (req, res, next) => {
     utilities.runHerokuBuilder();
-    redis
-        .rpush('poolDeploys', JSON.stringify({
-        username: req.body.username,
-        delete: true
-    }))
+    redisNormal_1.deleteOrg(req.body.username)
         .then(() => {
         res.status(302).send('/deleteConfirm');
     })
@@ -62,7 +57,7 @@ app.post('/delete', (req, res, next) => {
     });
 });
 app.get('/deleteConfirm', (req, res, next) => res.render('pages/deleteConfirm'));
-app.get('/launch', (req, res, next) => {
+app.get('/launch', async (req, res, next) => {
     if (!req.query.template ||
         !req.query.template.includes('https://github.com/')) {
         throw 'There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo';
@@ -82,18 +77,8 @@ app.get('/launch', (req, res, next) => {
         visitor.event('Repo', req.query.template).send();
     }
     utilities.runHerokuBuilder();
-    redis
-        .rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
-        .then((rpushResult) => {
-        logger.debug(rpushResult);
-        if (message.pool) {
-            logger.debug('putting in pool deploy queue');
-            return res.send('pool initiated');
-        }
-        else {
-            return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
-        }
-    });
+    await redisNormal_1.putDeployRequest(message);
+    return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
 });
 app.get('/deploying/:format/:deployId', (req, res, next) => {
     if (req.params.format === 'deployer') {
@@ -113,16 +98,8 @@ app.get('/userinfo', (req, res, next) => {
     });
 });
 app.get('/pools', async (req, res, next) => {
-    const keys = await redis.keys('*');
-    const output = [];
-    for (const key of keys) {
-        const size = await redis.llen(key);
-        output.push({
-            repo: key,
-            size
-        });
-    }
-    res.send(output);
+    const keys = await redisNormal_1.getKeys();
+    res.send(keys);
 });
 app.get('/testform', (req, res, next) => {
     res.render('pages/testForm');
@@ -151,8 +128,8 @@ wss.on('connection', (ws, req) => {
     logger.debug(`connection on url ${req.url}`);
     ws.url = req.url;
 });
-redisSub.subscribe(ex).then(() => {
-    logger.info(`subscribed to Redis channel ${ex}`);
+redisSub.subscribe(redisNormal_1.cdsExchange).then(() => {
+    logger.info(`subscribed to Redis channel ${redisNormal_1.cdsExchange}`);
 });
 redisSub.on('message', (channel, message) => {
     const msgJSON = JSON.parse(message);

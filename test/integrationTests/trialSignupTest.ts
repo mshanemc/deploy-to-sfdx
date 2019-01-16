@@ -3,13 +3,14 @@ import * as chai from 'chai';
 import * as Nightmare from 'nightmare';
 import * as dotenv from 'dotenv';
 import { clearQueues } from '../helpers/clearRedis';
+import { requestAddToPool, requestBuildPool } from './poolRepoTest';
+import { testRepos } from '../testRepos';
 
 dotenv.config();
 
 const expect = chai.expect;
 const testEnv = process.env.DEPLOYER_TESTING_ENDPOINT;
 const waitTimeout = 1000 * 60 * 15; // 15 minutes should do it
-const tmpDir = 'tmp';
 
 if (!testEnv) {
   throw new Error(
@@ -18,11 +19,17 @@ if (!testEnv) {
 }
 
 describe('runs the trial', async () => {
+  await requestAddToPool({
+    repo: 'platformTrial',
+    username: 'mshanemc'
+  });
+  await requestBuildPool(testRepos.other.find( repo => repo.repo === 'platformTrial'), false);
+
   // eslint-disable-next-line no-restricted-syntax
   const nightmare = new Nightmare({
-    show: true,
+    // show: true,
     waitTimeout,
-    openDevTools: { mode: 'detach' },
+    // openDevTools: { mode: 'detach' },
     typeInterval: 10
   });
   const url = 'https://github.com/mshanec/platformTrial';
@@ -76,11 +83,11 @@ describe('runs the trial', async () => {
     expect(trialUrl).to.include('lightning.force');
   }).timeout(waitTimeout);
 
-  before(async () => {
-    await clearQueues();
-  });
+  // before(async () => {
+  //   await clearQueues();
+  // });
 
-  after(async() => {
+  after(async () => {
     await nightmare.end();
   });
 });
