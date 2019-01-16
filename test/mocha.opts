@@ -2,3 +2,4 @@
 --require test/helpers/init.ts
 --reporter spec
 --bail
+--exit

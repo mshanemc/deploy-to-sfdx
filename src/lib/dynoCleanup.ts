@@ -35,4 +35,5 @@ import { herokuDyno } from './types';
       logger.error('dynoCleanup', err);
     }
   }
+  process.exit(0);
 })();

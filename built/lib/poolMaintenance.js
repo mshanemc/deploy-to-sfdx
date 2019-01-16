@@ -14,4 +14,5 @@ const execProm = util.promisify(child_process_1.exec);
         await Promise.all(Array(Math.max(0, currentNeed)).fill(execProm(`heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`)));
         await poolPrep_1.prepareAll();
     }
+    process.exit(0);
 })();

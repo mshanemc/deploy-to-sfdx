@@ -83,6 +83,7 @@ const check = async () => {
             await redisNormal_1.deleteOrg(msgJSON.username);
         }
     }
+    await redisNormal_1.redis.quit();
     await rmfr(`tmp/${msgJSON.deployId}`);
     return true;
 };

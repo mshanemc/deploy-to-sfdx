@@ -6,4 +6,5 @@ import { auth } from './hubAuth';
   logger.debug('A one-off deploy consumer dyno is up!');
   await auth();
   await checkQueue();
+  process.exit(0);
 })();

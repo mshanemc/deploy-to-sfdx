@@ -22,4 +22,5 @@ const execProm = util.promisify(exec);
     );
     await prepareAll();
   }
+  process.exit(0);
 })();

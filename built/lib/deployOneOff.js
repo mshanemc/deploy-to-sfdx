@@ -7,4 +7,5 @@ const hubAuth_1 = require("./hubAuth");
     logger.debug('A one-off deploy consumer dyno is up!');
     await hubAuth_1.auth();
     await checkQueue();
+    process.exit(0);
 })();

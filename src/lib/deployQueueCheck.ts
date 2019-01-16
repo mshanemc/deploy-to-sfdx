@@ -25,6 +25,7 @@ const check = async () => {
     msgJSON = await getDeployRequest(true);
   } catch (e) {
     // throws on empty queue
+    // console.log('queue was empty');
     return false;
   }
 
@@ -127,6 +128,7 @@ const check = async () => {
     }
   }
 
+  await redis.quit();
   await rmfr(`tmp/${msgJSON.deployId}`);
   return true;
 

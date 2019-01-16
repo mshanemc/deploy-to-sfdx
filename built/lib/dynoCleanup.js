@@ -29,4 +29,5 @@ const utilities = require("./utilities");
             logger.error('dynoCleanup', err);
         }
     }
+    process.exit(0);
 })();
