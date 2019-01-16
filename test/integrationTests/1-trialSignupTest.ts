@@ -3,7 +3,7 @@ import * as chai from 'chai';
 import * as Nightmare from 'nightmare';
 import * as dotenv from 'dotenv';
 import { clearQueues } from '../helpers/clearRedis';
-import { requestAddToPool, requestBuildPool } from './poolRepoTest';
+import { requestAddToPool, requestBuildPool } from './3-poolRepoTest';
 import { testRepos } from '../testRepos';
 
 dotenv.config();

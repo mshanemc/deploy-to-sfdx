@@ -3,3 +3,4 @@
 --reporter spec
 --bail
 --exit
+--sort
