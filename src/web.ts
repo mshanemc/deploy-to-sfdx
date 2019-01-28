@@ -110,6 +110,18 @@ app.get('/launch', (req, res, next) => {
     }`;
   }
 
+  if (req.query.template.includes('%')) {
+    throw `That template has a %  in it, making the url impossible to parse: ${
+      req.query.template
+    }`;
+  }
+
+  if (req.query.template.includes(';')) {
+    throw `That template has a %  in it, making the url impossible to parse: ${
+      req.query.template
+    }`;
+  }
+
   // allow repos to require the email parameter
   if (req.query.email === 'required') {
     return res.render('pages/userinfo', {
