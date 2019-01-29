@@ -194,7 +194,7 @@ describe('lineParserLocalTests', () => {
           await execProm(gitCloneCmd, { cwd: testDir});
           const parsedLines = await lineParse(depReq);
           expect(parsedLines).to.be.an('array');
-        }).timeout(5000);
+        }).timeout(10000);
       });
     }
 
