@@ -63,43 +63,37 @@ app.post('/delete', (req, res, next) => {
 });
 app.get('/deleteConfirm', (req, res, next) => res.render('pages/deleteConfirm'));
 app.get('/launch', (req, res, next) => {
-    if (!req.query.template ||
-        !req.query.template.includes('https://github.com/')) {
-        throw 'There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo';
-    }
-    if (req.query.template.includes('?')) {
-        throw `That template has a ? in it, making the url impossible to parse: ${req.query.template}`;
-    }
-    if (req.query.template.includes('%')) {
-        throw `That template has a %  in it, making the url impossible to parse: ${req.query.template}`;
-    }
-    if (req.query.template.includes(';')) {
-        throw `That template has a %  in it, making the url impossible to parse: ${req.query.template}`;
-    }
     if (req.query.email === 'required') {
         return res.render('pages/userinfo', {
             template: req.query.template
         });
     }
-    const message = msgBuilder(req.query);
-    if (process.env.UA_ID) {
-        const visitor = ua(process.env.UA_ID);
-        visitor.pageview('/launch').send();
-        visitor.event('Repo', req.query.template).send();
+    try {
+        const message = msgBuilder(req.query);
+        if (process.env.UA_ID) {
+            const visitor = ua(process.env.UA_ID);
+            visitor.pageview('/launch').send();
+            visitor.event('Repo', req.query.template).send();
+        }
+        utilities.runHerokuBuilder();
+        redis
+            .rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
+            .then((rpushResult) => {
+            logger.debug(rpushResult);
+            if (message.pool) {
+                logger.debug('putting in pool deploy queue');
+                return res.send('pool initiated');
+            }
+            else {
+                return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
+            }
+        });
     }
-    utilities.runHerokuBuilder();
-    redis
-        .rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
-        .then((rpushResult) => {
-        logger.debug(rpushResult);
-        if (message.pool) {
-            logger.debug('putting in pool deploy queue');
-            return res.send('pool initiated');
-        }
-        else {
-            return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
-        }
-    });
+    catch (error) {
+        return res.render('pages/error', {
+            customError: error
+        });
+    }
 });
 app.get('/deploying/:format/:deployId', (req, res, next) => {
     if (req.params.format === 'deployer') {
