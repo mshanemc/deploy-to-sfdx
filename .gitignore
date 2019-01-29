@@ -43,3 +43,4 @@ examples.md
 .vscode/launch.json
 .tmpLocalExamples
 repoList.json
+dump.rdb
