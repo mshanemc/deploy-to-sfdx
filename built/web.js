@@ -28,22 +28,30 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.post('/trial', (req, res, next) => {
-    const message = msgBuilder(req.query);
-    logger.debug('trial request', message);
-    message.email = req.body.UserEmail;
-    if (process.env.sfdcLeadCaptureServlet) {
-        org62LeadCapture(req.body);
+    try {
+        const message = msgBuilder(req.query);
+        logger.debug('trial request', message);
+        message.email = req.body.UserEmail;
+        if (process.env.sfdcLeadCaptureServlet) {
+            org62LeadCapture(req.body);
+        }
+        if (process.env.UA_ID) {
+            const visitor = ua(process.env.UA_ID);
+            visitor.pageview('/trial').send();
+            visitor.event('Repo', req.query.template).send();
+            message.visitor = visitor;
+        }
+        utilities.runHerokuBuilder();
+        redis.rpush('deploys', JSON.stringify(message)).then(() => {
+            res.redirect(`/deploying/trial/${message.deployId.trim()}`);
+        });
     }
-    if (process.env.UA_ID) {
-        const visitor = ua(process.env.UA_ID);
-        visitor.pageview('/trial').send();
-        visitor.event('Repo', req.query.template).send();
-        message.visitor = visitor;
+    catch (error) {
+        logger.error(`request failed: ${req.url}`);
+        return res.render('pages/error', {
+            customError: error
+        });
     }
-    utilities.runHerokuBuilder();
-    redis.rpush('deploys', JSON.stringify(message)).then(() => {
-        res.redirect(`/deploying/trial/${message.deployId.trim()}`);
-    });
 });
 app.post('/delete', (req, res, next) => {
     utilities.runHerokuBuilder();
@@ -90,6 +98,7 @@ app.get('/launch', (req, res, next) => {
         });
     }
     catch (error) {
+        logger.error(`request failed: ${req.url}`);
         return res.render('pages/error', {
             customError: error
         });
