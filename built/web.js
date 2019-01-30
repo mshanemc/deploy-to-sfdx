@@ -27,58 +27,61 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.post('/trial', (req, res, next) => {
-    const message = msgBuilder(req.query);
-    logger.debug('trial request', message);
-    message.email = req.body.UserEmail;
-    if (process.env.sfdcLeadCaptureServlet) {
-        org62LeadCapture(req.body);
+    try {
+        const message = msgBuilder(req);
+        logger.debug('trial request', message);
+        if (process.env.sfdcLeadCaptureServlet) {
+            org62LeadCapture(req.body);
+        }
+        if (message.visitor) {
+            message.visitor.pageview('/trial').send();
+            message.visitor.event('Repo', message.template).send();
+        }
+        utilities.runHerokuBuilder();
+        redisNormal_1.putDeployRequest(message).then(() => {
+            res.redirect(`/deploying/trial/${message.deployId.trim()}`);
+        });
     }
-    if (process.env.UA_ID) {
-        const visitor = ua(process.env.UA_ID);
-        visitor.pageview('/trial').send();
-        visitor.event('Repo', req.query.template).send();
-        message.visitor = visitor;
+    catch (e) {
+        logger.error(`An error occurred in the trial page: ${req.body}`);
+        logger.error(e);
+        next();
     }
-    utilities.runHerokuBuilder();
-    redisNormal_1.putDeployRequest(message).then(() => {
-        res.redirect(`/deploying/trial/${message.deployId.trim()}`);
-    });
 });
-app.post('/delete', (req, res, next) => {
-    utilities.runHerokuBuilder();
-    redisNormal_1.deleteOrg(req.body.username)
-        .then(() => {
+app.post('/delete', async (req, res, next) => {
+    try {
+        await redisNormal_1.deleteOrg(req.body.username);
+        utilities.runHerokuBuilder();
         res.status(302).send('/deleteConfirm');
-    })
-        .catch((e) => {
+    }
+    catch (e) {
         logger.error(`An error occurred in the redis rpush to the delete queue: ${req.body}`);
         logger.error(e);
-        res.status(500).send(e);
-    });
+        next();
+    }
+    ;
 });
 app.get('/deleteConfirm', (req, res, next) => res.render('pages/deleteConfirm'));
 app.get('/launch', async (req, res, next) => {
-    if (!req.query.template ||
-        !req.query.template.includes('https://github.com/')) {
-        throw 'There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo';
-    }
-    if (req.query.template.includes('?')) {
-        throw `That template has a ? in it, making the url impossible to parse: ${req.query.template}`;
-    }
     if (req.query.email === 'required') {
         return res.render('pages/userinfo', {
             template: req.query.template
         });
     }
-    const message = msgBuilder(req.query);
-    if (process.env.UA_ID) {
-        const visitor = ua(process.env.UA_ID);
-        visitor.pageview('/launch').send();
-        visitor.event('Repo', req.query.template).send();
+    try {
+        const message = msgBuilder(req);
+        if (message.visitor) {
+            message.visitor.pageview('/launch').send();
+            message.visitor.event('Repo', message.template).send();
+        }
+        utilities.runHerokuBuilder();
+        await redisNormal_1.putDeployRequest(message);
+        return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
     }
-    utilities.runHerokuBuilder();
-    await redisNormal_1.putDeployRequest(message);
-    return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
+    catch (e) {
+        logger.error(`launch msg error`, e);
+        next();
+    }
 });
 app.get('/deploying/:format/:deployId', (req, res, next) => {
     if (req.params.format === 'deployer') {

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Redis = require("ioredis");
 const logger = require("heroku-logger");
 const utilities = require("./utilities");
+const shellSanitize = require("./shellSanitize");
 const cdsExchange = 'deployMsg';
 exports.cdsExchange = cdsExchange;
 const deployRequestExchange = 'deploys';
@@ -11,11 +12,16 @@ const poolDeployExchange = 'poolDeploys';
 const redis = new Redis(process.env.REDIS_URL);
 exports.redis = redis;
 const deleteOrg = async (username) => {
-    const msg = {
-        username,
-        delete: true
-    };
-    await redis.publish(poolDeployExchange, JSON.stringify(msg));
+    if (shellSanitize(username)) {
+        const msg = {
+            username,
+            delete: true
+        };
+        await redis.publish(poolDeployExchange, JSON.stringify(msg));
+    }
+    else {
+        throw new Error(`invalid username ${username}`);
+    }
 };
 exports.deleteOrg = deleteOrg;
 const getDeployRequest = async (log) => {

@@ -1,6 +1,17 @@
 "use strict";
 const logger = require("heroku-logger");
-const deployMsgBuilder = function (query) {
+const shellSanitize = require("./shellSanitize");
+const ua = require("universal-analytics");
+const deployMsgBuilder = function (req) {
+    const query = req.query;
+    for (const prop in query) {
+        if (!shellSanitize(query[prop])) {
+            throw new Error(`unsafe query parameter ${prop}`);
+        }
+    }
+    if (!query.template || !query.template.includes('https://github.com/')) {
+        throw 'There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo';
+    }
     const template = query.template;
     const path = template.replace('https://github.com/', '');
     const username = path.split('/')[0];
@@ -12,10 +23,21 @@ const deployMsgBuilder = function (query) {
         path,
         username,
         repo,
-        deployId
+        deployId,
     };
+    if (process.env.UA_ID) {
+        message.visitor = ua(process.env.UA_ID);
+    }
     if (query.email) {
         message.email = query.email;
+    }
+    if (req.body && req.body.UserEmail) {
+        if (shellSanitize(req.body.UserEmail)) {
+            message.email = req.body.UserEmail;
+        }
+        else {
+            throw new Error(`invalid email address in form post ${req.body.UserEmail}`);
+        }
     }
     if (query.firstname) {
         message.firstname = query.firstname;
