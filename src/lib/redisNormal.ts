@@ -24,7 +24,6 @@ const deleteOrg = async (username: string) => {
     };
     await redis.publish(poolDeployExchange, JSON.stringify(msg));
   } else {
-    logger.error(`invalid username ${username}`);
     throw new Error(`invalid username ${username}`);
   }
 
