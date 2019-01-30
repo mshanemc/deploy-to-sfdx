@@ -51,7 +51,7 @@ describe('deploys all the test repos', () => {
       const user = 'mshanemc';
       const repo = 'this-aint-nothin';
       const url = `https://github.com/${user}/${repo}`;
-      const nightmare = new Nightmare({ show: true, waitTimeout });
+      const nightmare = new Nightmare({ waitTimeout });
 
       const page = <NightmarePage>(
         await nightmare.goto(
