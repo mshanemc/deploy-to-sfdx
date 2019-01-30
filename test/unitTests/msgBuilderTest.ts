@@ -10,7 +10,9 @@ describe('urlTestsMaster', () => {
 	it('handles master repos', () => {
 
 		const req = {
-			template: 'https://github.com/mshanemc/cg4Integrate'
+			query: {
+				template: 'https://github.com/mshanemc/cg4Integrate'
+			}
 		};
 
 		expect(msgBuilder(req).repo).to.equal('cg4Integrate');
@@ -31,7 +33,9 @@ describe('urlTestsBranch', () => {
 	it('handles branch repos', () => {
 
 		const req = {
-			template: 'https://github.com/mshanemc/cg4Integrate/tree/passwordSet'
+			query: {
+				template: 'https://github.com/mshanemc/cg4Integrate/tree/passwordSet'
+			}
 		};
 
 		expect(msgBuilder(req).username).to.equal('mshanemc');
@@ -49,16 +53,28 @@ describe('urlTestsBranch', () => {
 		assert(message.deployId.split('-')[1] === message.repo, 'incorrect repo for deployId');
 
 	});
+
+	it('prevents bad urls', () => {
+		const req = {
+			query: {
+				template: 'https://github.com/mshanemc/df17IntegrationWorkshops/tree/master; wget http://'
+			}
+		};
+
+		expect( () => msgBuilder(req)).to.throw();
+	});
 });
 
 describe('userinfo', () => {
 	it('handles email, firstname, lastname', () => {
 
 		const req = {
-			template: 'https://github.com/mshanemc/cg4Integrate/tree/passwordSet',
-			firstname: 'shane',
-			lastname: 'mclaughlin',
-			email : 'shane.mclaughlin@salesforce.com'
+			query: {
+				template: 'https://github.com/mshanemc/cg4Integrate/tree/passwordSet',
+				firstname: 'shane',
+				lastname: 'mclaughlin',
+				email : 'shane.mclaughlin@salesforce.com'
+			}
 		};
 
 		expect(msgBuilder(req).username).to.equal('mshanemc');
