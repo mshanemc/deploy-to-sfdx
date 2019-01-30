@@ -118,7 +118,7 @@ describe('tests that each repo works in a pooled scenario', () => {
       testRepos[prop].forEach((testRepo) => {
         it(`gets an org from the pool for ${testRepo.username}/${ testRepo.repo }`, async () => {
           await deployCheck(testRepo.username, testRepo.repo);
-        });
+        }).timeout(waitTimeout);
       });
     });
   }
