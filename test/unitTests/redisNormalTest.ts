@@ -40,4 +40,12 @@ describe('redis tests', async () => {
     expect(msg).to.be.an('object');
     expect(msg).to.deep.equal(deployMsgTest);
   });
+
+  it('blocks deletes with bad usernames', async () => {
+    await expect(deleteOrg('hack@you.bad;wget')).to.be.rejected;
+  });
+
+  it('allows deletes with good usernames', async () => {
+    await expect(deleteOrg('sweet@you.good'));
+  });
 });
