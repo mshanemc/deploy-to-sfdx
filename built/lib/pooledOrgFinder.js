@@ -16,49 +16,55 @@ const pooledOrgFinder = async function (deployReq) {
         return false;
     }
     logger.debug('this is a pooled repo');
-    const msgJSON = await redisNormal_1.getPooledOrg(await utilities.getKey(deployReq), true);
-    const cds = {
-        deployId: deployReq.deployId,
-        browserStartTime: new Date(),
-        complete: true,
-        commandResults: [],
-        errors: []
-    };
-    const uniquePath = path.join(__dirname, '../tmp/pools', msgJSON.displayResults.id);
-    fs.ensureDirSync(uniquePath);
-    const loginResult = await execProm(`sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${msgJSON.displayResults.username} --jwtkeyfile ${await hubAuth_1.getKeypath()} --instanceurl https://test.salesforce.com -s`, { cwd: uniquePath });
-    logger.debug(`auth completed ${loginResult.stdout}`);
-    if (deployReq.email) {
-        logger.debug(`changing email to ${deployReq.email}`);
-        const emailResult = await execProm(`sfdx force:data:record:update -s User -w "username='${msgJSON.displayResults.username}'" -v "email='${deployReq.email}'"`, { cwd: uniquePath });
-        if (emailResult) {
-            logger.debug(`updated email: ${emailResult.stdout}`);
+    try {
+        const msgJSON = await redisNormal_1.getPooledOrg(await utilities.getKey(deployReq), true);
+        const cds = {
+            deployId: deployReq.deployId,
+            browserStartTime: new Date(),
+            complete: true,
+            commandResults: [],
+            errors: []
+        };
+        const uniquePath = path.join(__dirname, '../tmp/pools', msgJSON.displayResults.id);
+        fs.ensureDirSync(uniquePath);
+        const loginResult = await execProm(`sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${msgJSON.displayResults.username} --jwtkeyfile ${await hubAuth_1.getKeypath()} --instanceurl https://test.salesforce.com -s`, { cwd: uniquePath });
+        logger.debug(`auth completed ${loginResult.stdout}`);
+        if (deployReq.email) {
+            logger.debug(`changing email to ${deployReq.email}`);
+            const emailResult = await execProm(`sfdx force:data:record:update -s User -w "username='${msgJSON.displayResults.username}'" -v "email='${deployReq.email}'"`, { cwd: uniquePath });
+            if (emailResult) {
+                logger.debug(`updated email: ${emailResult.stdout}`);
+            }
         }
-    }
-    let password;
-    if (msgJSON.passwordCommand) {
-        const stripped = argStripper(msgJSON.passwordCommand, '--json', true);
-        const passwordSetResult = await execProm(`${stripped} --json`, {
+        let password;
+        if (msgJSON.passwordCommand) {
+            const stripped = argStripper(msgJSON.passwordCommand, '--json', true);
+            const passwordSetResult = await execProm(`${stripped} --json`, {
+                cwd: uniquePath
+            });
+            if (passwordSetResult) {
+                logger.debug(`password set results: ${passwordSetResult.stdout}`);
+                password = JSON.parse(passwordSetResult.stdout).result.password;
+            }
+        }
+        const openResult = await execProm(`${msgJSON.openCommand} --json -r`, {
             cwd: uniquePath
         });
-        if (passwordSetResult) {
-            logger.debug(`password set results: ${passwordSetResult.stdout}`);
-            password = JSON.parse(passwordSetResult.stdout).result.password;
-        }
+        cds.openTimestamp = new Date();
+        cds.completeTimestamp = new Date();
+        cds.orgId = msgJSON.displayResults.id;
+        cds.mainUser = {
+            username: msgJSON.displayResults.username,
+            loginUrl: utilities.urlFix(JSON.parse(openResult.stdout)).result.url,
+            password
+        };
+        logger.debug(`opened : ${openResult.stdout}`);
+        await redisNormal_1.cdsPublish(cds);
+        return true;
     }
-    const openResult = await execProm(`${msgJSON.openCommand} --json -r`, {
-        cwd: uniquePath
-    });
-    cds.openTimestamp = new Date();
-    cds.completeTimestamp = new Date();
-    cds.orgId = msgJSON.displayResults.id;
-    cds.mainUser = {
-        username: msgJSON.displayResults.username,
-        loginUrl: utilities.urlFix(JSON.parse(openResult.stdout)).result.url,
-        password
-    };
-    logger.debug(`opened : ${openResult.stdout}`);
-    await redisNormal_1.cdsPublish(cds);
-    return true;
+    catch (e) {
+        logger.warn('pooledOrgFinder', e);
+        return false;
+    }
 };
 module.exports = pooledOrgFinder;
