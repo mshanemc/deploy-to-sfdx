@@ -1,6 +1,5 @@
 import * as Redis from 'ioredis';
 import * as logger from 'heroku-logger';
-
 import {
   DeleteRequest,
   deployRequest,
@@ -9,6 +8,7 @@ import {
 } from './types';
 
 import utilities = require('./utilities');
+import * as shellSanitize from './shellSanitize';
 
 const cdsExchange = 'deployMsg';
 const deployRequestExchange = 'deploys';
@@ -17,12 +17,17 @@ const poolDeployExchange = 'poolDeploys';
 const redis = new Redis(process.env.REDIS_URL);
 
 const deleteOrg = async (username: string) => {
-  const msg: DeleteRequest = {
-    username,
-    delete: true
-  };
+  if (shellSanitize(username)){
+    const msg: DeleteRequest = {
+      username,
+      delete: true
+    };
+    await redis.publish(poolDeployExchange, JSON.stringify(msg));
+  } else {
+    logger.error(`invalid username ${username}`);
+    throw new Error(`invalid username ${username}`);
+  }
 
-  await redis.publish(poolDeployExchange, JSON.stringify(msg));
 };
 
 const getDeployRequest = async (log?: boolean) => {
