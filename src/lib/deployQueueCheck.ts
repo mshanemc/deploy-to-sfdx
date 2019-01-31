@@ -11,6 +11,7 @@ import { lineParse } from './lineParse';
 import * as lineRunner from './lines';
 import * as pooledOrgFinder from './pooledOrgFinder';
 import * as utilities from './utilities';
+import { timesToGA } from './timeTracking';
 
 import { clientDataStructure, deployRequest } from './types';
 
@@ -29,13 +30,12 @@ const check = async () => {
     return false;
   }
 
-  if (msgJSON.visitor){
-    try {
-      msgJSON.visitor.event('Deploy Request', msgJSON.template).send();
-    } catch (e){
-      logger.warn('failed to send GA event');
-    }
+  try {
+    msgJSON.visitor.event('Deploy Request', msgJSON.template).send();
+  } catch (e){
+    logger.warn('failed to send GA event');
   }
+  
 
   if (await pooledOrgFinder(msgJSON)) {
     logger.debug('deployQueueCheck: using a pooled org'); // throw an error to break out of the rest of the promise chain and ack
@@ -49,7 +49,8 @@ const check = async () => {
       commandResults: [],
       additionalUsers: [],
       mainUser: {},
-      browserStartTime: new Date()
+      browserStartTime: msgJSON.createdTimestamp || new Date(),
+      buildStartTime: new Date()
     };
 
     const gitCloneCmd = utilities.getCloneCommand(msgJSON);
@@ -131,31 +132,6 @@ const check = async () => {
   await rmfr(`tmp/${msgJSON.deployId}`);
   return true;
 
-};
-
-const timesToGA = (msgJSON: deployRequest, CDS: clientDataStructure) => {
-  if (msgJSON.visitor) {
-    try {
-      msgJSON.visitor
-        .event(
-          'deploy complete',
-          msgJSON.template,
-          'deploytime',
-          CDS.completeTimestamp.getTime() - CDS.browserStartTime.getTime()
-        )
-        .send();
-      msgJSON.visitor
-        .event(
-          'deploy complete',
-          msgJSON.template,
-          'opentime',
-          CDS.openTimestamp.getTime() - CDS.browserStartTime.getTime()
-        )
-        .send();
-    } catch (e) {
-      logger.warn('GA timestamps not firing', msgJSON);
-    }
-  }
 };
 
 export = check;

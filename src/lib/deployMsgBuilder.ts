@@ -35,6 +35,7 @@ const deployMsgBuilder = function(req): deployRequest {
     username,
     repo,
     deployId,
+    createdTimestamp: new Date()
   };
 
   if (process.env.UA_ID){

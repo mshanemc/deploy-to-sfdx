@@ -8,6 +8,7 @@ import * as utilities from './utilities';
 import { getPooledOrg, cdsPublish } from './redisNormal';
 import { getKeypath } from './hubAuth';
 import * as argStripper from './argStripper';
+import { timesToGA } from './timeTracking';
 
 import { deployRequest, clientDataStructure } from './types';
 
@@ -20,7 +21,8 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 
 		const cds: clientDataStructure = {
 			deployId: deployReq.deployId,
-			browserStartTime: new Date(),
+			browserStartTime: deployReq.createdTimestamp || new Date(),
+			buildStartTime: new Date(),
 			complete: true,
 			commandResults: [],
 			errors: []
@@ -84,7 +86,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 
 		logger.debug(`opened : ${openResult.stdout}`);
 		await cdsPublish(cds);
-
+		timesToGA(deployReq, cds);
 		return true;
 	} catch (e) {
 		logger.warn('pooledOrgFinder', e);

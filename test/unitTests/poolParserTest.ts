@@ -20,7 +20,7 @@ dotenv.config();
 describe('poolURLTest', function () {
 	this.timeout(500000);
 
-	it('gets an array of objects', async () => {
+	it.skip('gets an array of objects', async () => {
 
 		if (process.env.POOLCONFIG_URL){
 
@@ -40,7 +40,7 @@ describe('poolURLTest', function () {
 		}
 	});
 
-	it('gets an object from the array', async () => {
+	it.skip('gets an object from the array', async () => {
 		if (process.env.POOLCONFIG_URL) {
 
 			// the pool is sane
