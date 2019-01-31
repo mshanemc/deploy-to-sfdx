@@ -30,7 +30,11 @@ const check = async () => {
   }
 
   if (msgJSON.visitor){
-    msgJSON.visitor.event('Deploy Request', msgJSON.template).send();
+    try {
+      msgJSON.visitor.event('Deploy Request', msgJSON.template).send();
+    } catch (e){
+      logger.warn('failed to send GA event');
+    }
   }
 
   if (await pooledOrgFinder(msgJSON)) {

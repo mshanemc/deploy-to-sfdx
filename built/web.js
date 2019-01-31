@@ -58,7 +58,7 @@ app.post('/delete', async (req, res, next) => {
     catch (e) {
         logger.error(`An error occurred in the redis rpush to the delete queue: ${req.body}`);
         logger.error(e);
-        next();
+        next(e);
     }
     ;
 });
@@ -82,8 +82,12 @@ app.get('/launch', async (req, res, next) => {
     }
     catch (e) {
         logger.error(`launch msg error`, e);
+<<<<<<< HEAD
         next();
 
+=======
+        next(e);
+>>>>>>> redisUtilities
     }
 });
 app.get('/deploying/:format/:deployId', (req, res, next) => {
