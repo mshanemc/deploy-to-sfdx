@@ -14,16 +14,7 @@ import { deployRequest, clientDataStructure } from './types';
 const execProm = util.promisify(exec);
 
 const pooledOrgFinder = async function(deployReq: deployRequest) {
-	// is this a template that we prebuild?  uses the utilities.getPoolConfig
-	const foundPool = await utilities.getPool(deployReq.username, deployReq.repo);
-
-	if (!foundPool) {
-		logger.debug('not a pooled repo');
-		return false; // go back and build it the normal way!
-	}
-
-	logger.debug('this is a pooled repo');
-
+	
 	try {
 		const msgJSON = await getPooledOrg(await utilities.getKey(deployReq), true);
 

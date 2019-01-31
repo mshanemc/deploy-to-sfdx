@@ -12,7 +12,13 @@ const redisNormal_1 = require("./redisNormal");
 const exec = util.promisify(require('child_process').exec);
 const execFile = util.promisify(require('child_process').execFile);
 async function poolBuild() {
-    const msgJSON = await redisNormal_1.getPoolRequest(true);
+    let msgJSON;
+    try {
+        msgJSON = await redisNormal_1.getPoolRequest(true);
+    }
+    catch (e) {
+        return false;
+    }
     await hubAuth_1.auth();
     if (msgJSON.delete) {
         await handleOrgDelete(msgJSON);

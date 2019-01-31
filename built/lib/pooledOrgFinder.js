@@ -10,12 +10,6 @@ const hubAuth_1 = require("./hubAuth");
 const argStripper = require("./argStripper");
 const execProm = util.promisify(child_process_1.exec);
 const pooledOrgFinder = async function (deployReq) {
-    const foundPool = await utilities.getPool(deployReq.username, deployReq.repo);
-    if (!foundPool) {
-        logger.debug('not a pooled repo');
-        return false;
-    }
-    logger.debug('this is a pooled repo');
     try {
         const msgJSON = await redisNormal_1.getPooledOrg(await utilities.getKey(deployReq), true);
         const cds = {

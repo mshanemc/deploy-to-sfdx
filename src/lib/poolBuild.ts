@@ -15,7 +15,12 @@ const exec = util.promisify(require('child_process').exec);
 const execFile = util.promisify(require('child_process').execFile);
 
 export async function poolBuild() {
-  const msgJSON = await getPoolRequest(true);
+  let msgJSON;
+  try { 
+    msgJSON = await getPoolRequest(true);
+  } catch (e){
+    return false;
+  }
   await auth();
 
   // handling deletes
