@@ -18,7 +18,12 @@ const check = async () => {
         return false;
     }
     if (msgJSON.visitor) {
-        msgJSON.visitor.event('Deploy Request', msgJSON.template).send();
+        try {
+            msgJSON.visitor.event('Deploy Request', msgJSON.template).send();
+        }
+        catch (e) {
+            logger.warn('failed to send GA event');
+        }
     }
     if (await pooledOrgFinder(msgJSON)) {
         logger.debug('deployQueueCheck: using a pooled org');
