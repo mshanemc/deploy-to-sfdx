@@ -118,13 +118,9 @@ const check = async () => {
       const output = <clientDataStructure> await localLineRunner.runLines();
       timesToGA(msgJSON, output);
     } catch (e) {
-      logger.error('deployQueueCheck: Deployment error', {
-        request: msgJSON,
-        error: JSON.stringify(e)
-      });
-
-      // don't need that org anymore!
-      await deleteOrg(msgJSON.username);
+      logger.error('deployQueueCheck: Deployment error', msgJSON);
+      logger.error('deployQueueCheck: Deployment error', e);  
+      await deleteOrg(msgJSON.username);    
     }
   }
 
