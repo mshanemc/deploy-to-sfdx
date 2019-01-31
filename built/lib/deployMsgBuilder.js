@@ -24,6 +24,7 @@ const deployMsgBuilder = function (req) {
         username,
         repo,
         deployId,
+        createdTimestamp: new Date()
     };
     if (process.env.UA_ID) {
         message.visitor = ua(process.env.UA_ID);

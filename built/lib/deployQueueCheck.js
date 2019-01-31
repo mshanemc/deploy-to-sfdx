@@ -8,6 +8,7 @@ const lineParse_1 = require("./lineParse");
 const lineRunner = require("./lines");
 const pooledOrgFinder = require("./pooledOrgFinder");
 const utilities = require("./utilities");
+const timeTracking_1 = require("./timeTracking");
 const exec = util.promisify(require('child_process').exec);
 const check = async () => {
     let msgJSON;
@@ -17,13 +18,11 @@ const check = async () => {
     catch (e) {
         return false;
     }
-    if (msgJSON.visitor) {
-        try {
-            msgJSON.visitor.event('Deploy Request', msgJSON.template).send();
-        }
-        catch (e) {
-            logger.warn('failed to send GA event');
-        }
+    try {
+        msgJSON.visitor.event('Deploy Request', msgJSON.template).send();
+    }
+    catch (e) {
+        logger.warn('failed to send GA event');
     }
     if (await pooledOrgFinder(msgJSON)) {
         logger.debug('deployQueueCheck: using a pooled org');
@@ -37,7 +36,8 @@ const check = async () => {
             commandResults: [],
             additionalUsers: [],
             mainUser: {},
-            browserStartTime: new Date()
+            browserStartTime: msgJSON.createdTimestamp || new Date(),
+            buildStartTime: new Date()
         };
         const gitCloneCmd = utilities.getCloneCommand(msgJSON);
         try {
@@ -78,7 +78,7 @@ const check = async () => {
         const localLineRunner = new lineRunner(msgJSON, parsedLines, redisNormal_1.redis, clientResult);
         try {
             const output = await localLineRunner.runLines();
-            timesToGA(msgJSON, output);
+            timeTracking_1.timesToGA(msgJSON, output);
         }
         catch (e) {
             logger.error('deployQueueCheck: Deployment error', msgJSON);
@@ -88,20 +88,5 @@ const check = async () => {
     }
     await rmfr(`tmp/${msgJSON.deployId}`);
     return true;
-};
-const timesToGA = (msgJSON, CDS) => {
-    if (msgJSON.visitor) {
-        try {
-            msgJSON.visitor
-                .event('deploy complete', msgJSON.template, 'deploytime', CDS.completeTimestamp.getTime() - CDS.browserStartTime.getTime())
-                .send();
-            msgJSON.visitor
-                .event('deploy complete', msgJSON.template, 'opentime', CDS.openTimestamp.getTime() - CDS.browserStartTime.getTime())
-                .send();
-        }
-        catch (e) {
-            logger.warn('GA timestamps not firing', msgJSON);
-        }
-    }
 };
 module.exports = check;

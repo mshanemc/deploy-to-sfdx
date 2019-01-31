@@ -28,6 +28,7 @@ export interface deployRequest extends deployMessage {
   lastname?: string;
   visitor?: ua.Visitor;
   delete?: boolean;
+  createdTimestamp: Date;
 }
 
 // tells how a pool should be built.  Used in an array from a url like POOLCONFIG_URL=https://deployer-pools.herokuapp.com/pools-dev
@@ -46,7 +47,6 @@ export interface poolOrg {
   openCommand: string;
   passwordCommand?: string;
   branch?: string;
-
   displayResults?: sfdxDisplayResult;
 }
 
@@ -78,6 +78,7 @@ export interface clientDataStructure {
   completeTimestamp?: Date; // when the job completed
   browserStartTime?: Date; // when the job began
   openTimestamp?: Date; // when the open button became visible, even if more scripts were still running
+  buildStartTime?: Date;
 
   orgId?: string;
 

@@ -23,7 +23,8 @@ exports.preparePoolByName = async (pool, createHerokuDynos = true) => {
                 username,
                 repo,
                 deployId,
-                whitelisted: true
+                whitelisted: true,
+                createdTimestamp: new Date()
             };
             if (poolname.split('.')[2]) {
                 message.branch = poolname.split('.')[2];

@@ -38,7 +38,8 @@ export const preparePoolByName = async (
         username,
         repo,
         deployId,
-        whitelisted: true
+        whitelisted: true,
+        createdTimestamp: new Date()
       };
 
       // branch support

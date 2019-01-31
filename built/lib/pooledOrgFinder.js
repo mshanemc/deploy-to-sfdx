@@ -8,13 +8,15 @@ const utilities = require("./utilities");
 const redisNormal_1 = require("./redisNormal");
 const hubAuth_1 = require("./hubAuth");
 const argStripper = require("./argStripper");
+const timeTracking_1 = require("./timeTracking");
 const execProm = util.promisify(child_process_1.exec);
 const pooledOrgFinder = async function (deployReq) {
     try {
         const msgJSON = await redisNormal_1.getPooledOrg(await utilities.getKey(deployReq), true);
         const cds = {
             deployId: deployReq.deployId,
-            browserStartTime: new Date(),
+            browserStartTime: deployReq.createdTimestamp || new Date(),
+            buildStartTime: new Date(),
             complete: true,
             commandResults: [],
             errors: []
@@ -54,6 +56,7 @@ const pooledOrgFinder = async function (deployReq) {
         };
         logger.debug(`opened : ${openResult.stdout}`);
         await redisNormal_1.cdsPublish(cds);
+        timeTracking_1.timesToGA(deployReq, cds);
         return true;
     }
     catch (e) {
