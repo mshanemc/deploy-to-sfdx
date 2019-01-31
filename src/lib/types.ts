@@ -6,6 +6,11 @@ export interface testRepo {
   repo: string;
 }
 
+export interface DeleteRequest {
+  delete: boolean;
+  username: string;
+}
+
 export interface deployMessage {
   username?: string;
   repo: string;
@@ -17,7 +22,7 @@ export interface deployMessage {
 
 export interface deployRequest extends deployMessage {
   path?: string;
-  template: string;
+  template?: string;
   email?: string;
   firstname?: string;
   lastname?: string;
@@ -127,3 +132,8 @@ export interface herokuDyno {
   id: string;
   command: string;
 }
+
+export interface NightmarePage {
+  url ?: string;
+}
+

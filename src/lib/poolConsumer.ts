@@ -1,6 +1,6 @@
 import { poolBuild } from './poolBuild';
 
-poolBuild()
-.then( (builtAnOrg:boolean) => {
+(async () => {
+	await poolBuild();
 	process.exit(0);
-});
+})();

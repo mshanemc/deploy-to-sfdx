@@ -2,7 +2,7 @@ import * as logger from 'heroku-logger';
 import * as util from 'util';
 
 import * as utilities from './utilities';
-import * as redis from './redisNormal';
+import { redis } from './redisNormal';
 import * as argStripper from './argStripper';
 
 import { deployRequest, clientDataStructure, commandSummary } from './types';
@@ -132,11 +132,8 @@ const lines = function(
           logger.error(
             `error running line ${localLine} from ${msgJSON.username}/${
               msgJSON.repo
-            }: ${response.message}`
+            }: ${response.message}`, response
           );
-          this.msgJSON.visitor
-            .event('deploy error', this.msgJSON.template, response.message)
-            .send();
         } else {
           logger.debug('line returned status 0');
           if (summary === commandSummary.OPEN) {

@@ -1,32 +1,26 @@
 import * as logger from 'heroku-logger';
 import * as util from 'util';
+import { exec } from 'child_process';
 
 import * as utilities from './utilities';
-import * as redis from './redisNormal';
+import { getPoolDeployRequestQueueSize } from './redisNormal';
 import { prepareAll } from './poolPrep';
 
+const execProm = util.promisify(exec);
 
-const exec = util.promisify(require('child_process').exec);
+(async () => {
+  if (utilities.checkHerokuAPI()) {
+    const currentNeed = await getPoolDeployRequestQueueSize();
 
-utilities.checkHerokuAPI();
-
-// one-off dynos to flush anything in the queue already
-const existingQFlush = async () => {
-	const currentNeed = await redis.llen('poolDeploys');
-	if (currentNeed > 0) {
-		logger.debug(`going to start ${currentNeed} dynos to handle existing poolDeploys`);
-		const execs = [];
-		for (let x = 0; x < currentNeed; x++) {
-			execs.push(exec(`heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`));
-		}
-		await Promise.all(execs);
-	} else {
-		logger.debug('no additional builders needed for poolQueue');
-	}
-};
-
-existingQFlush()
-.then( async () => {
-	await prepareAll();
-	process.exit(0);
-});
+    logger.debug(`starting ${currentNeed} builders for poolQueue`);
+    await Promise.all(
+      Array(Math.max(0, currentNeed)).fill(
+        execProm(
+          `heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`
+        )
+      )
+    );
+    await prepareAll();
+  }
+  process.exit(0);
+})();

@@ -25,7 +25,7 @@ const argStripper = function(cmd: string, parameter: string, noarg?: boolean):st
 			let paramValueEnd;
 			// if it starts with a ` or ' or " we need to find the other end.  Otherwise, it's a space
 			if (cmd.charAt(paramValueStart) === '"' || cmd.charAt(paramValueStart) === '\'' || cmd.charAt(paramValueStart) === '`'){
-				logger.debug(`it is a quoted string starting with ${cmd.charAt(paramValueStart)}`);
+				// logger.debug(`it is a quoted string starting with ${cmd.charAt(paramValueStart)}`);
 				const quoteEnd = cmd.indexOf(cmd.charAt(paramValueStart), paramValueStart+1);
 				if (cmd.charAt(quoteEnd+1) === ' '){
 					paramValueEnd = quoteEnd;
@@ -40,7 +40,7 @@ const argStripper = function(cmd: string, parameter: string, noarg?: boolean):st
 
 		}
 
-		logger.debug(`converted ${cmd} to ${output}`);
+		logger.debug(`argStripper: converted ${cmd} to ${output}`);
 		return output.trim();
 	}
 

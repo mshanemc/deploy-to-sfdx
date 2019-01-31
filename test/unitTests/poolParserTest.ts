@@ -3,7 +3,7 @@ import * as chai from 'chai';
 import * as fs from 'fs-extra';
 import * as util from 'util';
 import * as path from 'path';
-import * as rimraf from 'rimraf';
+import * as rmfr from 'rmfr';
 import * as dotenv from 'dotenv';
 
 import * as parser from '../../src/lib/poolParse';
@@ -83,8 +83,8 @@ describe('tests the crash course workshop', function () {
 		expect(result.openLine).to.equal('sfdx force:org:open');
 	});
 
-	after(() => {
-		rimraf.sync(cloneDirPath);
+	after(async () => {
+		await rmfr(cloneDirPath);
 	});
 });
 
@@ -110,9 +110,9 @@ describe('tests the trial', function () {
 		expect(result.openLine).to.include('-p');
 	});
 
-	after(() => {
-		rimraf.sync(cloneDirPath);
-		rimraf.sync(tmpDir);
+	after( async () => {
+		await rmfr(cloneDirPath);
+		await rmfr(tmpDir);
 	});
 });
 
@@ -138,8 +138,8 @@ describe('tests the integration workshop', function () {
 		expect(result.passwordLine).to.equal('sfdx shane:user:password:set -l User -g User -p sfdx1234 --json');
 	});
 
-	after(() => {
-		rimraf.sync(cloneDirPath);
-		rimraf.sync(tmpDir);
+	after( async () => {
+		await rmfr(cloneDirPath);
+		await rmfr(tmpDir);
 	});
 });

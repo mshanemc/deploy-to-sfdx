@@ -3,12 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const logger = require("heroku-logger");
 const util = require("util");
 const utilities = require("./utilities");
-const redis = require("./redisNormal");
+const redisNormal_1 = require("./redisNormal");
 const exec = util.promisify(require('child_process').exec);
 exports.preparePoolByName = async (pool, createHerokuDynos = true) => {
     const targetQuantity = pool.quantity;
     const poolname = `${pool.user}.${pool.repo}`;
-    const actualQuantity = await redis.llen(poolname);
+    const actualQuantity = await redisNormal_1.redis.llen(poolname);
     const messages = [];
     const execs = [];
     if (actualQuantity < targetQuantity) {
@@ -28,7 +28,7 @@ exports.preparePoolByName = async (pool, createHerokuDynos = true) => {
             if (poolname.split('.')[2]) {
                 message.branch = poolname.split('.')[2];
             }
-            messages.push(redis.rpush('poolDeploys', JSON.stringify(message)));
+            messages.push(redisNormal_1.putPoolRequest(message));
             if (createHerokuDynos) {
                 execs.push(exec(`heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`));
             }

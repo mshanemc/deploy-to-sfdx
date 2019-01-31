@@ -6,15 +6,18 @@ import * as WebSocket from 'ws';
 import * as path from 'path';
 import * as favicon from 'serve-favicon';
 
-import * as redis from './lib/redisNormal';
+import {
+  cdsExchange,
+  putDeployRequest,
+  getKeys,
+  deleteOrg
+} from './lib/redisNormal';
 import * as redisSub from './lib/redisSubscribe';
 import * as msgBuilder from './lib/deployMsgBuilder';
 import * as utilities from './lib/utilities';
 import * as org62LeadCapture from './lib/trialLeadCreate';
 
 import { clientDataStructure, deployRequest } from './lib/types';
-
-const ex = 'deployMsg';
 
 const app = express();
 
@@ -43,69 +46,47 @@ app.set('views', path.join(__dirname, '/views'));
 
 app.post('/trial', (req, res, next) => {
   try {
-    const message = msgBuilder(req.query);
-  
+    const message = msgBuilder(req);
     logger.debug('trial request', message);
-
-    // assign the email from the post field because it wasn't in the query string
-    message.email = req.body.UserEmail;
 
     if (process.env.sfdcLeadCaptureServlet) {
       org62LeadCapture(req.body);
     }
 
-    if (process.env.UA_ID) {
-      const visitor = ua(process.env.UA_ID);
-      visitor.pageview('/trial').send();
-      visitor.event('Repo', req.query.template).send();
-      message.visitor = visitor;
+    if (message.visitor) {
+      message.visitor.pageview('/trial').send();
+      message.visitor.event('Repo', message.template).send();
     }
 
     utilities.runHerokuBuilder();
-
-    redis.rpush('deploys', JSON.stringify(message)).then(() => {
+    putDeployRequest(message).then(() => {
       res.redirect(`/deploying/trial/${message.deployId.trim()}`);
     });
-
-  } catch (error) {
-    logger.error(`request failed: ${req.url}`);
-    return res.render('pages/error', {
-      customError: error
-    });
+  } catch (e) {
+    logger.error( `An error occurred in the trial page: ${req.body}` );
+    logger.error(e);
+    next();
   }
 });
 
-app.post('/delete', (req, res, next) => {
-  // logger.debug('in the delete post action with body:');
-  // logger.debug(req.body);
-  utilities.runHerokuBuilder();
-
-  redis
-    .rpush(
-      'poolDeploys',
-      JSON.stringify({
-        username: req.body.username,
-        delete: true
-      })
-    )
-    .then(() => {
-      res.status(302).send('/deleteConfirm');
-    })
-    .catch((e) => {
-      logger.error(
-        `An error occurred in the redis rpush to the delete queue: ${req.body}`
-      );
-      logger.error(e);
-      res.status(500).send(e);
-    });
+app.post('/delete', async (req, res, next) => {
+  try {
+    await deleteOrg(req.body.username);
+    utilities.runHerokuBuilder();
+    res.status(302).send('/deleteConfirm');
+  } catch (e){
+    logger.error( `An error occurred in the redis rpush to the delete queue: ${req.body}` );
+    logger.error(e);
+    next();
+  };
 });
 
 app.get('/deleteConfirm', (req, res, next) =>
   res.render('pages/deleteConfirm')
 );
 
-app.get('/launch', (req, res, next) => {
-  
+app.get('/launch', async (req, res, next) => {  
+
   // allow repos to require the email parameter
   if (req.query.email === 'required') {
     return res.render('pages/userinfo', {
@@ -114,32 +95,19 @@ app.get('/launch', (req, res, next) => {
   }
 
   try {
-    const message: deployRequest = msgBuilder(req.query);
-    
-    // analytics
-    if (process.env.UA_ID) {
-      const visitor = ua(process.env.UA_ID);
-      visitor.pageview('/launch').send();
-      visitor.event('Repo', req.query.template).send();
-    }
-    utilities.runHerokuBuilder();
+    const message: deployRequest = msgBuilder(req);
 
-    redis
-      .rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
-      .then((rpushResult) => {
-        logger.debug(rpushResult);
-        if (message.pool) {
-          logger.debug('putting in pool deploy queue');
-          return res.send('pool initiated');
-        } else {
-          return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
-        }
-      });
-  } catch (error) {
-    logger.error(`request failed: ${req.url}`);
-    return res.render('pages/error', {
-      customError: error
-    });
+    if (message.visitor){
+      message.visitor.pageview('/launch').send();
+      message.visitor.event('Repo', message.template).send();
+    }
+
+    utilities.runHerokuBuilder();
+    await putDeployRequest(message);
+    return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
+  } catch (e) {
+    logger.error( `launch msg error`, e);
+    next();
   }
 
 });
@@ -163,16 +131,8 @@ app.get('/userinfo', (req, res, next) => {
 });
 
 app.get('/pools', async (req, res, next) => {
-  const keys = await redis.keys('*');
-  const output = [];
-  for (const key of keys) {
-    const size = await redis.llen(key);
-    output.push({
-      repo: key,
-      size
-    });
-  }
-  res.send(output);
+  const keys = await getKeys();
+  res.send(keys);
 });
 
 app.get('/testform', (req, res, next) => {
@@ -212,8 +172,8 @@ wss.on('connection', (ws: WebSocket, req) => {
 });
 
 // subscribe to deploy events to share them with the web clients
-redisSub.subscribe(ex).then(() => {
-  logger.info(`subscribed to Redis channel ${ex}`);
+redisSub.subscribe(cdsExchange).then(() => {
+  logger.info(`subscribed to Redis channel ${cdsExchange}`);
 });
 
 redisSub.on('message', (channel, message) => {

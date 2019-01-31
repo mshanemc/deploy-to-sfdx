@@ -7,12 +7,11 @@ const bodyParser = require("body-parser");
 const WebSocket = require("ws");
 const path = require("path");
 const favicon = require("serve-favicon");
-const redis = require("./lib/redisNormal");
+const redisNormal_1 = require("./lib/redisNormal");
 const redisSub = require("./lib/redisSubscribe");
 const msgBuilder = require("./lib/deployMsgBuilder");
 const utilities = require("./lib/utilities");
 const org62LeadCapture = require("./lib/trialLeadCreate");
-const ex = 'deployMsg';
 const app = express();
 const port = process.env.PORT || 8443;
 const server = app.listen(port, () => {
@@ -29,79 +28,62 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.post('/trial', (req, res, next) => {
     try {
-        const message = msgBuilder(req.query);
+        const message = msgBuilder(req);
         logger.debug('trial request', message);
-        message.email = req.body.UserEmail;
         if (process.env.sfdcLeadCaptureServlet) {
             org62LeadCapture(req.body);
         }
-        if (process.env.UA_ID) {
-            const visitor = ua(process.env.UA_ID);
-            visitor.pageview('/trial').send();
-            visitor.event('Repo', req.query.template).send();
-            message.visitor = visitor;
+        if (message.visitor) {
+            message.visitor.pageview('/trial').send();
+            message.visitor.event('Repo', message.template).send();
         }
         utilities.runHerokuBuilder();
-        redis.rpush('deploys', JSON.stringify(message)).then(() => {
+        redisNormal_1.putDeployRequest(message).then(() => {
             res.redirect(`/deploying/trial/${message.deployId.trim()}`);
         });
     }
-    catch (error) {
-        logger.error(`request failed: ${req.url}`);
-        return res.render('pages/error', {
-            customError: error
-        });
+    catch (e) {
+        logger.error(`An error occurred in the trial page: ${req.body}`);
+        logger.error(e);
+        next();
+
     }
 });
-app.post('/delete', (req, res, next) => {
-    utilities.runHerokuBuilder();
-    redis
-        .rpush('poolDeploys', JSON.stringify({
-        username: req.body.username,
-        delete: true
-    }))
-        .then(() => {
+app.post('/delete', async (req, res, next) => {
+    try {
+        await redisNormal_1.deleteOrg(req.body.username);
+        utilities.runHerokuBuilder();
         res.status(302).send('/deleteConfirm');
-    })
-        .catch((e) => {
+    }
+    catch (e) {
         logger.error(`An error occurred in the redis rpush to the delete queue: ${req.body}`);
         logger.error(e);
-        res.status(500).send(e);
-    });
+        next();
+    }
+    ;
 });
 app.get('/deleteConfirm', (req, res, next) => res.render('pages/deleteConfirm'));
-app.get('/launch', (req, res, next) => {
+app.get('/launch', async (req, res, next) => {
+
     if (req.query.email === 'required') {
         return res.render('pages/userinfo', {
             template: req.query.template
         });
     }
     try {
-        const message = msgBuilder(req.query);
-        if (process.env.UA_ID) {
-            const visitor = ua(process.env.UA_ID);
-            visitor.pageview('/launch').send();
-            visitor.event('Repo', req.query.template).send();
+        const message = msgBuilder(req);
+        if (message.visitor) {
+            message.visitor.pageview('/launch').send();
+            message.visitor.event('Repo', message.template).send();
         }
         utilities.runHerokuBuilder();
-        redis
-            .rpush(message.pool ? 'poolDeploys' : 'deploys', JSON.stringify(message))
-            .then((rpushResult) => {
-            logger.debug(rpushResult);
-            if (message.pool) {
-                logger.debug('putting in pool deploy queue');
-                return res.send('pool initiated');
-            }
-            else {
-                return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
-            }
-        });
+        await redisNormal_1.putDeployRequest(message);
+        return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
     }
-    catch (error) {
-        logger.error(`request failed: ${req.url}`);
-        return res.render('pages/error', {
-            customError: error
-        });
+    catch (e) {
+        logger.error(`launch msg error`, e);
+        next();
+
     }
 });
 app.get('/deploying/:format/:deployId', (req, res, next) => {
@@ -122,16 +104,8 @@ app.get('/userinfo', (req, res, next) => {
     });
 });
 app.get('/pools', async (req, res, next) => {
-    const keys = await redis.keys('*');
-    const output = [];
-    for (const key of keys) {
-        const size = await redis.llen(key);
-        output.push({
-            repo: key,
-            size
-        });
-    }
-    res.send(output);
+    const keys = await redisNormal_1.getKeys();
+    res.send(keys);
 });
 app.get('/testform', (req, res, next) => {
     res.render('pages/testForm');
@@ -160,8 +134,8 @@ wss.on('connection', (ws, req) => {
     logger.debug(`connection on url ${req.url}`);
     ws.url = req.url;
 });
-redisSub.subscribe(ex).then(() => {
-    logger.info(`subscribed to Redis channel ${ex}`);
+redisSub.subscribe(redisNormal_1.cdsExchange).then(() => {
+    logger.info(`subscribed to Redis channel ${redisNormal_1.cdsExchange}`);
 });
 redisSub.on('message', (channel, message) => {
     const msgJSON = JSON.parse(message);

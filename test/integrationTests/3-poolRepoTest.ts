@@ -3,14 +3,15 @@ import * as chai from 'chai';
 import * as util from 'util';
 
 import * as fs from 'fs-extra';
-import * as rimraf from 'rimraf';
+import * as rmfr from 'rmfr';
 
 import { testRepos } from '../testRepos';
 import { deployRequest, testRepo, poolOrg } from '../../src/lib/types';
 
-import * as redis from '../../src/lib/redisNormal';
+import { redis } from '../../src/lib/redisNormal';
 
 import { clearQueues } from '../helpers/clearRedis';
+import { deployCheck } from '../helpers/deployCheck';
 
 import { preparePoolByName } from '../../src/lib/poolPrep';
 import { poolBuild } from '../../src/lib/poolBuild';
@@ -85,111 +86,47 @@ const requestBuildPool = async (testRepo: testRepo, deleteIt: boolean) => {
   }
 };
 
-const requestOrgFromPool = async (testRepo: testRepo) => {
-  // run deployQueueCheck
-  // verify launch button, with no "action" bits on the page
-  // verify other displayed info (username/password)
-  // verify email was updated
-  // verify opens (token is valid, etc)
-  // verify not in pool for that repo
-};
-
 describe('tests that each repo works in a pooled scenario', () => {
   before(async () => {
     await clearQueues();
-    rimraf.sync(tmpDir);
+    await rmfr(tmpDir);
     fs.ensureDirSync(tmpDir);
   });
 
-  describe('runs platform workshops', () => {
-    after(async () => {
-      await clearQueues();
-    });
+  for (const prop in testRepos) {
+    describe(`tests all the repos under ${prop}`, () => {
+      testRepos[prop].forEach((testRepo) => {
+        it(`adds ${testRepo.username}/${
+          testRepo.repo
+        } to the poolDeploys queue`, async () => {
+          await requestAddToPool(testRepo);
+        });
 
-    for (const testRepo of testRepos.platformWorkshops) {
-      it(`adds ${testRepo.username}/${
-        testRepo.repo
-      } to the poolDeploys queue`, async () => {
-        await requestAddToPool(testRepo);
+        it(`builds a pooled org for ${testRepo.username}/${
+          testRepo.repo
+          }`, async () => {
+            await requestBuildPool(testRepo, true);
+          })
+          .timeout(waitTimeout)
+          .retries(2);
       });
-
-      it(`builds a pooled org for ${testRepo.username}/${
-        testRepo.repo
-      }`, async () => {
-        await requestBuildPool(testRepo, true);
-      })
-        .timeout(waitTimeout)
-        .retries(2);
-    }
-  });
-
-  describe('runs adoption workshops', () => {
-    after(async () => {
-      await clearQueues();
     });
+  }
 
-    for (const testRepo of testRepos.adoptionWorkshops) {
-      it(`adds ${testRepo.username}/${
-        testRepo.repo
-      } to the poolDeploys queue`, async () => {
-        await requestAddToPool(testRepo);
+  for (const prop in testRepos) {
+    describe(`tests all the repos under ${prop}`, () => {
+      testRepos[prop].forEach((testRepo) => {
+        it(`gets an org from the pool for ${testRepo.username}/${ testRepo.repo }`, async () => {
+          await deployCheck(testRepo.username, testRepo.repo);
+        }).timeout(waitTimeout);
       });
-
-      it(`builds a pooled org for ${testRepo.username}/${
-        testRepo.repo
-      }`, async () => {
-        await requestBuildPool(testRepo, true);
-      })
-        .timeout(waitTimeout)
-        .retries(2);
-    }
-  });
-
-  describe('runs campground demos', () => {
-    after(async () => {
-      await clearQueues();
     });
-
-    for (const testRepo of testRepos.campground) {
-      it(`adds ${testRepo.username}/${
-        testRepo.repo
-      } to the poolDeploys queue`, async () => {
-        await requestAddToPool(testRepo);
-      });
-
-      it(`builds a pooled org for ${testRepo.username}/${
-        testRepo.repo
-      }`, async () => {
-        await requestBuildPool(testRepo, true);
-      })
-        .timeout(waitTimeout)
-        .retries(2);
-    }
-  });
-
-  describe('runs other demos and trial', () => {
-    after(async () => {
-      await clearQueues();
-    });
-
-    for (const testRepo of testRepos.other) {
-      it(`adds ${testRepo.username}/${
-        testRepo.repo
-      } to the poolDeploys queue`, async () => {
-        await requestAddToPool(testRepo);
-      });
-
-      it(`builds a pooled org for ${testRepo.username}/${
-        testRepo.repo
-      }`, async () => {
-        await requestBuildPool(testRepo, true);
-      })
-        .timeout(waitTimeout)
-        .retries(2);
-    }
-  });
+  }
 
   after(async () => {
     await clearQueues();
+    await rmfr(tmpDir);
   });
 });
+
+export {requestAddToPool, requestBuildPool}

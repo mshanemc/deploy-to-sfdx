@@ -41,7 +41,6 @@ const utilities = {
         }
         const foundPool = pools.find(pool => pool.user === username && pool.repo === repo);
         if (!foundPool) {
-            return;
         }
         else {
             return foundPool;
@@ -78,11 +77,17 @@ const utilities = {
         }
         return input;
     },
+    getCloneCommand: (depReq) => {
+        let gitCloneCmd = `git clone https://github.com/${depReq.username}/${depReq.repo}.git ${depReq.deployId}`;
+        if (depReq.branch) {
+            gitCloneCmd = `git clone -b ${depReq.branch} --single-branch https://github.com/${depReq.username}/${depReq.repo}.git ${depReq.deployId}`;
+        }
+        return gitCloneCmd;
+    },
     getArg: (cmd, parameter) => {
         cmd = cmd.concat(' ');
         const bufferedParam = ' '.concat(parameter).concat(' ');
         if (!cmd.includes(bufferedParam)) {
-            return;
         }
         else {
             const paramStartIndex = cmd.indexOf(' '.concat(parameter).concat(' ')) + 1;

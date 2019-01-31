@@ -1,19 +1,24 @@
 import * as logger from 'heroku-logger';
 import * as util from 'util';
-import * as hubAuth from './hubAuth';
+import { auth } from './hubAuth';
 import * as checkQueue from './deployQueueCheck';
 
 const setTimeoutPromise = util.promisify(setTimeout);
 
-logger.debug('I am a deploy (non-pool) consumer and I am up!');
+(async () => {
+  logger.debug(
+    'DeployConsumer: I am a always-on deploy (non-pool) consumer and I am up!'
+  );
 
-async function runTheLoop(){
-	const processedSomething = await checkQueue();
-	if (!processedSomething){
-		await setTimeoutPromise(1000);
-	}
-	runTheLoop();
-}
+  await auth();
+  let processedSomething = true;
 
-hubAuth()
-	.then( () => runTheLoop() );
+  while (true) {
+		processedSomething = await checkQueue();
+
+		// back off a second before checking the queue again if it was empty
+    if (!processedSomething) {
+      await setTimeoutPromise(1000);
+    }
+  }
+})();

@@ -4,86 +4,82 @@ const util = require("util");
 const fs = require("fs-extra");
 const logger = require("heroku-logger");
 const path = require("path");
+const rmfr = require("rmfr");
 const utilities = require("./utilities");
 const poolParse = require("./poolParse");
-const hubAuth = require("./hubAuth");
-const redis = require("./redisNormal");
+const hubAuth_1 = require("./hubAuth");
+const redisNormal_1 = require("./redisNormal");
 const exec = util.promisify(require('child_process').exec);
 const execFile = util.promisify(require('child_process').execFile);
 async function poolBuild() {
-    const msg = await redis.lpop('poolDeploys');
-    if (msg) {
-        const keypath = await hubAuth();
-        const msgJSON = JSON.parse(msg);
-        if (msgJSON.delete) {
-            logger.debug(`deleting org with username ${msgJSON.username}`);
-            try {
-                utilities.loggerFunction(await exec(`sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${msgJSON.username} --jwtkeyfile ${keypath} --instanceurl https://test.salesforce.com -s`));
-                logger.debug('connected to the org');
-                utilities.loggerFunction(await exec(`sfdx force:org:delete -p -u ${msgJSON.username}`));
-                logger.debug('org deleted');
-                return true;
-            }
-            catch (err) {
-                logger.error('failed to delete an org!', err);
-                logger.error('failed to delete an org!', msgJSON);
-                return false;
-            }
-        }
-        else {
-            logger.debug(msgJSON.deployId);
-            logger.debug('building a pool org!');
-            let gitCloneCmd = `git clone https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
-            if (msgJSON.branch) {
-                gitCloneCmd = `git clone -b ${msgJSON.branch} --single-branch https://github.com/${msgJSON.username}/${msgJSON.repo}.git ${msgJSON.deployId}`;
-            }
-            const cloneDir = path.join(__dirname, '../tmp', msgJSON.deployId);
-            const tmpDir = path.join(__dirname, '../tmp');
-            fs.ensureDirSync(cloneDir);
-            const poolMessage = {
-                repo: msgJSON.repo,
-                githubUsername: msgJSON.username,
-                openCommand: 'placeholder',
-                createdDate: new Date()
-            };
-            if (msgJSON.branch) {
-                poolMessage.branch = msgJSON.branch;
-            }
-            utilities.loggerFunction(await exec(gitCloneCmd, { cwd: tmpDir }));
-            if (!fs.existsSync(`${cloneDir}/orgInit.sh`)) {
-                logger.error('There is no orgInit.sh file in the repo');
-                logger.debug(`${cloneDir}/orgInit.sh`);
-                throw 'There is no orgInit.sh file in the repo';
-            }
-            else {
-                logger.debug('orgInit exists!');
-            }
-            const parseResults = await poolParse(path.join(cloneDir, 'orgInit.sh'));
-            logger.debug(`open command is ${parseResults.openLine}`);
-            poolMessage.openCommand = parseResults.openLine;
-            if (parseResults.passwordLine) {
-                poolMessage.passwordCommand = parseResults.passwordLine;
-            }
-            try {
-                utilities.loggerFunction(await execFile('./orgInit.sh', { cwd: cloneDir, timeout: 1000000 }));
-                const displayResults = await exec('sfdx force:org:display --json', {
-                    cwd: cloneDir
-                });
-                poolMessage.displayResults = JSON.parse(displayResults.stdout).result;
-                const key = await utilities.getKey(msgJSON);
-                await redis.rpush(key, JSON.stringify(poolMessage));
-                await exec(`rm -rf ${msgJSON.deployId}`, { cwd: tmpDir });
-                return true;
-            }
-            catch (error) {
-                logger.error(`error runnning file for ${msgJSON.username}/${msgJSON.repo}`, error);
-                return false;
-            }
-        }
+    let msgJSON;
+    try {
+        msgJSON = await redisNormal_1.getPoolRequest(true);
+    }
+    catch (e) {
+        logger.error('failed to build pool', e);
+        return false;
+    }
+    await hubAuth_1.auth();
+    if (msgJSON.delete) {
+        await handleOrgDelete(msgJSON);
     }
     else {
-        logger.debug('nothing for me to do');
-        return false;
+        logger.debug('building a pool org!', msgJSON);
+        const gitCloneCmd = utilities.getCloneCommand(msgJSON);
+        const cloneDir = path.join(__dirname, '../tmp', msgJSON.deployId);
+        const tmpDir = path.join(__dirname, '../tmp');
+        fs.ensureDirSync(cloneDir);
+        const poolMessage = {
+            repo: msgJSON.repo,
+            githubUsername: msgJSON.username,
+            openCommand: 'placeholder',
+            createdDate: new Date()
+        };
+        if (msgJSON.branch) {
+            poolMessage.branch = msgJSON.branch;
+        }
+        utilities.loggerFunction(await exec(gitCloneCmd, { cwd: tmpDir }));
+        if (!fs.existsSync(`${cloneDir}/orgInit.sh`)) {
+            logger.error('There is no orgInit.sh file in the repo', msgJSON);
+            throw new Error('There is no orgInit.sh file in the repo');
+        }
+        const parseResults = await poolParse(path.join(cloneDir, 'orgInit.sh'));
+        logger.debug(`open command is ${parseResults.openLine}`);
+        poolMessage.openCommand = parseResults.openLine;
+        if (parseResults.passwordLine) {
+            poolMessage.passwordCommand = parseResults.passwordLine;
+        }
+        try {
+            utilities.loggerFunction(await execFile('./orgInit.sh', { cwd: cloneDir, timeout: 1000000 }));
+            const displayResults = await exec('sfdx force:org:display --json', {
+                cwd: cloneDir
+            });
+            poolMessage.displayResults = JSON.parse(displayResults.stdout).result;
+            await redisNormal_1.putPooledOrg(msgJSON, poolMessage);
+            await rmfr(`${tmpDir}/${msgJSON.deployId}`);
+            return true;
+        }
+        catch (error) {
+            logger.error(`error runnning file for ${msgJSON.username}/${msgJSON.repo}`, error);
+            await rmfr(`${tmpDir}/${msgJSON.deployId}`);
+            return false;
+        }
     }
 }
 exports.poolBuild = poolBuild;
+const handleOrgDelete = async (depReq) => {
+    logger.debug(`deleting org with username ${depReq.username}`);
+    try {
+        utilities.loggerFunction(await exec(`sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${depReq.username} --jwtkeyfile ${await hubAuth_1.getKeypath()} --instanceurl https://test.salesforce.com -s`));
+        logger.debug('connected to the org');
+        utilities.loggerFunction(await exec(`sfdx force:org:delete -p -u ${depReq.username}`));
+        logger.debug('org deleted');
+        return true;
+    }
+    catch (err) {
+        logger.error('failed to delete an org!', err);
+        logger.error('failed to delete an org!', depReq);
+        return false;
+    }
+};

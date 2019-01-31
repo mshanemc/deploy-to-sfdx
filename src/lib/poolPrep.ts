@@ -2,13 +2,16 @@ import * as logger from 'heroku-logger';
 import * as util from 'util';
 
 import * as utilities from './utilities';
-import * as redis from './redisNormal';
+import { redis, putPoolRequest } from './redisNormal';
 
-import { deployMessage, poolConfig } from './types';
+import { deployRequest, poolConfig } from './types';
 
 const exec = util.promisify(require('child_process').exec);
 
-export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boolean = true) => {
+export const preparePoolByName = async (
+  pool: poolConfig,
+  createHerokuDynos: boolean = true
+) => {
   const targetQuantity = pool.quantity;
   const poolname = `${pool.user}.${pool.repo}`;
 
@@ -30,7 +33,7 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
         `${username}-${repo}-${new Date().valueOf()}`
       );
 
-      const message: deployMessage = {
+      const message: deployRequest = {
         pool: true,
         username,
         repo,
@@ -45,8 +48,8 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
 
       // await redis.rpush('poolDeploys', JSON.stringify(message));
       // await exec(`heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`);
-      messages.push(redis.rpush('poolDeploys', JSON.stringify(message)));
-      if (createHerokuDynos){
+      messages.push(putPoolRequest(message));
+      if (createHerokuDynos) {
         execs.push(
           exec(
             `heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`

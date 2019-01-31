@@ -75,10 +75,10 @@ export const testRepos = {
       username: 'mshanemc',
       repo: 'platformTrial'
     },
-    // {
-    //   username: 'mshanemc',
-    //   repo: 'rviot'
-    // },
+    {
+      username: 'mshanemc',
+      repo: 'rviot'
+    },
     {
       username: 'mshanemc',
       repo: 'easy-spaces'

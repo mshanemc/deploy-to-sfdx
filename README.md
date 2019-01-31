@@ -42,7 +42,9 @@ Create a connected app for JWT auth, with certificates, per the SFDX setup guide
 * `UA_ID` for google analytics measurement protocol
 * `GITHUB_USERNAME_WHITELIST` lets you whitelist usernames.  It's a comma-separated list.  Ex: `mshanemc,andrew,bebraw`
 * `GITHUB_REPO_WHITELIST` lets you whitelist username/repo combinations.  It's a comma-separated list. Ex: `mshanemc/DF17integrationWorkshops,torvalds/linux`
+* if you need to use the prerelease version of the sfdx plugin, then set `SFDX_PRERELEASE` to true.
 * org pools -- see below for details
+
 
 What's whitelisting do?  Normally, this app will parse your orgInit.sh and throw an error if you're doing any funny business.  BUT if you're on the whitelist, the app owner trusts you and you can do things with bash metacharacters (think &&, |, >) and execute non-sfdx commands  (grep, rm, whatever!) etc.  BE CAREFUL!
 

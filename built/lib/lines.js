@@ -2,7 +2,7 @@
 const logger = require("heroku-logger");
 const util = require("util");
 const utilities = require("./utilities");
-const redis = require("./redisNormal");
+const redisNormal_1 = require("./redisNormal");
 const argStripper = require("./argStripper");
 const types_1 = require("./types");
 const exec = util.promisify(require('child_process').exec);
@@ -83,7 +83,7 @@ const lines = function (msgJSON, lines, redisPub, output) {
                         utilities.getArg(localLine, '--name'),
                     expiration: Date.now() + days * 24 * 60 * 60 * 1000
                 };
-                redis.rpush('herokuDeletes', JSON.stringify(herokuDeleteMessage));
+                redisNormal_1.redis.rpush('herokuDeletes', JSON.stringify(herokuDeleteMessage));
             }
             let lineResult;
             logger.debug(`running line-- ${localLine}`);
@@ -96,10 +96,7 @@ const lines = function (msgJSON, lines, redisPub, output) {
                         error: response.message,
                         raw: response
                     });
-                    logger.error(`error running line ${localLine} from ${msgJSON.username}/${msgJSON.repo}: ${response.message}`);
-                    this.msgJSON.visitor
-                        .event('deploy error', this.msgJSON.template, response.message)
-                        .send();
+                    logger.error(`error running line ${localLine} from ${msgJSON.username}/${msgJSON.repo}: ${response.message}`, response);
                 }
                 else {
                     logger.debug('line returned status 0');

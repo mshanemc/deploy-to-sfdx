@@ -59,7 +59,7 @@ const utilities = {
       pool => pool.user === username && pool.repo === repo
     );
     if (!foundPool) {
-      return; // go back and build it the normal way!
+       // go back and build it the normal way!
     } else {
       return foundPool;
     }
@@ -105,7 +105,24 @@ const utilities = {
     return input;
   },
 
-  getArg: (cmd: string, parameter: string):string => {
+  getCloneCommand: (depReq: deployRequest) => {
+    let gitCloneCmd = `git clone https://github.com/${depReq.username}/${
+      depReq.repo
+    }.git ${depReq.deployId}`;
+    // special handling for branches
+    if (depReq.branch) {
+      // logger.debug('It is a branch!');
+      gitCloneCmd = `git clone -b ${
+        depReq.branch
+        } --single-branch https://github.com/${depReq.username}/${
+        depReq.repo
+        }.git ${depReq.deployId}`;
+      // logger.debug(gitCloneCmd);
+    }
+    return gitCloneCmd;
+  },
+
+  getArg: (cmd: string, parameter: string): string => {
     cmd = cmd.concat(' ');
     const bufferedParam = ' '.concat(parameter).concat(' ');
     // takes a command line command and removes a parameter.  Make noarg true if it's a flag (parameter with no arguments), like sfdx force:org:create -s
@@ -116,7 +133,7 @@ const utilities = {
 
     // quickly return if it doesn't exist
     if (!cmd.includes(bufferedParam)) {
-      return;
+
     } else {
       // find the string
       const paramStartIndex =
