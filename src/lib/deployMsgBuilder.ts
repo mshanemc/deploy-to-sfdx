@@ -101,6 +101,7 @@ const deployMsgBuilder = function(req): deployRequest {
 
 	logger.debug('deployMsgBuilder: done', message);
   return message;
+
 };
 
 export = deployMsgBuilder;

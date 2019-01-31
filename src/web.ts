@@ -86,6 +86,7 @@ app.get('/deleteConfirm', (req, res, next) =>
 );
 
 app.get('/launch', async (req, res, next) => {  
+
   // allow repos to require the email parameter
   if (req.query.email === 'required') {
     return res.render('pages/userinfo', {
@@ -108,6 +109,7 @@ app.get('/launch', async (req, res, next) => {
     logger.error( `launch msg error`, e);
     next();
   }
+
 });
 
 app.get('/deploying/:format/:deployId', (req, res, next) => {

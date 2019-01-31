@@ -13,6 +13,18 @@ const deployMsgBuilder = function (req) {
         throw 'There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo';
     }
     const template = query.template;
+    if (!template || !template.includes('https://github.com/')) {
+        throw 'There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo';
+    }
+    if (template.includes('?')) {
+        throw `That template has a ? in it, making the url impossible to parse: ${template}`;
+    }
+    if (template.includes('%')) {
+        throw `That template has a % in it, making the url impossible to parse: ${template}`;
+    }
+    if (template.includes(';')) {
+        throw `That template has a semicolon in it, making the url impossible to parse: ${template}`;
+    }
     const path = template.replace('https://github.com/', '');
     const username = path.split('/')[0];
     const repo = path.split('/')[1];
