@@ -46,7 +46,6 @@ app.post('/trial', (req, res, next) => {
         logger.error(`An error occurred in the trial page: ${req.body}`);
         logger.error(e);
         next();
-
     }
 });
 app.post('/delete', async (req, res, next) => {
@@ -64,7 +63,6 @@ app.post('/delete', async (req, res, next) => {
 });
 app.get('/deleteConfirm', (req, res, next) => res.render('pages/deleteConfirm'));
 app.get('/launch', async (req, res, next) => {
-
     if (req.query.email === 'required') {
         return res.render('pages/userinfo', {
             template: req.query.template
@@ -82,12 +80,7 @@ app.get('/launch', async (req, res, next) => {
     }
     catch (e) {
         logger.error(`launch msg error`, e);
-<<<<<<< HEAD
-        next();
-
-=======
         next(e);
->>>>>>> redisUtilities
     }
 });
 app.get('/deploying/:format/:deployId', (req, res, next) => {
