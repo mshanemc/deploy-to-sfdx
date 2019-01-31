@@ -2,8 +2,9 @@
 import * as chai from 'chai';
 import * as Nightmare from 'nightmare';
 import * as dotenv from 'dotenv';
+import { requestAddToPool, requestBuildPool } from '../helpers/poolHelpers';
 import { clearQueues } from '../helpers/clearRedis';
-import { requestAddToPool, requestBuildPool } from './3-poolRepoTest';
+
 import { testRepos } from '../testRepos';
 
 dotenv.config();
@@ -19,12 +20,6 @@ if (!testEnv) {
 }
 
 describe('runs the trial', async () => {
-  await requestAddToPool({
-    repo: 'platformTrial',
-    username: 'mshanemc'
-  });
-  await requestBuildPool(testRepos.other.find( repo => repo.repo === 'platformTrial'), false);
-
   // eslint-disable-next-line no-restricted-syntax
   const nightmare = new Nightmare({
     // show: true,
@@ -34,6 +29,22 @@ describe('runs the trial', async () => {
   });
   const url = 'https://github.com/mshanec/platformTrial';
   let page;
+
+  before( async () => {
+    await clearQueues();  
+  });
+  
+  it('created an org', async() => {
+    await requestAddToPool({
+      repo: 'platformTrial',
+      username: 'mshanemc'
+    });
+    await requestBuildPool({
+      username: 'mshanemc',
+      repo: 'platformTrial'
+    }, false);
+  }).timeout(waitTimeout);
+
   it('loads the test form', async () => {
     page = <NightmarePage>(
       await nightmare.goto(`${process.env.DEPLOYER_TESTING_ENDPOINT}/testform`)
@@ -89,6 +100,7 @@ describe('runs the trial', async () => {
 
   after(async () => {
     await nightmare.end();
+    await clearQueues();
   });
 });
 

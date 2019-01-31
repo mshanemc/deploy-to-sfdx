@@ -71,18 +71,20 @@ export const testRepos = {
   ],
 
   other: [
-    {
-      username: 'mshanemc',
-      repo: 'platformTrial'
-    },
-    {
-      username: 'mshanemc',
-      repo: 'rviot'
-    },
+    // {
+    //   username: 'mshanemc',
+    //   repo: 'platformTrial'
+    // }
+    // ,
+    // {
+    //   username: 'mshanemc',
+    //   repo: 'rviot'
+    // },
     {
       username: 'mshanemc',
       repo: 'easy-spaces'
-    },
+    }
+    ,
     {
       username: 'mshanemc',
       repo: 'mobileWebinar'
