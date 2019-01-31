@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Redis = require("ioredis");
 const logger = require("heroku-logger");
+const ua = require("universal-analytics");
 const utilities = require("./utilities");
 const shellSanitize = require("./shellSanitize");
 const cdsExchange = 'deployMsg';
@@ -28,6 +29,9 @@ const getDeployRequest = async (log) => {
     const msg = await redis.lpop(deployRequestExchange);
     if (msg) {
         const msgJSON = JSON.parse(msg);
+        if (process.env.UA_ID && msgJSON.visitor) {
+            msgJSON.visitor = ua(process.env.UA_ID);
+        }
         if (log) {
             logger.debug(`deployQueueCheck: found a msg for ${msgJSON.deployId}`, msgJSON);
         }

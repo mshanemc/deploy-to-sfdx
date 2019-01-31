@@ -1,5 +1,7 @@
 import * as Redis from 'ioredis';
 import * as logger from 'heroku-logger';
+import * as ua from 'universal-analytics';
+
 import {
   DeleteRequest,
   deployRequest,
@@ -33,6 +35,11 @@ const getDeployRequest = async (log?: boolean) => {
   const msg = await redis.lpop(deployRequestExchange);
   if (msg) {
     const msgJSON = <deployRequest>JSON.parse(msg);
+    // hook back up the UA events since they're lost in the queue
+
+    if (process.env.UA_ID && msgJSON.visitor){
+      msgJSON.visitor = ua(process.env.UA_ID);
+    }
     if (log) {
       logger.debug(
         `deployQueueCheck: found a msg for ${msgJSON.deployId}`,
