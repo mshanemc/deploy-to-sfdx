@@ -19,6 +19,7 @@ export async function poolBuild() {
   try { 
     msgJSON = await getPoolRequest(true);
   } catch (e){
+    logger.error('failed to build pool', e);
     return false;
   }
   await auth();
