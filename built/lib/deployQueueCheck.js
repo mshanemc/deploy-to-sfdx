@@ -76,10 +76,8 @@ const check = async () => {
             timesToGA(msgJSON, output);
         }
         catch (e) {
-            logger.error('deployQueueCheck: Deployment error', {
-                request: msgJSON,
-                error: JSON.stringify(e)
-            });
+            logger.error('deployQueueCheck: Deployment error', msgJSON);
+            logger.error('deployQueueCheck: Deployment error', e);
             await redisNormal_1.deleteOrg(msgJSON.username);
         }
     }
