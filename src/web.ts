@@ -65,7 +65,7 @@ app.post('/trial', (req, res, next) => {
   } catch (e) {
     logger.error( `An error occurred in the trial page: ${req.body}` );
     logger.error(e);
-    next();
+    next(e);
   }
 });
 
