@@ -44,10 +44,7 @@ app.post('/trial', (req, res, next) => {
     }
     catch (e) {
         logger.error(`An error occurred in the trial page: ${req.body}`);
-        logger.error(e);
-        return res.render('pages/error', {
-            customError: e
-        });
+        next(e);
     }
 });
 app.post('/delete', async (req, res, next) => {
@@ -58,10 +55,7 @@ app.post('/delete', async (req, res, next) => {
     }
     catch (e) {
         logger.error(`An error occurred in the redis rpush to the delete queue: ${req.body}`);
-        logger.error(e);
-        return res.render('pages/error', {
-            customError: e
-        });
+        next(e);
     }
     ;
 });
@@ -84,9 +78,7 @@ app.get('/launch', async (req, res, next) => {
     }
     catch (e) {
         logger.error(`launch msg error`, e);
-        return res.render('pages/error', {
-            customError: e
-        });
+        next(e);
     }
 });
 app.get('/deploying/:format/:deployId', (req, res, next) => {
@@ -129,6 +121,7 @@ app.use((error, req, res, next) => {
         visitor.event('Error', req.query.template).send();
     }
     logger.error(`request failed: ${req.url}`);
+    logger.error(error);
     return res.render('pages/error', {
         customError: error
     });
