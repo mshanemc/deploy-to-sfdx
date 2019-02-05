@@ -180,7 +180,7 @@ wss.on('connection', (ws: WebSocket, req) => {
 // subscribe to deploy events to share them with the web clients
 redisSub.subscribe(cdsExchange)
   .then( () => logger.info(`subscribed to Redis channel ${cdsExchange}`))
-  .catch( e => logger.error('unable to subscribe to cdsExchagne', e));
+  .catch( e => logger.error('unable to subscribe to cdsExchange', e));
 
 redisSub.on('message', (channel, message) => {
   // logger.debug('heard a message from the worker:');

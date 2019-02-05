@@ -45,7 +45,9 @@ app.post('/trial', (req, res, next) => {
     catch (e) {
         logger.error(`An error occurred in the trial page: ${req.body}`);
         logger.error(e);
-        next(e);
+        return res.render('pages/error', {
+            customError: e
+        });
     }
 });
 app.post('/delete', async (req, res, next) => {
@@ -57,7 +59,9 @@ app.post('/delete', async (req, res, next) => {
     catch (e) {
         logger.error(`An error occurred in the redis rpush to the delete queue: ${req.body}`);
         logger.error(e);
-        next(e);
+        return res.render('pages/error', {
+            customError: e
+        });
     }
     ;
 });
@@ -80,7 +84,9 @@ app.get('/launch', async (req, res, next) => {
     }
     catch (e) {
         logger.error(`launch msg error`, e);
-        next(e);
+        return res.render('pages/error', {
+            customError: e
+        });
     }
 });
 app.get('/deploying/:format/:deployId', (req, res, next) => {
@@ -131,9 +137,9 @@ wss.on('connection', (ws, req) => {
     logger.debug(`connection on url ${req.url}`);
     ws.url = req.url;
 });
-redisSub.subscribe(redisNormal_1.cdsExchange).then(() => {
-    logger.info(`subscribed to Redis channel ${redisNormal_1.cdsExchange}`);
-});
+redisSub.subscribe(redisNormal_1.cdsExchange)
+    .then(() => logger.info(`subscribed to Redis channel ${redisNormal_1.cdsExchange}`))
+    .catch(e => logger.error('unable to subscribe to cdsExchange', e));
 redisSub.on('message', (channel, message) => {
     const msgJSON = JSON.parse(message);
     wss.clients.forEach((client) => {
