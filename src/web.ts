@@ -65,7 +65,9 @@ app.post('/trial', (req, res, next) => {
   } catch (e) {
     logger.error( `An error occurred in the trial page: ${req.body}` );
     logger.error(e);
-    next(e);
+    return res.render('pages/error', {
+      customError: e
+    });
   }
 });
 
@@ -77,7 +79,9 @@ app.post('/delete', async (req, res, next) => {
   } catch (e){
     logger.error( `An error occurred in the redis rpush to the delete queue: ${req.body}` );
     logger.error(e);
-    next(e);
+    return res.render('pages/error', {
+      customError: e
+    });
   };
 });
 
@@ -107,7 +111,9 @@ app.get('/launch', async (req, res, next) => {
     return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
   } catch (e) {
     logger.error( `launch msg error`, e);
-    next(e);
+    return res.render('pages/error', {
+      customError: e
+    });
   }
 
 });
@@ -172,9 +178,9 @@ wss.on('connection', (ws: WebSocket, req) => {
 });
 
 // subscribe to deploy events to share them with the web clients
-redisSub.subscribe(cdsExchange).then(() => {
-  logger.info(`subscribed to Redis channel ${cdsExchange}`);
-});
+redisSub.subscribe(cdsExchange)
+  .then( () => logger.info(`subscribed to Redis channel ${cdsExchange}`))
+  .catch( e => logger.error('unable to subscribe to cdsExchagne', e));
 
 redisSub.on('message', (channel, message) => {
   // logger.debug('heard a message from the worker:');
