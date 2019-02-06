@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
-app.post('/trial', (req, res, next) => {
+app.post('/trial', async (req, res, next) => {
     try {
         const message = msgBuilder(req);
         logger.debug('trial request', message);
@@ -38,9 +38,8 @@ app.post('/trial', (req, res, next) => {
             message.visitor.event('Repo', message.template).send();
         }
         utilities.runHerokuBuilder();
-        redisNormal_1.putDeployRequest(message).then(() => {
-            res.redirect(`/deploying/trial/${message.deployId.trim()}`);
-        });
+        await redisNormal_1.putDeployRequest(message);
+        res.redirect(`/deploying/trial/${message.deployId.trim()}`);
     }
     catch (e) {
         logger.error(`An error occurred in the trial page: ${req.body}`);
