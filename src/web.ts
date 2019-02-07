@@ -44,46 +44,37 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 // app.use(cookieParser());
 
-app.post('/trial', async (req, res, next) => {
-  try {
-    const message = msgBuilder(req);
-    logger.debug('trial request', message);
+app.post('/trial', wrapAsync(async (req, res, next) => {
 
-    if (process.env.sfdcLeadCaptureServlet) {
-      org62LeadCapture(req.body);
-    }
+  const message = msgBuilder(req);
+  logger.debug('trial request', message);
 
-    if (message.visitor) {
-      message.visitor.pageview('/trial').send();
-      message.visitor.event('Repo', message.template).send();
-    }
-
-    utilities.runHerokuBuilder();
-    await putDeployRequest(message);
-    res.redirect(`/deploying/trial/${message.deployId.trim()}`);
-    
-  } catch (e) {
-    logger.error( `An error occurred in the trial page: ${req.body}` );
-    next(e);
+  if (process.env.sfdcLeadCaptureServlet) {
+    org62LeadCapture(req.body);
   }
-});
 
-app.post('/delete', async (req, res, next) => {
-  try {
-    await deleteOrg(req.body.username);
-    utilities.runHerokuBuilder();
-    res.status(302).send('/deleteConfirm');
-  } catch (e){
-    logger.error( `An error occurred in the redis rpush to the delete queue: ${req.body}` );
-    next(e);
-  };
-});
+  if (message.visitor) {
+    message.visitor.pageview('/trial').send();
+    message.visitor.event('Repo', message.template).send();
+  }
+
+  utilities.runHerokuBuilder();
+  await putDeployRequest(message);
+  res.redirect(`/deploying/trial/${message.deployId.trim()}`);
+ 
+}));
+
+app.post('/delete', wrapAsync(async (req, res, next) => {
+  await deleteOrg(req.body.username);
+  utilities.runHerokuBuilder();
+  res.status(302).send('/deleteConfirm');
+}));
 
 app.get('/deleteConfirm', (req, res, next) =>
   res.render('pages/deleteConfirm')
 );
 
-app.get('/launch', async (req, res, next) => {  
+app.get('/launch', wrapAsync(async (req, res, next) => {  
 
   // allow repos to require the email parameter
   if (req.query.email === 'required') {
@@ -92,23 +83,18 @@ app.get('/launch', async (req, res, next) => {
     });
   }
 
-  try {
-    const message: deployRequest = msgBuilder(req);
+  const message: deployRequest = msgBuilder(req);
 
-    if (message.visitor){
-      message.visitor.pageview('/launch').send();
-      message.visitor.event('Repo', message.template).send();
-    }
-
-    utilities.runHerokuBuilder();
-    await putDeployRequest(message);
-    return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
-  } catch (e) {
-    logger.error( `launch msg error`, e);
-    next(e);    
+  if (message.visitor){
+    message.visitor.pageview('/launch').send();
+    message.visitor.event('Repo', message.template).send();
   }
 
-});
+  utilities.runHerokuBuilder();
+  await putDeployRequest(message);
+  return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
+ 
+}));
 
 app.get('/deploying/:format/:deployId', (req, res, next) => {
   if (req.params.format === 'deployer') {
@@ -128,10 +114,10 @@ app.get('/userinfo', (req, res, next) => {
   });
 });
 
-app.get('/pools', async (req, res, next) => {
+app.get('/pools', wrapAsync(async (req, res, next) => {
   const keys = await getKeys();
   res.send(keys);
-});
+}));
 
 app.get('/testform', (req, res, next) => {
   res.render('pages/testForm');
@@ -150,8 +136,6 @@ app.get('*', (req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
-  // Any request to this server will get here, and will send an HTTP
-  // response with the error message 'woops'
   if (process.env.UA_ID) {
     const visitor = ua(process.env.UA_ID);
     visitor.event('Error', req.query.template).send();
@@ -189,3 +173,15 @@ redisSub.on('message', (channel, message) => {
     }
   });
 });
+
+function wrapAsync(fn) {
+  return function(req, res, next) {
+    // Make sure to `.catch()` any errors and pass them along to the `next()`
+    // middleware in the chain, in this case the error handler.
+    fn(req, res, next).catch(next);
+  };
+}
+
+process.on('unhandledRejection', e => {
+  logger.error('this reached the unhandledRejection handler somehow:', e);
+})
