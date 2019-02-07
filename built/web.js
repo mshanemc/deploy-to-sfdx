@@ -26,60 +26,41 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
-app.post('/trial', async (req, res, next) => {
-    try {
-        const message = msgBuilder(req);
-        logger.debug('trial request', message);
-        if (process.env.sfdcLeadCaptureServlet) {
-            org62LeadCapture(req.body);
-        }
-        if (message.visitor) {
-            message.visitor.pageview('/trial').send();
-            message.visitor.event('Repo', message.template).send();
-        }
-        utilities.runHerokuBuilder();
-        await redisNormal_1.putDeployRequest(message);
-        res.redirect(`/deploying/trial/${message.deployId.trim()}`);
+app.post('/trial', wrapAsync(async (req, res, next) => {
+    const message = msgBuilder(req);
+    logger.debug('trial request', message);
+    if (process.env.sfdcLeadCaptureServlet) {
+        org62LeadCapture(req.body);
     }
-    catch (e) {
-        logger.error(`An error occurred in the trial page: ${req.body}`);
-        next(e);
+    if (message.visitor) {
+        message.visitor.pageview('/trial').send();
+        message.visitor.event('Repo', message.template).send();
     }
-});
-app.post('/delete', async (req, res, next) => {
-    try {
-        await redisNormal_1.deleteOrg(req.body.username);
-        utilities.runHerokuBuilder();
-        res.status(302).send('/deleteConfirm');
-    }
-    catch (e) {
-        logger.error(`An error occurred in the redis rpush to the delete queue: ${req.body}`);
-        next(e);
-    }
-    ;
-});
+    utilities.runHerokuBuilder();
+    await redisNormal_1.putDeployRequest(message);
+    res.redirect(`/deploying/trial/${message.deployId.trim()}`);
+}));
+app.post('/delete', wrapAsync(async (req, res, next) => {
+    await redisNormal_1.deleteOrg(req.body.username);
+    utilities.runHerokuBuilder();
+    res.status(302).send('/deleteConfirm');
+}));
 app.get('/deleteConfirm', (req, res, next) => res.render('pages/deleteConfirm'));
-app.get('/launch', async (req, res, next) => {
+app.get('/launch', wrapAsync(async (req, res, next) => {
     if (req.query.email === 'required') {
         return res.render('pages/userinfo', {
             template: req.query.template
         });
     }
-    try {
-        const message = msgBuilder(req);
-        if (message.visitor) {
-            message.visitor.pageview('/launch').send();
-            message.visitor.event('Repo', message.template).send();
-        }
-        utilities.runHerokuBuilder();
-        await redisNormal_1.putDeployRequest(message);
-        return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
+    const message = msgBuilder(req);
+    if (message.visitor) {
+        message.visitor.pageview('/launch').send();
+        message.visitor.event('Repo', message.template).send();
     }
-    catch (e) {
-        logger.error(`launch msg error`, e);
-        next(e);
-    }
-});
+    utilities.runHerokuBuilder();
+    await redisNormal_1.putDeployRequest(message);
+    return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
+}));
 app.get('/deploying/:format/:deployId', (req, res, next) => {
     if (req.params.format === 'deployer') {
         res.render('pages/messages', {
@@ -97,10 +78,10 @@ app.get('/userinfo', (req, res, next) => {
         template: req.query.template
     });
 });
-app.get('/pools', async (req, res, next) => {
+app.get('/pools', wrapAsync(async (req, res, next) => {
     const keys = await redisNormal_1.getKeys();
     res.send(keys);
-});
+}));
 app.get('/testform', (req, res, next) => {
     res.render('pages/testForm');
 });
@@ -142,4 +123,12 @@ redisSub.on('message', (channel, message) => {
             }
         }
     });
+});
+function wrapAsync(fn) {
+    return function (req, res, next) {
+        fn(req, res, next).catch(next);
+    };
+}
+process.on('unhandledRejection', e => {
+    logger.error('this reached the unhandledRejection handler somehow:', e);
 });
