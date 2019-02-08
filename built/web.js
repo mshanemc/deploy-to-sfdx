@@ -92,7 +92,7 @@ app.get('/', (req, res, next) => {
 });
 app.get('*', (req, res, next) => {
     setImmediate(() => {
-        next(new Error('Route not found'));
+        next(new Error(`Route not found: ${req.url}`));
     });
 });
 app.use((error, req, res, next) => {
