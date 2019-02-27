@@ -38,7 +38,7 @@
     "request-promise-native": "^1.0.5",
     "rmfr": "^2.0.0",
     "serve-favicon": "^2.5.0",
-    "shane-sfdx-plugins": "^3.0.0",
+    "shane-sfdx-plugins": "^3.1.0",
     "universal-analytics": "^0.4.20",
     "ws": "^6.1.2"
   },
