@@ -23,13 +23,11 @@
       "description": "Get from account settings in the UI (https://dashboard.heroku.com/account)",
       "value": ""
     },
+    "HEROKU_APP_NAME": {
+      "description": "name of your heroku app...used for review apps and one-off dyno creation"
+    },
     "LOG_LEVEL": {
       "value" : "debug"
-    },
-    "env":{
-      "HEROKU_APP_NAME": {
-        "required": true
-      }
     }
   },
   "formation": [
