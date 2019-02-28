@@ -25,6 +25,11 @@
     },
     "LOG_LEVEL": {
       "value" : "debug"
+    },
+    "env":{
+      "HEROKU_APP_NAME": {
+        "required": true
+      }
     }
   },
   "formation": [
