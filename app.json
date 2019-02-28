@@ -31,13 +31,13 @@
 		}
 	},
 	"formation": {
-		"web": { "quantity": 1, "size": "hobby" },
-		"orgbuilder": { "quantity": 1, "size": "hobby" },
-		"pooldeployer": { "quantity": 0, "size": "hobby" },
-		"poolwatcher": { "quantity": 0, "size": "hobby" },
-		"oneoffbuilder": { "quantity": 0, "size": "hobby" },
-		"poolskimmer": { "quantity": 0, "size": "hobby" },
-		"dynoskimmer": { "quantity": 0, "size": "hobby" }
+		"web": { "quantity": 1, "size": "free" },
+		"orgbuilder": { "quantity": 1, "size": "free" },
+		"pooldeployer": { "quantity": 0, "size": "free" },
+		"poolwatcher": { "quantity": 0, "size": "free" },
+		"oneoffbuilder": { "quantity": 0, "size": "free" },
+		"poolskimmer": { "quantity": 0, "size": "free" },
+		"dynoskimmer": { "quantity": 0, "size": "free" }
 	},
 	"buildpacks": [
 		{
