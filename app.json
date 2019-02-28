@@ -30,43 +30,16 @@
       "value" : "debug"
     }
   },
-  "formation": [
-    {
-      "type" : "web",
+  "formation": {
+    "web" : {
       "quantity": 1,
       "size": "hobby"
     },
-    {
-      "type" :"orgbuilder",
+    "orgbuilder": {
       "quantity" : 1,
       "size" : "hobby"
-    },
-    {
-      "type": "pooldeployer",
-      "quantity": 0,
-      "size": "hobby"
-    },
-    {
-      "type": "poolwatcher",
-      "quantity": 0,
-      "size": "hobby"
-    },
-    {
-      "type": "oneoffbuilder",
-      "quantity": 0,
-      "size": "hobby"
-    },
-    {
-      "type":"poolskimmer",
-      "quantity": 0,
-      "size": "hobby"
-    },
-    {
-      "type": "dynoskimmer",
-      "quantity": 0,
-      "size": "hobby"
     }
-  ],
+  },
   "buildpacks": [
     {
       "url": "heroku/nodejs"
