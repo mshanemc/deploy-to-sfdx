@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "An application that will deploy an SFDX project from a public Github repo",
   "main": "web.js",
+  "engines": {
+    "node":"11.7.0"
+  },
   "scripts": {
     "build": "tsc && cp -R ./src/views ./built/ && npm run css-build",
     "local": "npm run build && export HEROKU_API_KEY=`heroku auth:token` && heroku local web=1,orgbuilder=1",
