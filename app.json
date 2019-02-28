@@ -20,7 +20,7 @@
       "required": true
     },
     "HEROKU_API_KEY": {
-      "description": "Get from account settings in the UI (https://dashboard.heroku.com/account) or by running 'heroku auth:token' on the cli",
+      "description": "Get from account settings in the UI (https://dashboard.heroku.com/account)",
       "value": ""
     },
     "LOG_LEVEL": {
