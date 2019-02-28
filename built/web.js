@@ -116,7 +116,7 @@ redisSub.subscribe(redisNormal_1.cdsExchange)
 redisSub.on('message', (channel, message) => {
     const msgJSON = JSON.parse(message);
     wss.clients.forEach((client) => {
-        if (client.url.includes(msgJSON.deployId.trim())) {
+        if (client.url.includes(msgJSON.deployId.trim()) && client.readyState === client.OPEN) {
             client.send(JSON.stringify(msgJSON));
             if (msgJSON.complete) {
                 client.close();
