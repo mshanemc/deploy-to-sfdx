@@ -3,7 +3,6 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as util from 'util';
 
 import * as fs from 'fs-extra';
-import * as rmfr from 'rmfr';
 
 import { testRepos } from '../testRepos';
 import { lineParse } from '../../src/lib/lineParse';
@@ -12,8 +11,7 @@ import * as utilities from '../../src/lib/utilities';
 import {
   deployRequest,
   testRepo,
-  poolOrg,
-  deployMessage
+  poolOrg
 } from '../../src/lib/types';
 import { exec } from 'child_process';
 
@@ -34,18 +32,20 @@ const timeOutLocalFS = 3000;
 const testDepReqWL: deployRequest = {
   deployId,
   repo: 'testItOut',
-  whitelisted: true
+  whitelisted: true,
+  createdTimestamp: new Date()
 };
 
 const testDepReq: deployRequest = {
   deployId,
   repo: 'testItOut',
-  whitelisted: false
+  whitelisted: false,
+  createdTimestamp: new Date()
 };
 
 describe('lineParserLocalTests', () => {
   before(async () => {
-    await rmfr(testDir);
+    await fs.remove(testDir);
   });
 
   describe('whitelisted', () => {
@@ -120,7 +120,7 @@ describe('lineParserLocalTests', () => {
     });
 
     afterEach(async () => {
-      await rmfr(testDir);
+      await fs.remove(testDir);
     });
   });
 
@@ -169,7 +169,7 @@ describe('lineParserLocalTests', () => {
     });
 
     afterEach(async () => {
-      await rmfr(testDir);
+      await fs.remove(testDir);
     });
   });
 
@@ -181,11 +181,12 @@ describe('lineParserLocalTests', () => {
     for (const prop in testRepos) {
       testRepos[prop].forEach((repo) => {
         const loopedDeployId = `test-${repo.username}-${repo.repo}`;
-        const depReq: deployMessage = {
+        const depReq: deployRequest = {
           whitelisted: true,
           deployId: loopedDeployId,
           repo: repo.repo,
-          username: repo.username
+          username: repo.username,
+          createdTimestamp: new Date()
         };
 
         it(`tests ${repo.username}/${repo.repo}`, async () => {
@@ -199,7 +200,7 @@ describe('lineParserLocalTests', () => {
     }
 
     afterEach(async () => {
-      await rmfr(testDir);
+      await fs.remove(testDir);
     });
   });
 });

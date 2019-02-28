@@ -16,16 +16,23 @@ import {
   getPoolDeployRequestQueueSize
 } from '../../src/lib/redisNormal';
 
+import { deployRequest } from '../../src/lib/types';
+
 import * as chai from 'chai';
 
 const expect = chai.expect;
 
 describe('redis tests', async () => {
-  const deployMsgTest = {
+  const deployMsgTest:deployRequest = {
     repo: 'testRepo',
     username: 'mshanemc',
-    deployId: 'this-is-the-deploy-id'
+    deployId: 'this-is-the-deploy-id',
+    createdTimestamp: new Date()
   };
+
+
+  const deployMsgSerialized: any = {...deployMsgTest};
+  deployMsgSerialized.createdTimestamp = deployMsgSerialized.createdTimestamp.toJSON();
 
   before(async () => {
     await clearQueues();
@@ -38,7 +45,7 @@ describe('redis tests', async () => {
   it('can get a message from the deploy queue', async () => {
     const msg = await getDeployRequest();
     expect(msg).to.be.an('object');
-    expect(msg).to.deep.equal(deployMsgTest);
+    expect(msg).to.deep.equal(deployMsgSerialized);
   });
 
   it('blocks deletes with bad usernames', async () => {

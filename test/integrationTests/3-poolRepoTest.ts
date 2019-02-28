@@ -1,6 +1,5 @@
 /* globals it, describe, document */
 import * as fs from 'fs-extra';
-import * as rmfr from 'rmfr';
 
 import { testRepos } from '../testRepos';
 import { clearQueues } from '../helpers/clearRedis';
@@ -20,7 +19,7 @@ if (!testEnv) {
 describe('tests that each repo works in a pooled scenario', () => {
   before(async () => {
     await clearQueues();
-    await rmfr(tmpDir);
+    await fs.remove(tmpDir);
     fs.ensureDirSync(tmpDir);
   });
 
@@ -53,6 +52,6 @@ describe('tests that each repo works in a pooled scenario', () => {
 
   after(async () => {
     await clearQueues();
-    await rmfr(tmpDir);
+    await fs.remove(tmpDir);
   });
 });

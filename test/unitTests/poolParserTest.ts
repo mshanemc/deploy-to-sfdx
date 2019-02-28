@@ -3,7 +3,6 @@ import * as chai from 'chai';
 import * as fs from 'fs-extra';
 import * as util from 'util';
 import * as path from 'path';
-import * as rmfr from 'rmfr';
 import * as dotenv from 'dotenv';
 
 import * as parser from '../../src/lib/poolParse';
@@ -84,7 +83,7 @@ describe('tests the crash course workshop', function () {
 	});
 
 	after(async () => {
-		await rmfr(cloneDirPath);
+		await fs.remove(cloneDirPath);
 	});
 });
 
@@ -111,8 +110,8 @@ describe('tests the trial', function () {
 	});
 
 	after( async () => {
-		await rmfr(cloneDirPath);
-		await rmfr(tmpDir);
+		await fs.remove(cloneDirPath);
+		await fs.remove(tmpDir);
 	});
 });
 
@@ -139,7 +138,7 @@ describe('tests the integration workshop', function () {
 	});
 
 	after( async () => {
-		await rmfr(cloneDirPath);
-		await rmfr(tmpDir);
+		await fs.remove(cloneDirPath);
+		await fs.remove(tmpDir);
 	});
 });

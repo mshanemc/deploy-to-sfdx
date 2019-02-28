@@ -2,7 +2,6 @@ import * as util from 'util';
 import * as fs from 'fs-extra';
 import * as logger from 'heroku-logger';
 import * as path from 'path';
-import * as rmfr from 'rmfr';
 
 import * as utilities from './utilities';
 import * as poolParse from './poolParse';
@@ -74,14 +73,14 @@ export async function poolBuild() {
       });
       poolMessage.displayResults = JSON.parse(displayResults.stdout).result;
       await putPooledOrg(msgJSON, poolMessage);
-      await rmfr(`${tmpDir}/${msgJSON.deployId}`);
+      await fs.remove(`${tmpDir}/${msgJSON.deployId}`);
       return true;
     } catch (error) {
       logger.error(
         `error runnning file for ${msgJSON.username}/${msgJSON.repo}`,
         error
       );
-      await rmfr(`${tmpDir}/${msgJSON.deployId}`);
+      await fs.remove(`${tmpDir}/${msgJSON.deployId}`);
       return false;
     }
   }

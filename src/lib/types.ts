@@ -11,24 +11,20 @@ export interface DeleteRequest {
   username: string;
 }
 
-export interface deployMessage {
-  username?: string;
+export interface deployRequest {
   repo: string;
+  createdTimestamp: Date;
+  deployId: string;
+  username?: string;
   pool?: boolean;
   whitelisted?: boolean;
-  deployId: string;
-  branch?: string;
-}
-
-export interface deployRequest extends deployMessage {
-  path?: string;
+  branch?: string;path?: string;
   template?: string;
   email?: string;
   firstname?: string;
   lastname?: string;
   visitor?: ua.Visitor;
   delete?: boolean;
-  createdTimestamp: Date;
 }
 
 // tells how a pool should be built.  Used in an array from a url like POOLCONFIG_URL=https://deployer-pools.herokuapp.com/pools-dev

@@ -4,7 +4,6 @@
 import * as util from 'util';
 import * as fs from 'fs-extra';
 import * as logger from 'heroku-logger';
-import * as rmfr from 'rmfr';
 
 import { redis, deleteOrg, getDeployRequest, cdsPublish } from './redisNormal';
 import { lineParse } from './lineParse';
@@ -111,7 +110,20 @@ const check = async () => {
       );
     }
 
-    const parsedLines = await lineParse(msgJSON);
+    let parsedLines;
+    
+    try {
+      parsedLines = await lineParse(msgJSON);
+    } catch (e) {
+      clientResult.errors.push({
+        command: 'line parsing',
+        error: e,
+        raw: e
+      });
+      clientResult.complete = true;
+      await cdsPublish(clientResult);
+      return true;
+    }
 
     const localLineRunner = new lineRunner(
       msgJSON,
@@ -119,6 +131,7 @@ const check = async () => {
       redis,
       clientResult
     );
+
     try {
       const output = <clientDataStructure> await localLineRunner.runLines();
       timesToGA(msgJSON, output);
@@ -129,7 +142,7 @@ const check = async () => {
     }
   }
 
-  await rmfr(`tmp/${msgJSON.deployId}`);
+  await fs.remove(`tmp/${msgJSON.deployId}`);
   return true;
 
 };
