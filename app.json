@@ -1,60 +1,61 @@
 {
-  "name": "SFDX Public Deployer",
-  "description": "An application that will deploy an SFDX project from a public Github repo",
-  "repository": "https://github.com/mshanemc/deploy-to-sfdx",
-  "keywords": ["deploy", "sfdx", "salesforcedx"],
-  "env": {
-    "CONSUMERKEY": {
-      "description": "The consumer key for your Connected App.",
-      "value": "",
-      "required": true
-    },
-    "HUB_USERNAME": {
-      "description": "The username for your connected app",
-      "value": "",
-      "required": true
-    },
-    "JWTKEY": {
-      "description": "The server.key file from your connected app",
-      "value": "",
-      "required": true
-    },
-    "HEROKU_API_KEY": {
-      "description": "Get from account settings in the UI (https://dashboard.heroku.com/account)",
-      "value": ""
-    },
-    "HEROKU_APP_NAME": {
-      "description": "name of your heroku app...used for review apps and one-off dyno creation"
-    },
-    "LOG_LEVEL": {
-      "value" : "debug"
-    }
-  },
-  "formation": {
-    "web" : {
-      "quantity": 1,
-      "size": "hobby"
-    },
-    "orgbuilder": {
-      "quantity" : 1,
-      "size" : "hobby"
-    }
-  },
-  "buildpacks": [
-    {
-      "url": "heroku/nodejs"
-    },
-    {
-      "url": "https://buildpack-registry.s3.amazonaws.com/buildpacks/jontewks/puppeteer.tgz"
-    },
-    {
-      "url": "https://github.com/mshanemc/salesforce-cli-buildpack#456646ed76729bc4ef32db7a22758de5c217a7b8"
-    },
-    {
-      "url": "https://github.com/heroku/heroku-buildpack-cli#ff0bfe609b4618be16b5e446d623d0eabc1576cb"
-    }
-  ],
-  "addons": [{
-      "plan": "heroku-redis:hobby-dev"
-  }]
+	"name": "SFDX Public Deployer",
+	"description": "An application that will deploy an SFDX project from a public Github repo",
+	"repository": "https://github.com/mshanemc/deploy-to-sfdx",
+	"keywords": ["deploy", "sfdx", "salesforcedx"],
+	"env": {
+		"CONSUMERKEY": {
+			"description": "The consumer key for your Connected App.",
+			"value": "",
+			"required": true
+		},
+		"HUB_USERNAME": {
+			"description": "The username for your connected app",
+			"value": "",
+			"required": true
+		},
+		"JWTKEY": {
+			"description": "The server.key file from your connected app",
+			"value": "",
+			"required": true
+		},
+		"HEROKU_API_KEY": {
+			"description": "Get from account settings in the UI (https://dashboard.heroku.com/account)",
+			"value": ""
+		},
+		"HEROKU_APP_NAME": {
+			"description": "name of your heroku app...used for review apps and one-off dyno creation"
+		},
+		"LOG_LEVEL": {
+			"value": "debug"
+		}
+	},
+	"formation": {
+		"web": { "quantity": 1, "size": "hobby" },
+		"orgbuilder": { "quantity": 1, "size": "hobby" },
+		"pooldeployer": { "quantity": 0, "size": "hobby" },
+		"poolwatcher": { "quantity": 0, "size": "hobby" },
+		"oneoffbuilder": { "quantity": 0, "size": "hobby" },
+		"poolskimmer": { "quantity": 0, "size": "hobby" },
+		"dynoskimmer": { "quantity": 0, "size": "hobby" }
+	},
+	"buildpacks": [
+		{
+			"url": "heroku/nodejs"
+		},
+		{
+			"url": "https://buildpack-registry.s3.amazonaws.com/buildpacks/jontewks/puppeteer.tgz"
+		},
+		{
+			"url": "https://github.com/mshanemc/salesforce-cli-buildpack#456646ed76729bc4ef32db7a22758de5c217a7b8"
+		},
+		{
+			"url": "https://github.com/heroku/heroku-buildpack-cli#ff0bfe609b4618be16b5e446d623d0eabc1576cb"
+		}
+	],
+	"addons": [
+		{
+			"plan": "heroku-redis:hobby-dev"
+		}
+	]
 }
