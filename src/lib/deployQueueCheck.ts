@@ -110,7 +110,20 @@ const check = async () => {
       );
     }
 
-    const parsedLines = await lineParse(msgJSON);
+    let parsedLines;
+    
+    try {
+      parsedLines = await lineParse(msgJSON);
+    } catch (e) {
+      clientResult.errors.push({
+        command: 'line parsing',
+        error: e,
+        raw: e
+      });
+      clientResult.complete = true;
+      await cdsPublish(clientResult);
+      return true;
+    }
 
     const localLineRunner = new lineRunner(
       msgJSON,
@@ -118,6 +131,7 @@ const check = async () => {
       redis,
       clientResult
     );
+
     try {
       const output = <clientDataStructure> await localLineRunner.runLines();
       timesToGA(msgJSON, output);
