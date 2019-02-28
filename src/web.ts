@@ -164,9 +164,9 @@ redisSub.on('message', (channel, message) => {
   const msgJSON = <clientDataStructure>JSON.parse(message);
 
   wss.clients.forEach((client) => {
-    if (client.url.includes(msgJSON.deployId.trim())) {
+    if (client.url.includes(msgJSON.deployId.trim()) && client.readyState === client.OPEN) {
       client.send(JSON.stringify(msgJSON));
-      // close connection when ALLDONE
+      // close connection when ALLDONE if the client hasn't already
       if (msgJSON.complete) {
         client.close();
       }
