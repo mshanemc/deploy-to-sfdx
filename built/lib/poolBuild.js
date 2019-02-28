@@ -4,7 +4,6 @@ const util = require("util");
 const fs = require("fs-extra");
 const logger = require("heroku-logger");
 const path = require("path");
-const rmfr = require("rmfr");
 const utilities = require("./utilities");
 const poolParse = require("./poolParse");
 const hubAuth_1 = require("./hubAuth");
@@ -57,12 +56,12 @@ async function poolBuild() {
             });
             poolMessage.displayResults = JSON.parse(displayResults.stdout).result;
             await redisNormal_1.putPooledOrg(msgJSON, poolMessage);
-            await rmfr(`${tmpDir}/${msgJSON.deployId}`);
+            await fs.remove(`${tmpDir}/${msgJSON.deployId}`);
             return true;
         }
         catch (error) {
             logger.error(`error runnning file for ${msgJSON.username}/${msgJSON.repo}`, error);
-            await rmfr(`${tmpDir}/${msgJSON.deployId}`);
+            await fs.remove(`${tmpDir}/${msgJSON.deployId}`);
             return false;
         }
     }

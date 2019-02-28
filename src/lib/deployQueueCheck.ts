@@ -4,7 +4,6 @@
 import * as util from 'util';
 import * as fs from 'fs-extra';
 import * as logger from 'heroku-logger';
-import * as rmfr from 'rmfr';
 
 import { redis, deleteOrg, getDeployRequest, cdsPublish } from './redisNormal';
 import { lineParse } from './lineParse';
@@ -129,7 +128,7 @@ const check = async () => {
     }
   }
 
-  await rmfr(`tmp/${msgJSON.deployId}`);
+  await fs.remove(`tmp/${msgJSON.deployId}`);
   return true;
 
 };

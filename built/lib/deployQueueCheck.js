@@ -2,7 +2,6 @@
 const util = require("util");
 const fs = require("fs-extra");
 const logger = require("heroku-logger");
-const rmfr = require("rmfr");
 const redisNormal_1 = require("./redisNormal");
 const lineParse_1 = require("./lineParse");
 const lineRunner = require("./lines");
@@ -86,7 +85,7 @@ const check = async () => {
             await redisNormal_1.deleteOrg(msgJSON.username);
         }
     }
-    await rmfr(`tmp/${msgJSON.deployId}`);
+    await fs.remove(`tmp/${msgJSON.deployId}`);
     return true;
 };
 module.exports = check;

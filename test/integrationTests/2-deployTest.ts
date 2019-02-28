@@ -3,7 +3,6 @@ import * as chai from 'chai';
 import * as Nightmare from 'nightmare';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs-extra';
-import * as rmfr from 'rmfr';
 
 import { testRepos } from '../testRepos';
 import { clearQueues } from '../helpers/clearRedis';
@@ -27,7 +26,7 @@ describe('deploys all the test repos', () => {
   // eslint-disable-next-line no-restricted-syntax
   before(async () => {
     await clearQueues();
-    await rmfr(tmpDir);
+    await fs.remove(tmpDir);
     fs.ensureDirSync(tmpDir);
   });
 
@@ -71,7 +70,7 @@ describe('deploys all the test repos', () => {
   });
 
   after(async () => {
-    await rmfr(tmpDir);
+    await fs.remove(tmpDir);
     await clearQueues();
   });
 });
