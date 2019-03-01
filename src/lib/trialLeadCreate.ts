@@ -1,6 +1,7 @@
 // asynchronously posts the lead form back to org62
 // const request = require('request');
 import * as request from 'request-promise-native';
+import * as logger from 'heroku-logger';
 
 const sfdcLeadCaptureServlet = process.env.sfdcLeadCaptureServlet;
 const requestPage = '/form.html';
@@ -30,13 +31,17 @@ const leadCreate = async function (incoming) {
 		requestHost
 	};
 
-	const result = await request({
-		url: sfdcLeadCaptureServlet,
-		method: 'POST',
-		strictSSL : false,
-		headers: { 'content-type': 'application/x-www-form-urlencoded' },
-		form: formPostBody
-	});
+	try {
+		await request({
+			url: sfdcLeadCaptureServlet,
+			method: 'POST',
+			strictSSL : false,
+			headers: { 'content-type': 'application/x-www-form-urlencoded' },
+			form: formPostBody
+		});
+	} catch (e){
+		logger.error('error in trialLeadCreate', e);
+	}
 
 };
 
