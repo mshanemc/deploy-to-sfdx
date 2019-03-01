@@ -66,10 +66,13 @@ const utilities = {
   },
 
   runHerokuBuilder: (): void => {
-    if (process.env.HEROKU_API_KEY) {
+    if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME && !process.env.LOCAL_ONLY_KEY_PATH) {
       exec(
         `heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`
       );
+    } else if (process.env.LOCAL_ONLY_KEY_PATH) {
+      logger.debug('run one-off dynos via heroku local');
+      exec('heroku local oneoffbuilder');
     } else {
       logger.warn('no heroku api key. not running one-off dynos');
     }
