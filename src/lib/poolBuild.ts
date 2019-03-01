@@ -18,7 +18,11 @@ export async function poolBuild() {
   try { 
     msgJSON = await getPoolRequest(true);
   } catch (e){
-    logger.error('failed to build pool', e);
+    if (e.message === 'pool request queue is empty'){
+      logger.warn(`failed to build pool: ${e.message}`);
+    } else {
+      logger.error(`failed to build pool: ${e.message}`);
+    }
     return false;
   }
   await auth();
