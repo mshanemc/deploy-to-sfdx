@@ -15,7 +15,7 @@ import {
 import * as redisSub from './lib/redisSubscribe';
 import * as msgBuilder from './lib/deployMsgBuilder';
 import * as utilities from './lib/utilities';
-import * as org62LeadCapture from './lib/trialLeadCreate';
+import { emitLead } from './lib/trialLeadCreate';
 
 import { clientDataStructure, deployRequest } from './lib/types';
 
@@ -48,10 +48,7 @@ app.post('/trial', wrapAsync(async (req, res, next) => {
 
   const message = msgBuilder(req);
   logger.debug('trial request', message);
-
-  if (process.env.sfdcLeadCaptureServlet) {
-    org62LeadCapture(req.body);
-  }
+  emitLead(req.body);
 
   if (message.visitor) {
     message.visitor.pageview('/trial').send();

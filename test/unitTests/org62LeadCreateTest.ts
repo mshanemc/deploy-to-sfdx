@@ -1,5 +1,5 @@
 /* globals it, describe */
-import * as leadCreate from '../../src/lib/trialLeadCreate';
+import { emitLead } from '../../src/lib/trialLeadCreate';
 
 import * as chai from 'chai';
 import * as dotenv from 'dotenv';

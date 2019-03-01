@@ -2,12 +2,24 @@
 // const request = require('request');
 import * as request from 'request-promise-native';
 import * as logger from 'heroku-logger';
+import { EventEmitter } from 'events';
+
+const emitter = new EventEmitter();
 
 const sfdcLeadCaptureServlet = process.env.sfdcLeadCaptureServlet;
 const requestPage = '/form.html';
 const resultPage = '/conf.html';
 const requestHost = 'www.salesforce.com';
 
+const emitLead = incoming => {
+	emitter.emit('lead', incoming);
+};
+
+emitter.on('lead', async incoming => {
+	if (process.env.sfdcLeadCaptureServlet){
+		await leadCreate(incoming);
+	}
+});
 
 const leadCreate = async function (incoming) {
 
@@ -45,4 +57,4 @@ const leadCreate = async function (incoming) {
 
 };
 
-export = leadCreate;
+export { emitLead };
