@@ -37,9 +37,7 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
     } else {
       logger.warn('pool org did not have a username', msgJSON);
     }
-    await exec(
-      `heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`
-    );
+    await exec(utilities.getPoolDeployerCommand());    
     return `removed an expired org from pool ${poolname}`;
   } else {
     await redis.lpush(poolname, JSON.stringify(msgJSON));

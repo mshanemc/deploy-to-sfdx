@@ -78,6 +78,17 @@ const utilities = {
     }
   },
 
+  getPoolDeployerCommand: (): string => {
+    if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME && !process.env.LOCAL_ONLY_KEY_PATH) {
+      return `heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`;
+    } else if (process.env.LOCAL_ONLY_KEY_PATH) {
+      logger.debug('run poolbuilder dynos via heroku local');
+      return 'heroku local pooldeployer';
+    } else {
+      logger.warn('unable to run pooldeployers...missing api key or app name');
+    }
+  },
+
   checkHerokuAPI: (): boolean => {
     // we allow not to exist if running locally
     if (process.env.HEROKU_API_KEY || process.env.DEPLOYER_TESTING_ENDPOINT) {

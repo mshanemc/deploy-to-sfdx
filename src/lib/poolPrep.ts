@@ -47,15 +47,9 @@ export const preparePoolByName = async (
         message.branch = poolname.split('.')[2];
       }
 
-      // await redis.rpush('poolDeploys', JSON.stringify(message));
-      // await exec(`heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`);
       messages.push(putPoolRequest(message));
       if (createHerokuDynos) {
-        execs.push(
-          exec(
-            `heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`
-          )
-        );
+        execs.push(utilities.getPoolDeployerCommand());          
       }
     }
 

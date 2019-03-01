@@ -18,11 +18,10 @@ const maxPoolBuilders = parseInt(process.env.maxPoolBuilders) || 50;
     }
     
     logger.debug(`starting ${currentNeed} builders for poolQueue`);
+    let command = utilities.getPoolDeployerCommand();
     await Promise.all(
       Array(Math.max(0, currentNeed)).fill(
-        execProm(
-          `heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`
-        )
+        execProm(command)
       )
     );
     await prepareAll();
