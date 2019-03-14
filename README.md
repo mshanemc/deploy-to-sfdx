@@ -50,7 +50,7 @@ What's whitelisting do?  Normally, this app will parse your orgInit.sh and throw
 
 Here's a heroku button so you can have your own instance of the Deployer
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https%3A%2F%2Fgithub.com%2Fmshanemc%2Fdeploy-to-sfdx)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https%3A%2F%2Fgithub.com%2Fjrattanpal%2Fdeploy-to-sfdx)
 
 ---
 
