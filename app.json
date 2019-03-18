@@ -55,7 +55,7 @@
 	],
 	"addons": [
 		{
-			"plan": "heroku-redis:Premium-0"	
+			"plan": "heroku-redis:premium-0"	
 		}
 	]
 }
