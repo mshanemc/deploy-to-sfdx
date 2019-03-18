@@ -31,13 +31,13 @@
 		}
 	},
 	"formation": {
-		"web": { "quantity": 1, "size": "free" },
-		"orgbuilder": { "quantity": 1, "size": "free" },
-		"pooldeployer": { "quantity": 0, "size": "free" },
-		"poolwatcher": { "quantity": 0, "size": "free" },
-		"oneoffbuilder": { "quantity": 0, "size": "free" },
-		"poolskimmer": { "quantity": 0, "size": "free" },
-		"dynoskimmer": { "quantity": 0, "size": "free" }
+		"web": { "quantity": 1, "size": "Private-S" },
+		"orgbuilder": { "quantity": 1, "size": "Private-L" },
+		"pooldeployer": { "quantity": 0, "size": "Private-L" },
+		"poolwatcher": { "quantity": 0, "size": "Private-S" },
+		"oneoffbuilder": { "quantity": 0, "size": "Private-S" },
+		"poolskimmer": { "quantity": 0, "size": "Private-S" },
+		"dynoskimmer": { "quantity": 0, "size": "Private-S" }
 	},
 	"buildpacks": [
 		{
