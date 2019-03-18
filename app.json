@@ -55,7 +55,7 @@
 	],
 	"addons": [
 		{
-			"plan": "heroku-redis:Private-M"	
+			"plan": "heroku-redis:Private-7"	
 		}
 	]
 }
