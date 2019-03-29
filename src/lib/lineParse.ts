@@ -42,11 +42,9 @@ const lineParse = function(msgJSON: deployRequest): Promise<string[]> {
             // it's an OK line.
             logger.debug('lineParse: line pushed');
 
-            //TEmp fix to force sfdx update
-            if (!line.startsWith('sfdx update')) {
             // json-ify every line
             line = `${argStripper(line, '--json', true)} --json`;
-            }
+            
             parsedLines.push(jsonify(line));
           }
         }
