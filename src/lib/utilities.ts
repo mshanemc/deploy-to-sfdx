@@ -2,6 +2,7 @@ import * as logger from 'heroku-logger';
 import * as request from 'request-promise-native';
 
 import { deployRequest, poolConfig, openResult } from './types';
+import { isLocal } from './amIlocal';
 
 const exec = require('child_process').exec;
 
@@ -20,22 +21,6 @@ const utilities = {
     }
     return key;
   },
-
-  bufferKey: (content, deployId: string): string => {
-    const message = {
-      deployId,
-      content
-    };
-    return JSON.stringify(message);
-  },
-
-  // fetches the pools object from some external URL
-  // [{
-  // 	user : 'mshanemc',
-  // 	repo : 'exampleRepo',
-  // 	quantitiy: 4,
-  //	lifeHours: 12
-  // }]
 
   getPoolConfig: async (): Promise<poolConfig[]> => {
     // TODO: fallback as a singleton?
@@ -66,11 +51,11 @@ const utilities = {
   },
 
   runHerokuBuilder: (): void => {
-    if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME && !process.env.LOCAL_ONLY_KEY_PATH) {
+    if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME && !isLocal) {
       exec(
         `heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`
       );
-    } else if (process.env.LOCAL_ONLY_KEY_PATH) {
+    } else if (isLocal) {
       logger.debug('run one-off dynos via heroku local');
       exec('heroku local oneoffbuilder');
     } else {
@@ -79,9 +64,9 @@ const utilities = {
   },
 
   getPoolDeployerCommand: (): string => {
-    if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME && !process.env.LOCAL_ONLY_KEY_PATH) {
+    if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME && !isLocal) {
       return `heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`;
-    } else if (process.env.LOCAL_ONLY_KEY_PATH) {
+    } else if (isLocal) {
       logger.debug('run poolbuilder dynos via heroku local');
       return 'heroku local pooldeployer';
     } else {
@@ -91,7 +76,7 @@ const utilities = {
 
   checkHerokuAPI: (): boolean => {
     // we allow not to exist if running locally
-    if (process.env.HEROKU_API_KEY || process.env.DEPLOYER_TESTING_ENDPOINT) {
+    if (process.env.HEROKU_API_KEY || isLocal) {
       return true;
     } else {
       throw new Error('HEROKU_API_KEY is not defined!');

@@ -18,7 +18,8 @@ export const testRepos = {
       username: 'mshanemc',
       repo: 'process-automation-workshop-df17'
     }
-  ],
+  ]
+  ,
 
   adoptionWorkshops: [
     {
@@ -28,15 +29,7 @@ export const testRepos = {
     {
       username: 'mshanemc',
       repo: 'adoption-service'
-    },
-    {
-      username: 'mshanemc',
-      repo: 'reporting-workshop'
-    },
-    {
-      username: 'mshanemc',
-      repo: 'lightning-go-live'
-    },
+    },    
     {
       username: 'mshanemc',
       repo: 'lightning-vf'
@@ -44,8 +37,18 @@ export const testRepos = {
     {
       username: 'mshanemc',
       repo: 'js-buttons'
+    },
+    {
+      username: 'mshanemc',
+      repo: 'lightning-go-live'
+    },
+    {
+      username: 'mshanemc',
+      repo: 'reporting-workshop'
     }
   ],
+
+  
 
   campground: [
     {
@@ -71,11 +74,11 @@ export const testRepos = {
   ],
 
   other: [
-    // {
-    //   username: 'mshanemc',
-    //   repo: 'platformTrial'
-    // }
-    // ,
+    {
+      username: 'mshanemc',
+      repo: 'platformTrial'
+    }
+    ,
     // {
     //   username: 'mshanemc',
     //   repo: 'rviot'

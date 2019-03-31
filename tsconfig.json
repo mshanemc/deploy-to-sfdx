@@ -6,7 +6,8 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "module": "none",
-    "removeComments": true
+    "removeComments": true,
+    "types": ["node", "jest", "express", "ioredis", "fs-extra", "moment", "request", "request-promise-native", "universal-analytics"]
   },
   "compileOnSave": true,
   "include": [

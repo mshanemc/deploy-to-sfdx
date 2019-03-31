@@ -45,7 +45,6 @@ Create a connected app for JWT auth, with certificates, per the SFDX setup guide
 * if you need to use the prerelease version of the sfdx plugin, then set `SFDX_PRERELEASE` to true.
 * org pools -- see below for details
 
-
 What's whitelisting do?  Normally, this app will parse your orgInit.sh and throw an error if you're doing any funny business.  BUT if you're on the whitelist, the app owner trusts you and you can do things with bash metacharacters (think &&, |, >) and execute non-sfdx commands  (grep, rm, whatever!) etc.  BE CAREFUL!
 
 Here's a heroku button so you can have your own instance of the Deployer
@@ -158,18 +157,27 @@ That lets you create records, assign permsets, create users, install packages, r
 
 ## Testing
 
+uses Jest.
+
+There's a file called `testRepos` that you'll want to customize with any repos you want to use for verification.
+
 There's unit tests in tests/unitTests.  Run these to not break stuff.
-Run them with `npm run unit-test`
+Run them with `npm run test:unit`.  A few of them are not true unit tests...the require a server and redis running, and will try to connect to github for your testRepos.  Run each of these commands in a separate terminal.
+
+``` shell
+redis-server
+heroku run local
+```
 
 Integration (tests/integrationTests) are slower/harder.
 
-* `deployTest.ts` runs against a server.  It can be local--just edit `/test/helpers/init.ts` to set the location either in the cloud or locally.  If locally, run `npm run local` to get the web and orgbuilder dynos running
-* `poolRepoTest.ts` runs against a redis queue, using your local sfdx instance (which you'll need!).  It can run against the REDIS_URL of your dotenv file, OR you can also override this using `/test/helpers/init.ts`
-* once your local servers are running, you can run all the tests with npm run-integration-test
+`npm run test:generate` will parse testRepos and create an integration test for each repo that
 
-`deployTest.ts` is deploying actual repos from github.  They're defined in `test/testRepos.ts`.  You should probably remove all of mine, and if you have repos you really care about, add them!
+1. tests that it deploys
+2. builds a pooled org using org pools
+3. tests that it deploys from the pool
 
-NOTE: This is using up your scratch org quotas.  The tests delete the orgs, so it's minimally wastefuly, but still expect it to take a while AND watch your daily limit.
+NOTE: This is using up your scratch org quotas.  The tests delete the orgs, so it's minimally wastefuly, but still expect it to take a while AND watch your daily limit.  Especially if you're testing deploys and tests are failing...you might be using orgs that never get to the delete phase.
 
 ---
 

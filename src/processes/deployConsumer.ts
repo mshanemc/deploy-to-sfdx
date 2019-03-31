@@ -1,7 +1,7 @@
 import * as logger from 'heroku-logger';
 import * as util from 'util';
-import { auth } from './hubAuth';
-import * as checkQueue from './deployQueueCheck';
+import { auth } from '../lib/hubAuth';
+import * as checkQueue from '../lib/deployQueueCheck';
 
 const setTimeoutPromise = util.promisify(setTimeout);
 

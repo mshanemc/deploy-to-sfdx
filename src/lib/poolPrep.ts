@@ -17,61 +17,57 @@ export const preparePoolByName = async (
 
   const actualQuantity = await redis.llen(poolname);
 
-  const messages = [];
-  const execs = [];
-
+  if (actualQuantity >= targetQuantity) {
+    logger.debug(`pool ${poolname} has ${actualQuantity} ready out of ${targetQuantity} and is full.`);
+    return;
+  }
+  
+  // still there?  you must need some more orgs
   if (actualQuantity < targetQuantity) {
     const needed = targetQuantity - actualQuantity;
     logger.debug(
       `pool ${poolname} has ${actualQuantity} ready out of ${targetQuantity}...`
     );
 
-    for (let x = 0; x < needed; x++) {
-      const username = poolname.split('.')[0];
-      const repo = poolname.split('.')[1];
-      const deployId = encodeURIComponent(
-        `${username}-${repo}-${new Date().valueOf()}`
-      );
+    const username = poolname.split('.')[0];
+    const repo = poolname.split('.')[1];
+    const deployId = encodeURIComponent( `${username}-${repo}-${new Date().valueOf()}` );
+    
+    const message: deployRequest = {
+      pool: true,
+      username,
+      repo,
+      deployId,
+      whitelisted: true,
+      createdTimestamp: new Date()
+    };
 
-      const message: deployRequest = {
-        pool: true,
-        username,
-        repo,
-        deployId,
-        whitelisted: true,
-        createdTimestamp: new Date()
-      };
-
-      // branch support
-      if (poolname.split('.')[2]) {
-        message.branch = poolname.split('.')[2];
-      }
-
-      messages.push(putPoolRequest(message));
-      if (createHerokuDynos) {
-        execs.push(utilities.getPoolDeployerCommand());          
-      }
+    // branch support
+    if (poolname.split('.')[2]) {
+      message.branch = poolname.split('.')[2];
     }
 
+    const messages = [];
+    while (messages.length < needed){
+      messages.push(putPoolRequest(message));
+    }
     await Promise.all(messages);
-    await Promise.all(execs);
     logger.debug(`...Requesting ${needed} more org for ${poolname}...`);
-  } else {
-    logger.debug(
-      `pool ${poolname} has ${actualQuantity} ready out of ${targetQuantity} and is full.`
-    );
-  }
+
+    if (createHerokuDynos) {
+      const execs = new Array(needed).fill(utilities.getPoolDeployerCommand());
+      await Promise.all(execs);
+    }
+    
+  } 
 };
 
 export const prepareAll = async () => {
   const pools = <poolConfig[]> await utilities.getPoolConfig();
   logger.debug(`preparing ${pools.length} pools`);
-
-  const prepares = [];
-  pools.forEach((pool) => {
-    prepares.push(preparePoolByName(pool));
-  });
-
-  await Promise.all(prepares);
+  
+  await Promise.all(
+    pools.map( pool => preparePoolByName(pool))
+  );
   logger.debug('all pools prepared');
 };

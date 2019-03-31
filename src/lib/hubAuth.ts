@@ -2,13 +2,20 @@ import * as fs from 'fs';
 import * as logger from 'heroku-logger';
 import * as util from 'util';
 
+import { isLocal } from './amIlocal';
+
 const exec = util.promisify(require('child_process').exec);
 
 const getKeypath = async () => {
-  if (process.env.LOCAL_ONLY_KEY_PATH) {
+
+  if (isLocal) {
     // I'm fairly local
     logger.debug('hubAuth...using local key');
-    return process.env.LOCAL_ONLY_KEY_PATH;
+    if (process.env.LOCAL_ONLY_KEY_PATH) {
+      return process.env.LOCAL_ONLY_KEY_PATH;
+    } else {
+      logger.error(`isLocal, but no local keypath. ${process.env.LOCAL_ONLY_KEY_PATH}`);
+    }
   } else {
     // we're doing it in the cloud
     logger.debug('hubAuth...using key from heroku environment');
@@ -25,7 +32,7 @@ const auth = async () => {
   const keypath = await getKeypath();
 
   try {
-    if (process.env.JWTKEY) {
+    if (!isLocal) {
       // not local, so link the plugin.  local runs will hae it already linked.
       await exec('sfdx plugins:link node_modules/shane-sfdx-plugins');
     }

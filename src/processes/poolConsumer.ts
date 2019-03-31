@@ -1,4 +1,4 @@
-import { poolBuild } from './poolBuild';
+import { poolBuild } from '../lib/poolBuild';
 
 (async () => {
 	await poolBuild();
