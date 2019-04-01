@@ -41,7 +41,6 @@
     "request-promise-native": "^1.0.5",
     "serve-favicon": "^2.5.0",
     "shane-sfdx-plugins": "^3.1.0",
-    "sfdx-wry-plugin": "^0.0.9",
     "universal-analytics": "^0.4.20",
     "ws": "^6.1.2"
   },
