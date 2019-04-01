@@ -10,7 +10,6 @@ const exec = util.promisify(require('child_process').exec);
 
 const requestAddToPool = async (testRepo: testRepo, quantity:number = 2) => {
   const originalPoolSize = await redis.llen('poolDeploys');
-  // console.log(`original pool size: ${originalPoolSize}`);
   // add to pool
   await preparePoolByName(
     {
@@ -44,10 +43,6 @@ const requestBuildPool = async (testRepo: testRepo, deleteIt: boolean) => {
 
   const buildResult = await poolBuild();
   expect(buildResult).toBe(true);
-
-  // verify not in poolRequests
-  poolDeploySize = await redis.llen('poolDeploys');
-  expect(poolDeploySize).toBe(0);
 
   // verify in the pool for that repo
   const repoPoolSize = await redis.llen(

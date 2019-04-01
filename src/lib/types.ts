@@ -49,6 +49,7 @@ export interface poolOrg {
 interface sfdxDisplayResult {
   username: string;
   id: string;
+  instanceUrl?: string;
 }
 
 // result of force:org:open --json

@@ -17,6 +17,10 @@ export const testRepos = {
     {
       username: 'mshanemc',
       repo: 'process-automation-workshop-df17'
+    },
+    {
+      username: 'mshanemc',
+      repo: 'volunteering-base-pkg'
     }
   ]
   ,
@@ -71,7 +75,8 @@ export const testRepos = {
       username: 'mshanemc',
       repo: 'cg1-lowcode'
     }
-  ],
+  ]
+  ,
 
   other: [
     {
@@ -92,5 +97,14 @@ export const testRepos = {
       username: 'mshanemc',
       repo: 'mobileWebinar'
     }
+    ,
+    {
+      username: 'mshanemc',
+      repo: 'cpq-workshop'
+    },
+    {
+      username: 'mshanemc',
+      repo: 'solutions-engagement'
+    }    
   ]
 };

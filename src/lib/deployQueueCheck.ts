@@ -8,7 +8,7 @@ import * as logger from 'heroku-logger';
 import { redis, deleteOrg, getDeployRequest, cdsPublish } from './redisNormal';
 import { lineParse } from './lineParse';
 import * as lineRunner from './lines';
-import * as pooledOrgFinder from './pooledOrgFinder';
+import { pooledOrgFinder }from './pooledOrgFinder';
 import * as utilities from './utilities';
 import { timesToGA } from './timeTracking';
 
@@ -25,7 +25,6 @@ const check = async () => {
     msgJSON = await getDeployRequest(true);
   } catch (e) {
     // throws on empty queue
-    // console.log('queue was empty');
     return false;
   }
 
@@ -37,7 +36,7 @@ const check = async () => {
   
 
   if (await pooledOrgFinder(msgJSON)) {
-    logger.debug('deployQueueCheck: using a pooled org'); // throw an error to break out of the rest of the promise chain and ack
+    logger.debug('deployQueueCheck: using a pooled org');
   } else {
     fs.ensureDirSync('tmp');
 

@@ -5,7 +5,7 @@ import { sfdxTimeout , getTestURL } from '../helpers/testingUtils';
 
 const shouldBeLoaded = 1000;
 
-describe('runs the trial', () => {
+describe.skip('runs the trial', () => {
     let browser, page;
     let baseUrl = getTestURL();
 

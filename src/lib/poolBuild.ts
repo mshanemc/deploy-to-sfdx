@@ -27,7 +27,6 @@ export async function poolBuild() {
   }
   
   const authResult = await auth();
-  // console.log(authResult);
 
   // handling deletes
   if (msgJSON.delete) {
