@@ -28,12 +28,12 @@ const getKeypath = async () => {
 
 const auth = async () => {
   // where will our cert live?
-  logger.debug('hubAuth: updating plugin');
   const keypath = await getKeypath();
 
   try {
     if (!isLocal) {
       // not local, so link the plugin.  local runs will hae it already linked.
+      logger.debug('hubAuth: updating plugin');
       await exec('sfdx plugins:link node_modules/shane-sfdx-plugins');
     }
 
