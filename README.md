@@ -161,21 +161,22 @@ uses Jest.
 
 There's a file called `testRepos` that you'll want to customize with any repos you want to use for verification.
 
-There's unit tests in tests/unitTests.  Run these to not break stuff.
 Run them with `npm run test:unit`.  A few of them are not true unit tests...the require a server and redis running, and will try to connect to github for your testRepos.  Run each of these commands in a separate terminal.
 
 ``` shell
 redis-server
-heroku run local
+npm run local
 ```
 
 Integration (tests/integrationTests) are slower/harder.
 
-`npm run test:generate` will parse testRepos and create an integration test for each repo that
+`npm run test:generate` will parse testRepos and create a integration tests for each repo that
 
 1. tests that it deploys
 2. builds a pooled org using org pools
 3. tests that it deploys from the pool
+
+Modify `repoCodeGen.ts` to change the generator.
 
 NOTE: This is using up your scratch org quotas.  The tests delete the orgs, so it's minimally wastefuly, but still expect it to take a while AND watch your daily limit.  Especially if you're testing deploys and tests are failing...you might be using orgs that never get to the delete phase.
 
