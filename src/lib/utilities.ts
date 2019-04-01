@@ -51,11 +51,12 @@ const utilities = {
   },
 
   runHerokuBuilder: (): void => {
-    if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME && !isLocal) {
+
+    if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME && !isLocal()) {
       exec(
         `heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`
       );
-    } else if (isLocal) {
+    } else if (isLocal()) {
       logger.debug('run one-off dynos via heroku local');
       exec('heroku local oneoffbuilder');
     } else {
@@ -64,9 +65,9 @@ const utilities = {
   },
 
   getPoolDeployerCommand: (): string => {
-    if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME && !isLocal) {
+    if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME && !isLocal()) {
       return `heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`;
-    } else if (isLocal) {
+    } else if (isLocal()) {
       logger.debug('run poolbuilder dynos via heroku local');
       return 'heroku local pooldeployer';
     } else {
@@ -76,7 +77,7 @@ const utilities = {
 
   checkHerokuAPI: (): boolean => {
     // we allow not to exist if running locally
-    if (process.env.HEROKU_API_KEY || isLocal) {
+    if (process.env.HEROKU_API_KEY || isLocal()) {
       return true;
     } else {
       throw new Error('HEROKU_API_KEY is not defined!');

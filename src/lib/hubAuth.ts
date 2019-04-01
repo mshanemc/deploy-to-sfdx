@@ -7,8 +7,8 @@ import { isLocal } from './amIlocal';
 const exec = util.promisify(require('child_process').exec);
 
 const getKeypath = async () => {
-
-  if (isLocal) {
+  
+  if (isLocal()) {
     // I'm fairly local
     logger.debug('hubAuth...using local key');
     if (process.env.LOCAL_ONLY_KEY_PATH) {
@@ -31,7 +31,7 @@ const auth = async () => {
   const keypath = await getKeypath();
 
   try {
-    if (!isLocal) {
+    if (!isLocal()) {
       // not local, so link the plugin.  local runs will hae it already linked.
       logger.debug('hubAuth: updating plugin');
       await exec('sfdx plugins:link node_modules/shane-sfdx-plugins');
