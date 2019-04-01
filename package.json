@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "tsc && cp -R ./src/views ./built/ && npm run css-build",
-    "local": "npm run build && export HEROKU_API_KEY=`heroku auth:token` && heroku local dynoskimmer=1 && heroku local poolskimmer=1 && heroku local oneoffbuilder=1 && heroku local poolwatcher=1 && heroku local pooldeployer=1 && heroku local web=1,orgbuilder=3",
+    "local": "npm run build && heroku local dynoskimmer=1 && heroku local poolskimmer=1 && heroku local oneoffbuilder=1 && heroku local poolwatcher=1 && heroku local pooldeployer=1 && heroku local web=1,orgbuilder=3",
     "start": "node .",
     "css-build": "mkdirp built/assets/css && mkdirp built/assets/fonts && ncp src/assets built/assets && ncp src/assets/favicons built/assets/favicons && node-sass src/scss -o built/assets/css && ncp node_modules/@salesforce-ux/design-system/assets/fonts built/assets/fonts",
     "css-watch": "node-sass --watch src/scss -o built/assets/css",
@@ -17,6 +17,7 @@
     "test:integration": "redis-cli flushall && sleep 2 && jest test/integrationTests -c jest.config.integration.js",
     "test:unit:watch": "redis-cli flushall && sleep 2 && jest test/unitTests/* -c jest.config.unit.js --watch",
     "test:integration:watch": "redis-cli flushall && jest test/integrationTests  -c jest.config.integration.js --watch",
+    "test": "test:generate && jest test/integrationTests -c jest.config.integration.js",
     "jest": "jest",
     "jest:watch": "jest --watch"
   },
