@@ -1,8 +1,12 @@
 import * as logger from 'heroku-logger';
+import * as util from 'util';
+import { exec } from 'child_process';
 
 import * as utilities from './utilities';
 import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
 import { deployRequest, poolConfig } from './types';
+
+const execProm = util.promisify(exec);
 
 export const preparePoolByName = async (
   pool: poolConfig,
@@ -59,7 +63,7 @@ export const preparePoolByName = async (
 
     if (createHerokuDynos) {
       while (builders.length < needed){
-        builders.push(builderCommand);
+        builders.push(execProm(builderCommand));
       }
       await Promise.all(builders);
     }
