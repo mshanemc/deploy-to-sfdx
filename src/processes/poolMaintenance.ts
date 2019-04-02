@@ -12,18 +12,19 @@ const maxPoolBuilders = parseInt(process.env.maxPoolBuilders) || 50;
 (async () => {
   if (utilities.checkHerokuAPI()) {
     const currentNeed = Math.min(maxPoolBuilders, await getPoolDeployRequestQueueSize());
-    
+        
     if (currentNeed === maxPoolBuilders){
       logger.warn('the poolDeploys queue seems really large');
     }
     
     logger.debug(`starting ${currentNeed} builders for poolQueue`);
-    let command = utilities.getPoolDeployerCommand();
-    await Promise.all(
-      Array(Math.max(0, currentNeed)).fill(
-        execProm(command)
-      )
-    );
+
+    const builders = [];
+
+    while (builders.length < currentNeed){
+      builders.push(utilities.getPoolDeployerCommand());
+    }
+    await Promise.all(builders);
     await prepareAll();
   }
   process.exit(0);

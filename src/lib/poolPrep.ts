@@ -52,11 +52,15 @@ export const preparePoolByName = async (
       messages.push(putPoolRequest(message));
     }
     await Promise.all(messages);
+
     logger.debug(`...Requesting ${needed} more org for ${poolname}...`);
+    const builders = [];
 
     if (createHerokuDynos) {
-      const execs = new Array(needed).fill(utilities.getPoolDeployerCommand());
-      await Promise.all(execs);
+      while (builders.length < needed){
+        builders.push(utilities.getPoolDeployerCommand());
+      }
+      await Promise.all(builders);
     }
     
   } 
