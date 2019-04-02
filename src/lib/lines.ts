@@ -118,9 +118,7 @@ const lines = function(
 
       try {
         lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}` });
-        
-        console.log(lineResult);
-        
+                
         if (localLine.includes('--json')) {
           let response = JSON.parse(stripcolor(lineResult.stdout));
           // returned a reasonable error but not a full-on throw
