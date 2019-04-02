@@ -35,13 +35,13 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
 		.filter(org => moment().diff(moment(org.createdDate)) <= pool.lifeHours * 60 * 60 * 1000)
     .map(org => JSON.stringify(org));
       
-  if (goodOrgs.length > 0){
-    await redis.lpush(poolname, ...goodOrgs);
-  }
-
 	if (goodOrgs.length === currentPoolSize) {
 		return `all the orgs in pool ${poolname} are fine`;
-	}
+	} else if (goodOrgs.length > 0) {
+    await redis.del(poolname);
+    // put the good ones back
+    await redis.lpush(poolname, ...goodOrgs);
+  }
 
 	const expiredOrgs = allOrgs
 		.filter(org => 
