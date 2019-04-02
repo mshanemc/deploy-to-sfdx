@@ -1,12 +1,9 @@
 import * as logger from 'heroku-logger';
-import * as util from 'util';
-import { exec } from 'child_process';
 
 import * as utilities from '../lib/utilities';
 import { getPoolDeployRequestQueueSize } from '../lib/redisNormal';
 import { prepareAll } from '../lib/poolPrep';
 
-const execProm = util.promisify(exec);
 const maxPoolBuilders = parseInt(process.env.maxPoolBuilders) || 50;
 
 (async () => {
