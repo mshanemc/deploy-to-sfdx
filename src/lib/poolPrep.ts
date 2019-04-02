@@ -59,7 +59,7 @@ export const preparePoolByName = async (
 
     logger.debug(`...Requesting ${needed} more org for ${poolname}...`);
     const builders = [];
-    const builderCommand = utilities.getPoolDeployerCommand()
+    const builderCommand = utilities.getPoolDeployerCommand();
 
     if (createHerokuDynos) {
       while (builders.length < needed){

@@ -28,14 +28,14 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
 		return `pool ${poolname} is empty`;
 	}
 
-  const allMessages = await redis.lrange(poolname, 0, currentPoolSize); // we'll take them all
+  const allMessages = await redis.lrange(poolname, 0, -1); // we'll take them all
   const allOrgs:poolOrg[] = allMessages.map( msg => JSON.parse(msg));
 
 	const goodOrgs = allOrgs
-		.filter(org => moment().diff(moment(org.createdDate)) <= pool.lifeHours * 60 * 60 * 1000)
+		.filter(org => moment().diff(moment(org.createdDate), 'hours', true) <= pool.lifeHours)
     .map(org => JSON.stringify(org));
       
-	if (goodOrgs.length === currentPoolSize) {
+	if (goodOrgs.length === allMessages.length) {
 		return `all the orgs in pool ${poolname} are fine`;
 	} else if (goodOrgs.length > 0) {
     await redis.del(poolname);
@@ -45,14 +45,19 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
 
 	const expiredOrgs = allOrgs
 		.filter(org => 
-      moment().diff(moment(org.createdDate)) > pool.lifeHours * 60 * 60 * 1000
+      moment().diff(moment(org.createdDate), 'hours', true) > pool.lifeHours
       && org.displayResults
       && org.displayResults.username
 		)
 		.map(org => JSON.stringify({ username: org.displayResults.username, delete: true }));
 
-	await redis.rpush('poolDeploys', ...expiredOrgs);
-	await Promise.all([].fill(exec(utilities.getPoolDeployerCommand()), 0, expiredOrgs.length));
+  await redis.rpush('poolDeploys', ...expiredOrgs);
+  const builders = [];
+  const builderCommand = utilities.getPoolDeployerCommand();
+  while (builders.length < expiredOrgs.length) {
+    builders.push(exec(builderCommand));
+  }
+	await Promise.all(builders);
 	return `removing ${expiredOrgs.length} expired orgs from pool ${poolname}`;
 };
 
