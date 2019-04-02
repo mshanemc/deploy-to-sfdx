@@ -30,11 +30,11 @@ const lines = function(
       let summary: commandSummary;
       let shortForm: string;
 
-      if (!localLine.includes('--json')) {
-        throw new Error(
-          `Every line should have included --json by this point.  Cannot process ${localLine}`
-        );
-      }
+      // if (localLine.includes('sfdx') !localLine.includes('--json')) {
+      //   throw new Error(
+      //     `Every line should have included --json by this point.  Cannot process ${localLine}`
+      //   );
+      // }
       logger.debug(localLine);
 
       // corrections and improvements for individual commands
@@ -118,7 +118,9 @@ const lines = function(
 
       try {
         lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}` });
-
+        
+        console.log(lineResult);
+        
         if (localLine.includes('--json')) {
           let response = JSON.parse(stripcolor(lineResult.stdout));
           // returned a reasonable error but not a full-on throw
