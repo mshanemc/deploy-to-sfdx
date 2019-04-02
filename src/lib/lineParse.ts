@@ -57,7 +57,7 @@ const lineParse = function(msgJSON: deployRequest): Promise<string[]> {
 };
 
 const jsonify = (line: string): string => {
-  if ( line.includes('sfdx ') ) {
+  if ( line.startsWith('sfdx ') ) {
     // TODO: handling for & at the end of line for background runs
     return `${argStripper(line, '--json', true)} --json`;
   } else {
