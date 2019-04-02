@@ -62,7 +62,7 @@ export const preparePoolByName = async (
     const builderCommand = utilities.getPoolDeployerCommand();
 
     if (createHerokuDynos) {
-      while (builders < needed && builders < 25){
+      while (builders < needed && builders < 50){
         await execProm(builderCommand);
         builders++;
       }
