@@ -8,7 +8,7 @@ import { prepareAll } from '../lib/poolPrep';
 
 const execProm = util.promisify(exec);
 
-const maxPoolBuilders = parseInt(process.env.maxPoolBuilders) || 50;
+const maxPoolBuilders = parseInt(process.env.maxPoolBuilders) || 30;
 
 (async () => {
   if (utilities.checkHerokuAPI()) {
