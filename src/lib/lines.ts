@@ -1,4 +1,5 @@
 import * as logger from 'heroku-logger';
+import * as stripcolor from 'strip-color';
 import * as util from 'util';
 
 import * as utilities from './utilities';
@@ -118,7 +119,7 @@ const lines = function(
       try {
         lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}` });
 
-        let response = JSON.parse(lineResult.stdout);
+        let response = JSON.parse(stripcolor(lineResult.stdout));
         // returned a reasonable error but not a full-on throw
 
         if (response.status !== 0) {
