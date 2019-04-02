@@ -1,4 +1,5 @@
 import * as logger from 'heroku-logger';
+import * as stripcolor from 'strip-color';
 import * as util from 'util';
 
 import * as utilities from './utilities';
@@ -29,11 +30,11 @@ const lines = function(
       let summary: commandSummary;
       let shortForm: string;
 
-      if (!localLine.includes('--json')) {
-        throw new Error(
-          `Every line should have included --json by this point.  Cannot process ${localLine}`
-        );
-      }
+      // if (localLine.includes('sfdx') !localLine.includes('--json')) {
+      //   throw new Error(
+      //     `Every line should have included --json by this point.  Cannot process ${localLine}`
+      //   );
+      // }
       logger.debug(localLine);
 
       // corrections and improvements for individual commands
@@ -117,49 +118,51 @@ const lines = function(
 
       try {
         lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}` });
+                
+        if (localLine.includes('--json')) {
+          let response = JSON.parse(stripcolor(lineResult.stdout));
+          // returned a reasonable error but not a full-on throw
 
-        let response = JSON.parse(lineResult.stdout);
-        // returned a reasonable error but not a full-on throw
+          if (response.status !== 0) {
 
-        if (response.status !== 0) {
-
-          // you fail!
-          output.errors.push({
-            command: localLine,
-            error: response.message,
-            raw: response
-          });
-          logger.error(
-            `error running line ${localLine} from ${msgJSON.username}/${
-              msgJSON.repo
-            }: ${response.message}`, response
-          );
-        } else {
-          logger.debug('line returned status 0');
-          if (summary === commandSummary.OPEN) {
-            // temporary
-            response = utilities.urlFix(response);
-            output.mainUser.loginUrl = response.result.url;
-            output.mainUser.username = response.result.username;
-            output.openTimestamp = new Date();
-          } else if (summary === commandSummary.ORG_CREATE) {
-            output.orgId = response.result.orgId;
-            output.mainUser.username = response.result.username;
-            shortForm = `created org ${response.result.orgId} with username ${
-              response.result.username
-            }`;
-          } else if (summary === commandSummary.PASSWORD_GEN) {
-            output.mainUser.password = response.result.password;
-            shortForm = `set password to ${
-              response.result.password
-            } for user ${response.result.username || output.mainUser.username}`;
-          } else if (summary === commandSummary.USER_CREATE) {
-            output.additionalUsers.push({
-              username: response.result.fields.username
+            // you fail!
+            output.errors.push({
+              command: localLine,
+              error: response.message,
+              raw: response
             });
-            shortForm = `created user with username ${
-              response.result.fields.username
-            }`;
+            logger.error(
+              `error running line ${localLine} from ${msgJSON.username}/${
+                msgJSON.repo
+              }: ${response.message}`, response
+            );
+          } else {
+            logger.debug('line returned status 0');
+            if (summary === commandSummary.OPEN) {
+              // temporary
+              response = utilities.urlFix(response);
+              output.mainUser.loginUrl = response.result.url;
+              output.mainUser.username = response.result.username;
+              output.openTimestamp = new Date();
+            } else if (summary === commandSummary.ORG_CREATE) {
+              output.orgId = response.result.orgId;
+              output.mainUser.username = response.result.username;
+              shortForm = `created org ${response.result.orgId} with username ${
+                response.result.username
+              }`;
+            } else if (summary === commandSummary.PASSWORD_GEN) {
+              output.mainUser.password = response.result.password;
+              shortForm = `set password to ${
+                response.result.password
+              } for user ${response.result.username || output.mainUser.username}`;
+            } else if (summary === commandSummary.USER_CREATE) {
+              output.additionalUsers.push({
+                username: response.result.fields.username
+              });
+              shortForm = `created user with username ${
+                response.result.fields.username
+              }`;
+            }
           }
 
           // always
@@ -169,7 +172,12 @@ const lines = function(
             raw: response,
             shortForm
           });
-        }
+        } else {
+          output.commandResults.push({
+            command: line,
+            raw: lineResult
+          });
+        }        
 
         // finally, emit the entire new data structure back to the web server to forward to the client after each line
         redisPub.publish(ex, JSON.stringify(output));
@@ -188,12 +196,6 @@ const lines = function(
         // and throw so the requester can do the rest of logging to heroku logs and GA
         throw new Error(e);
       }
-
-      // if (localLine.includes('heroku ')){
-      // 	const tempOut = lineResult.stdout;
-      // 	lineResult.stdout = lineResult.stderr;
-      // 	lineResult.stderr = tempOut;
-      // }
     } //end of the loop
 
     // we're done here

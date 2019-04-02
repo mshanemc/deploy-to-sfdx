@@ -1,8 +1,10 @@
 import { exec } from 'child_process';
 import * as logger from 'heroku-logger';
+import * as delay from 'delay';
 import * as util from 'util';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import * as stripcolor from 'strip-color';
 
 import * as utilities from './utilities';
 import { getPooledOrg, cdsPublish } from './redisNormal';
@@ -13,6 +15,7 @@ import { timesToGA } from './timeTracking';
 import { deployRequest, clientDataStructure } from './types';
 
 const execProm = util.promisify(exec);
+const maxRetries = 300;
 
 const pooledOrgFinder = async function(deployReq: deployRequest) {
 	
@@ -32,15 +35,43 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 
 		fs.ensureDirSync(uniquePath);
 
-		// let's auth to the org from the pool
-		const loginResult = await execProm(
-			`sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${
-				msgJSON.displayResults.username
-			} --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`,
-			{ cwd: uniquePath }
-		);
+		let keepTrying = true;
+		let authD = false;
+		let tries = 0;
 
-		logger.debug(`auth completed ${loginResult.stdout}`);
+		while (!authD && keepTrying && tries < maxRetries) {
+			// let's auth to the org from the pool
+			tries++;
+			try {
+				const loginResult = await execProm(
+					`sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${
+						msgJSON.displayResults.username
+					} --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`,
+					{ cwd: uniquePath }
+				);
+
+				logger.debug(`auth completed ${loginResult.stdout}`);
+				authD = true;
+				keepTrying = false;
+			} catch (err) {
+				const parsedOut = JSON.parse(stripcolor(err.stdout));
+				if (parsedOut.message.includes('This org appears to have a problem with its OAuth configuration')) {
+					keepTrying = true;
+				} else if (parsedOut.message.includes('This command requires a scratch org username set either with a flag or by default in the config.')) {
+					keepTrying = true;
+				} else {
+					logger.error(parsedOut);
+					keepTrying = false;
+				}
+				await delay.default(1000);
+			}
+
+
+		}
+		
+		if (!authD){
+			throw new Error('unable to get authenticated to the org from the pool');
+		}
 
 		// we may need to put the user's email on it
 		if (deployReq.email) {
@@ -50,10 +81,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 					deployReq.email
 				}'"`,
 				{ cwd: uniquePath }
-			);
-			if (emailResult) {
-				logger.debug(`updated email: ${emailResult.stdout}`);
-			}
+			);			
 		}
 
 		let password: string;
@@ -66,32 +94,34 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 
 			// may not have returned anything if it wasn't used
 			if (passwordSetResult) {
-				logger.debug(`password set results: ${passwordSetResult.stdout}`);
-				password = JSON.parse(passwordSetResult.stdout).result.password;
+				password = JSON.parse(stripcolor(passwordSetResult.stdout)).result.password;
+				logger.debug(`password set to: ${password}`);
 			}
 		}
 
 		const openResult = await execProm(`${msgJSON.openCommand} --json -r`, {
 			cwd: uniquePath
 		});
+		const openOutput = JSON.parse(stripcolor(openResult.stdout));
 
 		cds.openTimestamp = new Date();
 		cds.completeTimestamp = new Date();
 		cds.orgId = msgJSON.displayResults.id;
 		cds.mainUser = {
 			username: msgJSON.displayResults.username,
-			loginUrl: utilities.urlFix(JSON.parse(openResult.stdout)).result.url,
+			loginUrl: utilities.urlFix(openOutput).result.url,
 			password
 		};
 
-		logger.debug(`opened : ${openResult.stdout}`);
+		logger.debug(`opened : ${openOutput}`);
 		await cdsPublish(cds);
 		timesToGA(deployReq, cds);
-		return true;
+		return cds;
 	} catch (e) {
-		logger.warn('pooledOrgFinder', e);
-		return false;
+		logger.warn('pooledOrgFinder');
+		logger.warn(e);
+		return null;
 	}
 };
 
-export = pooledOrgFinder;
+export { pooledOrgFinder };

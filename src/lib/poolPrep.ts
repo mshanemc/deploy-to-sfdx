@@ -1,12 +1,12 @@
 import * as logger from 'heroku-logger';
 import * as util from 'util';
+import { exec } from 'child_process';
 
 import * as utilities from './utilities';
-import { redis, putPoolRequest } from './redisNormal';
-
+import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
 import { deployRequest, poolConfig } from './types';
 
-const exec = util.promisify(require('child_process').exec);
+const execProm = util.promisify(exec);
 
 export const preparePoolByName = async (
   pool: poolConfig,
@@ -17,67 +17,66 @@ export const preparePoolByName = async (
 
   const actualQuantity = await redis.llen(poolname);
 
-  const messages = [];
-  const execs = [];
-
+  if (actualQuantity >= targetQuantity) {
+    logger.debug(`pool ${poolname} has ${actualQuantity} ready out of ${targetQuantity} and is full.`);
+    return;
+  }
+  
+  // still there?  you must need some more orgs
   if (actualQuantity < targetQuantity) {
-    const needed = targetQuantity - actualQuantity;
+    const inFlight =  await getPoolDeployCountByRepo(pool.user, pool.repo)
+    const needed = targetQuantity - actualQuantity - inFlight;
     logger.debug(
-      `pool ${poolname} has ${actualQuantity} ready out of ${targetQuantity}...`
+      `pool ${poolname} has ${actualQuantity} ready and ${inFlight} in queue out of ${targetQuantity}...`
     );
+    
+    if (needed <=0 ) {
+      return;
+    }
+    const username = poolname.split('.')[0];
+    const repo = poolname.split('.')[1];
+    const deployId = encodeURIComponent( `${username}-${repo}-${new Date().valueOf()}` );
+    
+    const message: deployRequest = {
+      pool: true,
+      username,
+      repo,
+      deployId,
+      whitelisted: true,
+      createdTimestamp: new Date()
+    };
 
-    for (let x = 0; x < needed; x++) {
-      const username = poolname.split('.')[0];
-      const repo = poolname.split('.')[1];
-      const deployId = encodeURIComponent(
-        `${username}-${repo}-${new Date().valueOf()}`
-      );
-
-      const message: deployRequest = {
-        pool: true,
-        username,
-        repo,
-        deployId,
-        whitelisted: true,
-        createdTimestamp: new Date()
-      };
-
-      // branch support
-      if (poolname.split('.')[2]) {
-        message.branch = poolname.split('.')[2];
-      }
-
-      // await redis.rpush('poolDeploys', JSON.stringify(message));
-      // await exec(`heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`);
-      messages.push(putPoolRequest(message));
-      if (createHerokuDynos) {
-        execs.push(
-          exec(
-            `heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`
-          )
-        );
-      }
+    // branch support
+    if (poolname.split('.')[2]) {
+      message.branch = poolname.split('.')[2];
     }
 
+    const messages = [];
+    while (messages.length < needed){
+      messages.push(putPoolRequest(message));
+    }
     await Promise.all(messages);
-    await Promise.all(execs);
+
     logger.debug(`...Requesting ${needed} more org for ${poolname}...`);
-  } else {
-    logger.debug(
-      `pool ${poolname} has ${actualQuantity} ready out of ${targetQuantity} and is full.`
-    );
-  }
+    const builders = [];
+    const builderCommand = utilities.getPoolDeployerCommand();
+
+    if (createHerokuDynos) {
+      while (builders.length < needed){
+        builders.push(execProm(builderCommand));
+      }
+      await Promise.all(builders);
+    }
+    
+  } 
 };
 
 export const prepareAll = async () => {
   const pools = <poolConfig[]> await utilities.getPoolConfig();
   logger.debug(`preparing ${pools.length} pools`);
-
-  const prepares = [];
-  pools.forEach((pool) => {
-    prepares.push(preparePoolByName(pool));
-  });
-
-  await Promise.all(prepares);
+  
+  await Promise.all(
+    pools.map( pool => preparePoolByName(pool))
+  );
   logger.debug('all pools prepared');
 };

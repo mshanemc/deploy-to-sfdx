@@ -1,47 +1,37 @@
-import * as Nightmare from 'nightmare';
-import {expect} from 'chai';
-import { NightmarePage } from '../../src/lib/types';
+import * as puppeteer from 'puppeteer';
+import * as fs from 'fs-extra';
 
-const waitTimeout = 1000 * 60 * 15;
+import { getTestURL } from './../helpers/testingUtils';
+import { sfdxTimeout } from './../helpers/testingUtils';
 
 const deployCheck = async (user, repo) => {
-  const url = `https://github.com/${user}/${repo}`;
-  const nightmare = new Nightmare({
-    // show: true,
-    waitTimeout
-    // openDevTools: { mode: 'detach' }
-  });
+    await fs.ensureDir('tmp');
 
-  const page = <NightmarePage>(
-    await nightmare.goto(
-      `${process.env.DEPLOYER_TESTING_ENDPOINT}/launch?template=${url}`
-    )
-  );
-  expect(page.url).to.include(`deploying/deployer/${user}-${repo}-`);
+    const baseUrl = getTestURL();
+	const url = `https://github.com/${user}/${repo}`;
+	const browser = await puppeteer.launch({headless:true});
+	const page = await browser.newPage();
+    
+    await page.goto(`${baseUrl}/launch?template=${url}`);
 
-  await nightmare.wait('a#loginURL[href*="https:"]');
+    const urlResult = await page.url(); 
+	expect(urlResult).toContain(`deploying/deployer/${user}-${repo}-`);
 
-  const href = await nightmare.evaluate(
-    () => (<HTMLAnchorElement>document.querySelector('#loginUrl')).href
-  );
-  expect(href).to.be.a('string');
+    await page.waitForSelector('a#loginURL[href*="https:"]', { timeout: sfdxTimeout});
 
-  // verify that loading icon eventually stops spinning
-  let loading: boolean = true;
+    const href = await page.evaluate(() => (<HTMLAnchorElement>document.querySelector('#loginUrl')).href);    
+	expect(typeof href).toBe('string');
 
-  while (loading) {
-    loading = <boolean>(<unknown> await nightmare.exists('#loaderBlock'));
-  }
+	// verify that loading icon eventually stops spinning
+    await page.waitForSelector('#loaderBlock', { timeout: sfdxTimeout, hidden: true});
+    await page.waitForSelector('#errorBlock', { timeout: sfdxTimeout, hidden: true});
 
-  expect(loading).to.be.false;
+    await Promise.all([
+        page.click('#deleteButton'),
+        page.waitForNavigation()
+    ]);
 
-  const hasError = await nightmare.exists('#errorBlock');
-  expect(hasError).to.be.false;
-
-  return nightmare
-    .click('#deleteButton')
-    .wait(1000)
-    .end();
+    browser.close();
 };
 
-export { deployCheck }
+export { deployCheck };

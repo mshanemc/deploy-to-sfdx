@@ -2,7 +2,7 @@ import * as util from 'util';
 import * as fs from 'fs-extra';
 import * as logger from 'heroku-logger';
 import * as path from 'path';
-
+import * as stripcolor from 'strip-color';
 import * as utilities from './utilities';
 import * as poolParse from './poolParse';
 import { auth, getKeypath } from './hubAuth';
@@ -25,7 +25,8 @@ export async function poolBuild() {
     }
     return false;
   }
-  await auth();
+  
+  const authResult = await auth();
 
   // handling deletes
   if (msgJSON.delete) {
@@ -69,13 +70,19 @@ export async function poolBuild() {
 
     // run the file
     try {
-      utilities.loggerFunction(
-        await execFile('./orgInit.sh', { cwd: cloneDir, timeout: 1000000 })
-      );
-      const displayResults = await exec('sfdx force:org:display --json', {
-        cwd: cloneDir
-      });
-      poolMessage.displayResults = JSON.parse(displayResults.stdout).result;
+      await execFile('./orgInit.sh', { cwd: cloneDir, timeout: 1000000 })
+    } catch (e) {
+      throw new Error(e);
+    }
+
+    try {
+      const displayResults = await exec('sfdx force:org:display --json', { cwd: cloneDir });
+      poolMessage.displayResults = JSON.parse(stripcolor(displayResults.stdout)).result;
+    } catch (e) {
+      // console.error('error in force:org:display');
+      throw new Error(e);
+    }
+    try {
       await putPooledOrg(msgJSON, poolMessage);
       await fs.remove(`${tmpDir}/${msgJSON.deployId}`);
       return true;

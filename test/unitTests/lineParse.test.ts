@@ -1,5 +1,3 @@
-import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
 import * as util from 'util';
 
 import * as fs from 'fs-extra';
@@ -7,6 +5,7 @@ import * as fs from 'fs-extra';
 import { testRepos } from '../testRepos';
 import { lineParse } from '../../src/lib/lineParse';
 import * as utilities from '../../src/lib/utilities';
+import { sfdxTimeout } from './../helpers/testingUtils';
 
 import {
   deployRequest,
@@ -14,12 +13,6 @@ import {
   poolOrg
 } from '../../src/lib/types';
 import { exec } from 'child_process';
-
-const expect = chai.expect;
-// const assert = chai.assert;
-// const expect = chai.expect; // we are using the "expect" style of Chai
-
-chai.use(chaiAsPromised);
 
 const testDir = 'tmp'; // has to match what's expected by the parser
 const deployId = 'testDepId';
@@ -29,6 +22,7 @@ const testOrgInitLoc = `${testFileLoc}/orgInit.sh`;
 const execProm = util.promisify(exec);
 
 const timeOutLocalFS = 3000;
+
 const testDepReqWL: deployRequest = {
   deployId,
   repo: 'testItOut',
@@ -44,7 +38,7 @@ const testDepReq: deployRequest = {
 };
 
 describe('lineParserLocalTests', () => {
-  before(async () => {
+  beforeAll(async () => {
     await fs.remove(testDir);
   });
 
@@ -53,18 +47,17 @@ describe('lineParserLocalTests', () => {
       await fs.ensureDir(testFileLoc);
     });
 
-    it('returns a basic one untouched', async () => {
+    test('returns a basic one untouched', async () => {
       // save a local orgIinit.sh in matching deploytId
       const fileContents = 'echo "hello world"';
       await fs.writeFile(testOrgInitLoc, fileContents);
       const parsedLines = await lineParse(testDepReqWL);
-      expect(parsedLines).to.be.an('array');
-      expect(parsedLines.length).to.equal(1);
-      expect(parsedLines[0]).to.equal(fileContents);
+      expect(parsedLines.length).toBe(1);
+      expect(parsedLines[0]).toBe(fileContents);
       // expect(parsedLines[0]).to.equal(fileContents);
     });
 
-    it('properly removes comments', async () => {
+    test('properly removes comments', async () => {
       // save a local orgIinit.sh in matching deploytId
       const fileContents = `
       echo "hello world"
@@ -72,12 +65,11 @@ describe('lineParserLocalTests', () => {
       await fs.writeFile(testOrgInitLoc, fileContents);
       const parsedLines = await lineParse(testDepReqWL);
       // expect(parsedLines).to.equal(Array(1).fill(fileContents));
-      expect(parsedLines).to.be.an('array');
-      expect(parsedLines.length).to.equal(1);
-      expect(parsedLines[0]).to.equal('echo "hello world"');
+      expect(parsedLines.length).toBe(1);
+      expect(parsedLines[0]).toBe('echo "hello world"');
     });
 
-    it('properly removes empty lines', async () => {
+    test('properly removes empty lines', async () => {
       // save a local orgIinit.sh in matching deploytId
       const fileContents = `echo "hello world"
 
@@ -86,12 +78,11 @@ describe('lineParserLocalTests', () => {
       await fs.writeFile(testOrgInitLoc, fileContents);
       const parsedLines = await lineParse(testDepReqWL);
       // expect(parsedLines).to.equal(Array(1).fill(fileContents));
-      expect(parsedLines).to.be.an('array');
-      expect(parsedLines.length).to.equal(1);
-      expect(parsedLines[0]).to.equal('echo "hello world"');
+      expect(parsedLines.length).toBe(1);
+      expect(parsedLines[0]).toBe('echo "hello world"');
     });
 
-    it('adds json to sfdx commands', async () => {
+    test('adds json to sfdx commands', async () => {
       // save a local orgIinit.sh in matching deploytId
       const fileContents = `
       echo "hello world"
@@ -99,13 +90,12 @@ describe('lineParserLocalTests', () => {
       await fs.writeFile(testOrgInitLoc, fileContents);
       const parsedLines = await lineParse(testDepReqWL);
       // expect(parsedLines).to.equal(Array(1).fill(fileContents));
-      expect(parsedLines).to.be.an('array');
-      expect(parsedLines.length).to.equal(2);
-      expect(parsedLines[0]).to.equal('echo "hello world"');
-      expect(parsedLines[1]).to.equal('sfdx force:org:open --json');
+      expect(parsedLines.length).toBe(2);
+      expect(parsedLines[0]).toBe('echo "hello world"');
+      expect(parsedLines[1]).toBe('sfdx force:org:open --json');
     });
 
-    it('leaves non-sfdx commands untouched', async () => {
+    test('leaves non-sfdx commands untouched', async () => {
       // save a local orgIinit.sh in matching deploytId
       const fileContents = `
       echo "hello world"
@@ -113,10 +103,9 @@ describe('lineParserLocalTests', () => {
       await fs.writeFile(testOrgInitLoc, fileContents);
       const parsedLines = await lineParse(testDepReqWL);
       // expect(parsedLines).to.equal(Array(1).fill(fileContents));
-      expect(parsedLines).to.be.an('array');
-      expect(parsedLines.length).to.equal(2);
-      expect(parsedLines[0]).to.equal('echo "hello world"');
-      expect(parsedLines[1]).to.equal('something force:org:open');
+      expect(parsedLines.length).toBe(2);
+      expect(parsedLines[0]).toBe('echo "hello world"');
+      expect(parsedLines[1]).toBe('something force:org:open');
     });
 
     afterEach(async () => {
@@ -129,43 +118,42 @@ describe('lineParserLocalTests', () => {
       await fs.ensureDir(testFileLoc);
     });
 
-    it('throws error on shell sanitize issue', async () => {
+    test('throws error on shell sanitize issue', async () => {
       const fileContents = 'cat ../tmp > somewhereElse';
       await fs.writeFile(testOrgInitLoc, fileContents);
-      expect(lineParse(testDepReq)).be.be.rejectedWith(
-        `ERROR: Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${fileContents}`
+      //  await expect(deleteOrg('hack@you.bad;wget')).rejects.toEqual(Error('invalid username hack@you.bad;wget'));
+      expect(lineParse(testDepReq)).rejects.toEqual(`ERROR: Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${fileContents}`
       );
     });
 
-    it('throws error with -u commands', async () => {
+    test('throws error with -u commands', async () => {
       // save a local orgIinit.sh in matching deploytId
       const fileContents = 'sfdx force:org:open -u sneaky';
       await fs.writeFile(testOrgInitLoc, fileContents);
-      expect(lineParse(testDepReq)).be.be.rejectedWith(
+      expect(lineParse(testDepReq)).rejects.toEqual(
         `ERROR: Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${fileContents}`
       );
     });
 
-    it('throws error on non-sfdx commands', async () => {
+    test('throws error on non-sfdx commands', async () => {
       // save a local orgIinit.sh in matching deploytId
       const fileContents = 'echo "hello world"';
       await fs.writeFile(testOrgInitLoc, fileContents);
-      expect(lineParse(testDepReq)).be.be.rejectedWith(
+      expect(lineParse(testDepReq)).rejects.toEqual(
         `ERROR: Commands must start with sfdx or be comments (security, yo!).  Your command: ${fileContents}`
       );
     });
 
-    it('adds json to sfdx commands', async () => {
+    test('adds json to sfdx commands', async () => {
       // save a local orgIinit.sh in matching deploytId
       const fileContents = `sfdx force:source:push
       sfdx force:org:open`;
       await fs.writeFile(testOrgInitLoc, fileContents);
       const parsedLines = await lineParse(testDepReq);
       // expect(parsedLines).to.equal(Array(1).fill(fileContents));
-      expect(parsedLines).to.be.an('array');
-      expect(parsedLines.length).to.equal(2);
-      expect(parsedLines[0]).to.equal('sfdx force:source:push --json');
-      expect(parsedLines[1]).to.equal('sfdx force:org:open --json');
+      expect(parsedLines.length).toBe(2);
+      expect(parsedLines[0]).toBe('sfdx force:source:push --json');
+      expect(parsedLines[1]).toBe('sfdx force:org:open --json');
     });
 
     afterEach(async () => {
@@ -174,6 +162,9 @@ describe('lineParserLocalTests', () => {
   });
 
   describe('everything in test repos', () => {
+    
+    jest.setTimeout(sfdxTimeout);
+
     beforeEach(async () => {
       await fs.ensureDir(testDir);
     });
@@ -189,13 +180,13 @@ describe('lineParserLocalTests', () => {
           createdTimestamp: new Date()
         };
 
-        it(`tests ${repo.username}/${repo.repo}`, async () => {
+        test(`tests ${repo.username}/${repo.repo}`, async () => {
+
           // git clone it
           const gitCloneCmd = utilities.getCloneCommand(depReq);
           await execProm(gitCloneCmd, { cwd: testDir});
           const parsedLines = await lineParse(depReq);
-          expect(parsedLines).to.be.an('array');
-        }).timeout(10000);
+        });
       });
     }
 

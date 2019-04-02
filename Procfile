@@ -1,7 +1,7 @@
 web: node built/web.js
-orgbuilder: node built/lib/deployConsumer.js
-poolwatcher: node built/lib/poolMaintenance.js
-pooldeployer: node built/lib/poolConsumer.js
-oneoffbuilder: node built/lib/deployOneOff.js
-poolskimmer: node built/lib/skimmer.js
-dynoskimmer: node built/lib/dynoCleanup.js
+orgbuilder: node built/processes/deployConsumer.js
+poolwatcher: node built/processes/poolMaintenance.js
+pooldeployer: node built/processes/poolConsumer.js
+oneoffbuilder: node built/processes/deployOneOff.js
+poolskimmer: node built/processes/skimmer.js
+dynoskimmer: node built/processes/dynoCleanup.js

@@ -17,8 +17,13 @@ export const testRepos = {
     {
       username: 'mshanemc',
       repo: 'process-automation-workshop-df17'
+    },
+    {
+      username: 'mshanemc',
+      repo: 'volunteering-base-pkg'
     }
-  ],
+  ]
+  ,
 
   adoptionWorkshops: [
     {
@@ -28,15 +33,7 @@ export const testRepos = {
     {
       username: 'mshanemc',
       repo: 'adoption-service'
-    },
-    {
-      username: 'mshanemc',
-      repo: 'reporting-workshop'
-    },
-    {
-      username: 'mshanemc',
-      repo: 'lightning-go-live'
-    },
+    },    
     {
       username: 'mshanemc',
       repo: 'lightning-vf'
@@ -44,8 +41,18 @@ export const testRepos = {
     {
       username: 'mshanemc',
       repo: 'js-buttons'
+    },
+    {
+      username: 'mshanemc',
+      repo: 'lightning-go-live'
+    },
+    {
+      username: 'mshanemc',
+      repo: 'reporting-workshop'
     }
   ],
+
+  
 
   campground: [
     {
@@ -68,14 +75,15 @@ export const testRepos = {
       username: 'mshanemc',
       repo: 'cg1-lowcode'
     }
-  ],
+  ]
+  ,
 
   other: [
-    // {
-    //   username: 'mshanemc',
-    //   repo: 'platformTrial'
-    // }
-    // ,
+    {
+      username: 'mshanemc',
+      repo: 'platformTrial'
+    }
+    ,
     // {
     //   username: 'mshanemc',
     //   repo: 'rviot'
@@ -89,5 +97,14 @@ export const testRepos = {
       username: 'mshanemc',
       repo: 'mobileWebinar'
     }
+    ,
+    {
+      username: 'mshanemc',
+      repo: 'cpq-workshop'
+    },
+    {
+      username: 'mshanemc',
+      repo: 'solutions-engagement'
+    }    
   ]
 };
