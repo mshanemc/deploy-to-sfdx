@@ -23,9 +23,12 @@ export const preparePoolByName = async (
     const inFlight =  await getPoolDeployCountByRepo(pool.user, pool.repo)
     const needed = targetQuantity - actualQuantity - inFlight;
     logger.debug(
-      `pool ${poolname} has ${actualQuantity} ready and ${inFlight} in queued out of ${targetQuantity}...`
+      `pool ${poolname} has ${actualQuantity} ready and ${inFlight} in queue out of ${targetQuantity}...`
     );
-
+    
+    if (needed <=0 ) {
+      return;
+    }
     const username = poolname.split('.')[0];
     const repo = poolname.split('.')[1];
     const deployId = encodeURIComponent( `${username}-${repo}-${new Date().valueOf()}` );
