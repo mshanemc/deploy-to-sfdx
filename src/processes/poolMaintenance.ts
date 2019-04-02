@@ -20,9 +20,9 @@ const maxPoolBuilders = parseInt(process.env.maxPoolBuilders) || 50;
     logger.debug(`starting ${currentNeed} builders for poolQueue`);
 
     const builders = [];
-
+    const builderCommand = utilities.getPoolDeployerCommand()
     while (builders.length < currentNeed){
-      builders.push(utilities.getPoolDeployerCommand());
+      builders.push(builderCommand);
     }
     await Promise.all(builders);
     await prepareAll();
