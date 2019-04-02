@@ -18,14 +18,12 @@ const maxPoolBuilders = parseInt(process.env.maxPoolBuilders) || 50;
       logger.warn('the poolDeploys queue seems really large');
     }
     
-    logger.debug(`starting ${currentNeed} builders for poolQueue`);
-
     const builders = [];
     const builderCommand = utilities.getPoolDeployerCommand()
     while (builders.length < currentNeed){
       builders.push(execProm(builderCommand));
     }
-    logger.debug(`starting ${builders.length} of${currentNeed} builders for poolQueue`);
+    logger.debug(`starting ${builders.length} of ${currentNeed} builders for poolQueue`);
     await Promise.all(builders);
     await prepareAll();
   }
