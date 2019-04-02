@@ -1,7 +1,6 @@
 /* globals it, describe */
 
 import * as utilities from '../../src/lib/utilities';
-import * as types from '../../src/lib/types';
 
 describe('Utilities: getArg', () => {
 

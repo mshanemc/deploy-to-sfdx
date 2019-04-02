@@ -11,7 +11,8 @@ import {
   getPooledOrg,
   putPooledOrg,
   getPoolRequest,
-  getPoolDeployRequestQueueSize
+  getPoolDeployRequestQueueSize,
+  getPoolDeployCountByRepo
 } from '../../src/lib/redisNormal';
 
 import { deployRequest } from '../../src/lib/types';
@@ -44,4 +45,40 @@ test('allows deletes with good usernames', async () => {
   expect(deleteOrg('sweet@you.good')).resolves.toBeUndefined();
   const result = await deleteOrg('sweet@you.good');
   expect(result).toBeUndefined();
+});
+
+test('properly counts poolDeploys', async () => {
+
+  const username = 'mshanemc';
+  const mainRepo = 'platformTrial';
+
+  const req: deployRequest = {
+    username: username,
+    repo: mainRepo,
+    deployId: encodeURIComponent( `${username}-${mainRepo}-${new Date().valueOf()}` ),
+    whitelisted: true,
+    pool: true,
+    createdTimestamp: new Date()
+  };
+
+  const req2: deployRequest = {
+    username: username,
+    repo: 'else',
+    deployId: encodeURIComponent( `${username}-else-${new Date().valueOf()}` ),
+    whitelisted: true,
+    pool: true,
+    createdTimestamp: new Date()
+  };
+  
+  await putPoolRequest(req);
+  await putPoolRequest(req);
+  await putPoolRequest(req);
+  await putPoolRequest(req);
+  await putPoolRequest(req2);
+
+  const poolSize = await getPoolDeployRequestQueueSize();
+  expect(poolSize).toBe(5);
+
+  const trialSize = await getPoolDeployCountByRepo(username, mainRepo);
+  expect(trialSize).toBe(4);
 });

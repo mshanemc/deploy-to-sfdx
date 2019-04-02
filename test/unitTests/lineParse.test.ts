@@ -5,6 +5,7 @@ import * as fs from 'fs-extra';
 import { testRepos } from '../testRepos';
 import { lineParse } from '../../src/lib/lineParse';
 import * as utilities from '../../src/lib/utilities';
+import { sfdxTimeout } from './../helpers/testingUtils';
 
 import {
   deployRequest,
@@ -21,6 +22,7 @@ const testOrgInitLoc = `${testFileLoc}/orgInit.sh`;
 const execProm = util.promisify(exec);
 
 const timeOutLocalFS = 3000;
+
 const testDepReqWL: deployRequest = {
   deployId,
   repo: 'testItOut',
@@ -160,6 +162,9 @@ describe('lineParserLocalTests', () => {
   });
 
   describe('everything in test repos', () => {
+    
+    jest.setTimeout(sfdxTimeout);
+
     beforeEach(async () => {
       await fs.ensureDir(testDir);
     });
@@ -176,11 +181,12 @@ describe('lineParserLocalTests', () => {
         };
 
         test(`tests ${repo.username}/${repo.repo}`, async () => {
+
           // git clone it
           const gitCloneCmd = utilities.getCloneCommand(depReq);
           await execProm(gitCloneCmd, { cwd: testDir});
           const parsedLines = await lineParse(depReq);
-            });
+        });
       });
     }
 

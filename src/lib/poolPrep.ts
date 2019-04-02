@@ -1,12 +1,8 @@
 import * as logger from 'heroku-logger';
-import * as util from 'util';
 
 import * as utilities from './utilities';
-import { redis, putPoolRequest } from './redisNormal';
-
+import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
 import { deployRequest, poolConfig } from './types';
-
-const exec = util.promisify(require('child_process').exec);
 
 export const preparePoolByName = async (
   pool: poolConfig,
@@ -24,9 +20,10 @@ export const preparePoolByName = async (
   
   // still there?  you must need some more orgs
   if (actualQuantity < targetQuantity) {
-    const needed = targetQuantity - actualQuantity;
+    const inFlight =  await getPoolDeployCountByRepo(pool.user, pool.repo)
+    const needed = targetQuantity - actualQuantity - inFlight;
     logger.debug(
-      `pool ${poolname} has ${actualQuantity} ready out of ${targetQuantity}...`
+      `pool ${poolname} has ${actualQuantity} ready and ${inFlight} in queued out of ${targetQuantity}...`
     );
 
     const username = poolname.split('.')[0];
