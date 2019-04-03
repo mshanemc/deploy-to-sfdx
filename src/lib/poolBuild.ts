@@ -70,7 +70,7 @@ export async function poolBuild() {
 
     // run the file
     try {
-      await execFile('./orgInit.sh', { cwd: cloneDir, timeout: 1000000 })
+      await execFile('./orgInit.sh', { cwd: cloneDir, timeout: 1000000, shell: '/bin/bash' })
     } catch (e) {
       throw new Error(e);
     }

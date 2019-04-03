@@ -117,7 +117,7 @@ const lines = function(
       logger.debug(`running line-- ${localLine}`);
 
       try {
-        lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}` });
+        lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' });
                 
         if (localLine.includes('--json')) {
           let response = JSON.parse(stripcolor(lineResult.stdout));
