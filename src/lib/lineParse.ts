@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as logger from 'heroku-logger';
 import * as readline from 'readline';
 
-import * as shellSanitize from './shellSanitize';
+import { shellSanitize}  from './shellSanitize';
 import * as argStripper from './argStripper';
 import { deployRequest } from './types';
 

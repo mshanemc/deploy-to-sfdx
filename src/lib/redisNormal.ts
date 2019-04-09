@@ -10,7 +10,7 @@ import {
 } from './types';
 
 import utilities = require('./utilities');
-import * as shellSanitize from './shellSanitize';
+import { shellSanitize } from './shellSanitize';
 
 const cdsExchange = 'deployMsg';
 const deployRequestExchange = 'deploys';
