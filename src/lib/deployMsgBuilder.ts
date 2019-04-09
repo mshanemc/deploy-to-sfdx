@@ -1,6 +1,6 @@
 import * as logger from 'heroku-logger';
 import { deployRequest } from './types';
-import * as shellSanitize from './shellSanitize';
+import { shellSanitize, filterAlphaHypenUnderscore } from './shellSanitize';
 import * as ua from 'universal-analytics';
 
 const deployMsgBuilder = function(req): deployRequest {
@@ -20,8 +20,8 @@ const deployMsgBuilder = function(req): deployRequest {
   
   const template = query.template;
   const path = template.replace('https://github.com/', '');
-  const username = path.split('/')[0];
-  const repo = path.split('/')[1];
+  const username = filterAlphaHypenUnderscore(path.split('/')[0]);
+  const repo = filterAlphaHypenUnderscore(path.split('/')[1]);
 
   const deployId = encodeURIComponent(
     `${username}-${repo}-${new Date().valueOf()}`
@@ -68,8 +68,8 @@ const deployMsgBuilder = function(req): deployRequest {
   }
 
   if (path.includes('/tree/')) {
-    // we're dealing with a branch
-    message.branch = path.split('/tree/')[1];
+    // we're dealing with a branch.  Only allow alphanumeric, hyphen, underscore
+    message.branch = filterAlphaHypenUnderscore(path.split('/tree/')[1]);
   }
 
   // checking for whitelisting
