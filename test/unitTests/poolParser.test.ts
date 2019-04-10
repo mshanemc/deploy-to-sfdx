@@ -1,13 +1,12 @@
 /* globals it, describe, before, after */
 import * as fs from 'fs-extra';
-import * as util from 'util';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 
 import * as parser from '../../src/lib/poolParse';
 import * as utilities from '../../src/lib/utilities';
+import { exec } from '../../src/lib/execProm';
 
-const exec = util.promisify(require('child_process').exec);
 
 const username = 'mshanemc';
 

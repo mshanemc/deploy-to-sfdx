@@ -1,4 +1,3 @@
-import * as util from 'util';
 
 import * as fs from 'fs-extra';
 
@@ -6,22 +5,18 @@ import { testRepos } from '../testRepos';
 import { lineParse } from '../../src/lib/lineParse';
 import * as utilities from '../../src/lib/utilities';
 import { sfdxTimeout } from './../helpers/testingUtils';
+import { execProm } from '../../src/lib/execProm';
 
 import {
-  deployRequest,
-  testRepo,
-  poolOrg
+  deployRequest  
 } from '../../src/lib/types';
-import { exec } from 'child_process';
 
 const testDir = 'tmp'; // has to match what's expected by the parser
 const deployId = 'testDepId';
 const testFileLoc = `${testDir}/${deployId}`;
 const testOrgInitLoc = `${testFileLoc}/orgInit.sh`;
 
-const execProm = util.promisify(exec);
-
-const timeOutLocalFS = 3000;
+// const timeOutLocalFS = 3000;
 
 const testDepReqWL: deployRequest = {
   deployId,

@@ -1,12 +1,9 @@
 import * as logger from 'heroku-logger';
-import * as util from 'util';
-import { exec } from 'child_process';
 
 import * as utilities from './utilities';
 import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
 import { deployRequest, poolConfig } from './types';
-
-const execProm = util.promisify(exec);
+import { execProm } from '../lib/execProm';
 
 export const preparePoolByName = async (
   pool: poolConfig,

@@ -1,10 +1,8 @@
 import * as fs from 'fs';
 import * as logger from 'heroku-logger';
-import * as util from 'util';
 
 import { isLocal } from './amIlocal';
-
-const exec = util.promisify(require('child_process').exec);
+import { exec } from '../lib/execProm';
 
 const getKeypath = async () => {
   

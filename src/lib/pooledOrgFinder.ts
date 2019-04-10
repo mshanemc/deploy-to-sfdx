@@ -1,6 +1,4 @@
-import { exec } from 'child_process';
 import * as logger from 'heroku-logger';
-import * as util from 'util';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as stripcolor from 'strip-color';
@@ -10,10 +8,10 @@ import { getPooledOrg, cdsPublish } from './redisNormal';
 import { getKeypath } from './hubAuth';
 import * as argStripper from './argStripper';
 import { timesToGA } from './timeTracking';
+import { execProm } from '../lib/execProm';
 
 import { deployRequest, clientDataStructure } from './types';
 
-const execProm = util.promisify(exec);
 
 const pooledOrgFinder = async function(deployReq: deployRequest) {
 	

@@ -1,11 +1,9 @@
 import * as logger from 'heroku-logger';
-import * as util from 'util';
-import { exec } from 'child_process';
 
+import { execProm } from '../lib/execProm';
 import { getDeleteQueueSize, getDeleteRequest } from '../lib/redisNormal';
 import { auth, getKeypath } from './../lib/hubAuth';
 
-const execProm = util.promisify(exec);
 
 (async () => {
     const delQueueInitialSize = await getDeleteQueueSize();

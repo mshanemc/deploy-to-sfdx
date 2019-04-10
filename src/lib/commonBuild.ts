@@ -1,19 +1,16 @@
 // serves as a shared build path for pool and non-pool orgs
 import * as fs from 'fs-extra';
-import {exec} from 'child_process';
 
 import * as logger from 'heroku-logger';
-import * as util from 'util';
 
 import { clientDataStructure, deployRequest } from './types';
 import { redis, deleteOrg, cdsPublish } from './redisNormal';
 import { lineParse } from './lineParse';
 import * as lineRunner from './lines';
 import { timesToGA } from './timeTracking';
-
+import { execProm } from './execProm';
 import * as utilities from './utilities';
 
-const execProm = util.promisify(exec);
 
 const build = async (msgJSON: deployRequest) => {
     fs.ensureDirSync('tmp');

@@ -1,12 +1,10 @@
-import * as util from 'util';
-
 import { preparePoolByName } from '../../src/lib/poolPrep';
-import { deployRequest, testRepo, poolOrg } from '../../src/lib/types';
+import { testRepo, poolOrg } from '../../src/lib/types';
 import { redis } from '../../src/lib/redisNormal';
 // import utilities = require('../../src/lib/utilities');
 import { poolBuild } from '../../src/lib/poolBuild';
 
-const exec = util.promisify(require('child_process').exec);
+import { exec } from '../../src/lib/execProm';
 
 const requestAddToPool = async (testRepo: testRepo, quantity:number = 1) => {
   // add to pool

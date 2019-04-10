@@ -1,14 +1,12 @@
 import * as logger from 'heroku-logger';
 import * as stripcolor from 'strip-color';
-import * as util from 'util';
 
 import * as utilities from './utilities';
 import { redis } from './redisNormal';
 import * as argStripper from './argStripper';
 
 import { deployRequest, clientDataStructure, commandSummary } from './types';
-
-const exec = util.promisify(require('child_process').exec);
+import { exec } from '../lib/execProm';
 
 const ex = 'deployMsg';
 
