@@ -39,6 +39,8 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 		let authD = false;
 		let tries = 0;
 
+		const keypath = await getKeypath();
+
 		while (!authD && keepTrying && tries < maxRetries) {
 			// let's auth to the org from the pool
 			tries++;
@@ -46,7 +48,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 				const loginResult = await execProm(
 					`sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${
 						msgJSON.displayResults.username
-					} --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`,
+					} --jwtkeyfile ${keypath} --instanceurl https://test.salesforce.com -s`,
 					{ cwd: uniquePath }
 				);
 
