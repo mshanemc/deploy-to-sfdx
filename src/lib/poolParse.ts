@@ -4,7 +4,7 @@ import * as readline from 'readline';
 import { lineParserResult } from './types';
 
 // returns the open command after making changes to local FS (removing the line from the file)
-const poolParse = function (path): Promise<lineParserResult> {
+const poolParse = function (path: string): Promise<lineParserResult> {
 
 	let parsedLines = [];
 
@@ -35,4 +35,4 @@ const poolParse = function (path): Promise<lineParserResult> {
 	});
 };
 
-export = poolParse;
+export { poolParse };
