@@ -11,7 +11,8 @@ const shellSanitize = function (input: string) {
 
 const filterAlphaHypenUnderscore = function (input: string) {
 	const regex = /([A-Za-z0-9\-\_]+)/g;
-	if (input.length === input.match(regex).length) {
+
+	if (input.length === input.match(regex)[0].length) {
 		return input;
 	} else {
 		throw new Error(`invalid characters in ${input}`);
