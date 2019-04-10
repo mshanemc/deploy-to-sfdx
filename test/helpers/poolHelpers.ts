@@ -8,8 +8,7 @@ import { poolBuild } from '../../src/lib/poolBuild';
 
 const exec = util.promisify(require('child_process').exec);
 
-const requestAddToPool = async (testRepo: testRepo, quantity:number = 2) => {
-  const originalPoolSize = await redis.llen('poolDeploys');
+const requestAddToPool = async (testRepo: testRepo, quantity:number = 1) => {
   // add to pool
   await preparePoolByName(
     {
@@ -21,12 +20,9 @@ const requestAddToPool = async (testRepo: testRepo, quantity:number = 2) => {
     false
   );
 
-  let poolSize = await redis.llen('poolDeploys');
-  expect(poolSize).toBe(originalPoolSize + quantity);
-  // verify in poolRequests
-  const msg = <deployRequest>JSON.parse(await redis.lpop('poolDeploys'));
-  poolSize = await redis.llen('poolDeploys');
-  expect(poolSize).toBe(originalPoolSize + 1);
+  // verify exists in poolRequests
+  const allMessages = await redis.lrange('poolDeploys', 0, -1);
+  const msg = allMessages.map( msg => JSON.parse(msg)).find( msg => msg.repo === testRepo.repo);
 
   expect(msg.username).toBe(testRepo.username);
   expect(msg.repo).toBe(testRepo.repo);
@@ -37,12 +33,13 @@ const requestAddToPool = async (testRepo: testRepo, quantity:number = 2) => {
 
 const requestBuildPool = async (testRepo: testRepo, deleteIt: boolean) => {
   
-  // verify not in poolRequests
-  let poolDeploySize = await redis.llen('poolDeploys');
-  expect(poolDeploySize).toBeGreaterThan(0);
-
   const buildResult = await poolBuild();
   expect(buildResult).toBe(true);
+
+  // verify not in poolRequests
+  const allMessages = await redis.lrange('poolDeploys', 0, -1);
+  const msg = allMessages.map( msg => JSON.parse(msg)).find( msg => msg.repo === testRepo.repo);
+  expect(msg).toBeFalsy();
 
   // verify in the pool for that repo
   const repoPoolSize = await redis.llen(
