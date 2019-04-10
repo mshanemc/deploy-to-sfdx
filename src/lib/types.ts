@@ -45,7 +45,7 @@ export interface poolOrg {
   displayResults?: sfdxDisplayResult;
 }
 
-interface sfdxDisplayResult {
+export interface sfdxDisplayResult {
   username: string;
   id: string;
   instanceUrl?: string;
@@ -77,7 +77,8 @@ export interface clientDataStructure {
   buildStartTime?: Date;
 
   orgId?: string;
-
+  instanceUrl?: string;
+  
   mainUser?: {
     username: string;
     loginUrl: string;
@@ -87,6 +88,8 @@ export interface clientDataStructure {
   additionalUsers?: additionalUser[];
   errors: clientError[];
   commandResults: clientResult[];
+
+  poolLines?: lineParserResult
 }
 
 interface clientError {
