@@ -1,15 +1,17 @@
 // serves as a shared build path for pool and non-pool orgs
 import * as fs from 'fs-extra';
+import * as stripcolor from 'strip-color';
 
 import * as logger from 'heroku-logger';
 
-import { clientDataStructure, deployRequest } from './types';
+import { clientDataStructure, deployRequest, sfdxDisplayResult } from './types';
 import { redis, deleteOrg, cdsPublish } from './redisNormal';
 import { lineParse } from './lineParse';
 import * as lineRunner from './lines';
 import { timesToGA } from './timeTracking';
 import { execProm } from './execProm';
 import * as utilities from './utilities';
+import { poolParse} from './poolParse';
 
 
 const build = async (msgJSON: deployRequest) => {
@@ -66,18 +68,18 @@ const build = async (msgJSON: deployRequest) => {
       fs.writeFileSync(location, JSON.stringify(configFileJSON), 'utf8');
     }
 
+    const orgInitPath = `tmp/${msgJSON.deployId}/orgInit.sh`;
+
     // grab the deploy script from the repo
     logger.debug(
-      `deployQueueCheck: going to look in the directory tmp/${
-        msgJSON.deployId
-      }/orgInit.sh`
+      `deployQueueCheck: going to look in the directory ${orgInitPath}`
     );
 
     // use the default file if there's not one
-    if (!fs.existsSync(`tmp/${msgJSON.deployId}/orgInit.sh`)) {
+    if (!fs.existsSync(orgInitPath)) {
       logger.debug('deployQueueCheck: no orgInit.sh.  Will use default');
       fs.writeFileSync(
-        `tmp/${msgJSON.deployId}/orgInit.sh`,
+        orgInitPath,
         `sfdx force:org:create -f config/project-scratch-def.json -s -d 1
         sfdx force:source:push
         sfdx force:org:open`
@@ -85,6 +87,11 @@ const build = async (msgJSON: deployRequest) => {
     }
 
     let parsedLines;
+
+    // reads the lines and removes and stores the open and password lines
+    if (msgJSON.pool) {
+      clientResult.poolLines = await poolParse(orgInitPath)
+    }
     
     try {
       parsedLines = await lineParse(msgJSON);
@@ -108,7 +115,10 @@ const build = async (msgJSON: deployRequest) => {
 
     try {
       clientResult = <clientDataStructure> await localLineRunner.runLines();
+      // used by pools, may be otherwise handy
+      clientResult.instanceUrl = await getInstanceUrl(`tmp/${msgJSON.deployId}`);      
       timesToGA(msgJSON, clientResult);
+      
     } catch (e) {
       logger.error('deployQueueCheck: Deployment error', msgJSON);
       logger.error('deployQueueCheck: Deployment error', e);  
@@ -121,3 +131,9 @@ const build = async (msgJSON: deployRequest) => {
   }
 
   export { build };
+
+  const getInstanceUrl = async (path: string) => {
+    const displayResults = await execProm('sfdx force:org:display --json', { cwd: path });
+    const displayResultsJSON = <sfdxDisplayResult> JSON.parse(stripcolor(displayResults.stdout));
+    return displayResultsJSON.instanceUrl;
+  }
