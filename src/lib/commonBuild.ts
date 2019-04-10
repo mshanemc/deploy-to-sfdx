@@ -51,7 +51,7 @@ const build = async (msgJSON: deployRequest) => {
       });
       clientResult.complete = true;
       if (!msgJSON.pool) await cdsPublish(clientResult);
-      return true;
+      return clientResult;
     }
 
     // if you passed in a custom email address, we need to edit the config file and add the adminEmail property
@@ -103,7 +103,7 @@ const build = async (msgJSON: deployRequest) => {
       });
       clientResult.complete = true;
       if (!msgJSON.pool) await cdsPublish(clientResult);
-      return true;
+      return clientResult;
     }
 
     const localLineRunner = new lineRunner(
