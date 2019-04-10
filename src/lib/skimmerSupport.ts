@@ -1,12 +1,9 @@
 import * as moment from 'moment';
-import { redis } from './redisNormal';
+import { redis, orgDeleteExchange } from './redisNormal';
 import { poolOrg, poolConfig } from './types';
 import * as utilities from './utilities';
-import * as util from 'util';
 import * as logger from 'heroku-logger';
 import * as request from 'request-promise-native';
-
-const exec = util.promisify(require('child_process').exec);
 
 const skimmer = async () => {
 	const pools = await utilities.getPoolConfig();
@@ -51,14 +48,8 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
 		)
 		.map(org => JSON.stringify({ username: org.displayResults.username, delete: true }));
 
-  await redis.rpush('poolDeploys', ...expiredOrgs);
-  const builders = [];
-  const builderCommand = utilities.getPoolDeployerCommand();
-  while (builders.length < expiredOrgs.length) {
-    builders.push(exec(builderCommand));
-  }
-	await Promise.all(builders);
-	return `removing ${expiredOrgs.length} expired orgs from pool ${poolname}`;
+  await redis.rpush(orgDeleteExchange, ...expiredOrgs);  
+	return `queueing for deletion ${expiredOrgs.length} expired orgs from pool ${poolname}`;
 };
 
 const herokuExpirationCheck = async () => {

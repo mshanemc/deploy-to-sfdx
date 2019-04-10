@@ -21,12 +21,13 @@ const orgDeleteExchange = 'orgDeletes';
 const redis = new Redis(process.env.REDIS_URL);
 
 const deleteOrg = async (username: string) => {
+  logger.debug(`org delete requested for ${username}`);
   if (shellSanitize(username)){
     const msg: DeleteRequest = {
       username,
       delete: true
     };
-    await redis.publish(orgDeleteExchange, JSON.stringify(msg));
+    await redis.rpush(orgDeleteExchange, JSON.stringify(msg));
   } else {
     throw new Error(`invalid username ${username}`);
   }
@@ -149,6 +150,7 @@ export {
   getPoolRequest,
   getPoolDeployRequestQueueSize,
   getPoolDeployCountByRepo,
+  orgDeleteExchange,
   getDeleteQueueSize,
   getDeleteRequest,
   deleteOrg
