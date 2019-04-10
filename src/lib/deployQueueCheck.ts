@@ -1,21 +1,13 @@
 // checks the deploy queue and runs the process.  Can be run as a one-off dyno, or on a setInterval.
 // testing: http://localhost:8443/launch?template=https://github.com/mshanemc/df17AppBuilding
 
-import * as util from 'util';
-import * as fs from 'fs-extra';
 import * as logger from 'heroku-logger';
 
-import { redis, deleteOrg, getDeployRequest, cdsPublish } from './redisNormal';
-import { lineParse } from './lineParse';
-import * as lineRunner from './lines';
+import { getDeployRequest } from './redisNormal';
 import { pooledOrgFinder }from './pooledOrgFinder';
-import * as utilities from './utilities';
-import { timesToGA } from './timeTracking';
 import { build } from './commonBuild';
 
-import { clientDataStructure, deployRequest } from './types';
-
-const exec = util.promisify(require('child_process').exec);
+import { deployRequest } from './types';
 
 const check = async () => {
   // pull the oldest thing on the queue
