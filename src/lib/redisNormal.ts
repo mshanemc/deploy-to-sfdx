@@ -15,21 +15,37 @@ import { shellSanitize } from './shellSanitize';
 const cdsExchange = 'deployMsg';
 const deployRequestExchange = 'deploys';
 const poolDeployExchange = 'poolDeploys';
+const orgDeleteExchange = 'orgDeletes';
+
 // for accessing the redis directly.  Less favored
 const redis = new Redis(process.env.REDIS_URL);
 
 const deleteOrg = async (username: string) => {
+  logger.debug(`org delete requested for ${username}`);
   if (shellSanitize(username)){
     const msg: DeleteRequest = {
       username,
       delete: true
     };
-    await redis.publish(poolDeployExchange, JSON.stringify(msg));
+    await redis.rpush(orgDeleteExchange, JSON.stringify(msg));
   } else {
     throw new Error(`invalid username ${username}`);
   }
-
 };
+
+const getDeleteQueueSize = async () => {
+  return await redis.llen(orgDeleteExchange);
+}
+
+const getDeleteRequest = async () => {
+  const msg = await redis.lpop(orgDeleteExchange);
+  if (msg) {
+    const msgJSON = <DeleteRequest>JSON.parse(msg);
+    return msgJSON;
+  } else {
+    throw new Error('delete request queue is empty');
+  }
+}
 
 const getDeployRequest = async (log?: boolean) => {
   const msg = await redis.lpop(deployRequestExchange);
@@ -122,7 +138,6 @@ const getPoolDeployCountByRepo = async (username: string, repo: string) => {
 
 export {
   redis,
-  deleteOrg,
   deployRequestExchange,
   getDeployRequest,
   cdsExchange,
@@ -134,5 +149,9 @@ export {
   putPooledOrg,
   getPoolRequest,
   getPoolDeployRequestQueueSize,
-  getPoolDeployCountByRepo
+  getPoolDeployCountByRepo,
+  orgDeleteExchange,
+  getDeleteQueueSize,
+  getDeleteRequest,
+  deleteOrg
 };

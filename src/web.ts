@@ -63,7 +63,6 @@ app.post('/trial', wrapAsync(async (req, res, next) => {
 
 app.post('/delete', wrapAsync(async (req, res, next) => {
   await deleteOrg(req.body.username);
-  utilities.runHerokuBuilder();
   res.status(302).send('/deleteConfirm');
 }));
 
