@@ -70,7 +70,7 @@ const getDeployRequest = async (log?: boolean) => {
 
 const putDeployRequest = async (depReq: deployRequest, log?: boolean) => {
   await redis.rpush(deployRequestExchange, JSON.stringify(depReq));
-  logger.debug('redis: added to deploy queue', putDeployRequest);
+  logger.debug('redis: added to deploy queue', depReq);
 };
 
 const putPoolRequest = async (poolReq: deployRequest, log?: boolean) => {
