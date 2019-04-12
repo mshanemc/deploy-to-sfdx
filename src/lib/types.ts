@@ -89,7 +89,7 @@ export interface clientDataStructure {
   errors: clientError[];
   commandResults: clientResult[];
 
-  poolLines?: lineParserResult
+  poolLines?: lineParserResult;
 }
 
 interface clientError {
