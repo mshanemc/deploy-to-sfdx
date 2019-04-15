@@ -52,7 +52,7 @@ const leadCreate = async function (incoming) {
 			form: formPostBody
 		});
 	} catch (e){
-		logger.error('error in trialLeadCreate', e);
+		logger.error('error in trialLeadCreate');
 	}
 
 };
