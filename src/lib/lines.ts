@@ -1,14 +1,11 @@
 import * as logger from 'heroku-logger';
 import * as stripcolor from 'strip-color';
 
+import { deployRequest, clientDataStructure, commandSummary, sfdxDisplayResult } from './types';
 import * as utilities from './utilities';
-import { redis } from './redisNormal';
+import { cdsPublish, redis } from './redisNormal';
 import * as argStripper from './argStripper';
-
-import { deployRequest, clientDataStructure, commandSummary } from './types';
 import { exec } from '../lib/execProm';
-
-const ex = 'deployMsg';
 
 const lines = function(
   msgJSON: deployRequest,
@@ -178,7 +175,7 @@ const lines = function(
         }        
 
         // finally, emit the entire new data structure back to the web server to forward to the client after each line
-        redisPub.publish(ex, JSON.stringify(output));
+        cdsPublish(output);
       } catch (e) {
         logger.error('a very serious error occurred on this line...in the catch section', e);
         // a more serious error...tell the client
@@ -189,7 +186,7 @@ const lines = function(
           raw: e
         });
 
-        redisPub.publish(ex, JSON.stringify(output));
+        cdsPublish(output);
 
         // and throw so the requester can do the rest of logging to heroku logs and GA
         throw new Error(e);
@@ -199,8 +196,12 @@ const lines = function(
     // we're done here
     output.complete = true;
     output.completeTimestamp = new Date();
+
+    // used by pools, may be otherwise handy
+    output.instanceUrl = await getInstanceUrl( `tmp/${msgJSON.deployId}`, output.mainUser.username);
+    
     await Promise.all([
-      redisPub.publish(ex, JSON.stringify(output)),
+      cdsPublish(output),
       exec('sfdx force:auth:logout -p', { cwd: `tmp/${msgJSON.deployId}` })
     ]);
     return output;
@@ -208,3 +209,10 @@ const lines = function(
 };
 
 export = lines;
+
+
+const getInstanceUrl = async (path: string, username: string) => {
+  const displayResults = await exec(`sfdx force:org:display -u ${username} --json`, { cwd: path });
+  const displayResultsJSON = <sfdxDisplayResult> JSON.parse(stripcolor(displayResults.stdout)).result;
+  return displayResultsJSON.instanceUrl;
+}

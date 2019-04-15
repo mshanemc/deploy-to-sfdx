@@ -37,7 +37,7 @@ describe('pool for ${testRepo.username}/${testRepo.repo}', () => {
     test('makes a pool org for ${testRepo.username}/${testRepo.repo}', async () => {
         const added = await requestAddToPool(tr);
         expect(added).toBe(true);
-        const built = await requestBuildPool(tr, false);
+        const built = await requestBuildPool(tr, true);
         expect(built).toBe(true);
     }, sfdxTimeout);  
 

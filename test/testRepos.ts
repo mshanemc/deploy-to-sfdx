@@ -5,23 +5,23 @@ export const testRepos = {
       username: 'mshanemc',
       repo: 'df17IntegrationWorkshops'
     }
-    ,
-    {
-      username: 'mshanemc',
-      repo: 'codeForClicks'
-    },
-    {
-      username: 'mshanemc',
-      repo: 'df17AppBuilding'
-    },
-    {
-      username: 'mshanemc',
-      repo: 'process-automation-workshop-df17'
-    },
-    {
-      username: 'mshanemc',
-      repo: 'volunteering-base-pkg'
-    }
+    // ,
+    // {
+    //   username: 'mshanemc',
+    //   repo: 'codeForClicks'
+    // },
+    // {
+    //   username: 'mshanemc',
+    //   repo: 'df17AppBuilding'
+    // },
+    // {
+    //   username: 'mshanemc',
+    //   repo: 'process-automation-workshop-df17'
+    // },
+    // {
+    //   username: 'mshanemc',
+    //   repo: 'volunteering-base-pkg'
+    // }
   ]
   // ,
 

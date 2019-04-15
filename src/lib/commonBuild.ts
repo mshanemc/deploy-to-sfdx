@@ -1,10 +1,8 @@
 // serves as a shared build path for pool and non-pool orgs
 import * as fs from 'fs-extra';
-import * as stripcolor from 'strip-color';
-
 import * as logger from 'heroku-logger';
 
-import { clientDataStructure, deployRequest, sfdxDisplayResult } from './types';
+import { clientDataStructure, deployRequest } from './types';
 import { redis, deleteOrg, cdsPublish } from './redisNormal';
 import { lineParse } from './lineParse';
 import * as lineRunner from './lines';
@@ -115,8 +113,6 @@ const build = async (msgJSON: deployRequest) => {
 
     try {
       clientResult = <clientDataStructure> await localLineRunner.runLines();
-      // used by pools, may be otherwise handy
-      clientResult.instanceUrl = await getInstanceUrl(`tmp/${msgJSON.deployId}`);      
       timesToGA(msgJSON, clientResult);
       
     } catch (e) {
@@ -131,9 +127,3 @@ const build = async (msgJSON: deployRequest) => {
   }
 
   export { build };
-
-  const getInstanceUrl = async (path: string) => {
-    const displayResults = await execProm('sfdx force:org:display --json', { cwd: path });
-    const displayResultsJSON = <sfdxDisplayResult> JSON.parse(stripcolor(displayResults.stdout));
-    return displayResultsJSON.instanceUrl;
-  }
