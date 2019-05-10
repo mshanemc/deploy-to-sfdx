@@ -34,8 +34,11 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
       
 	if (goodOrgs.length === allMessages.length) {
 		return `all the orgs in pool ${poolname} are fine`;
-	} else if (goodOrgs.length > 0) {
-    await redis.del(poolname);
+  } 
+  
+  await redis.del(poolname);
+  
+  if (goodOrgs.length > 0) {
     // put the good ones back
     logger.debug(`putting ${goodOrgs.length} back in ${poolname}`);
     await redis.lpush(poolname, ...goodOrgs);
