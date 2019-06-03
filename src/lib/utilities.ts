@@ -25,7 +25,7 @@ const utilities = {
   getPoolConfig: async (): Promise<poolConfig[]> => {
     // TODO: fallback as a singleton?
     if (!process.env.POOLCONFIG_URL) {
-      return;
+      return [];
     }
     try {
       return JSON.parse(await request(process.env.POOLCONFIG_URL));
