@@ -77,8 +77,14 @@ export interface clientDataStructure {
   additionalUsers?: additionalUser[];
   errors: clientError[];
   commandResults: clientResult[];
-
+  HerokuResults?: HerokuResult[];
   poolLines?: lineParserResult;
+}
+
+export interface HerokuResult {
+  appName: string;
+  dashboardUrl: string;
+  openUrl: string;
 }
 
 interface clientError {
