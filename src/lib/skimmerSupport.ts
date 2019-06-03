@@ -69,6 +69,8 @@ const herokuExpirationCheck = async () => {
   
         herokuDeletes.forEach((raw) => {
           const herokuDelete = JSON.parse(raw);
+          logger.debug('checking herokuDelete', herokuDelete.appName);
+
           if (moment(herokuDelete.expiration).isBefore(moment())) {
             logger.debug(`deleting heroku app: ${herokuDelete.appName}`);
             execs.push(
