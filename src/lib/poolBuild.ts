@@ -3,7 +3,6 @@ import * as logger from 'heroku-logger';
 import { auth } from './hubAuth';
 import { getPoolRequest, putPooledOrg } from './redisNormal';
 import { build } from './commonBuild';
-import { poolOrg } from './types';
 
 export async function poolBuild() {
   let msgJSON;
@@ -23,16 +22,6 @@ export async function poolBuild() {
 
   const buildResult = await build(msgJSON);
   
-  const poolMessage: poolOrg = {
-    repo: msgJSON.repo,
-    githubUsername: msgJSON.username,
-    openCommand: 'placeholder',
-    createdDate: new Date()
-  };
-  if (msgJSON.branch) {
-    poolMessage.branch = msgJSON.branch;
-  }
-
   await putPooledOrg(msgJSON, buildResult);
   return true;
 }

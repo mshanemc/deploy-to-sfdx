@@ -5,8 +5,7 @@ import * as ua from 'universal-analytics';
 import {
   DeleteRequest,
   deployRequest,
-  clientDataStructure,
-  poolOrg
+  clientDataStructure
 } from './types';
 
 import utilities = require('./utilities');

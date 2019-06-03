@@ -5,7 +5,9 @@ import { redis } from '../../src/lib/redisNormal';
 import { poolBuild } from '../../src/lib/poolBuild';
 import { getKeypath } from '../../src/lib/hubAuth';
 import { exec } from '../../src/lib/execProm';
+import { retry } from '@lifeomic/attempt';
 
+const retryOptions = { maxAttempts: 60, delay: 5000 };
 const requestAddToPool = async (testRepo: testRepo, quantity:number = 1) => {
   // add to pool
   await preparePoolByName(
@@ -54,17 +56,44 @@ const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) =
   expect(typeof poolOrg.instanceUrl).toBe('string');
   expect(typeof poolOrg.mainUser.username).toBe('string');
 
-  if (requireAuthable) {
-     
-    await exec(
-      `sfdx shane:org:reauth -r -u ${poolOrg.mainUser.username} --json`
-    );
+  if (requireAuthable) {     
+    try {
+      // we do this several times to increase the odds of the pool actually working...the first ones to get through sometimes doesn't hit on the findPooledOrg, but many times seems to be pretty sure.
+      // it's still flappy sometimes, though
+      await retry( 
+        async context => exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ poolOrg.mainUser.username } --jwtkeyfile ${ await getKeypath()} --instanceurl https://test.salesforce.com -s`), 
+        retryOptions
+      );
 
-    await exec(`sfdx force:auth:logout -u ${ poolOrg.mainUser.username }`)
+      await retry( 
+        async context => exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ poolOrg.mainUser.username } --jwtkeyfile ${ await getKeypath()} --instanceurl https://test.salesforce.com -s`), 
+        retryOptions
+      );
+
+      await retry( 
+        async context => exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ poolOrg.mainUser.username } --jwtkeyfile ${ await getKeypath()} --instanceurl https://test.salesforce.com -s`), 
+        retryOptions
+      );
+
+      await retry( 
+        async context => exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ poolOrg.mainUser.username } --jwtkeyfile ${ await getKeypath()} --instanceurl https://test.salesforce.com -s`), 
+        retryOptions
+      );
+
+      const result = await retry( 
+        async context => exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ poolOrg.mainUser.username } --jwtkeyfile ${ await getKeypath()} --instanceurl https://test.salesforce.com -s`), 
+        retryOptions
+      );
+      
+      await exec(`sfdx force:auth:logout -u ${ poolOrg.mainUser.username } -p`);
+    } catch (err) {
+      throw new Error(err);
+    }
+    
   }
   // put it back for the next use
-  await redis.rpush(`${testRepo.username}.${testRepo.repo}`, JSON.stringify(poolOrg));
-  
+  await redis.lpush(`${testRepo.username}.${testRepo.repo}`, JSON.stringify(poolOrg));
+
   return true;
 };
 

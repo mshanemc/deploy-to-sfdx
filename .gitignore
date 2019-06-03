@@ -45,3 +45,6 @@ examples.md
 repoList.json
 dump.rdb
 built
+
+# specialized tests
+test/integrationTests/generatedRepos

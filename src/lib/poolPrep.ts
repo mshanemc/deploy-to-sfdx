@@ -4,6 +4,7 @@ import * as utilities from './utilities';
 import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
 import { deployRequest, poolConfig } from './types';
 import { execProm } from '../lib/execProm';
+import * as ua from 'universal-analytics';
 
 export const preparePoolByName = async (
   pool: poolConfig,
@@ -42,6 +43,10 @@ export const preparePoolByName = async (
       whitelisted: true,
       createdTimestamp: new Date()
     };
+
+    if (process.env.UA_ID){
+      message.visitor = ua(process.env.UA_ID);
+    }
 
     // branch support
     if (poolname.split('.')[2]) {

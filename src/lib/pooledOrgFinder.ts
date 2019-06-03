@@ -19,15 +19,11 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 		cds = {...cds, buildStartTime: new Date(), deployId: deployReq.deployId, browserStartTime: deployReq.createdTimestamp || new Date() };
 
 		const uniquePath = path.join(__dirname, '../tmp/pools', cds.orgId);
-
 		fs.ensureDirSync(uniquePath);
 
-		const keypath = await getKeypath();
-
 		await execProm(
-			`sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${
-				cds.mainUser.username
-			} --jwtkeyfile ${keypath} --instanceurl ${cds.instanceUrl || 'https://test.salesforce.com'} -s`,
+			// `sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${keypath} --instanceurl ${cds.instanceUrl || 'https://test.salesforce.com'} -s`,
+			`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`,
 			{ cwd: uniquePath }
 		);
 		

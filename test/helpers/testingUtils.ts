@@ -6,7 +6,7 @@ const getTestURL = () => {
       return `http://localhost:${process.env.PORT || 8443}`;
     }
 }
-const sfdxTimeout = 1000 * 60 * 25;
+const sfdxTimeout = 1000 * 60 * 35;
 
 export { getTestURL, sfdxTimeout }
 
