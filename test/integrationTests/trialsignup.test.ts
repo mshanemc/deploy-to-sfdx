@@ -1,6 +1,5 @@
 import * as puppeteer from 'puppeteer';
 
-// import { requestAddToPool, requestBuildPool } from '../helpers/poolHelpers';
 import { sfdxTimeout , getTestURL } from '../helpers/testingUtils';
 
 const shouldBeLoaded = 1000;

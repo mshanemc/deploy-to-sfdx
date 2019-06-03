@@ -1,6 +1,4 @@
-import { exec } from 'child_process';
 import * as logger from 'heroku-logger';
-import * as util from 'util';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as stripcolor from 'strip-color';
@@ -10,43 +8,30 @@ import { getPooledOrg, cdsPublish } from './redisNormal';
 import { getKeypath } from './hubAuth';
 import * as argStripper from './argStripper';
 import { timesToGA } from './timeTracking';
+import { execProm } from '../lib/execProm';
 
-import { deployRequest, clientDataStructure } from './types';
-
-const execProm = util.promisify(exec);
+import { deployRequest } from './types';
 
 const pooledOrgFinder = async function(deployReq: deployRequest) {
 	
 	try {
-		const msgJSON = await getPooledOrg(await utilities.getKey(deployReq), true);
+		let cds = await getPooledOrg(await utilities.getKey(deployReq), true);
+		cds = {...cds, buildStartTime: new Date(), deployId: deployReq.deployId, browserStartTime: deployReq.createdTimestamp || new Date() };
 
-		const cds: clientDataStructure = {
-			deployId: deployReq.deployId,
-			browserStartTime: deployReq.createdTimestamp || new Date(),
-			buildStartTime: new Date(),
-			complete: true,
-			commandResults: [],
-			errors: []
-		};
-
-		const uniquePath = path.join(__dirname, '../tmp/pools', msgJSON.displayResults.id);
-
+		const uniquePath = path.join(__dirname, '../tmp/pools', cds.orgId);
 		fs.ensureDirSync(uniquePath);
 
-		const keypath = await getKeypath();
-
 		await execProm(
-			`sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${
-				msgJSON.displayResults.username
-			} --jwtkeyfile ${keypath} --instanceurl https://test.salesforce.com -s`,
+			// `sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${keypath} --instanceurl ${cds.instanceUrl || 'https://test.salesforce.com'} -s`,
+			`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`,
 			{ cwd: uniquePath }
 		);
 		
 		// we may need to put the user's email on it
 		if (deployReq.email) {
 			logger.debug(`changing email to ${deployReq.email}`);
-			const emailResult = await execProm(
-				`sfdx force:data:record:update -s User -w "username='${msgJSON.displayResults.username}'" -v "email='${
+			await execProm(
+				`sfdx force:data:record:update -s User -w "username='${cds.mainUser.username}'" -v "email='${
 					deployReq.email
 				}'"`,
 				{ cwd: uniquePath }
@@ -55,8 +40,8 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 
 		let password: string;
 
-		if (msgJSON.passwordCommand) {
-			const stripped = argStripper(msgJSON.passwordCommand, '--json', true);
+		if (cds.poolLines.passwordLine) {
+			const stripped = argStripper(cds.poolLines.passwordLine, '--json', true);
 			const passwordSetResult = await execProm(`${stripped} --json`, {
 				cwd: uniquePath
 			});
@@ -68,16 +53,15 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
 			}
 		}
 
-		const openResult = await execProm(`${msgJSON.openCommand} --json -r`, {
+		const openResult = await execProm(`${cds.poolLines.openLine} --json -r`, {
 			cwd: uniquePath
 		});
 		const openOutput = JSON.parse(stripcolor(openResult.stdout));
 
 		cds.openTimestamp = new Date();
 		cds.completeTimestamp = new Date();
-		cds.orgId = msgJSON.displayResults.id;
 		cds.mainUser = {
-			username: msgJSON.displayResults.username,
+			...(cds.mainUser),
 			loginUrl: utilities.urlFix(openOutput).result.url,
 			password
 		};

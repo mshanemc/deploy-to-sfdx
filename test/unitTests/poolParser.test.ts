@@ -1,13 +1,12 @@
 /* globals it, describe, before, after */
 import * as fs from 'fs-extra';
-import * as util from 'util';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 
-import * as parser from '../../src/lib/poolParse';
+import { poolParse } from '../../src/lib/poolParse';
 import * as utilities from '../../src/lib/utilities';
+import { exec } from '../../src/lib/execProm';
 
-const exec = util.promisify(require('child_process').exec);
 
 const username = 'mshanemc';
 
@@ -72,7 +71,7 @@ describe('tests the crash course workshop', () => {
 
 	test('works for a org:open only file', async () => {
 		expect(fs.existsSync(filepath));
-		const result = await parser(filepath);
+		const result = await poolParse(filepath);
 		expect(result);
 		expect(result.openLine).toBe('sfdx force:org:open');
 	}, timeout);
@@ -97,7 +96,7 @@ describe('tests the trial', () => {
 
 	test('works for a org:open with a path', async () => {
 		expect(fs.existsSync(filepath));
-		const result = await parser(filepath);
+		const result = await poolParse(filepath);
 		expect(result);
 		expect(result.openLine).toContain('sfdx force:org:open');
 		expect(result.openLine).toContain('-p');
@@ -123,7 +122,7 @@ describe('tests the integration workshop', () => {
 
 	test('works with custom user password set', async () => {
 		expect(fs.existsSync(filepath));
-		const result = await parser(filepath);
+		const result = await poolParse(filepath);
 		expect(result);
 		expect(result.openLine).toContain('sfdx force:org:open');
 		expect(result.passwordLine).toBe('sfdx shane:user:password:set -l User -g User -p sfdx1234 --json');

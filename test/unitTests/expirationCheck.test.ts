@@ -73,7 +73,7 @@ describe('tests the skimmer\'s expiration checks', () => {
             lifeHours: 12,
             quantity: 4
         });
-        expect(result).toBe(`removing 2 expired orgs from pool mshanemc.mixedpool`);
+        expect(result).toBe(`queueing for deletion 2 expired orgs from pool mshanemc.mixedpool`);
 
     });
 });

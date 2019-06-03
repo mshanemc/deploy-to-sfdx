@@ -34,18 +34,7 @@ export interface poolConfig {
   quantity: number;
 }
 
-// an org that's already built
-export interface poolOrg {
-  createdDate: Date;
-  repo: string;
-  githubUsername: string;
-  openCommand: string;
-  passwordCommand?: string;
-  branch?: string;
-  displayResults?: sfdxDisplayResult;
-}
-
-interface sfdxDisplayResult {
+export interface sfdxDisplayResult {
   username: string;
   id: string;
   instanceUrl?: string;
@@ -77,7 +66,8 @@ export interface clientDataStructure {
   buildStartTime?: Date;
 
   orgId?: string;
-
+  instanceUrl?: string;
+  
   mainUser?: {
     username: string;
     loginUrl: string;
@@ -87,6 +77,8 @@ export interface clientDataStructure {
   additionalUsers?: additionalUser[];
   errors: clientError[];
   commandResults: clientResult[];
+
+  poolLines?: lineParserResult;
 }
 
 interface clientError {
@@ -129,8 +121,3 @@ export interface herokuDyno {
   id: string;
   command: string;
 }
-
-export interface NightmarePage {
-  url ?: string;
-}
-

@@ -32,7 +32,9 @@
   },
   "homepage": "https://github.com/mshanemc/deploy-to-sfdx#readme",
   "dependencies": {
+    "@lifeomic/attempt": "^3.0.0",
     "@salesforce-ux/design-system": "^2.8.3",
+    "@salesforce/kit": "^1.1.1",
     "body-parser": "^1.18.3",
     "delay": "^4.1.0",
     "dotenv": "^6.2.0",
@@ -45,7 +47,7 @@
     "moment": "^2.24.0",
     "request-promise-native": "^1.0.7",
     "serve-favicon": "^2.5.0",
-    "shane-sfdx-plugins": "^3.16.1",
+    "shane-sfdx-plugins": "^3.17",
     "strip-color": "^0.1.0",
     "universal-analytics": "^0.4.20",
     "ws": "^6.2.0"
@@ -53,6 +55,7 @@
   "devDependencies": {
     "@babel/core": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
+    "@types/async-retry": "^1.4.1",
     "@types/dotenv": "^6.1.0",
     "@types/express": "^4.16.1",
     "@types/express-ws": "^3.0.0",
@@ -74,7 +77,7 @@
     "jest-puppeteer": "^4.0.0",
     "mkdirp": "^0.5.1",
     "ncp": "^2.0.0",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.12.0",
     "puppeteer": "^1.13.0",
     "ts-jest": "^24.0.0",
     "ts-node": "^8.0.3",

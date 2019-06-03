@@ -1,13 +1,13 @@
-import * as util from 'util';
-
 import { preparePoolByName } from '../../src/lib/poolPrep';
-import { deployRequest, testRepo, poolOrg } from '../../src/lib/types';
+import { testRepo, clientDataStructure } from '../../src/lib/types';
 import { redis } from '../../src/lib/redisNormal';
 // import utilities = require('../../src/lib/utilities');
 import { poolBuild } from '../../src/lib/poolBuild';
+import { getKeypath } from '../../src/lib/hubAuth';
+import { exec } from '../../src/lib/execProm';
+import { retry } from '@lifeomic/attempt';
 
-const exec = util.promisify(require('child_process').exec);
-
+const retryOptions = { maxAttempts: 60, delay: 5000 };
 const requestAddToPool = async (testRepo: testRepo, quantity:number = 1) => {
   // add to pool
   await preparePoolByName(
@@ -31,7 +31,7 @@ const requestAddToPool = async (testRepo: testRepo, quantity:number = 1) => {
   return true;
 };
 
-const requestBuildPool = async (testRepo: testRepo, deleteIt: boolean) => {
+const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) => {
   
   const buildResult = await poolBuild();
   expect(buildResult).toBe(true);
@@ -47,23 +47,53 @@ const requestBuildPool = async (testRepo: testRepo, deleteIt: boolean) => {
   );
   expect(repoPoolSize).toBe(1);
 
-  const poolOrg = <poolOrg>(
+  const poolOrg = <clientDataStructure>(
     JSON.parse(await redis.lpop(`${testRepo.username}.${testRepo.repo}`))
   );
-  expect(poolOrg.repo).toBe(testRepo.repo);
-  expect(poolOrg.githubUsername).toBe(testRepo.username);
-  expect(typeof poolOrg.openCommand).toBe('string');
-  expect(typeof poolOrg.displayResults.username).toBe('string');
+  expect(poolOrg.deployId).toContain(testRepo.repo);
+  expect(poolOrg.deployId).toContain(testRepo.username);
+  expect(typeof poolOrg.poolLines.openLine).toBe('string');
+  expect(typeof poolOrg.instanceUrl).toBe('string');
+  expect(typeof poolOrg.mainUser.username).toBe('string');
 
-  if (deleteIt) {
-    // clean up after ourselves by deleting the org
-    const deleteResult = await exec(
-      `sfdx force:org:delete -p -u ${poolOrg.displayResults.username} --json`
-    );
-    expect(JSON.parse(deleteResult.stdout).status).toBe(0);
-  } else {
-    await redis.rpush(`${testRepo.username}.${testRepo.repo}`, JSON.stringify(poolOrg));
+  if (requireAuthable) {     
+    try {
+      // we do this several times to increase the odds of the pool actually working...the first ones to get through sometimes doesn't hit on the findPooledOrg, but many times seems to be pretty sure.
+      // it's still flappy sometimes, though
+      await retry( 
+        async context => exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ poolOrg.mainUser.username } --jwtkeyfile ${ await getKeypath()} --instanceurl https://test.salesforce.com -s`), 
+        retryOptions
+      );
+
+      await retry( 
+        async context => exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ poolOrg.mainUser.username } --jwtkeyfile ${ await getKeypath()} --instanceurl https://test.salesforce.com -s`), 
+        retryOptions
+      );
+
+      await retry( 
+        async context => exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ poolOrg.mainUser.username } --jwtkeyfile ${ await getKeypath()} --instanceurl https://test.salesforce.com -s`), 
+        retryOptions
+      );
+
+      await retry( 
+        async context => exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ poolOrg.mainUser.username } --jwtkeyfile ${ await getKeypath()} --instanceurl https://test.salesforce.com -s`), 
+        retryOptions
+      );
+
+      const result = await retry( 
+        async context => exec(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ poolOrg.mainUser.username } --jwtkeyfile ${ await getKeypath()} --instanceurl https://test.salesforce.com -s`), 
+        retryOptions
+      );
+      
+      await exec(`sfdx force:auth:logout -u ${ poolOrg.mainUser.username } -p`);
+    } catch (err) {
+      throw new Error(err);
+    }
+    
   }
+  // put it back for the next use
+  await redis.lpush(`${testRepo.username}.${testRepo.repo}`, JSON.stringify(poolOrg));
+
   return true;
 };
 

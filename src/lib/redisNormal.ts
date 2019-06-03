@@ -5,8 +5,7 @@ import * as ua from 'universal-analytics';
 import {
   DeleteRequest,
   deployRequest,
-  clientDataStructure,
-  poolOrg
+  clientDataStructure
 } from './types';
 
 import utilities = require('./utilities');
@@ -108,10 +107,10 @@ const getKeys = async () => {
 };
 
 // returns finished orgs from a pool
-const getPooledOrg = async (key: string, log?: boolean): Promise<poolOrg> => {
+const getPooledOrg = async (key: string, log?: boolean): Promise<clientDataStructure> => {
   const msg = await redis.lpop(key);
   if (msg) {
-    const poolOrg = <poolOrg>JSON.parse(msg);
+    const poolOrg = <clientDataStructure>JSON.parse(msg);
     if (log) {
       logger.debug(`pooledOrgFinder: found an org in ${key}`, poolOrg);
     }
@@ -121,7 +120,7 @@ const getPooledOrg = async (key: string, log?: boolean): Promise<poolOrg> => {
   }
 };
 
-const putPooledOrg = async (depReq: deployRequest, poolMessage: poolOrg) => {
+const putPooledOrg = async (depReq: deployRequest, poolMessage: clientDataStructure) => {
   const key = await utilities.getKey(depReq);
   await redis.rpush(key, JSON.stringify(poolMessage));
 };

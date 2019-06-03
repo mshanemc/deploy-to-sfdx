@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 import { redis, orgDeleteExchange } from './redisNormal';
-import { poolOrg, poolConfig } from './types';
+import { poolConfig, clientDataStructure } from './types';
 import * as utilities from './utilities';
 import * as logger from 'heroku-logger';
 import * as request from 'request-promise-native';
@@ -26,10 +26,10 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
 	}
 
   const allMessages = await redis.lrange(poolname, 0, -1); // we'll take them all
-  const allOrgs:poolOrg[] = allMessages.map( msg => JSON.parse(msg));
+  const allOrgs:clientDataStructure[] = allMessages.map( msg => JSON.parse(msg));
 
 	const goodOrgs = allOrgs
-		.filter(org => moment().diff(moment(org.createdDate), 'hours', true) <= pool.lifeHours)
+		.filter(org => moment().diff(moment(org.completeTimestamp), 'hours', true) <= pool.lifeHours)
     .map(org => JSON.stringify(org));
       
 	if (goodOrgs.length === allMessages.length) {
@@ -45,12 +45,12 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
   }
 
 	const expiredOrgs = allOrgs
-		.filter(
-      org => moment().diff(moment(org.createdDate), 'hours', true) > pool.lifeHours
-      && org.displayResults
-      && org.displayResults.username
+		.filter(org => 
+      moment().diff(moment(org.completeTimestamp), 'hours', true) > pool.lifeHours
+      && org.mainUser
+      && org.mainUser.username
 		)
-		.map(org => JSON.stringify({ username: org.displayResults.username, delete: true }));
+		.map(org => JSON.stringify({ username: org.mainUser.username, delete: true }));
 
   await redis.rpush(orgDeleteExchange, ...expiredOrgs);  
 	return `queueing for deletion ${expiredOrgs.length} expired orgs from pool ${poolname}`;
@@ -73,6 +73,8 @@ const herokuExpirationCheck = async () => {
   
         herokuDeletes.forEach((raw) => {
           const herokuDelete = JSON.parse(raw);
+          logger.debug('checking herokuDelete', herokuDelete.appName);
+
           if (moment(herokuDelete.expiration).isBefore(moment())) {
             logger.debug(`deleting heroku app: ${herokuDelete.appName}`);
             execs.push(

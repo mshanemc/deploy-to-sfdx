@@ -1,12 +1,10 @@
 import * as logger from 'heroku-logger';
-import * as util from 'util';
-import { exec } from 'child_process';
 
 import * as utilities from './utilities';
 import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
 import { deployRequest, poolConfig } from './types';
-
-const execProm = util.promisify(exec);
+import { execProm } from '../lib/execProm';
+import * as ua from 'universal-analytics';
 
 export const preparePoolByName = async (
   pool: poolConfig,
@@ -45,6 +43,10 @@ export const preparePoolByName = async (
       whitelisted: true,
       createdTimestamp: new Date()
     };
+
+    if (process.env.UA_ID){
+      message.visitor = ua(process.env.UA_ID);
+    }
 
     // branch support
     if (poolname.split('.')[2]) {
