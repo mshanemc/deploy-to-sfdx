@@ -37,6 +37,33 @@ const putHerokuCDS = async (cds: clientDataStructure) => {
   return await redis.lpush(herokuCDSExchange, JSON.stringify(cds));
 }
 
+const getHerokuCDSs = async () => {
+  const CDSs : clientDataStructure[] = (await redis.lrange(herokuCDSExchange, 0, -1))
+    .map( queueItem => JSON.parse(queueItem))
+  return CDSs;
+}
+
+const getAppNamesFromHerokuCDSs = async  (salesforceUsername : string) => {
+  // get all the CDSs
+  let herokuCDSs : clientDataStructure[] = (await redis.lrange(herokuCDSExchange, 0, -1))
+    .map( queueItem => JSON.parse(queueItem))
+  
+  // find the matching username
+  const matchedCDSIndex = herokuCDSs  
+    .findIndex( (cds) => cds.mainUser.username === salesforceUsername)
+  
+  const matched = herokuCDSs
+    .splice(matchedCDSIndex, 1)
+
+  // clear the queue and push the unmatched stuff back
+  await redis.del(herokuCDSExchange);
+  await redis.lpush(herokuCDSExchange, herokuCDSs.map( cds => JSON.stringify(cds)));
+
+  // return array of appnames
+  return matched[0].herokuResults.map( result => result.appName);
+
+}
+
 const getDeleteQueueSize = async () => {
   return await redis.llen(orgDeleteExchange);
 }
@@ -158,5 +185,7 @@ export {
   getDeleteQueueSize,
   getDeleteRequest,
   deleteOrg,
-  putHerokuCDS
+  putHerokuCDS,
+  getAppNamesFromHerokuCDSs,
+  getHerokuCDSs
 };

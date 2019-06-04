@@ -1,9 +1,11 @@
 import * as moment from 'moment';
-import { redis, orgDeleteExchange } from './redisNormal';
+import * as logger from 'heroku-logger';
+
+import { redis, orgDeleteExchange, getHerokuCDSs, getAppNamesFromHerokuCDSs } from './redisNormal';
 import { poolConfig, clientDataStructure } from './types';
 import * as utilities from './utilities';
-import * as logger from 'heroku-logger';
-import * as request from 'request-promise-native';
+import { herokuDelete } from './herokuDelete';
+import { execProm } from '../lib/execProm';
 
 const skimmer = async () => {
 	const pools = await utilities.getPoolConfig();
@@ -57,42 +59,27 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
 };
 
 const herokuExpirationCheck = async () => {
-    const herokuDeletes = await redis.lrange('herokuDeletes', 0, -1);
-    await redis.del('herokuDeletes');
-  
-    if (herokuDeletes.length > 0) {
+    const herokuCDSs = await getHerokuCDSs();
+
+    if (herokuCDSs.length > 0) {
       if (!process.env.HEROKU_API_KEY) {
         logger.warn('there is no heroku API key');
       } else {
-        const execs = [];
-  
-        const headers = {
-          Accept: 'application/vnd.heroku+json; version=3',
-          Authorization: `Bearer ${process.env.HEROKU_API_KEY}`
-        };
-  
-        herokuDeletes.forEach((raw) => {
-          const herokuDelete = JSON.parse(raw);
-          logger.debug('checking herokuDelete', herokuDelete.appName);
+        for (const cds of herokuCDSs) {
+          const username = cds.mainUser.username;
+          
+          // see if the org is deleted
+          const queryResult = await execProm(`sfdx force:data:soql:query -u hub -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`);
+          const status = JSON.parse(queryResult.stdout).result.records[0].Status;
 
-          if (moment(herokuDelete.expiration).isBefore(moment())) {
-            logger.debug(`deleting heroku app: ${herokuDelete.appName}`);
-            execs.push(
-              request.delete({
-                url: `https://api.heroku.com/apps/${herokuDelete.appName}`,
-                headers,
-                json: true
-              })
-            );
-          } else {
-            execs.push(
-              redis.rpush('herokuDeletes', JSON.stringify(herokuDelete))
-            );
+          if (status === 'Deleted') {
+            // if deleted, do the heroku delete thing
+            for (const appName of await getAppNamesFromHerokuCDSs(cds.mainUser.username)) {
+              await herokuDelete(appName);
+              logger.debug(`deleted heroku app with name ${appName}`);
+            }
           }
-        });
-  
-        const results = await Promise.all(execs);
-        results.forEach(result => logger.debug(result));
+        }        
       }
     }
   };

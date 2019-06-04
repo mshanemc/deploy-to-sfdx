@@ -1,9 +1,9 @@
 import * as logger from 'heroku-logger';
 
 import { execProm } from '../lib/execProm';
-import { getDeleteQueueSize, getDeleteRequest } from '../lib/redisNormal';
+import { getDeleteQueueSize, getDeleteRequest, getAppNamesFromHerokuCDSs } from '../lib/redisNormal';
 import { auth, getKeypath } from './../lib/hubAuth';
-
+import { herokuDelete } from './../lib/herokuDelete';
 
 (async () => {
     const delQueueInitialSize = await getDeleteQueueSize();
@@ -34,6 +34,12 @@ import { auth, getKeypath } from './../lib/hubAuth';
         
                     //delete it
                     await execProm(`sfdx force:org:delete -p -u ${deleteReq.username}`);
+                    
+                    // go through the herokuCDS for the username
+                    for (const appName of await getAppNamesFromHerokuCDSs(deleteReq.username)) {
+                        await herokuDelete(appName);
+                        logger.debug(`deleted heroku app with name ${appName}`);
+                    }
                 } catch (e) {
                     logger.warn(`unabled to delete org with username: ${deleteReq.username}`);
                 }
