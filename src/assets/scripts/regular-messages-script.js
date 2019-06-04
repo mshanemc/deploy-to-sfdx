@@ -19,6 +19,7 @@ const display = new Vue({
     completeTimestamp: '',
     browserStartTime: new Date(),
     orgId: 'init',
+    herokuResults: [],
     mainUser: {},
     additionalUsers: [],
     errors: [],
@@ -69,6 +70,7 @@ ws.onmessage = function (event) {
   try {
     // display.data = JSON.parse(event.data);
     display.orgId = newData.orgId;
+    display.herokuResults = newData.herokuResults;
     display.deployId = newData.deployId;
     display.commandResults = newData.commandResults;
     display.complete = newData.complete;
