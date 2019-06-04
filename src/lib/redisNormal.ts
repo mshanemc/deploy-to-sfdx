@@ -15,6 +15,7 @@ const cdsExchange = 'deployMsg';
 const deployRequestExchange = 'deploys';
 const poolDeployExchange = 'poolDeploys';
 const orgDeleteExchange = 'orgDeletes';
+const herokuCDSExchange = 'herokuCDSs';
 
 // for accessing the redis directly.  Less favored
 const redis = new Redis(process.env.REDIS_URL);
@@ -31,6 +32,10 @@ const deleteOrg = async (username: string) => {
     throw new Error(`invalid username ${username}`);
   }
 };
+
+const putHerokuCDS = async (cds: clientDataStructure) => {
+  return await redis.lpush(herokuCDSExchange, JSON.stringify(cds));
+}
 
 const getDeleteQueueSize = async () => {
   return await redis.llen(orgDeleteExchange);
@@ -152,5 +157,6 @@ export {
   orgDeleteExchange,
   getDeleteQueueSize,
   getDeleteRequest,
-  deleteOrg
+  deleteOrg,
+  putHerokuCDS
 };

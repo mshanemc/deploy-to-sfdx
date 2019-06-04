@@ -3,7 +3,7 @@ import * as fs from 'fs-extra';
 import * as logger from 'heroku-logger';
 
 import { clientDataStructure, deployRequest } from './types';
-import { redis, deleteOrg, cdsPublish } from './redisNormal';
+import { redis, deleteOrg, cdsPublish, putHerokuCDS } from './redisNormal';
 import { lineParse } from './lineParse';
 import * as lineRunner from './lines';
 import { timesToGA } from './timeTracking';
@@ -123,6 +123,11 @@ const build = async (msgJSON: deployRequest) => {
     }
 
     await fs.remove(`tmp/${msgJSON.deployId}`);
+    
+    // store in herokuCDS queue for synchronized deletion
+    if (clientResult.herokuResults.length > 0) {
+      await putHerokuCDS(clientResult);
+    }
     return clientResult;
 
   }
