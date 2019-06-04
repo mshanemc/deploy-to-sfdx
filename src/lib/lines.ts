@@ -164,12 +164,12 @@ const lines = function(
               } for user ${response.result.username || output.mainUser.username}`;
             } else if (summary === commandSummary.HEROKU_DEPLOY) {
               const HR :HerokuResult = {
-                appName: response.app.name,
-                dashboardUrl: `https://dashboard.heroku.com/apps/${response.app.name}`,
-                openUrl: response.resolved_success_url
+                appName: response.result.app.name,
+                dashboardUrl: `https://dashboard.heroku.com/apps/${response.result.app.name}`,
+                openUrl: response.result.resolved_success_url
               }
-              shortForm = `created heroku app with name ${response.app.name}`;
-              output.HerokuResults.push(HR);              
+              shortForm = `created heroku app with name ${response.result.app.name}`;
+              output.herokuResults.push(HR);              
             } else if (summary === commandSummary.USER_CREATE) {
               output.additionalUsers.push({
                 username: response.result.fields.username
