@@ -21,6 +21,7 @@ const build = async (msgJSON: deployRequest) => {
       errors: [],
       commandResults: [],
       additionalUsers: [],
+      herokuResults: [],
       mainUser: {},
       browserStartTime: msgJSON.createdTimestamp || new Date(),
       buildStartTime: new Date()
