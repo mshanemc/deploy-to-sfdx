@@ -2,15 +2,18 @@
   "name": "deploy-to-sfdx",
   "version": "0.0.1",
   "description": "An application that will deploy an SFDX project from a public Github repo",
-  "main": "web.js",
+  "main": "built/web.js",
   "engines": {
     "node": "11.7.0"
   },
   "scripts": {
-    "build": "tsc && cp -R ./src/views ./built/ && npm run css-build",
+    "build": "tsc && npm run client:build && npm run css-build",
+    "client:build": "lwc-services build",
+    "client:serve": "lwc-services serve",
+    "client:watch": "lwc-services watch",
     "local": "npm run build && heroku local dynoskimmer=1 && heroku local poolskimmer=1 && heroku local oneoffbuilder=1 && heroku local poolwatcher=1 && heroku local pooldeployer=1 && heroku local orgdeleter=1 && heroku local web=1,orgbuilder=3",
     "start": "node .",
-    "css-build": "mkdirp built/assets/css && mkdirp built/assets/fonts && ncp src/assets built/assets && ncp src/assets/favicons built/assets/favicons && node-sass src/scss -o built/assets/css && ncp node_modules/@salesforce-ux/design-system/assets/fonts built/assets/fonts",
+    "css-build": "mkdirp built/assets/css && mkdirp built/assets/fonts && ncp client-src/resources built/assets && ncp client-src/resources/favicons built/assets/favicons && node-sass src/scss -o built/assets/css && ncp node_modules/@salesforce-ux/design-system/assets/fonts built/assets/fonts",
     "css-watch": "node-sass --watch src/scss -o built/assets/css",
     "test:generate": "ts-node test/helpers/repoCodeGen.ts",
     "test:unit": "redis-cli flushall && sleep 2 && jest test/unitTests/* -c jest.config.unit.js && redis-cli flushall",
@@ -44,6 +47,8 @@
     "heroku-client": "^3.0.7",
     "heroku-logger": "^0.3.3",
     "ioredis": "^4.6.2",
+    "lwc": "^2.0.0",
+    "lwc-services": "^1.2.0",
     "moment": "^2.24.0",
     "request-promise-native": "^1.0.7",
     "serve-favicon": "^2.5.0",
@@ -78,6 +83,7 @@
     "mkdirp": "^0.5.1",
     "ncp": "^2.0.0",
     "node-sass": "^4.12.0",
+    "nodemon": "^1.19.1",
     "puppeteer": "^1.13.0",
     "ts-jest": "^24.0.0",
     "ts-node": "^8.0.3",
@@ -89,6 +95,15 @@
       "pre-commit": "rm -rf built",
       "pre-push": "rm -rf tmp/*; rm -rf src/tmp/* npm run test:unit:local"
     }
+  },
+  "nodemonConfig" : {
+    "restartable": "rs",
+    "watch": [
+      "client-src"
+    ],
+    "exec" : "npm run client:build && heroku local web=1,orgbuilder=1",
+    "verbose": true,
+    "ext": "js,json, html, css"
   },
   "heroku-run-build-script": true
 }

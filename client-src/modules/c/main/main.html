@@ -1,0 +1,40 @@
+<template>
+
+    <c-header></c-header>
+
+    <div class="primary-content">        
+        
+        <template if:true={isError}>
+            <c-top-level-error error-message={params.msg}></c-top-level-error>
+        </template>
+
+        <template if:true={isDeployer}>
+            <c-deploy-messages deploy-id={deployId}></c-deploy-messages>
+        </template>
+
+        <template if:true={isTrial}>
+            <c-trial-loader deploy-id={deployId}></c-trial-loader>
+        </template>
+
+        <template if:true={isDelete}>
+            <c-deleted></c-deleted>
+        </template>
+
+        <template if:true={isUserInfo}>
+            <c-user-info the-template={params.template}></c-user-info>
+        </template>
+
+        <template if:true={isTestform}>
+            <c-test-form ></c-test-form>
+        </template>
+
+    </div>
+
+    <c-footer></c-footer>
+
+    <!-- <div>hello from an LWC at pathname... {pathname}</div>
+    <div>{paramsDebug}</div>
+    <div>error status: {isError}</div>
+    <div>is it the deployer: {isDeployer}</div> -->
+
+</template>

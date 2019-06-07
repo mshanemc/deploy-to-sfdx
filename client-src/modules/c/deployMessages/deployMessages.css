@@ -1,0 +1,146 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-evenly;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.section {
+    /* vertical margin */
+    margin: 1.5rem 0rem;
+    width: 100%;
+}
+
+strong {
+    margin: 0rem 0.5rem 0rem 0rem;
+}
+
+strong.credentials {
+    margin: 0rem 0.5rem;
+}
+
+.loading-block {
+    display: inline-flex;
+    align-items: center;
+}
+
+.slds-notify_toast, .slds-notify--toast {
+    margin: 0.5rem 0 0.5rem 0;    
+    display: inline-flex;
+    align-items: center;
+    background: #706e6b;
+    font-weight: 300;
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    text-align: left;
+    justify-content: space-between;
+    color: white;
+    width: 100%;
+}
+
+.slds-theme_success, .slds-theme--success {
+    background-color: #04844b;
+}
+
+.slds-theme_error, .slds-theme--error {
+    background-color: #c23934;
+}
+
+.slds-theme_heroku, .slds-theme--heroku {
+    background-color: #6762a6;
+}
+
+.slds-button {
+    position: relative;
+    display: inline-block;
+    padding: 0;
+    background: transparent;
+    background-clip: border-box;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    line-height: 1.875rem;
+    text-decoration: none;
+    color: #0070d2;
+    -webkit-appearance: none;
+    white-space: normal;
+    user-select: none;
+}
+
+.slds-button_neutral, .slds-button--neutral {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #dddbda;
+    transition: border 0.15s linear;
+    border-color: #dddbda;
+    background-color: white;
+}
+
+.slds-button_neutral:hover, .slds-button_neutral:focus,
+.slds-button--neutral:hover,
+.slds-button--neutral:focus {
+  background-color: #f4f6f9;
+}
+
+.slds-button_destructive, .slds-button--destructive {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #dddbda;
+    transition: border 0.15s linear;
+    background-color: #c23934;
+    border-color: #c23934;
+    color: white;
+}
+
+a.slds-button {
+    text-align: center;
+}
+
+.slds-button + .slds-button {
+    margin-left: 1rem;
+}
+
+a.loginUrl, a.heroku {
+    color: initial;
+}
+
+a.loginUrl, a.deleteButton {
+    text-decoration: initial;
+}
+
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+.slds-card {
+    padding: 1rem 1.5rem;
+    background: white;
+
+    position: relative;
+    border: 1px solid #dddbda;
+    border-radius: 0.25rem;
+    background-clip: padding-box;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.output-area {       
+    line-height: 1.5rem;
+    color: #3e3e3c;
+}
+
+
+.slds-text-heading_small {
+    font-size: 1rem;
+    line-height: 1.25;
+}
+
+.slds-text-heading_medium {
+    font-weight: 300;
+    font-size: 1.25rem;
+    line-height: 1.25;
+}

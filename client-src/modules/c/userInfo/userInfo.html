@@ -1,0 +1,17 @@
+<template>
+    <c-card>
+        <div>
+            Your email address will be used in your new org.  It's not stored anywhere else.
+        </div>
+        <div class="slds-form slfd-form_stacked slds-m-top_large">
+            <div class="slds-form-element">
+                <label class="slds-form-element__label" for="input-unique-id">Email</label>
+                <div class="slds-form-element__control">
+                    <input type="email" id="email" class="slds-input" value={email} oninput={handleEmailChange} />
+                </div>
+            </div>
+            <a class="slds-button slds-button_brand slds-m-top_small" href={launchUrl}>Go</a>
+        </div>
+    </c-card>
+    
+</template>

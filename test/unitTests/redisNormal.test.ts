@@ -12,13 +12,16 @@ import {
   putPooledOrg,
   getPoolRequest,
   getPoolDeployRequestQueueSize,
-  getPoolDeployCountByRepo
+  getPoolDeployCountByRepo,
+  putHerokuCDS,
+  getHerokuCDSs,
+  getAppNamesFromHerokuCDSs
 } from '../../src/lib/redisNormal';
 
-import { deployRequest } from '../../src/lib/types';
+import { deployRequest, clientDataStructure } from '../../src/lib/types';
 
 jest.setTimeout(7000);
-const deployMsgTest:deployRequest = {
+const deployMsgTest: deployRequest = {
   repo: 'testRepo',
   username: 'mshanemc',
   deployId: 'this-is-the-deploy-id',
@@ -27,6 +30,58 @@ const deployMsgTest:deployRequest = {
 
 const deployMsgSerialized: any = {...deployMsgTest};
 deployMsgSerialized.createdTimestamp = deployMsgSerialized.createdTimestamp.toJSON();
+
+test('tests HerokuCDS functions', async () => {
+  await redis.del('herokuCDSs');
+
+  const CDS1: clientDataStructure = {
+    deployId: 'test1',
+    mainUser: {
+      username: 'test1@mailinator.com',
+      loginUrl: 'x'
+    },
+    errors: [],
+    complete: true,
+    commandResults: [],
+    herokuResults: [
+      {appName: 'testApp1a', openUrl: 'x', dashboardUrl: 'x'}
+    ]
+  };
+
+  const CDS2 = {
+    ...CDS1, 
+    mainUser: {
+      username: 'test2@mailinator.com',
+      loginUrl: 'x'
+    },
+    herokuResults : [
+      {appName: 'testApp2a', openUrl: 'x', dashboardUrl: 'x'},
+      {appName: 'testApp2b', openUrl: 'x', dashboardUrl: 'x'}
+    ],
+    deployId: 'test2'
+  };
+
+  await putHerokuCDS(CDS1);
+  await putHerokuCDS(CDS2);
+
+  const outputCDSs = await getHerokuCDSs();
+  expect(outputCDSs.length).toBe(2);
+  
+  outputCDSs.forEach( cds => {
+    expect(cds.herokuResults).toBeTruthy();
+  });
+
+  const appNames = await getAppNamesFromHerokuCDSs('test2@mailinator.com');
+  expect(appNames).toEqual(['testApp2a', 'testApp2b']);
+  expect(appNames).toEqual(['testApp2a', 'testApp2b']);
+
+  const remainingCDSs = await getHerokuCDSs();
+  expect(remainingCDSs.length).toBe(1);
+
+  await redis.del('herokuCDSs');
+
+}); 
+
 
 test('can put a message on the deploy queue', async () => {
   await putDeployRequest(deployMsgTest);

@@ -1,0 +1,93 @@
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+.slds-form-element {
+    position: relative;
+    min-width: 0;
+}
+
+.slds-button {
+    position: relative;
+    display: inline-block;
+    padding: 0;
+    background: transparent;
+    background-clip: border-box;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    line-height: 1.875rem;
+    text-decoration: none;
+    color: #0070d2;
+    -webkit-appearance: none;
+    white-space: normal;
+    user-select: none;
+}
+
+.slds-button_brand {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #dddbda;
+    transition: border 0.15s linear;
+    background-color: #0070d2;
+    border-color: #0070d2;
+    color: white;
+}
+
+a, button {
+    cursor: pointer;
+}
+
+button, input, optgroup, select, textarea {
+    color: inherit;
+    font: inherit;
+    margin: 0;
+}
+
+.slds-button:hover, .slds-button:focus, .slds-button:active, .slds-button:visited {
+    text-decoration: none;
+}
+
+.slds-button_brand:hover, .slds-button_brand:focus, .slds-button--brand:hover, .slds-button--brand:focus {
+    background-color: #005fb2;
+    border-color: #005fb2;
+    color: white;
+}
+
+.slds-form-element__label {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+    display: inline-block;
+    color: #3e3e3c;
+    font-size: 0.75rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    margin-bottom: 0.125rem;
+}
+
+.slds-form-element__control {
+    clear: left;
+    position: relative;
+}
+
+.slds-input {
+    background-color: white;
+    border: 1px solid #dddbda;
+    border-radius: 0.25rem;
+    width: 100%;
+    transition: border 0.1s linear, background-color 0.1s linear;
+    display: inline-block;
+    padding: 0 1rem 0 0.75rem;
+    line-height: 1.875rem;
+    min-height: calc(1.875rem + (1px * 2));
+}
+
+.slds-m-top_small {
+    margin-top: 0.75rem;
+}
+
+.slds-m-top_large, .slds-m-top--large {
+    margin-top: 1.5rem;
+}

@@ -5,6 +5,7 @@
     "target": "es2017",
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
+    "experimentalDecorators": true,
     "module": "none",
     "removeComments": true,
     "types": ["node", "jest", "express", "ioredis", "fs-extra", "moment", "request", "request-promise-native", "universal-analytics"]
