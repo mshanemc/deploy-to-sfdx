@@ -53,8 +53,10 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
       && org.mainUser.username
 		)
 		.map(org => JSON.stringify({ username: org.mainUser.username, delete: true }));
-
-  await redis.rpush(orgDeleteExchange, ...expiredOrgs);  
+  
+  if (expiredOrgs.length > 0 ) {
+    await redis.rpush(orgDeleteExchange, ...expiredOrgs);  
+  }
 	return `queueing for deletion ${expiredOrgs.length} expired orgs from pool ${poolname}`;
 };
 

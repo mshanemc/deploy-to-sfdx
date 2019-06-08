@@ -55,7 +55,9 @@ const getAppNamesFromHerokuCDSs = async  (salesforceUsername : string) => {
   const matchedCDSIndex = herokuCDSs  
     .findIndex( (cds) => cds.mainUser.username === salesforceUsername)
   
-  if (matchedCDSIndex !>0 ) {
+  logger.debug(`found matching cds ${salesforceUsername} === ${herokuCDSs[matchedCDSIndex].mainUser.username}`, );
+
+  if (matchedCDSIndex < 0 ) {
     logger.error(`no heroku CDS found for username ${salesforceUsername}`);
     return [];
   }
@@ -63,9 +65,11 @@ const getAppNamesFromHerokuCDSs = async  (salesforceUsername : string) => {
   const matched = herokuCDSs
     .splice(matchedCDSIndex, 1)
 
-  // clear the queue and push the unmatched stuff back
-  await redis.del(herokuCDSExchange);
-  await redis.lpush(herokuCDSExchange, ...(herokuCDSs.map( cds => JSON.stringify(cds))));
+  if (herokuCDSs.length > 0) {
+    // clear the queue and push the unmatched stuff back
+    await redis.del(herokuCDSExchange);
+    await redis.lpush(herokuCDSExchange, ...(herokuCDSs.map( cds => JSON.stringify(cds))));
+  }
   
 
   // return array of appnames

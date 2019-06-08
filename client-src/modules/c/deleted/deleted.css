@@ -14,9 +14,3 @@ div {
     align-items: center;
     justify-content: space-evenly;
 }
-
-a {
-    color: #006dcc;
-    text-decoration: none;
-    transition: color 0.1s linear;
-}

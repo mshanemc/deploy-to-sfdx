@@ -1,7 +1,15 @@
 import {checkExpiration}  from '../../src/lib/skimmerSupport';
-import { poolOrg } from './../../src/lib/types';
+import { clientDataStructure } from './../../src/lib/types';
 import { redis } from './../../src/lib/redisNormal';
 import * as moment from 'moment';
+
+const fineOrg: clientDataStructure = {
+    completeTimestamp: new Date(),
+    deployId: `test-1234`,
+    complete: true,
+    errors: [],
+    commandResults: []
+}
 
 describe('tests the skimmer\'s expiration checks', () => {
     test('handles empty pool', async () => {
@@ -18,12 +26,8 @@ describe('tests the skimmer\'s expiration checks', () => {
     test('handles pool where all are ok', async () => {
         // create a pool of stuff
         await redis.del('mshanemc.finepool');
-        const orgs: poolOrg[] = new Array(5).fill({
-            githubUsername: 'mshanemc',
-            repo: 'finepool',
-            createdDate: new Date(),
-            openCommand: 'nope'
-        }, 0, 5);
+        
+        const orgs: clientDataStructure[] = new Array(5).fill(fineOrg, 0, 5);
         expect(orgs.length).toBe(5);
 
         const messages = orgs.map( org => JSON.stringify(org));
@@ -42,21 +46,19 @@ describe('tests the skimmer\'s expiration checks', () => {
     test('handles pool with expired orgs', async () => {
         // create a pool of stuff
         await redis.del('mshanemc.mixedpool');
-        let orgs: poolOrg[] = new Array(3).fill({
-            githubUsername: 'mshanemc',
-            repo: 'mixedpool',
-            createdDate: new Date(),
-            openCommand: 'nope'
-        });
+        let orgs: clientDataStructure[] = new Array(3).fill(fineOrg);
+
         expect(orgs.length).toBe(3);
-        const badOrg:poolOrg = {
-            githubUsername: 'mshanemc',
-            repo: 'mixedpool',
-            createdDate: moment().subtract(5, 'days').toDate(),
-            openCommand: 'nope',
-            displayResults: {
-                id: 'nope',
-                username: 'mshanemc'
+
+        const badOrg: clientDataStructure = {
+            completeTimestamp: moment().subtract(5, 'days').toDate(),
+            deployId: `test-1234`,
+            complete: true,
+            errors: [],
+            commandResults: [],
+            mainUser: {
+                username: 'testusername@salesforce.com',
+                loginUrl: 'x'
             }
         };
 

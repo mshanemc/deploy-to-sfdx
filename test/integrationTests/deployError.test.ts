@@ -30,11 +30,15 @@ describe('tests error handling', () => {
 		const urlResult = await page.url();
 
 		expect(urlResult).toContain(`deploying/deployer/${user}-${repo}-`);
-		try {
-			await page.waitForSelector('div#errorBlock', {timeout: sfdxTimeout});
-		} catch (error) {
-			console.error('error message did not appear');
-		}
+
+		// not sure what to do because of shadow dom.  Need something fancy
+		
+		// try {
+		// 	await page.waitForSelector('div.slds-theme_error', {timeout: sfdxTimeout});
+		// } catch (error) {
+		// 	console.error('error message did not appear');
+		// }
+
 		browser.close();
 	});
 });

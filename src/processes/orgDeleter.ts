@@ -30,15 +30,6 @@ const retryOptions = { maxAttempts: 60, delay: 5000 };
                         async context => execProm(`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ deleteReq.username } --jwtkeyfile ${keypath} --instanceurl https://test.salesforce.com -s`), 
                         retryOptions
                       );
-
-                    // auth to the org
-                    await execProm(
-                        `sfdx force:auth:jwt:grant --json --clientid ${
-                        process.env.CONSUMERKEY
-                        } --username ${
-                            deleteReq.username
-                        } --jwtkeyfile ${keypath} --instanceurl https://test.salesforce.com -s`
-                    );
         
                     //delete it
                     await execProm(`sfdx force:org:delete -p -u ${deleteReq.username}`);                                    

@@ -4,7 +4,8 @@ export default class Main extends LightningElement {
 
     @track pathname = window.location.pathname;
     @track params = getQueryVariables();
-    
+
+    @track isHome = this.pathname === '/';
     @track isError = this.pathname === '/error';
     @track isDeployer = this.pathname.startsWith('/deploying/deployer/');
     @track isTrial = this.pathname.startsWith('/deploying/trial/');
