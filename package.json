@@ -7,14 +7,12 @@
     "node": "11.7.0"
   },
   "scripts": {
-    "build": "tsc && npm run client:build && npm run css-build",
+    "build": "tsc && npm run client:build",
     "client:build": "lwc-services build",
     "client:serve": "lwc-services serve",
     "client:watch": "lwc-services watch",
     "local": "npm run build && heroku local dynoskimmer=1 && heroku local poolskimmer=1 && heroku local oneoffbuilder=1 && heroku local poolwatcher=1 && heroku local pooldeployer=1 && heroku local orgdeleter=1 && heroku local web=1,orgbuilder=3",
     "start": "node .",
-    "css-build": "mkdirp built/assets/css && mkdirp built/assets/fonts && ncp client-src/resources built/assets && ncp client-src/resources/favicons built/assets/favicons && node-sass src/scss -o built/assets/css && ncp node_modules/@salesforce-ux/design-system/assets/fonts built/assets/fonts",
-    "css-watch": "node-sass --watch src/scss -o built/assets/css",
     "test:generate": "ts-node test/helpers/repoCodeGen.ts",
     "test:unit": "redis-cli flushall && sleep 2 && jest test/unitTests/* -c jest.config.unit.js && redis-cli flushall",
     "test:integration": "redis-cli flushall && sleep 2 && jest test/integrationTests -c jest.config.integration.js",
