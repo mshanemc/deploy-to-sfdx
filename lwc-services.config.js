@@ -24,19 +24,21 @@ module.exports = {
     }],
     // Default server options for watch command
     devServer: {
-        port: 8443,
-        host: '0.0.0.0',
+        // port: 8443,
+        // host: '0.0.0.0',
         open: false,
+        proxy: { '/': 'http://localhost:8443' },
         stats: 'errors-only',
         noInfo: true,
         contentBase: './client-src'
     },
     // Default server options for serve command
     server: {
-        port: 8443,
-        host: '0.0.0.0',
-        open: false,
-        customConfig: './built/web.js'
+        // port: 8443,
+        // host: '0.0.0.0',
+        proxy: { '/': 'http://localhost:8443'},
+        open: false
+        // customConfig: './built/web.js'
     },
     // LWC Compiler options for production mode.
     // Find the detailed description here: https://www.npmjs.com/package/@lwc/compiler
