@@ -90,7 +90,6 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "rm -rf built",
       "pre-push": "rm -rf tmp/*; rm -rf src/tmp/* npm run test:unit:local"
     }
   },
