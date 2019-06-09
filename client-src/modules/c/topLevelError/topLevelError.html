@@ -1,7 +1,9 @@
 <template>
     <c-card>
-        <div class="slds-text-heading_medium">Aww, something went wrong</div>
-        <div>{errorMessage}</div>
-        <div>Please send a message to <a href="https://twitter.com/mshanemc" target="_blank">@mshanemc</a> for help.</div>
+        
+        <c-illustration variant="WalkthroughNotAvailable" size="large" heading={errorMessage}>
+            <span slot="message">Please send a message to <a href="https://twitter.com/mshanemc" target="_blank">@mshanemc</a> for help</span>
+        </c-illustration>
+
     </c-card>
 </template>

@@ -8,7 +8,8 @@ export default class DeployMessages extends LightningElement {
         complete: false,
         mainUser: {},
         herokuResults: [],
-        errors: []
+        errors: [],
+        commandResults: []
     }
 
     get resultsOutput() {

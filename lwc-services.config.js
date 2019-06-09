@@ -27,7 +27,9 @@ module.exports = {
         // port: 8443,
         // host: '0.0.0.0',
         open: false,
-        proxy: { '/': 'http://localhost:8443' },
+        proxy: { 
+            '/': 'http://localhost:8443'
+        },
         stats: 'errors-only',
         noInfo: true,
         contentBase: './client-src'
@@ -36,7 +38,9 @@ module.exports = {
     server: {
         // port: 8443,
         // host: '0.0.0.0',
-        proxy: { '/': 'http://localhost:8443'},
+        proxy: { 
+            '/': 'http://localhost:8443'
+        },
         open: false
         // customConfig: './built/web.js'
     },
