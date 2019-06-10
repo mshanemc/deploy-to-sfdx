@@ -2612,10 +2612,15 @@ class MessageSubscriber extends lwc__WEBPACK_IMPORTED_MODULE_0__["LightningEleme
       this.dispatchEvent(deployMessage);
     };
 
-    this.ws.onclose = function () {
+    this.ws.onclose = () => {
       console.log('WS is closing');
       clearInterval(this.pinger);
     };
+  }
+
+  disconnectedCallback() {
+    this.ws.close();
+    clearInterval(this.pinger);
   }
 
 }
