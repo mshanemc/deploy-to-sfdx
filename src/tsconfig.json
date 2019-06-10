@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./built",
+    "outDir": "./../built",
     "allowJs": true,
     "target": "es2017",
     "allowSyntheticDefaultImports": true,
@@ -12,6 +12,7 @@
   "compileOnSave": true,
   "include": [
     "./lib",
-    "./processes"
+    "./processes",
+    "./web.ts"
   ]
 }
