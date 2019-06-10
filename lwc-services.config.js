@@ -9,7 +9,7 @@ module.exports = {
     noclear: true,
     // Defines the directory where to find the individual
     // modules. Change only when you know what you do. ;-)
-    moduleDir: 'client-src/modules',
+    moduleDir: './client-src/modules',
     // Array of directories where to look for additional
     // modules that don't live in `moduleDir`
     localModulesDirs: ['node_modules'],
@@ -19,8 +19,8 @@ module.exports = {
     sourceDir: './client-src',
     // List of resources for copying to the build folder
     resources: [{ 
-        from : 'client-src/resources',
-        to: 'built/assets'
+        from : './client-src/resources',
+        to: './built/assets'
     }],
     // Default server options for watch command
     devServer: {

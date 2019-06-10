@@ -7,12 +7,12 @@
     "node": "11.7.0"
   },
   "scripts": {
-    "build": "tsc -p src && npm run client:build",
+    "build": "tsc -p ./src && npm run client:build",
     "client:build": "lwc-services build",
     "client:serve": "lwc-services serve",
     "client:watch": "lwc-services watch",
-    "local": "npm run build && heroku local dynoskimmer=1 && heroku local poolskimmer=1 && heroku local oneoffbuilder=1 && heroku local poolwatcher=1 && heroku local pooldeployer=1 && heroku local orgdeleter=1 && heroku local web=1,orgbuilder=3",
-    "local:web": "npm run build && heroku local web=1,orgbuilder=3",
+    "local": "redis-server & npm run build && heroku local dynoskimmer=1 && heroku local poolskimmer=1 && heroku local oneoffbuilder=1 && heroku local poolwatcher=1 && heroku local pooldeployer=1 && heroku local orgdeleter=1 && heroku local web=1,orgbuilder=3",
+    "local:web": "redis-server & npm run build && heroku local web=1,orgbuilder=3",
     "start": "node .",
     "test:generate": "ts-node test/helpers/repoCodeGen.ts",
     "test:unit": "redis-server; redis-cli flushall && sleep 2 && jest test/unitTests/* -c jest.config.unit.js && redis-cli flushall",
