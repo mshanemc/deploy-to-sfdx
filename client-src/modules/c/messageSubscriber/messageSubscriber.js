@@ -27,7 +27,7 @@ export default class MessageSubscriber extends LightningElement {
             this.dispatchEvent(deployMessage);
         };
 
-        this.ws.onclose = function() {
+        this.ws.onclose = () => {
             console.log('WS is closing');
             clearInterval(this.pinger);
         };
