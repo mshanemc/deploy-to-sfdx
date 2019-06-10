@@ -44,7 +44,7 @@ examples.md
 .tmpLocalExamples
 repoList.json
 dump.rdb
-built
+# built
 
 # specialized tests
 test/integrationTests/generatedRepos
