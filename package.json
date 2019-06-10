@@ -45,7 +45,6 @@
     "heroku-client": "^3.0.7",
     "heroku-logger": "^0.3.3",
     "ioredis": "^4.6.2",
-    "lwc": "^2.0.0",
     "lwc-services": "^1.2.0",
     "moment": "^2.24.0",
     "request-promise-native": "^1.0.7",
@@ -93,12 +92,12 @@
       "pre-push": "rm -rf tmp/*; rm -rf src/tmp/* npm run test:unit:local"
     }
   },
-  "nodemonConfig" : {
+  "nodemonConfig": {
     "restartable": "rs",
     "watch": [
       "client-src"
     ],
-    "exec" : "npm run client:build && heroku local web=1,orgbuilder=1",
+    "exec": "npm run client:build && heroku local web=1,orgbuilder=1",
     "verbose": true,
     "ext": "js,json, html, css"
   },
