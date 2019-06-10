@@ -102,5 +102,5 @@
     "verbose": true,
     "ext": "js,json, html, css"
   },
-  "heroku-run-build-script": true
+  "heroku-run-build-script": false
 }
