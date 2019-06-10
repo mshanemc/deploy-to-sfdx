@@ -33,4 +33,10 @@ export default class MessageSubscriber extends LightningElement {
         };
           
     }
+
+    disconnectedCallback() {
+        this.ws.close();
+        clearInterval(this.pinger);
+    }
+
 }
