@@ -1,5 +1,5 @@
 <template>
-	<template if:false="{results.complete}">
+	<template if:false={results.complete}>
 		<div class="loading-block">
 			<img src="/images/loader.gif" style="width:27px;" />
 			<span class="slds-text-heading_medium">
@@ -8,20 +8,20 @@
 		</div>
 	</template>
 
-	<template if:true="{results.errors.length}">
+	<template if:true={results.errors.length}>
 		<div class="section slds-notify slds-notify_toast slds-theme_error" role="alert">
 			<div class="slds-notify__content">
 				<div class="slds-text-heading_small">
 					<strong>An error occurred while deploying. </strong> See the browser console logs for more information.
-					<template for:each="{results.errors}" for:item="error">
-						<p key="{error.error}">{ error.error }</p>
+					<template for:each={results.errors} for:item="error">
+						<p key={error.error}>{ error.error }</p>
 					</template>
 				</div>
 			</div>
 		</div>
 	</template>
 
-	<template if:true="{results.mainUser.loginUrl}">
+	<template if:true={results.mainUser.loginUrl}>
 		<div class="section">
 			<div>
 				<strong>Note: </strong> It can take up to 5 minutes for the my domain DNS to propogate. If the scratch org
@@ -30,8 +30,8 @@
 			<div class="slds-notify_toast slds-theme_success">
 				<div class="slds-text-heading_small">Your org is ready!</div>
 				<div>
-					<a href="" class="slds-button slds-button_destructive deleteButton" onclick="{deleteOrg}">Delete</a>
-					<a href="{results.mainUser.loginUrl}" target="_blank" class="slds-button slds-button_neutral loginUrl"
+					<a href="" class="slds-button slds-button_destructive deleteButton" onclick={deleteOrg}>Delete</a>
+					<a href={results.mainUser.loginUrl} target="_blank" class="slds-button slds-button_neutral loginUrl"
 						>Launch</a
 					>
 				</div>
@@ -39,7 +39,7 @@
 		</div>
 	</template>
 
-	<template if:true="{results.mainUser.password}">
+	<template if:true={results.mainUser.password}>
 		<div class="section">
 			<div>
 				<strong>Note: </strong> Use the Launch button above to login for the first time. These credentials are for other
@@ -60,21 +60,21 @@
 		</div>
 	</template>
 
-	<template if:true="{results.herokuResults.length}">
+	<template if:true={results.herokuResults.length}>
 		<div class="section">
 			<div>
 				<strong>Heroku Apps:</strong> Use these buttons to open the app (end user) or manage the app (heroku dashboard)
 			</div>
 
-			<template for:each="{results.herokuResults}" for:item="herokuResult">
-				<div key="{herokuResult.appName}">
+			<template for:each={results.herokuResults} for:item="herokuResult">
+				<div key={herokuResult.appName}>
 					<div class="slds-notify slds-notify_toast slds-theme_heroku" role="alert">
 						<div class="slds-text-heading_small">{herokuResult.appName}</div>
 						<div>
-							<a href="{herokuResult.openUrl}" target="_blank" class="slds-button slds-button_neutral heroku"
+							<a href={herokuResult.openUrl} target="_blank" class="slds-button slds-button_neutral heroku"
 								>Open App</a
 							>
-							<a href="{herokuResult.dashboardUrl}" target="_blank" class="slds-button slds-button_neutral heroku"
+							<a href={herokuResult.dashboardUrl} target="_blank" class="slds-button slds-button_neutral heroku"
 								>Open in Heroku</a
 							>
 						</div>
@@ -87,13 +87,13 @@
 	<div class="slds-card output-area section ">
 		<div>Open the browser console for more information and the full output of these commands</div>
 		<ol>
-			<template for:each="{results.commandResults}" for:item="commandResult" for:index="index">
-				<li key="{commandResult.command}">
-					<c-command-output command-result="{commandResult}"></c-command-output>
+			<template for:each={results.commandResults} for:item="commandResult" for:index="index">
+				<li key={commandResult.command}>
+					<c-command-output command-result={commandResult}></c-command-output>
 				</li>
 			</template>
 		</ol>
 	</div>
 
-	<c-message-subscriber deploy-id="{deployId}" ondeploymessage="{handleMessage}"></c-message-subscriber>
+	<c-message-subscriber deploy-id={deployId} ondeploymessage={handleMessage}></c-message-subscriber>
 </template>
