@@ -8,7 +8,7 @@ describe('misc server tests', () => {
   test('displays pools', async () => {
     const response = await request.get({
       url: `${testURL}/pools`,
-      json: true
+      json: true  
     });
     // expect(response.statusCode).toBe('200');
     expect(typeof response).toBe("object");

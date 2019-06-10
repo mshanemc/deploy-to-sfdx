@@ -1,17 +1,16 @@
 {
-    "compilerOptions": {
-      "outDir": "./built",
-      "allowJs": true,
-      "target": "es2017",
-      "allowSyntheticDefaultImports": true,
-      "moduleResolution": "node",
-      "experimentalDecorators": true,
-      "module": "none",
-      "removeComments": true,
-      "types": ["node", "jest", "express", "ioredis", "fs-extra", "moment", "request", "request-promise-native", "universal-analytics"]
-    },
-    "compileOnSave": true,
-    "include": [
-      "./src/**/*"
-    ]
-  }
+  "compilerOptions": {
+    "outDir": "./built",
+    "allowJs": true,
+    "target": "es2017",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "module": "none",
+    "removeComments": true,
+    "types": ["node", "jest", "express", "ioredis", "fs-extra", "moment", "request", "request-promise-native", "universal-analytics"]
+  },
+  "compileOnSave": true,
+  "include": [
+    "./src/**/*"
+  ]
+}
