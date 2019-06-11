@@ -21,8 +21,7 @@
     "test:integration:watch": "redis-server; redis-cli flushall && jest test/integrationTests  -c jest.config.integration.js --watch",
     "test": "test:generate && jest test/integrationTests -c jest.config.integration.js",
     "jest": "jest",
-    "jest:watch": "jest --watch",
-    "heroku-postbuild": "echo Skip builds on Heroku"
+    "jest:watch": "jest --watch"
   },
   "repository": {
     "type": "git",
