@@ -66,9 +66,7 @@ app.post('/delete', wrapAsync(async (req, res, next) => {
   res.status(302).send('/deleteConfirm');
 }));
 
-app.get('/deleteConfirm', (req, res, next) => {
-  res.sendFile('index.html', { root: path.join(__dirname, '../built/assets')});
-});
+
 
 app.get('/launch', wrapAsync(async (req, res, next) => {  
 
@@ -90,11 +88,7 @@ app.get('/launch', wrapAsync(async (req, res, next) => {
  
 }));
 
-app.get('/deploying/:format/:deployId', (req, res, next) => {
-  res.sendFile('index.html', { root: path.join(__dirname, '../built/assets')});
-});
-
-app.get('/userinfo', (req, res, next) => {
+app.get(['/', '/error', '/deploying/:format/:deployId', '/userinfo', '/testform', '/deleteConfirm'], (req, res, next) => {
   res.sendFile('index.html', { root: path.join(__dirname, '../built/assets')});
 });
 
@@ -102,18 +96,6 @@ app.get('/pools', wrapAsync(async (req, res, next) => {
   const keys = await getKeys();
   res.send(keys);
 }));
-
-app.get('/testform', (req, res, next) => {
-  res.sendFile('index.html', { root: path.join(__dirname, '../built/assets')});
-});
-
-app.get('/', (req, res, next) => {
-  res.sendFile('index.html', { root: path.join(__dirname, '../built/assets')});
-});
-
-app.get('/error', (req, res, next) => {
-  res.sendFile('index.html', { root: path.join(__dirname, '../built/assets')});
-});
 
 app.get('*', (req, res, next) => {
   setImmediate(() => {
