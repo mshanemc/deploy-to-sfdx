@@ -30,7 +30,6 @@ const server = app.listen(port, () => {
 const wss = new WebSocket.Server({ server, clientTracking: true });
 
 app.use(favicon(path.join(__dirname, 'assets/favicons', 'favicon.ico')));
-// app.use('/scripts', express.static(`${__dirname}/scripts`));
 app.use(express.static('built/assets'));
 
 app.use(
@@ -40,9 +39,6 @@ app.use(
 );
 
 app.use(bodyParser.json());
-// app.set('view engine', 'ejs');
-// app.set('views', path.join(__dirname, '/views'));
-// app.use(cookieParser());
 
 app.post('/trial', wrapAsync(async (req, res, next) => {
 
