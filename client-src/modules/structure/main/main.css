@@ -9,13 +9,13 @@
     max-width: 1000px;
 }
 
-c-top-level-error,
-c-home-message,
-c-user-info,
-c-test-form,
-c-deleted,
-c-deploy-messages,
-c-trial-loader {
+route-top-level-error,
+route-home-message,
+route-user-info,
+route-test-form,
+route-deleted,
+route-deploy-messages,
+route-trial-loader {
     width: 100%;
     height: 100%;
 }

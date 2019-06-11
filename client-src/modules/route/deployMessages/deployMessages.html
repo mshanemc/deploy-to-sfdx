@@ -89,11 +89,11 @@
 		<ol>
 			<template for:each={results.commandResults} for:item="commandResult" for:index="index">
 				<li key={commandResult.command}>
-					<c-command-output command-result={commandResult}></c-command-output>
+					<messages-command-output command-result={commandResult}></messages-command-output>
 				</li>
 			</template>
 		</ol>
 	</div>
 
-	<c-message-subscriber deploy-id={deployId} ondeploymessage={handleMessage}></c-message-subscriber>
+	<messages-message-subscriber deploy-id={deployId} ondeploymessage={handleMessage}></messages-message-subscriber>
 </template>
