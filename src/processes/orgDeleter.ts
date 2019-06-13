@@ -39,7 +39,7 @@ const retryOptions = { maxAttempts: 60, delay: 5000 };
                 }
 
                 // go through the herokuCDS for the username
-                for (const appName of await getAppNamesFromHerokuCDSs(deleteReq.username)) {
+                for (const appName of await getAppNamesFromHerokuCDSs(deleteReq.username, false)) {
                     try {
                         await herokuDelete(appName);
                     } catch (e) {

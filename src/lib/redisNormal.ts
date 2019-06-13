@@ -43,7 +43,7 @@ const getHerokuCDSs = async () => {
   return CDSs;
 }
 
-const getAppNamesFromHerokuCDSs = async  (salesforceUsername : string) => {
+const getAppNamesFromHerokuCDSs = async  (salesforceUsername : string, expecting:boolean = true) => {
   // get all the CDSs
   let herokuCDSs : clientDataStructure[] = (await redis.lrange(herokuCDSExchange, 0, -1))
     .map( queueItem => JSON.parse(queueItem))
@@ -56,7 +56,11 @@ const getAppNamesFromHerokuCDSs = async  (salesforceUsername : string) => {
     .findIndex( (cds) => cds.mainUser.username === salesforceUsername)
   
   if (matchedCDSIndex < 0 ) {
-    logger.error(`no heroku CDS found for username ${salesforceUsername}`);
+    if (expecting) {
+      logger.error(`no heroku CDS found for username ${salesforceUsername}`);
+    } else {
+      logger.debug(`no heroku CDS found for username ${salesforceUsername}`);
+    }
     return [];
   }
   
