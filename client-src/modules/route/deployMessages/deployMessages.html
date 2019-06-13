@@ -1,10 +1,7 @@
 <template>
 	<template if:false={results.complete}>
-		<div class="loading-block">
-			<img src="/images/loader.gif" style="width:27px;" />
-			<span class="slds-text-heading_medium">
-				Deploying {deployId}
-			</span>
+		<div class="section">
+			<base-progress-bar description={loadingDescription} progress={completionPercentage}></base-progress-bar>
 		</div>
 	</template>
 
@@ -60,7 +57,7 @@
 		</div>
 	</template>
 
-	<template if:true={results.herokuResults.length}>
+	<template if:true={results.herokuResults.length}> 
 		<div class="section">
 			<div>
 				<strong>Heroku Apps:</strong> Use these buttons to open the app (end user) or manage the app (heroku dashboard)

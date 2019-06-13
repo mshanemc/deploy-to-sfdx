@@ -3,17 +3,28 @@ import { LightningElement, api, track } from 'lwc';
 
 export default class DeployMessages extends LightningElement {
     @api deployId;
-
+    
+    // @track results = fakeData.default;
     @track results = {
         complete: false,
         mainUser: {},
         herokuResults: [],
         errors: [],
-        commandResults: []
+        commandResults: [],
+        lineCount: 100
     }
+
 
     get resultsOutput() {
         return JSON.stringify(this.results);
+    }
+
+    get completionPercentage() {
+        return (this.results.commandResults.length / this.results.lineCount) * 100;
+    }
+
+    get loadingDescription() {
+        return `Deploying ${ this.results.deployId ? this.results.deployId : '...'}`;
     }
 
     deleteOrg(e) {

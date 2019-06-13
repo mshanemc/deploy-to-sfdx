@@ -1,6 +1,6 @@
 {
 	"deployId": "mshanemc-process-automation-workshop-df17-1559757015305",
-	"complete": true,
+	"complete": false,
 	"errors": [{
 		"command": "this is a test command",
 		"error": "this is a test error",
@@ -171,6 +171,7 @@
 			}
 		}
 	],
+	"lineCount": "100",
 	"additionalUsers": [],
 	"mainUser": {
 		"username": "test-s0pml3myzddz@example.com",

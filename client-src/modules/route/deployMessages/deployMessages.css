@@ -21,11 +21,6 @@ strong.credentials {
     margin: 0rem 0.5rem;
 }
 
-.loading-block {
-    display: inline-flex;
-    align-items: center;
-}
-
 .slds-notify_toast, .slds-notify--toast {
     margin: 0.5rem 0 0.5rem 0;    
     display: inline-flex;
