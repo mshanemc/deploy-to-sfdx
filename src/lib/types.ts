@@ -65,6 +65,8 @@ export interface clientDataStructure {
   openTimestamp?: Date; // when the open button became visible, even if more scripts were still running
   buildStartTime?: Date;
 
+  lineCount?: Number; // how many lines need to run...used for status bar
+
   orgId?: string;
   instanceUrl?: string;
   

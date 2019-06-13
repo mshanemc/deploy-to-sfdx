@@ -94,6 +94,8 @@ const build = async (msgJSON: deployRequest) => {
     
     try {
       parsedLines = await lineParse(msgJSON);
+      clientResult.lineCount = parsedLines.length + 1; //1 extra to account for the git clone command 
+      await cdsPublish(clientResult);
     } catch (e) {
       clientResult.errors.push({
         command: 'line parsing',
