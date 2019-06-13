@@ -71,7 +71,7 @@ const herokuExpirationCheck = async () => {
           const username = cds.mainUser.username;
           
           // see if the org is deleted
-          const queryResult = await execProm(`sfdx force:data:soql:query -u {process.env.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`);
+          const queryResult = await execProm(`sfdx force:data:soql:query -u ${process.env.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`);
           const status = JSON.parse(queryResult.stdout).result.records[0].Status;
 
           if (status === 'Deleted') {
