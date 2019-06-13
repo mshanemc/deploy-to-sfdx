@@ -42,7 +42,6 @@ export default class DeployMessages extends LightningElement {
     }
 
     handleMessage(msg) {
-        console.log(msg);
         this.results = msg.detail;
     }
 }
