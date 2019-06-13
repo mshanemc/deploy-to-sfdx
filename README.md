@@ -129,7 +129,17 @@ in your `.env` add
 * in your `process.env` file, put the Heroku Redis url (it can be the same as you're using in the cloud. **Don't commit this file to your repo.**
 * `npm install` will get all your modules installed, including my plugin.
 * `npm build` will get the typescript from /src to /built, which is where the executables go.
-* then start this app with `npm run local`
+* then start this app with `npm run local:web`
+
+## Building for Local Dev
+
+Backend:
+`npx nodemon` will recompile all your typescript and restart the local web and worker servers.
+
+Frontend (LWC):
+`npm run client:watch` will start a server on localhost:3001.  It'll rebuild and hotswap anytime you save a file.
+
+Running both is good if you're working both front and backend
 
 ---
 
@@ -164,16 +174,15 @@ There's a file called `testRepos` that you'll want to customize with any repos y
 Run them with `npm run test:unit`.  A few of them are not true unit tests...the require a server and redis running, and will try to connect to github for your testRepos.  Run each of these commands in a separate terminal.
 
 ``` shell
-redis-server
-npm run local
+npm run local:web
 ```
 
 Integration (tests/integrationTests) are slower/harder.
 
-`npm run test:generate` will parse testRepos and create a integration tests for each repo that
+`npm run test:generate` will parse testRepos.ts and create a integration tests for each repo that
 
 1. tests that it deploys
-2. builds a pooled org using org pools
+2. builds a pooled org using org pools if you specify testPool=true in testrepos
 3. tests that it deploys from the pool
 
 Modify `repoCodeGen.ts` to change the generator.
@@ -186,18 +195,16 @@ NOTE: This is using up your scratch org quotas.  The tests delete the orgs, so i
 
 I'm using typescript...
 
-* `npm install` will get all your modules installed, including my plugin.
+* `npm install` will get all your modules installed, including my plugins.
 * `npm build` will get any typescript changes from /src to /built, which is where the executables go.
 
-... and scss, which also gets compiled via `npm build`
-
-finally, the front end app is mostly pug/jade, but that messages page is running vue.
+Finally, the front end app is Lightning Web Components.  You'll figure it out...if not, start here: https://lwc.dev/
 
 ---
 
 ## Launcher URLs
 
-There's not anything at / on the server.  Don't worry.  The only page you care about is `/launch` which takes 1 parameter `template`
+There's not anything at / on the server.  Don't worry.  The only page you probably care about is `/launch` which takes 1 parameter `template`
 
 So your path should be `https://whatever.herokuapp.com/launch?template=https://github.com/username/reponame`
 
