@@ -83,39 +83,6 @@ const lines = function(
         });
       }
 
-      // // heroku deployer support  // if it's heroku:repo:deploy
-      // if (localLine.includes('sfdx shane:heroku:repo:deploy')) {
-      //   if (!process.env.HEROKU_API_KEY) {
-      //     // check that heroku API key is defined in process.env
-      //     logger.error(
-      //       'there is no HEROKU_API_KEY defined, but shane:heroku:repo:deploy is used in an .orgInit',
-      //       {
-      //         repo: `${msgJSON.username}/${msgJSON.repo}`
-      //       }
-      //     );
-      //   }
-      //   summary = commandSummary.HEROKU_DEPLOY;
-      //   // if there's an org, align the expiration, otherwise default it to [?something]
-      //   // logger.debug(`heroku app deploy: ${localLine}`);
-      //   // visitor.event('sfdx event', 'heroku app deploy', this.msgJSON.template).send();
-      //   // push an object to the herokuDeletes queue
-
-      //   const days =
-      //     parseInt(utilities.getArg(localLine, '-d'), 10) ||
-      //     parseInt(utilities.getArg(localLine, '--days'), 10) ||
-      //     7;
-
-      //   const herokuDeleteMessage = {
-      //     herokuDelete: true,
-      //     appName:
-      //       utilities.getArg(localLine, '-n') ||
-      //       utilities.getArg(localLine, '--name'),
-      //     expiration: Date.now() + days * 24 * 60 * 60 * 1000
-      //   };
-
-      //   redis.rpush('herokuDeletes', JSON.stringify(herokuDeleteMessage));
-      // }
-
       // the actual work and error handling
       let lineResult;
 
