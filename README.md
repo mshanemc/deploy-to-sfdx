@@ -225,15 +225,23 @@ You can pass in `&email=required` to force user to a form where they add their e
 
 ## Example Repos with orgInit.sh scripts
 
-<https://github.com/mshanemc/DF17integrationWorkshops> [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/src/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops)
+[![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/client-src/resources/images/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/DF17integrationWorkshops) <https://github.com/mshanemc/DF17integrationWorkshops>
 
-<https://github.com/mshanemc/community-apps-workshop-df17> [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/src/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/community-apps-workshop-df17)
+---
 
-<https://github.com/mshanemc/process-automation-workshop-df17> [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/src/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/process-automation-workshop-df17)
+[![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/client-src/resources/images/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/community-apps-workshop-df17)
+<https://github.com/mshanemc/community-apps-workshop-df17>
 
-<https://github.com/mshanemc/df17-community-content-workshop> [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/src/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/df17-community-content-workshop)
+---
 
-<https://github.com/mshanemc/df17AppBuilding> [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/src/assets/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/df17AppBuilding)
+[![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/client-src/resources/images/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/process-automation-workshop-df17)
+<https://github.com/mshanemc/process-automation-workshop-df17>
+
+---
+
+[![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/client-src/resources/images/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/df17AppBuilding)<https://github.com/mshanemc/df17AppBuilding>
+
+---
 
 email example:
 <http://localhost:8543/launch?template=https://github.com/mshanemc/df17IntegrationWorkshops&email=shane.mclaughlin@salesforce.com>
