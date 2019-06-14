@@ -144,7 +144,6 @@ const lines = function(
               }: ${response.message}`, response
             );
           } else {
-            logger.debug('line returned status 0');
             if (summary === commandSummary.OPEN) {
               // temporary
               response = utilities.urlFix(response);
