@@ -67,19 +67,22 @@ const herokuExpirationCheck = async () => {
       if (!process.env.HEROKU_API_KEY) {
         logger.warn('there is no heroku API key');
       } else {
-        for (const cds of herokuCDSs) {
-          const username = cds.mainUser.username;
-          
+        for (const cds of herokuCDSs) {          
           // see if the org is deleted
-          const queryResult = await execProm(`sfdx force:data:soql:query -u ${process.env.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`);
-          const status = JSON.parse(queryResult.stdout).result.records[0].Status;
+          const queryResult = await execProm(`sfdx force:data:soql:query -u ${process.env.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${cds.mainUser.username}'" --json`);
+          try {          
+            const status = JSON.parse(queryResult.stdout).result.records[0].Status;
 
-          if (status === 'Deleted') {
-            // if deleted, do the heroku delete thing
-            for (const appName of await getAppNamesFromHerokuCDSs(cds.mainUser.username)) {
-              await herokuDelete(appName);
-              logger.debug(`deleted heroku app with name ${appName}`);
+            if (status === 'Deleted') {
+              // if deleted, do the heroku delete thing
+              for (const appName of await getAppNamesFromHerokuCDSs(cds.mainUser.username)) {
+                await herokuDelete(appName);
+                logger.debug(`deleted heroku app with name ${appName}`);
+              }
             }
+          } catch (e) {
+            logger.error(`error checking hub for username ${cds.mainUser.username}`);
+            logger.error(e);
           }
         }        
       }
