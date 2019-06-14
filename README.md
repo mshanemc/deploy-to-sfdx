@@ -1,5 +1,11 @@
 # SFDX Deployer
 
+Front end: [LWC](lwc.dev)
+
+Back end: nodejs/express/typescript + heroku buildpacks
+
+Test: jest
+
 ## Purpose
 
 You have a dev hub, and an sfdx repo.  You'd like to let people spin up scratch orgs based on the repo, and these people might not feel like using a terminal, cloning the repo, loggin in to a dev hub, and executing sfdx commands.
