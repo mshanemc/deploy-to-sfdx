@@ -123,7 +123,7 @@ Example code here, but feel free to generate it however you like.
 
 ```
 
-`pooldeployer` should have 0 dynos running.  It runs as a one-off dyno called by *** poolwatcher* *
+`pooldeployer` should have 0 dynos running.  It runs as a one-off dyno called by **poolwatcher**
 
 ---
 
@@ -204,7 +204,7 @@ I'm using typescript...
 * `npm install` will get all your modules installed, including my plugins.
 * `npm build` will get any typescript changes from /src to /built, which is where the executables go.
 
-Finally, the front end app is Lightning Web Components.  You'll figure it out...if not, start here: https://lwc.dev/
+Finally, the front end app is Lightning Web Components.  You'll figure it out...if not, start here: [https://lwc.dev/](https://lwc.dev/)
 
 ---
 
