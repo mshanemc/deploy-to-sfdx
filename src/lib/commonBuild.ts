@@ -120,8 +120,7 @@ const build = async (msgJSON: deployRequest) => {
       
     } catch (e) {
       logger.error('deployQueueCheck: Deployment error', msgJSON);
-      logger.error('deployQueueCheck: Deployment error', e);  
-      await deleteOrg(msgJSON.username);    
+      logger.error('deployQueueCheck: Deployment error', e);        
     }
 
     await fs.remove(`tmp/${msgJSON.deployId}`);

@@ -3,7 +3,7 @@ import * as stripcolor from 'strip-color';
 
 import { deployRequest, clientDataStructure, commandSummary, sfdxDisplayResult, HerokuResult } from './types';
 import * as utilities from './utilities';
-import { cdsPublish, redis } from './redisNormal';
+import { cdsPublish, deleteOrg } from './redisNormal';
 import * as argStripper from './argStripper';
 import { exec } from '../lib/execProm';
 
@@ -163,6 +163,10 @@ const lines = function(
         // finally, emit the entire new data structure back to the web server to forward to the client after each line
         cdsPublish(output);
       } catch (e) {
+        if (msgJSON.pool && output.mainUser && output.mainUser.username) {
+          // delete an org if one got created and it's a pool
+          await deleteOrg(output.mainUser.username);
+        }
         logger.error('a very serious error occurred on this line...in the catch section', e);
         // a more serious error...tell the client
         output.complete = true;
