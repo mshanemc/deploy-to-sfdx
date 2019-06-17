@@ -6,6 +6,8 @@ import * as moment from 'moment';
 import * as utilities from '../lib/utilities';
 import { herokuDyno } from '../lib/types';
 
+const dynoTimeLimit = process.env.DYNO_TIME_LIMIT || 30;
+
 (async () => {
   // validations that we can process these
   if ( !utilities.checkHerokuAPI() || !process.env.HEROKU_APP_NAME ) {
@@ -20,7 +22,7 @@ import { herokuDyno } from '../lib/types';
     await Promise.all( 
       runDynos
         .filter( dyno => dyno.type === 'run')
-        .filter( dyno => moment(dyno.created_at).isBefore(moment().subtract(20, 'minutes')))
+        .filter( dyno => moment(dyno.created_at).isBefore(moment().subtract(dynoTimeLimit, 'minutes')))
         .map( dyno => heroku.post(`/apps/${process.env.HEROKU_APP_NAME}/dynos/${dyno.id}/actions/stop`))
     );
 
