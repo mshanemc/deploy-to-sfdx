@@ -1,17 +1,18 @@
 import * as logger from 'heroku-logger';
 import * as stripcolor from 'strip-color';
 
-import { deployRequest, clientDataStructure, commandSummary, sfdxDisplayResult, HerokuResult } from './types';
+import { deployRequest, sfdxDisplayResult } from './types';
 import * as utilities from './utilities';
 import { cdsPublish, deleteOrg } from './redisNormal';
 import * as argStripper from './argStripper';
 import { exec } from '../lib/execProm';
+import { CDS, commandSummary, HerokuResult } from './CDS';
 
 const lines = function(
   msgJSON: deployRequest,
   lines,
   redisPub,
-  output: clientDataStructure
+  output: CDS
 ) {
   this.msgJSON = msgJSON;
   this.lines = lines;

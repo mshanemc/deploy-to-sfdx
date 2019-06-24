@@ -15,7 +15,7 @@
     "local:web": "redis-server & npm run build && heroku local web=1,orgbuilder=3",
     "start": "node .",
     "test:generate": "ts-node test/helpers/repoCodeGen.ts",
-    "test:unit": "redis-server; redis-cli flushall && sleep 2 && jest test/unitTests/* -c jest.config.unit.js && redis-cli flushall",
+    "test:unit": "redis-cli flushall && sleep 2 && jest test/unitTests/* -c jest.config.unit.js && redis-cli flushall",
     "test:integration": "redis-server; redis-cli flushall && sleep 2 && jest test/integrationTests -c jest.config.integration.js",
     "test:unit:watch": "redis-server; redis-cli flushall && sleep 2 && jest test/unitTests/* -c jest.config.unit.js --watch && redis-cli flushall",
     "test:integration:watch": "redis-server; redis-cli flushall && jest test/integrationTests  -c jest.config.integration.js --watch",

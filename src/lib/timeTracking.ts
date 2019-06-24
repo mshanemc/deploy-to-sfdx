@@ -1,7 +1,8 @@
 import * as logger from 'heroku-logger';
-import { clientDataStructure, deployRequest } from './types';
+import { deployRequest } from './types';
+import { CDS } from './CDS';
 
-const timesToGA = (msgJSON: deployRequest, CDS: clientDataStructure) => {
+const timesToGA = (msgJSON: deployRequest, CDS: CDS) => {
   
     try {
       msgJSON.visitor

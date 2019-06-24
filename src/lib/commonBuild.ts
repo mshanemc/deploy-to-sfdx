@@ -2,7 +2,7 @@
 import * as fs from 'fs-extra';
 import * as logger from 'heroku-logger';
 
-import { clientDataStructure, deployRequest } from './types';
+import { deployRequest } from './types';
 import { redis, deleteOrg, cdsPublish, putHerokuCDS } from './redisNormal';
 import { lineParse } from './lineParse';
 import * as lineRunner from './lines';
@@ -10,22 +10,16 @@ import { timesToGA } from './timeTracking';
 import { execProm } from './execProm';
 import * as utilities from './utilities';
 import { poolParse} from './poolParse';
+import { CDS } from './CDS';
 
 
 const build = async (msgJSON: deployRequest) => {
     fs.ensureDirSync('tmp');
 
-    let clientResult = <clientDataStructure>{
+    let clientResult = new CDS({
       deployId: msgJSON.deployId,
-      complete: false,
-      errors: [],
-      commandResults: [],
-      additionalUsers: [],
-      herokuResults: [],
-      mainUser: {},
-      browserStartTime: msgJSON.createdTimestamp || new Date(),
-      buildStartTime: new Date()
-    };
+      browserStartTime: msgJSON.createdTimestamp
+    });
 
     const gitCloneCmd = utilities.getCloneCommand(msgJSON);
 
@@ -115,7 +109,7 @@ const build = async (msgJSON: deployRequest) => {
     );
 
     try {
-      clientResult = <clientDataStructure> await localLineRunner.runLines();
+      clientResult = <CDS> await localLineRunner.runLines();
       timesToGA(msgJSON, clientResult);
       
     } catch (e) {

@@ -18,7 +18,8 @@ import {
   getAppNamesFromHerokuCDSs
 } from '../../src/lib/redisNormal';
 
-import { deployRequest, clientDataStructure } from '../../src/lib/types';
+import { deployRequest } from '../../src/lib/types';
+import { CDS } from '../../src/lib/CDS';
 
 jest.setTimeout(7000);
 const deployMsgTest: deployRequest = {
@@ -34,21 +35,19 @@ deployMsgSerialized.createdTimestamp = deployMsgSerialized.createdTimestamp.toJS
 test('tests HerokuCDS functions', async () => {
   await redis.del('herokuCDSs');
 
-  const CDS1: clientDataStructure = {
+  const CDS1 = new CDS({
     deployId: 'test1',
     mainUser: {
       username: 'test1@mailinator.com',
       loginUrl: 'x'
     },
-    errors: [],
     complete: true,
-    commandResults: [],
     herokuResults: [
       {appName: 'testApp1a', openUrl: 'x', dashboardUrl: 'x'}
     ]
-  };
+  });
 
-  const CDS2 = {
+  const CDS2 = new CDS({
     ...CDS1, 
     mainUser: {
       username: 'test2@mailinator.com',
@@ -59,7 +58,7 @@ test('tests HerokuCDS functions', async () => {
       {appName: 'testApp2b', openUrl: 'x', dashboardUrl: 'x'}
     ],
     deployId: 'test2'
-  };
+  });
 
   await putHerokuCDS(CDS1);
   await putHerokuCDS(CDS2);

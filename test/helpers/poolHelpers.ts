@@ -1,11 +1,12 @@
 import { preparePoolByName } from '../../src/lib/poolPrep';
-import { testRepo, clientDataStructure } from '../../src/lib/types';
+import { testRepo } from '../../src/lib/types';
 import { redis } from '../../src/lib/redisNormal';
 // import utilities = require('../../src/lib/utilities');
 import { poolBuild } from '../../src/lib/poolBuild';
 import { getKeypath } from '../../src/lib/hubAuth';
 import { exec } from '../../src/lib/execProm';
 import { retry } from '@lifeomic/attempt';
+import { CDS } from '../../src/lib/CDS'
 
 const retryOptions = { maxAttempts: 60, delay: 5000 };
 const requestAddToPool = async (testRepo: testRepo, quantity:number = 1) => {
@@ -46,8 +47,8 @@ const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) =
     `${testRepo.username}.${testRepo.repo}`
   );
   expect(repoPoolSize).toBe(1);
-
-  const poolOrg = <clientDataStructure>(
+  
+  const poolOrg = <CDS>(
     JSON.parse(await redis.lpop(`${testRepo.username}.${testRepo.repo}`))
   );
   expect(poolOrg.deployId).toContain(testRepo.repo);

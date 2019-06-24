@@ -2,10 +2,11 @@ import * as moment from 'moment';
 import * as logger from 'heroku-logger';
 
 import { redis, orgDeleteExchange, getHerokuCDSs, getAppNamesFromHerokuCDSs } from './redisNormal';
-import { poolConfig, clientDataStructure } from './types';
+import { poolConfig } from './types';
 import * as utilities from './utilities';
 import { herokuDelete } from './herokuDelete';
 import { execProm } from '../lib/execProm';
+import { CDS } from './CDS';
 
 const skimmer = async () => {
 	const pools = await utilities.getPoolConfig();
@@ -28,7 +29,7 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
 	}
 
   const allMessages = await redis.lrange(poolname, 0, -1); // we'll take them all
-  const allOrgs:clientDataStructure[] = allMessages.map( msg => JSON.parse(msg));
+  const allOrgs:CDS[] = allMessages.map( msg => JSON.parse(msg));
 
 	const goodOrgs = allOrgs
 		.filter(org => moment().diff(moment(org.completeTimestamp), 'hours', true) <= pool.lifeHours)
