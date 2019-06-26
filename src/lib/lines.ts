@@ -168,7 +168,7 @@ const lines = function(
           // delete an org if one got created and it's a pool
           await deleteOrg(output.mainUser.username);
         }
-        logger.error('a very serious error occurred on this line...in the catch section', e);
+        logger.error(`a very serious error occurred on this line...in the catch section: ${e.name}: ${e.message}`);
         // a more serious error...tell the client
         output.complete = true;
         output.errors.push({
