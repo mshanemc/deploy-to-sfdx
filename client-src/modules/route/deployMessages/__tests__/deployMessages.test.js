@@ -1,8 +1,15 @@
 import { createElement } from 'lwc';
+import { registerTestWireAdapter } from '@salesforce/wire-service-jest-util';  
+import wsSubscribe from '../../../messages/wsWire/wsWire';
+
 import DeployMessages from 'route/deployMessages';
-import * as fakeData from '../__tests__/fakeData.json';
+
+import * as fullExample from '../__tests__/data/fullExample.json';
 
 describe('deploy-messages', () => {
+
+  const fakeWire = registerTestWireAdapter(wsSubscribe);
+
   afterEach(() => {
     // The jsdom instance is shared across test cases in a single file so reset the DOM
     while (document.body.firstChild) {
@@ -12,7 +19,7 @@ describe('deploy-messages', () => {
 
   it('displays correct initial state (deployId only)', () => {
     // Create element
-    const deployId = fakeData.deployId;
+    const deployId = fullExample.deployId;
     const element = createElement('deploy-messages', {
       is: DeployMessages
     });
@@ -36,7 +43,7 @@ describe('deploy-messages', () => {
 
   it('displays lots of things from data', () => {
     // Create element
-    const deployId = fakeData.deployId;
+    const deployId = fullExample.deployId;
     const element = createElement('deploy-messages', {
       is: DeployMessages
     });
@@ -45,23 +52,14 @@ describe('deploy-messages', () => {
     document.body.appendChild(element);
     expect(element.deployId).toBe(deployId);
 
-    const subscriber = element.shadowRoot.querySelector('messages-message-subscriber');
-    expect(subscriber).toBeTruthy();
+    fakeWire.emit({ data: fullExample});
 
-    return Promise.resolve()
-      .then(() => {
-        // then, make it feel like data came down      
-        subscriber.dispatchEvent(
-          new CustomEvent('deploymessage', {
-           detail: fakeData 
-          })
-        );
-      })
+    return Promise.resolve()      
       .then( () => {
         // Verify displayed id
         const bpb = element.shadowRoot.querySelector('base-progress-bar');
         expect(bpb).toBeTruthy();
-        expect(bpb.description).toBe(`Deploying ${fakeData.deployId}`);
+        expect(bpb.description).toBe(`Deploying ${fullExample.deployId}`);
         expect(bpb.progress).toBe(25);
 
         const errors = element.shadowRoot.querySelector('div.slds-theme_error');

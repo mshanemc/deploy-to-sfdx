@@ -24,7 +24,7 @@ export default class DeployMessages extends LightningElement {
 
     get completionPercentage() {
         try {
-            return (this.results.commandResults.length / this.results.lineCount) * 100;
+            return (this.results.commandResults.length / this.results.lineCount) * 100 || 1;
         } catch (e) {
             return 1;
         }
@@ -52,28 +52,20 @@ export default class DeployMessages extends LightningElement {
         }
     }
 
-    deleteOrg(e) {
+    async deleteOrg(e) {
         console.log('delete called');
         e.preventDefault();
         e.stopPropagation();
+        const response = await (await fetch('/delete', {
+            method: 'POST',
+            body: JSON.stringify({
+                username: this.results.mainUser.username
+            })
+        })).json();
 
-        const xhttp = new XMLHttpRequest();
-
-        xhttp.open('POST', '/delete', true);
-        xhttp.setRequestHeader('Content-type', 'application/json');
-        xhttp.onreadystatechange = function () {
-            if (xhttp.readyState === 4 && xhttp.status === 302) {
-                console.log(xhttp.response);
-                console.log(xhttp.status);
-                console.log(xhttp.responseText);
-                window.location = xhttp.responseText;
-            }
-        };
-
-        xhttp.send(JSON.stringify({
-            username: this.results.mainUser.username
-        }));
-
+        if (response.status === 302) {
+            window.location = response.statusText;
+        }
         return false;
     }
 
