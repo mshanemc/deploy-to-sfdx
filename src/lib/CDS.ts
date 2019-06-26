@@ -23,8 +23,8 @@ class CDS  {
     instanceUrl?: string;
     
     mainUser?: {
-        username: string;
-        loginUrl: string;
+        username?: string;
+        loginUrl?: string;
         password?: string;
     };
 
@@ -47,7 +47,7 @@ class CDS  {
 
         this.orgId = options.orgId;
         this.instanceUrl = options.instanceUrl;
-        this.mainUser = options.mainUser;
+        this.mainUser = options.mainUser || {};
 
         this.additionalUsers = options.additionalUsers || [];
         this.errors = options.errors || [];
