@@ -1,7 +1,9 @@
-import { LightningElement, api, track } from 'lwc';
+import { LightningElement, api, track, wire } from 'lwc';
 import { CDS } from '../../../../built/lib/CDS';
+import wsSubscribe from '../../messages/wsWire/wsWire';
 
 export default class DeployMessages extends LightningElement {
+    // wsUrl = location.href.replace(/^http/, 'ws');
     @track results = {};
 
     @api 
@@ -21,7 +23,11 @@ export default class DeployMessages extends LightningElement {
     }
 
     get completionPercentage() {
-        return (this.results.commandResults.length / this.results.lineCount) * 100 || 1;
+        try {
+            return (this.results.commandResults.length / this.results.lineCount) * 100;
+        } catch (e) {
+            return 1;
+        }
     }
 
     get loadingDescription() {
@@ -34,6 +40,16 @@ export default class DeployMessages extends LightningElement {
 
     get showPassword() {
         return this.results && this.results.mainUser && this.results.mainUser.password;
+    }
+
+    @wire(wsSubscribe, { uri: location.href.replace(/^http/, 'ws'), log: true})
+    wiredResults({error, data}) {
+        if (error) {
+            console.error('error from ws subscribe wire', error);
+        } else if (data) {
+            console.log(data);
+            this.results = data;
+        }
     }
 
     deleteOrg(e) {
