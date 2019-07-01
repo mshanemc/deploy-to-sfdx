@@ -1,6 +1,3 @@
-// checks the deploy queue and runs the process.  Can be run as a one-off dyno, or on a setInterval.
-// testing: http://localhost:8443/launch?template=https://github.com/mshanemc/df17AppBuilding
-
 import * as logger from 'heroku-logger';
 
 import { getDeployRequest } from './redisNormal';

@@ -1,17 +1,18 @@
 import * as logger from 'heroku-logger';
 import * as stripcolor from 'strip-color';
 
-import { deployRequest, clientDataStructure, commandSummary, sfdxDisplayResult, HerokuResult } from './types';
+import { deployRequest, sfdxDisplayResult } from './types';
 import * as utilities from './utilities';
 import { cdsPublish, deleteOrg } from './redisNormal';
 import * as argStripper from './argStripper';
 import { exec } from '../lib/execProm';
+import { CDS, commandSummary, HerokuResult } from './CDS';
 
 const lines = function(
   msgJSON: deployRequest,
   lines,
   redisPub,
-  output: clientDataStructure
+  output: CDS
 ) {
   this.msgJSON = msgJSON;
   this.lines = lines;
@@ -167,7 +168,7 @@ const lines = function(
           // delete an org if one got created and it's a pool
           await deleteOrg(output.mainUser.username);
         }
-        logger.error('a very serious error occurred on this line...in the catch section', e);
+        logger.error(`a very serious error occurred on this line...in the catch section: ${e.name}: ${e.message}`);
         // a more serious error...tell the client
         output.complete = true;
         output.errors.push({

@@ -1,13 +1,19 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
+import wsSubscribe from '../../messages/wsWire/wsWire';
 
 export default class TrialLoader extends LightningElement {
   @api deployId;
 
-  handleMessage(msg) {
-    const detail = msg.detail;
-    console.log(detail);
-    if (detail.mainUser && detail.mainUser.loginUrl) {
-      window.location.href = detail.mainUser.loginUrl;
+    @wire(wsSubscribe, { uri: location.href.replace(/^http/, 'ws'), log: true})
+    wiredResults({error, data}) {
+        if (error) {
+            console.error('error from ws subscribe wire', error);
+        } else if (data) {
+            console.log(data);
+            if (data.mainUser && data.mainUser.loginUrl) {
+                window.location.href = data.mainUser.loginUrl;
+            }
+        }
     }
   }
 }

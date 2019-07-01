@@ -5,11 +5,11 @@ import * as ua from 'universal-analytics';
 import {
   DeleteRequest,
   deployRequest,
-  clientDataStructure
 } from './types';
 
 import utilities = require('./utilities');
 import { shellSanitize } from './shellSanitize';
+import { CDS } from './CDS';
 
 const cdsExchange = 'deployMsg';
 const deployRequestExchange = 'deploys';
@@ -33,19 +33,19 @@ const deleteOrg = async (username: string) => {
   }
 };
 
-const putHerokuCDS = async (cds: clientDataStructure) => {
+const putHerokuCDS = async (cds: CDS) => {
   return await redis.lpush(herokuCDSExchange, JSON.stringify(cds));
 }
 
 const getHerokuCDSs = async () => {
-  const CDSs : clientDataStructure[] = (await redis.lrange(herokuCDSExchange, 0, -1))
+  const CDSs : CDS[] = (await redis.lrange(herokuCDSExchange, 0, -1))
     .map( queueItem => JSON.parse(queueItem))
   return CDSs;
 }
 
 const getAppNamesFromHerokuCDSs = async  (salesforceUsername : string, expecting:boolean = true) => {
   // get all the CDSs
-  let herokuCDSs : clientDataStructure[] = (await redis.lrange(herokuCDSExchange, 0, -1))
+  let herokuCDSs : CDS[] = (await redis.lrange(herokuCDSExchange, 0, -1))
     .map( queueItem => JSON.parse(queueItem))
   
   if (herokuCDSs.length === 0) {
@@ -138,7 +138,7 @@ const getPoolRequest = async (log?: boolean) => {
   }
 };
 
-const cdsPublish = async (cds: clientDataStructure) => {
+const cdsPublish = async (cds: CDS) => {
   await redis.publish(cdsExchange, JSON.stringify(cds));
 };
 
@@ -156,10 +156,10 @@ const getKeys = async () => {
 };
 
 // returns finished orgs from a pool
-const getPooledOrg = async (key: string, log?: boolean): Promise<clientDataStructure> => {
+const getPooledOrg = async (key: string, log?: boolean): Promise<CDS> => {
   const msg = await redis.lpop(key);
   if (msg) {
-    const poolOrg = <clientDataStructure>JSON.parse(msg);
+    const poolOrg = <CDS>JSON.parse(msg);
     if (log) {
       logger.debug(`pooledOrgFinder: found an org in ${key}`, poolOrg);
     }
@@ -169,7 +169,7 @@ const getPooledOrg = async (key: string, log?: boolean): Promise<clientDataStruc
   }
 };
 
-const putPooledOrg = async (depReq: deployRequest, poolMessage: clientDataStructure) => {
+const putPooledOrg = async (depReq: deployRequest, poolMessage: CDS) => {
   const key = await utilities.getKey(depReq);
   await redis.rpush(key, JSON.stringify(poolMessage));
 };

@@ -1,15 +1,13 @@
 import {checkExpiration}  from '../../src/lib/skimmerSupport';
-import { clientDataStructure } from './../../src/lib/types';
+import { CDS } from './../../src/lib/CDS';
 import { redis } from './../../src/lib/redisNormal';
 import * as moment from 'moment';
 
-const fineOrg: clientDataStructure = {
-    completeTimestamp: new Date(),
+const fineOrg = new CDS({
     deployId: `test-1234`,
     complete: true,
-    errors: [],
-    commandResults: []
-}
+    completeTimestamp: new Date()
+});
 
 describe('tests the skimmer\'s expiration checks', () => {
     test('handles empty pool', async () => {
@@ -27,7 +25,7 @@ describe('tests the skimmer\'s expiration checks', () => {
         // create a pool of stuff
         await redis.del('mshanemc.finepool');
         
-        const orgs: clientDataStructure[] = new Array(5).fill(fineOrg, 0, 5);
+        const orgs: CDS[] = new Array(5).fill(fineOrg, 0, 5);
         expect(orgs.length).toBe(5);
 
         const messages = orgs.map( org => JSON.stringify(org));
@@ -46,21 +44,19 @@ describe('tests the skimmer\'s expiration checks', () => {
     test('handles pool with expired orgs', async () => {
         // create a pool of stuff
         await redis.del('mshanemc.mixedpool');
-        let orgs: clientDataStructure[] = new Array(3).fill(fineOrg);
+        let orgs: CDS[] = new Array(3).fill(fineOrg);
 
         expect(orgs.length).toBe(3);
 
-        const badOrg: clientDataStructure = {
+        const badOrg = new CDS({
             completeTimestamp: moment().subtract(5, 'days').toDate(),
             deployId: `test-1234`,
             complete: true,
-            errors: [],
-            commandResults: [],
             mainUser: {
                 username: 'testusername@salesforce.com',
                 loginUrl: 'x'
             }
-        };
+        });
 
         orgs.push(badOrg);
         orgs.push(badOrg);

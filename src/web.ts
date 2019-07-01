@@ -17,7 +17,8 @@ import * as msgBuilder from './lib/deployMsgBuilder';
 import * as utilities from './lib/utilities';
 import { emitLead } from './lib/trialLeadCreate';
 
-import { clientDataStructure, deployRequest } from './lib/types';
+import { deployRequest } from './lib/types';
+import { CDS } from './lib/CDS';
 
 const app = express();
 
@@ -123,7 +124,7 @@ redisSub.subscribe(cdsExchange)
 
 redisSub.on('message', (channel, message) => {
   // logger.debug('heard a message from the worker:');
-  const msgJSON = <clientDataStructure>JSON.parse(message);
+  const msgJSON = <CDS>JSON.parse(message);
 
   wss.clients.forEach((client) => {
     if (client.url.includes(msgJSON.deployId.trim()) && client.readyState === client.OPEN) {

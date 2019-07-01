@@ -18,7 +18,7 @@
     </div>
   </template>
 
-  <template if:true={results.mainUser.loginUrl}>
+  <template if:true={showMainUser}>
     <div class="section">
       <div>
         <strong>Note: </strong> It can take up to 5 minutes for the my domain DNS to propogate. If the scratch org doesn't load, refresh it in a few
@@ -34,7 +34,7 @@
     </div>
   </template>
 
-  <template if:true={results.mainUser.password}>
+  <template if:true={showPassword}>
     <div class="section">
       <div>
         <strong>Note: </strong> Use the Launch button above to login for the first time. These credentials are for other uses (mobile app,
@@ -85,5 +85,9 @@
     </ol>
   </div>
 
+  <<<<<<< HEAD
   <messages-message-subscriber deploy-id={deployId} ondeploymessage={handleMessage}></messages-message-subscriber>
+  =======
+  <!-- <messages-message-subscriber deploy-id={deployId} ondeploymessage={handleMessage}></messages-message-subscriber> -->
+  >>>>>>> wire-ws
 </template>

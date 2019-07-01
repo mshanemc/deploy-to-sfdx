@@ -16,13 +16,7 @@
     {
       "command": "sfdx force:org:create -f config/project-scratch-def.json -s -d 1 --json",
       "summary": "creating an org",
-      "raw": {
-        "status": 0,
-        "result": {
-          "orgId": "00D1F000000ERrxUAG",
-          "username": "test-s0pml3myzddz@example.com"
-        }
-      },
+      "raw": { "status": 0, "result": { "orgId": "00D1F000000ERrxUAG", "username": "test-s0pml3myzddz@example.com" } },
       "shortForm": "created org 00D1F000000ERrxUAG with username test-s0pml3myzddz@example.com"
     },
     {
@@ -156,12 +150,7 @@
       "raw": {
         "status": 0,
         "result": {
-          "successes": [
-            {
-              "name": "test-s0pml3myzddz@example.com",
-              "value": "WorkshopPerms"
-            }
-          ],
+          "successes": [{ "name": "test-s0pml3myzddz@example.com", "value": "WorkshopPerms" }],
           "failures": []
         }
       }
@@ -184,7 +173,7 @@
       }
     }
   ],
-  "lineCount": "100",
+  "lineCount": "20",
   "additionalUsers": [],
   "mainUser": {
     "username": "test-s0pml3myzddz@example.com",
