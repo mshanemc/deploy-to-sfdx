@@ -1,0 +1,45 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-evenly;
+  max-width: 1000px;
+  width: 100%;
+}
+
+base-button + .slds-button {
+  margin-left: 1rem;
+}
+
+.section {
+  width: 100%;
+}
+
+.slds-notify_toast {
+  margin: 0.5rem 0 0.5rem 0;
+  display: inline-flex;
+  padding: 0.75rem;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.slds-theme_heroku {
+  background-color: #6762a6;
+}
+
+.slds-button_neutral:hover,
+.slds-button_neutral:focus,
+.slds-button--neutral:hover,
+.slds-button--neutral:focus {
+  background-color: #f4f6f9;
+}
+
+.slds-theme_success a.loginUrl.slds-button_neutral,
+a.heroku.slds-button_neutral {
+  color: initial;
+}
+
+.slds-theme_success a.loginUrl.slds-button_neutral,
+a.deleteButton.slds-button_neutral {
+  text-decoration: initial;
+}

@@ -1,5 +1,6 @@
 /* eslint-disable @lwc/lwc/no-async-operation */
 import { register, ValueChangedEvent } from '@lwc/wire-service';
+import * as fakeData from '../../route/deployMessages/__tests__/data/fullExample.json';
 
 export default function wsSubscribe() {
   // eslint-disable-next-line no-unused-vars
@@ -21,38 +22,42 @@ register(wsSubscribe, eventTarget => {
   });
 
   eventTarget.addEventListener('connect', () => {
-    if (config.log) {
-      console.log('ws is connecting');
-    }
-
-    ws = new WebSocket(config.uri);
-    ws.onopen = () => {
+    if (config.fake) {
+      eventTarget.dispatchEvent(new ValueChangedEvent({ data: fakeData.default }));
+    } else {
       if (config.log) {
-        console.log('WS is open!');
+        console.log('ws is connecting');
       }
-      pinger = setInterval(() => {
-        try {
-          ws.send('ping');
-        } catch (e) {
-          console.log('could not send ws ping', e);
+
+      ws = new WebSocket(config.uri);
+      ws.onopen = () => {
+        if (config.log) {
+          console.log('WS is open!');
         }
-      }, 5000);
-    };
+        pinger = setInterval(() => {
+          try {
+            ws.send('ping');
+          } catch (e) {
+            console.log('could not send ws ping', e);
+          }
+        }, 5000);
+      };
 
-    ws.onmessage = event => {
-      const newData = JSON.parse(event.data);
-      if (config.log) {
-        console.log('heard ws event', newData);
-      }
-      eventTarget.dispatchEvent(new ValueChangedEvent({ data: newData }));
-    };
+      ws.onmessage = event => {
+        const newData = JSON.parse(event.data);
+        if (config.log) {
+          console.log('heard ws event', newData);
+        }
+        eventTarget.dispatchEvent(new ValueChangedEvent({ data: newData }));
+      };
 
-    ws.onclose = () => {
-      if (config.log) {
-        console.log('WS is closing');
-      }
-      clearInterval(pinger);
-    };
+      ws.onclose = () => {
+        if (config.log) {
+          console.log('WS is closing');
+        }
+        clearInterval(pinger);
+      };
+    }
   });
 
   eventTarget.addEventListener('disconnect', () => {

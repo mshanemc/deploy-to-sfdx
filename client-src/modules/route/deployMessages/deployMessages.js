@@ -3,7 +3,6 @@ import { CDS } from '../../../../built/lib/CDS';
 import wsSubscribe from '../../messages/wsWire/wsWire';
 
 export default class DeployMessages extends LightningElement {
-  // wsUrl = location.href.replace(/^http/, 'ws');
   @track results = {};
 
   @api
@@ -42,7 +41,15 @@ export default class DeployMessages extends LightningElement {
     return this.results && this.results.mainUser && this.results.mainUser.password;
   }
 
-  @wire(wsSubscribe, { uri: location.href.replace(/^http/, 'ws'), log: true })
+  get showErrors() {
+    return this.results && this.results.errors && this.results.errors.length > 0;
+  }
+
+  get showHeroku() {
+    return this.results && this.results.herokuResults && this.results.herokuResults.length > 0;
+  }
+
+  @wire(wsSubscribe, { uri: location.href.replace(/^http/, 'ws'), log: true, fake: true })
   wiredResults({ error, data }) {
     if (error) {
       console.error('error from ws subscribe wire', error);

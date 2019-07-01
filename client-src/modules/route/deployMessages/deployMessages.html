@@ -1,12 +1,12 @@
 <template>
   <template if:false={results.complete}>
-    <div class="section">
+    <div class="section slds-m-vertical_large">
       <base-progress-bar description={loadingDescription} progress={completionPercentage}></base-progress-bar>
     </div>
   </template>
 
-  <template if:true={results.errors.length}>
-    <div class="section slds-notify slds-notify_toast slds-theme_error" role="alert">
+  <template if:true={showErrors}>
+    <div class="section slds-m-vertical_mlargeslds-notify slds-notify_toast slds-theme_error" role="alert">
       <div class="slds-notify__content">
         <div class="slds-text-heading_small">
           <strong>An error occurred while deploying. </strong> See the browser console logs for more information.
@@ -19,7 +19,7 @@
   </template>
 
   <template if:true={showMainUser}>
-    <div class="section">
+    <div class="section slds-m-vertical_large">
       <div>
         <strong>Note: </strong> It can take up to 5 minutes for the my domain DNS to propogate. If the scratch org doesn't load, refresh it in a few
         minutes.
@@ -27,7 +27,7 @@
       <div class="slds-notify_toast slds-theme_success">
         <div class="slds-text-heading_small">Your org is ready!</div>
         <div>
-          <a href="" class="slds-button slds-button_destructive deleteButton" onclick={deleteOrg}>Delete</a>
+          <base-button label="Delete" variant="destructive" onclick={deleteOrg}></base-button>
           <a href={results.mainUser.loginUrl} target="_blank" class="slds-button slds-button_neutral loginUrl">Launch</a>
         </div>
       </div>
@@ -35,7 +35,7 @@
   </template>
 
   <template if:true={showPassword}>
-    <div class="section">
+    <div class="section slds-m-vertical_large">
       <div>
         <strong>Note: </strong> Use the Launch button above to login for the first time. These credentials are for other uses (mobile app,
         integrations). They auth to a sandbox (test.salesforce.com) not production (login.salesforce.com)
@@ -44,18 +44,17 @@
       <div class="slds-notify slds-notify_toast" role="alert">
         <div class="slds-notify__content">
           <div class="slds-text-heading_small ">
-            Your username is
-            <strong class="credentials">{results.mainUser.username}</strong>
-            and your password is
-            <strong class="credentials">{results.mainUser.password}</strong>
+            Your username is&nbsp;
+            <strong>{results.mainUser.username}</strong>and your password is&nbsp;
+            <strong>{results.mainUser.password}</strong>
           </div>
         </div>
       </div>
     </div>
   </template>
 
-  <template if:true={results.herokuResults.length}>
-    <div class="section">
+  <template if:true={showHeroku}>
+    <div class="section slds-m-vertical_large">
       <div><strong>Heroku Apps:</strong> Use these buttons to open the app (end user) or manage the app (heroku dashboard)</div>
 
       <template for:each={results.herokuResults} for:item="herokuResult">
@@ -72,22 +71,18 @@
     </div>
   </template>
 
-  <div class="slds-card output-area section ">
-    <div>
-      Open the browser console for more information and the full output of these commands
-    </div>
-    <ol>
-      <template for:each={results.commandResults} for:item="commandResult" for:index="index">
-        <li key={commandResult.command}>
-          <messages-command-output command-result={commandResult}></messages-command-output>
-        </li>
-      </template>
-    </ol>
+  <div class="section slds-m-vertical_large">
+    <base-card>
+      <div class="slds-m-vertical_large">
+        Open the browser console for more information and the full output of these commands
+      </div>
+      <ol class="slds-list_ordered">
+        <template for:each={results.commandResults} for:item="commandResult" for:index="index">
+          <li key={commandResult.command}>
+            <messages-command-output command-result={commandResult}></messages-command-output>
+          </li>
+        </template>
+      </ol>
+    </base-card>
   </div>
-
-  <<<<<<< HEAD
-  <messages-message-subscriber deploy-id={deployId} ondeploymessage={handleMessage}></messages-message-subscriber>
-  =======
-  <!-- <messages-message-subscriber deploy-id={deployId} ondeploymessage={handleMessage}></messages-message-subscriber> -->
-  >>>>>>> wire-ws
 </template>
