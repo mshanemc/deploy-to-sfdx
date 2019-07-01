@@ -2,18 +2,17 @@
 
 @charset "UTF-8";
 
-
-
 @font-face {
   font-family: 'Salesforce Sans';
-  src: url("../fonts/webfonts/SalesforceSans-Light.woff2") format("woff2"), url("../fonts/webfonts/SalesforceSans-Light.woff") format("woff");
+  src: url('../fonts/webfonts/SalesforceSans-Light.woff2') format('woff2'), url('../fonts/webfonts/SalesforceSans-Light.woff') format('woff');
   font-weight: 300;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Salesforce Sans';
-  src: url("../fonts/webfonts/SalesforceSans-LightItalic.woff2") format("woff2"), url("../fonts/webfonts/SalesforceSans-LightItalic.woff") format("woff");
+  src: url('../fonts/webfonts/SalesforceSans-LightItalic.woff2') format('woff2'),
+    url('../fonts/webfonts/SalesforceSans-LightItalic.woff') format('woff');
   font-style: italic;
   font-weight: 300;
   font-display: swap;
@@ -21,14 +20,14 @@
 
 @font-face {
   font-family: 'Salesforce Sans';
-  src: url("../fonts/webfonts/SalesforceSans-Regular.woff2") format("woff2"), url("../fonts/webfonts/SalesforceSans-Regular.woff") format("woff");
+  src: url('../fonts/webfonts/SalesforceSans-Regular.woff2') format('woff2'), url('../fonts/webfonts/SalesforceSans-Regular.woff') format('woff');
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Salesforce Sans';
-  src: url("../fonts/webfonts/SalesforceSans-Italic.woff2") format("woff2"), url("../fonts/webfonts/SalesforceSans-Italic.woff") format("woff");
+  src: url('../fonts/webfonts/SalesforceSans-Italic.woff2') format('woff2'), url('../fonts/webfonts/SalesforceSans-Italic.woff') format('woff');
   font-style: italic;
   font-weight: 400;
   font-display: swap;
@@ -36,14 +35,15 @@
 
 @font-face {
   font-family: 'Salesforce Sans';
-  src: url("../fonts/webfonts/SalesforceSans-Bold.woff2") format("woff2"), url("../fonts/webfonts/SalesforceSans-Bold.woff") format("woff");
+  src: url('../fonts/webfonts/SalesforceSans-Bold.woff2') format('woff2'), url('../fonts/webfonts/SalesforceSans-Bold.woff') format('woff');
   font-weight: 700;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Salesforce Sans';
-  src: url("../fonts/webfonts/SalesforceSans-BoldItalic.woff2") format("woff2"), url("../fonts/webfonts/SalesforceSans-BoldItalic.woff") format("woff");
+  src: url('../fonts/webfonts/SalesforceSans-BoldItalic.woff2') format('woff2'),
+    url('../fonts/webfonts/SalesforceSans-BoldItalic.woff') format('woff');
   font-style: italic;
   font-weight: 700;
   font-display: swap;
@@ -73,7 +73,8 @@ a {
   background-color: transparent;
 }
 
-a:active,a:hover {
+a:active,
+a:hover {
   outline: 0;
 }
 
@@ -82,7 +83,9 @@ code {
   font-size: 1em;
 }
 
-*,*:before,*:after {
+*,
+*:before,
+*:after {
   box-sizing: border-box;
 }
 
@@ -111,7 +114,7 @@ code {
 }
 
 html {
-  font-family: "Salesforce Sans", Arial, sans-serif;
+  font-family: 'Salesforce Sans', Arial, sans-serif;
   font-size: 100%;
   line-height: 1.5;
   background: #b0c4df;
@@ -136,7 +139,8 @@ a {
   transition: color 0.1s linear;
 }
 
-a:hover,a:focus {
+a:hover,
+a:focus {
   text-decoration: underline;
   color: #005fb2;
 }
@@ -149,242 +153,10 @@ a {
   cursor: pointer;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 [class*='slds-icon-action-'] {
   padding: 0.5rem;
   border-radius: 50%;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @keyframes slds-icon-ellie-pop {
   0% {
@@ -410,31 +182,19 @@ a {
   }
 }
 
-
-
-
-
 @keyframes slds-icon-eq {
   to {
     transform: scaleY(4.66667);
   }
 }
 
-
-
-[class*="slds-icon-score__"] {
+[class*='slds-icon-score__'] {
   position: absolute;
   opacity: 0;
   transition: opacity 0.4s ease-in-out;
   will-change: opacity;
   stroke-width: 1.125px;
 }
-
-
-
-
-
-
 
 @keyframes slds-icon-strength-positive-load {
   0% {
@@ -460,12 +220,6 @@ a {
   }
 }
 
-
-
-
-
-
-
 @keyframes slds-icon-trend-arrow {
   from {
     stroke-dashoffset: 40.3px;
@@ -478,21 +232,11 @@ a {
   }
 }
 
-
-
-
-
 @keyframes slds-icon-waffle-throb {
   to {
     transform: scale(1.5);
   }
 }
-
-
-
-
-
-
 
 @keyframes slds-click-global-action {
   25% {
@@ -504,10 +248,6 @@ a {
   }
 }
 
-
-
-
-
 @keyframes slds-icon-typing__dot-first {
   0% {
     background-color: #dddbda;
@@ -517,13 +257,15 @@ a {
     background-color: #c9c7c5;
   }
 
-  33%, 100% {
+  33%,
+  100% {
     background-color: #dddbda;
   }
 }
 
 @keyframes slds-icon-typing__dot-second {
-  0%, 33% {
+  0%,
+  33% {
     background-color: #dddbda;
   }
 
@@ -531,13 +273,15 @@ a {
     background-color: #c9c7c5;
   }
 
-  67%, 100% {
+  67%,
+  100% {
     background-color: #dddbda;
   }
 }
 
 @keyframes slds-icon-typing__dot-third {
-  0%, 67% {
+  0%,
+  67% {
     background-color: #dddbda;
   }
 
@@ -550,547 +294,9 @@ a {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .slds-template_default {
   padding: 0.75rem;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @keyframes click-icon {
   25% {
@@ -1101,14 +307,6 @@ a {
     transform: scale(0.98, 0.98);
   }
 }
-
-
-
-
-
-
-
-
 
 @keyframes click-favorites-icon {
   25% {
@@ -1123,12 +321,6 @@ a {
     transform: scale(1, 1) rotate(0deg);
   }
 }
-
-
-
-
-
-
 
 @keyframes ding {
   75% {
@@ -1161,10 +353,6 @@ a {
     transform: rotate(-5deg);
   }
 }
-
-
-
-
 
 @supports (mix-blend-mode: soft-light) {
   .slds-context-bar__item:not(.slds-no-hover):hover:after {
@@ -1244,289 +432,9 @@ a {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 [contenteditable]:focus {
   outline: none;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @keyframes dotsBounceBefore-extraExtraSmall {
   60% {
@@ -1560,8 +468,6 @@ a {
   }
 }
 
-
-
 @keyframes dotsBounceBefore-extraSmall {
   60% {
     transform: translateX(0);
@@ -1593,8 +499,6 @@ a {
     transform: translateX(0);
   }
 }
-
-
 
 @keyframes dotsBounceBefore-small {
   60% {
@@ -1628,8 +532,6 @@ a {
   }
 }
 
-
-
 @keyframes dotsBounceBefore-medium {
   60% {
     transform: translateX(0);
@@ -1662,8 +564,6 @@ a {
   }
 }
 
-
-
 @keyframes dotsBounceBefore-large {
   60% {
     transform: translateX(0);
@@ -1695,82 +595,6 @@ a {
     transform: translateX(0);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @keyframes error-pulse {
   0% {
@@ -1814,374 +638,11 @@ a {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-[class*="slds-col_padded"],[class*="slds-col--padded"] {
+[class*='slds-col_padded'],
+[class*='slds-col--padded'] {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .slds-align-top {
   vertical-align: top;
@@ -2189,508 +650,155 @@ a {
   align-self: flex-start;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @media (max-width: 48em) {
-  
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.slds-m-top_large,.slds-m-top--large {
+.slds-m-top_large,
+.slds-m-top--large {
   margin-top: 1.5rem;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.slds-text-color_default,.slds-text-color--default {
+.slds-text-color_default,
+.slds-text-color--default {
   color: #080707;
 }
 
-
-
-.slds-text-color_weak,.slds-text-color--weak {
+.slds-text-color_weak,
+.slds-text-color--weak {
   color: #3e3e3c;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.slds-text-align_center,.slds-text-align--center {
+.slds-text-align_center,
+.slds-text-align--center {
   text-align: center;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @media (min-width: 20em) {
-  [class*="slds-x-small-size_"],  [class*="slds-x-small-size--"] {
+  [class*='slds-x-small-size_'],
+  [class*='slds-x-small-size--'] {
     -ms-flex: none;
     flex: none;
   }
 }
 
 @media (max-width: 20em) {
-  [class*="slds-max-x-small-size_"],  [class*="slds-max-x-small-size--"] {
+  [class*='slds-max-x-small-size_'],
+  [class*='slds-max-x-small-size--'] {
     -ms-flex: none;
     flex: none;
   }
 }
 
 @media (min-width: 30em) {
-  [class*="slds-small-size_"],  [class*="slds-small-size--"] {
+  [class*='slds-small-size_'],
+  [class*='slds-small-size--'] {
     -ms-flex: none;
     flex: none;
   }
 }
 
 @media (max-width: 30em) {
-  [class*="slds-max-small-size_"],  [class*="slds-max-small-size--"] {
+  [class*='slds-max-small-size_'],
+  [class*='slds-max-small-size--'] {
     -ms-flex: none;
     flex: none;
   }
 }
 
 @media (min-width: 48em) {
-  [class*="slds-medium-size_"],  [class*="slds-medium-size--"] {
+  [class*='slds-medium-size_'],
+  [class*='slds-medium-size--'] {
     -ms-flex: none;
     flex: none;
   }
 }
 
 @media (max-width: 48em) {
-  [class*="slds-max-medium-size_"],  [class*="slds-max-medium-size--"] {
+  [class*='slds-max-medium-size_'],
+  [class*='slds-max-medium-size--'] {
     -ms-flex: none;
     flex: none;
   }
 }
 
 @media (min-width: 64em) {
-  [class*="slds-large-size_"],  [class*="slds-large-size--"] {
+  [class*='slds-large-size_'],
+  [class*='slds-large-size--'] {
     -ms-flex: none;
     flex: none;
   }
 }
 
 @media (max-width: 64em) {
-  [class*="slds-max-large-size_"],  [class*="slds-max-large-size--"] {
+  [class*='slds-max-large-size_'],
+  [class*='slds-max-large-size--'] {
     -ms-flex: none;
     flex: none;
   }
 }
 
-[class*="slds-size_"],[class*="slds-size--"] {
+[class*='slds-size_'],
+[class*='slds-size--'] {
   -ms-flex: none;
   flex: none;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .slds-large {
-  
-  
-  
 }
 
 @media (min-width: 320px) {
-  
 }
 
 @media (max-width: 319px) {
-  
 }
 
 @media (min-width: 480px) {
-  
 }
 
 @media (max-width: 479px) {
-  
 }
 
 @media (min-width: 768px) {
-  
 }
 
 @media (max-width: 767px) {
-  
 }
 
 @media (min-width: 1024px) {
-  
 }
 
 @media (max-width: 1023px) {
-  
 }
 
 @media (min-width: 1280px) {
-  
 }
 
 @media (max-width: 1279px) {
-  
 }
-
-
 
 /*! HTML5 Boilerplate v5.2.0 | MIT License | https://html5boilerplate.com/ */
 
 @media print {
-  *,  *:before,  *:after {
+  *,
+  *:before,
+  *:after {
     background: transparent !important;
     color: #000 !important;
     box-shadow: none !important;
     text-shadow: none !important;
   }
 
-  a,  a:visited {
+  a,
+  a:visited {
     text-decoration: underline;
   }
 
   a[href]:after {
-    content: " (" attr(href) ")";
+    content: ' (' attr(href) ')';
   }
 
-  a[href^="#"]:after,  a[href^="javascript:"]:after {
+  a[href^='#']:after,
+  a[href^='javascript:']:after {
     content: '';
   }
 }

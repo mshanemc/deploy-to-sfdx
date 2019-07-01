@@ -1,5 +1,5 @@
 import { createElement } from 'lwc';
-import { registerTestWireAdapter } from '@salesforce/wire-service-jest-util';  
+import { registerTestWireAdapter } from '@salesforce/wire-service-jest-util';
 import wsSubscribe from '../../../messages/wsWire/wsWire';
 
 import DeployMessages from 'route/deployMessages';
@@ -7,7 +7,6 @@ import DeployMessages from 'route/deployMessages';
 import * as fullExample from '../__tests__/data/fullExample.json';
 
 describe('deploy-messages', () => {
-
   const fakeWire = registerTestWireAdapter(wsSubscribe);
 
   afterEach(() => {
@@ -52,21 +51,20 @@ describe('deploy-messages', () => {
     document.body.appendChild(element);
     expect(element.deployId).toBe(deployId);
 
-    fakeWire.emit({ data: fullExample});
+    fakeWire.emit({ data: fullExample });
 
-    return Promise.resolve()      
-      .then( () => {
-        // Verify displayed id
-        const bpb = element.shadowRoot.querySelector('base-progress-bar');
-        expect(bpb).toBeTruthy();
-        expect(bpb.description).toBe(`Deploying ${fullExample.deployId}`);
-        expect(bpb.progress).toBe(25);
+    return Promise.resolve().then(() => {
+      // Verify displayed id
+      const bpb = element.shadowRoot.querySelector('base-progress-bar');
+      expect(bpb).toBeTruthy();
+      expect(bpb.description).toBe(`Deploying ${fullExample.deployId}`);
+      expect(bpb.progress).toBe(25);
 
-        const errors = element.shadowRoot.querySelector('div.slds-theme_error');
-        expect(errors).toBeTruthy();
+      const errors = element.shadowRoot.querySelector('div.slds-theme_error');
+      expect(errors).toBeTruthy();
 
-        expect(element.shadowRoot.querySelector('.slds-theme_heroku')).toBeTruthy();
-        expect(element.shadowRoot.querySelector('.slds-theme_success')).toBeTruthy();
-      });
+      expect(element.shadowRoot.querySelector('.slds-theme_heroku')).toBeTruthy();
+      expect(element.shadowRoot.querySelector('.slds-theme_success')).toBeTruthy();
+    });
   });
 });
