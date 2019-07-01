@@ -14,6 +14,9 @@ export default class Illustration extends LightningElement {
   }
 
   get sizeClass() {
-    return `slds-illustration slds-illustration_${this.size}`;
+    if (this.size === 'large') {
+      return `slds-illustration slds-illustration_large`;
+    }
+    return `slds-illustration slds-illustration_small`;
   }
 }
