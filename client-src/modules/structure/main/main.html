@@ -1,39 +1,35 @@
 <template>
+  <structure-header></structure-header>
 
-    <structure-header></structure-header>
+  <div class="primary-content">
+    <template if:true={isHome}>
+      <route-home-message></route-home-message>
+    </template>
 
-    <div class="primary-content">        
-        
-        <template if:true={isHome}>
-            <route-home-message></route-home-message>
-        </template>
+    <template if:true={isError}>
+      <route-top-level-error error-message={params.msg}></route-top-level-error>
+    </template>
 
-        <template if:true={isError}>
-            <route-top-level-error error-message={params.msg}></route-top-level-error>
-        </template>
+    <template if:true={isDeployer}>
+      <route-deploy-messages deploy-id={deployId}></route-deploy-messages>
+    </template>
 
-        <template if:true={isDeployer}>
-            <route-deploy-messages deploy-id={deployId}></route-deploy-messages>
-        </template>
+    <template if:true={isTrial}>
+      <route-trial-loader deploy-id={deployId}></route-trial-loader>
+    </template>
 
-        <template if:true={isTrial}>
-            <route-trial-loader deploy-id={deployId}></route-trial-loader>
-        </template>
+    <template if:true={isDelete}>
+      <route-deleted></route-deleted>
+    </template>
 
-        <template if:true={isDelete}>
-            <route-deleted></route-deleted>
-        </template>
+    <template if:true={isUserInfo}>
+      <route-user-info the-template={params.template}></route-user-info>
+    </template>
 
-        <template if:true={isUserInfo}>
-            <route-user-info the-template={params.template}></route-user-info>
-        </template>
+    <template if:true={isTestform}>
+      <route-test-form></route-test-form>
+    </template>
+  </div>
 
-        <template if:true={isTestform}>
-            <route-test-form ></route-test-form>
-        </template>
-
-    </div>
-
-    <structure-footer></structure-footer>
-
+  <structure-footer></structure-footer>
 </template>

@@ -1,13 +1,14 @@
 {
-  "extends": ["@salesforce/eslint-config-lwc/recommended"],
+  "extends": ["@salesforce/eslint-config-lwc/recommended", "prettier"],
+  "plugins": ["prettier"],
   "parserOptions": {
-      "ecmaVersion": 2017
+    "ecmaVersion": 2017
   },
   "env": {
     "node": true,
     "es6": true
   },
-  "rules" : {
+  "rules": {
     "arrow-body-style": ["error", "as-needed"],
     "no-alert": 2,
     "no-array-constructor": 2,
@@ -96,7 +97,7 @@
     "no-underscore-dangle": 0,
     "no-unreachable": 2,
     "no-unused-expressions": 0,
-    "no-unused-vars": [2, {"vars": "local", "args": "after-used", "argsIgnorePattern": "next"}],
+    "no-unused-vars": [2, { "vars": "local", "args": "after-used", "argsIgnorePattern": "next" }],
     "no-use-before-define": 1,
     "no-void": 0,
     "no-warning-comments": [0, { "terms": ["todo", "fixme", "xxx"], "location": "start" }],
@@ -138,10 +139,9 @@
     "operator-assignment": [0, "always"],
     "padded-blocks": 0,
     "quote-props": 0,
-    "quotes": ["error", "single"],
     "radix": 0,
     "semi": 2,
-    "semi-spacing": [0, {"before": false, "after": true}],
+    "semi-spacing": [0, { "before": false, "after": true }],
     "sort-vars": 0,
     "space-after-function-name": [0, "never"],
     "space-after-keywords": [0, "always"],
@@ -151,7 +151,7 @@
     "space-in-brackets": [0, "never"],
     "space-in-parens": [0, "never"],
     "space-infix-ops": 0,
-    "keyword-spacing": [2, {"before": true, "after": true}],
+    "keyword-spacing": [2, { "before": true, "after": true }],
     "space-unary-ops": [2, { "words": true, "nonwords": false }],
     "spaced-line-comment": [0, "always"],
     "strict": 0,

@@ -1,15 +1,16 @@
 :host {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 img {
-    padding: 0.5rem;
+  padding: 0.5rem;
 }
 
-.slds-text-heading_large, .slds-text-heading--large {
-    font-weight: 300;
-    font-size: 1.75rem;
-    line-height: 1.25;
+.slds-text-heading_large,
+.slds-text-heading--large {
+  font-weight: 300;
+  font-size: 1.75rem;
+  line-height: 1.25;
 }

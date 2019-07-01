@@ -1,12 +1,15 @@
 <template>
-    <base-card>
-        <div class="trial-content">
-            <div class="slds-text-heading_medium">We're setting up your Lightning Platform trial.</div>
-            <img src="https://a.sfdcstatic.com/content/dam/www/ocms-backup/common/assets/images/cloud.loader.gif" alt="loading cloud" />
-            <div class="slds-text-heading_medium">You'll be logged in momentarily.</div>
-        </div>
-    </base-card>
+  <base-card>
+    <div class="trial-content">
+      <div class="slds-text-heading_medium">
+        We're setting up your Lightning Platform trial.
+      </div>
+      <img src="https://a.sfdcstatic.com/content/dam/www/ocms-backup/common/assets/images/cloud.loader.gif" alt="loading cloud" />
+      <div class="slds-text-heading_medium">
+        You'll be logged in momentarily.
+      </div>
+    </div>
+  </base-card>
 
-    <messages-message-subscriber deploy-id={deployId} ondeploymessage={handleMessage}></messages-message-subscriber>
-    
+  <messages-message-subscriber deploy-id={deployId} ondeploymessage={handleMessage}></messages-message-subscriber>
 </template>

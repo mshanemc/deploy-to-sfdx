@@ -3,6 +3,7 @@ coverage/
 
 # Default build folder
 dist/
+built/
 
 # Default resources folder
 src/resources

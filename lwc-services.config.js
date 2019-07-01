@@ -18,16 +18,18 @@ module.exports = {
     // Default directory for source files
     sourceDir: 'client-src',
     // List of resources for copying to the build folder
-    resources: [{ 
-        from : 'client-src/resources',
-        to: 'built/assets'
-    }],
+    resources: [
+        {
+            from: 'client-src/resources',
+            to: 'built/assets'
+        }
+    ],
     // Default server options for watch command
     devServer: {
         // port: 8443,
         // host: '0.0.0.0',
         open: false,
-        proxy: { 
+        proxy: {
             '/': 'http://localhost:8443'
         },
         stats: 'errors-only',
@@ -38,7 +40,7 @@ module.exports = {
     server: {
         // port: 8443,
         // host: '0.0.0.0',
-        proxy: { 
+        proxy: {
             '/': 'http://localhost:8443'
         },
         open: false
