@@ -13,68 +13,70 @@ import { execProm } from '../lib/execProm';
 import { deployRequest } from './types';
 
 const pooledOrgFinder = async function(deployReq: deployRequest) {
-	
-	try {
-		let cds = await getPooledOrg(await utilities.getKey(deployReq), true);
-		cds = {...cds, buildStartTime: new Date(), deployId: deployReq.deployId, browserStartTime: deployReq.createdTimestamp || new Date() };
+    try {
+        if (!process.env.POOLCONFIG_URL) {
+            return;
+        }
 
-		const uniquePath = path.join(__dirname, '../tmp/pools', cds.orgId);
-		fs.ensureDirSync(uniquePath);
+        let cds = await getPooledOrg(await utilities.getKey(deployReq), true);
+        cds = { ...cds, buildStartTime: new Date(), deployId: deployReq.deployId, browserStartTime: deployReq.createdTimestamp || new Date() };
 
-		await execProm(
-			// `sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${keypath} --instanceurl ${cds.instanceUrl || 'https://test.salesforce.com'} -s`,
-			`sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`,
-			{ cwd: uniquePath }
-		);
-		
-		// we may need to put the user's email on it
-		if (deployReq.email) {
-			logger.debug(`changing email to ${deployReq.email}`);
-			await execProm(
-				`sfdx force:data:record:update -s User -w "username='${cds.mainUser.username}'" -v "email='${
-					deployReq.email
-				}'"`,
-				{ cwd: uniquePath }
-			);			
-		}
+        const uniquePath = path.join(__dirname, '../tmp/pools', cds.orgId);
+        fs.ensureDirSync(uniquePath);
 
-		let password: string;
+        await execProm(
+            // `sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${keypath} --instanceurl ${cds.instanceUrl || 'https://test.salesforce.com'} -s`,
+            `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
+                cds.mainUser.username
+            } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`,
+            { cwd: uniquePath }
+        );
 
-		if (cds.poolLines.passwordLine) {
-			const stripped = argStripper(cds.poolLines.passwordLine, '--json', true);
-			const passwordSetResult = await execProm(`${stripped} --json`, {
-				cwd: uniquePath
-			});
+        // we may need to put the user's email on it
+        if (deployReq.email) {
+            logger.debug(`changing email to ${deployReq.email}`);
+            await execProm(`sfdx force:data:record:update -s User -w "username='${cds.mainUser.username}'" -v "email='${deployReq.email}'"`, {
+                cwd: uniquePath
+            });
+        }
 
-			// may not have returned anything if it wasn't used
-			if (passwordSetResult) {
-				password = JSON.parse(stripcolor(passwordSetResult.stdout)).result.password;
-				logger.debug(`password set to: ${password}`);
-			}
-		}
+        let password: string;
 
-		const openResult = await execProm(`${cds.poolLines.openLine} --json -r`, {
-			cwd: uniquePath
-		});
-		const openOutput = JSON.parse(stripcolor(openResult.stdout));
+        if (cds.poolLines.passwordLine) {
+            const stripped = argStripper(cds.poolLines.passwordLine, '--json', true);
+            const passwordSetResult = await execProm(`${stripped} --json`, {
+                cwd: uniquePath
+            });
 
-		cds.openTimestamp = new Date();
-		cds.completeTimestamp = new Date();
-		cds.mainUser = {
-			...(cds.mainUser),
-			loginUrl: utilities.urlFix(openOutput).result.url,
-			password
-		};
+            // may not have returned anything if it wasn't used
+            if (passwordSetResult) {
+                password = JSON.parse(stripcolor(passwordSetResult.stdout)).result.password;
+                logger.debug(`password set to: ${password}`);
+            }
+        }
 
-		logger.debug(`opened : ${openOutput}`);
-		await cdsPublish(cds);
-		timesToGA(deployReq, cds);
-		return cds;
-	} catch (e) {
-		logger.warn('pooledOrgFinder');
-		logger.warn(e);
-		return null;
-	}
+        const openResult = await execProm(`${cds.poolLines.openLine} --json -r`, {
+            cwd: uniquePath
+        });
+        const openOutput = JSON.parse(stripcolor(openResult.stdout));
+
+        cds.openTimestamp = new Date();
+        cds.completeTimestamp = new Date();
+        cds.mainUser = {
+            ...cds.mainUser,
+            loginUrl: utilities.urlFix(openOutput).result.url,
+            password
+        };
+
+        logger.debug(`opened : ${openOutput}`);
+        await cdsPublish(cds);
+        timesToGA(deployReq, cds);
+        return cds;
+    } catch (e) {
+        logger.warn('pooledOrgFinder');
+        logger.warn(e);
+        return null;
+    }
 };
 
 export { pooledOrgFinder };
