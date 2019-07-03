@@ -1,13 +1,13 @@
 import { createElement } from 'lwc';
 import { registerTestWireAdapter } from '@salesforce/wire-service-jest-util';
-import wsSubscribe from '../../../messages/wsWire/wsWire';
+import resultsPoll from '../../../messages/resultsPoll/resultsPoll';
 
 import DeployMessages from 'route/deployMessages';
 
 import * as fullExample from '../__tests__/data/fullExample.json';
 
 describe('deploy-messages', () => {
-  const fakeWire = registerTestWireAdapter(wsSubscribe);
+  const fakeWire = registerTestWireAdapter(resultsPoll);
 
   afterEach(() => {
     // The jsdom instance is shared across test cases in a single file so reset the DOM
