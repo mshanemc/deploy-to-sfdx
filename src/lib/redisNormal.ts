@@ -139,7 +139,9 @@ const cdsPublish = async (cds: CDS) => {
     // await redis.publish(cdsExchange, JSON.stringify(cds));
     // write the CDS to its own deployId based key on redis
     // TODO: more clever expiration time
-    await redis.set(cds.deployId, JSON.stringify(cds));
+    if (!cds.isPool) {
+        await redis.set(cds.deployId, JSON.stringify(cds));
+    }
 };
 
 const cdsRetrieve = async (deployId: string) => {

@@ -32,7 +32,9 @@ class CDS {
     errors: clientError[];
     commandResults: clientResult[];
     herokuResults: HerokuResult[];
+
     poolLines?: lineParserResult;
+    isPool: boolean;
 
     constructor(options: CDSOptions) {
         this.deployId = options.deployId;
@@ -53,7 +55,9 @@ class CDS {
         this.errors = options.errors || [];
         this.commandResults = options.commandResults || [];
         this.herokuResults = options.herokuResults || [];
+
         this.poolLines = options.poolLines;
+        this.isPool = options.isPool || false;
     }
 }
 
@@ -87,7 +91,9 @@ export interface CDSOptions {
     errors?: clientError[];
     commandResults?: clientResult[];
     herokuResults?: HerokuResult[];
+
     poolLines?: lineParserResult;
+    isPool?: boolean;
 }
 
 interface clientError {

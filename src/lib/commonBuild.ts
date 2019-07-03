@@ -17,11 +17,12 @@ const build = async (msgJSON: deployRequest) => {
 
     let clientResult = new CDS({
         deployId: msgJSON.deployId,
-        browserStartTime: msgJSON.createdTimestamp
+        browserStartTime: msgJSON.createdTimestamp,
+        isPool: msgJSON.pool
     });
 
     // get something to redis as soon as possible
-    if (!msgJSON.pool) await cdsPublish(clientResult);
+    await cdsPublish(clientResult);
 
     const gitCloneCmd = utilities.getCloneCommand(msgJSON);
 
@@ -32,7 +33,7 @@ const build = async (msgJSON: deployRequest) => {
             command: gitCloneCmd,
             raw: gitCloneResult.stderr
         });
-        if (!msgJSON.pool) await cdsPublish(clientResult);
+        await cdsPublish(clientResult);
     } catch (err) {
         logger.warn(`deployQueueCheck: bad repo--https://github.com/${msgJSON.username}/${msgJSON.repo}.git`);
         clientResult.errors.push({
@@ -41,7 +42,7 @@ const build = async (msgJSON: deployRequest) => {
             raw: err
         });
         clientResult.complete = true;
-        if (!msgJSON.pool) await cdsPublish(clientResult);
+        await cdsPublish(clientResult);
         return clientResult;
     }
 
@@ -88,7 +89,7 @@ const build = async (msgJSON: deployRequest) => {
             raw: e
         });
         clientResult.complete = true;
-        if (!msgJSON.pool) await cdsPublish(clientResult);
+        await cdsPublish(clientResult);
         return clientResult;
     }
 
