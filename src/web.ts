@@ -4,7 +4,7 @@ import * as ua from 'universal-analytics';
 import * as path from 'path';
 import * as favicon from 'serve-favicon';
 
-import { putDeployRequest, getKeys, deleteOrg, cdsRetrieve } from './lib/redisNormal';
+import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve } from './lib/redisNormal';
 import * as msgBuilder from './lib/deployMsgBuilder';
 import * as utilities from './lib/utilities';
 import { emitLead } from './lib/trialLeadCreate';
@@ -44,8 +44,8 @@ app.post(
 app.post(
     '/delete',
     wrapAsync(async (req, res, next) => {
-        await deleteOrg(req.body.username, req.body.deployId);
-        res.status(302).send('/deleteConfirm');
+        await cdsDelete(req.body.deployId);
+        res.send({ redirectTo: '/deleteConfirm' });
     })
 );
 

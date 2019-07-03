@@ -145,7 +145,7 @@ const lines = function(msgJSON: deployRequest, lines, redisPub, output: CDS) {
             } catch (e) {
                 if (msgJSON.pool && output.mainUser && output.mainUser.username) {
                     // delete an org if one got created and it's a pool
-                    await deleteOrg(output.mainUser.username, output.deployId);
+                    await deleteOrg(output.deployId);
                 }
                 logger.error(`a very serious error occurred on this line...in the catch section: ${e.name}: ${e.message}`);
                 // a more serious error...tell the client

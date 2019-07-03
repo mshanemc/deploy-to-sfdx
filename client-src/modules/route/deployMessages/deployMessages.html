@@ -6,12 +6,12 @@
   </template>
 
   <template if:true={showErrors}>
-    <div class="section slds-m-vertical_mlargeslds-notify slds-notify_toast slds-theme_error" role="alert">
+    <div class="section slds-m-vertical_large slds-notify slds-notify_toast slds-theme_error" role="alert">
       <div class="slds-notify__content">
         <div class="slds-text-heading_small">
           <strong>An error occurred while deploying. </strong> See the browser console logs for more information.
           <template for:each={results.errors} for:item="error">
-            <p key={error.error}>{ error.error }</p>
+            <p class="slds-m-vertical_large" key={error.error}>{ error.error }</p>
           </template>
         </div>
       </div>

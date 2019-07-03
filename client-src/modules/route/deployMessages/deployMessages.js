@@ -65,7 +65,6 @@ export default class DeployMessages extends LightningElement {
     const response = await (await fetch('/delete', {
       method: 'POST',
       body: JSON.stringify({
-        username: this.results.mainUser.username,
         deployId: this.results.deployId
       }),
       headers: {
@@ -74,10 +73,7 @@ export default class DeployMessages extends LightningElement {
     })).json();
 
     console.log(response);
-    if (response.status === 302) {
-      window.location = response.statusText;
-    }
-    return false;
+    window.location = response.redirectTo;
   }
 
   handleMessage(msg) {

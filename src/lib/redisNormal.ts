@@ -17,11 +17,8 @@ const herokuCDSExchange = 'herokuCDSs';
 // for accessing the redis directly.  Less favored
 const redis = new Redis(process.env.REDIS_URL);
 
-const deleteOrg = async (username: string, deployId?: string) => {
+const deleteOrg = async (username: string) => {
     logger.debug(`org delete requested for ${username}`);
-    if (deployId) {
-        await redis.del(deployId);
-    }
     if (shellSanitize(username)) {
         const msg: DeleteRequest = {
             username,
@@ -129,6 +126,15 @@ const getPoolRequest = async (log?: boolean) => {
     }
 };
 
+const cdsDelete = async (deployId: string) => {
+    const retrieved = await redis.get(deployId);
+    if (retrieved) {
+        const cds = <CDS>JSON.parse(retrieved);
+        await deleteOrg(cds.mainUser.username);
+    }
+    await redis.del(deployId);
+};
+
 const cdsPublish = async (cds: CDS) => {
     // await redis.publish(cdsExchange, JSON.stringify(cds));
     // write the CDS to its own deployId based key on redis
@@ -142,12 +148,22 @@ const cdsRetrieve = async (deployId: string) => {
         const cds = <CDS>JSON.parse(retrieved);
         return cds;
     } else {
-        throw new Error('org no longer exists');
+        return new CDS({
+            deployId,
+            complete: true,
+            errors: [
+                {
+                    command: 'retrieval',
+                    error: 'Results not found for your deployId. It may have been deleted or may have expired',
+                    raw: ''
+                }
+            ]
+        });
     }
 };
 
 const getKeys = async () => {
-    const keys = await redis.keys('*');
+    const keys = await redis.keys('*.*');
     const output = [];
     for (const key of keys) {
         const size = await redis.llen(key);
@@ -192,6 +208,7 @@ export {
     cdsExchange,
     cdsPublish,
     cdsRetrieve,
+    cdsDelete,
     putDeployRequest,
     putPoolRequest,
     getKeys,

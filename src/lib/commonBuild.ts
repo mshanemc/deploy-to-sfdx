@@ -20,6 +20,9 @@ const build = async (msgJSON: deployRequest) => {
         browserStartTime: msgJSON.createdTimestamp
     });
 
+    // get something to redis as soon as possible
+    if (!msgJSON.pool) await cdsPublish(clientResult);
+
     const gitCloneCmd = utilities.getCloneCommand(msgJSON);
 
     try {
