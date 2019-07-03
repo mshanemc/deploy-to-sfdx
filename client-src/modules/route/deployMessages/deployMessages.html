@@ -21,8 +21,8 @@
   <template if:true={showMainUser}>
     <div class="section slds-m-vertical_large">
       <div>
-        <strong>Note: </strong> It can take up to 5 minutes for the my domain DNS to propogate. If the scratch org doesn't load, refresh it in a few
-        minutes.
+        <strong>Note: </strong> It can take up to 5 minutes for the DNS to propogate. If the scratch org doesn't load properly, wait a few minutes to
+        launch.
       </div>
       <div class="slds-notify_toast slds-theme_success">
         <div class="slds-text-heading_small">Your org is ready!</div>
@@ -31,6 +31,7 @@
           <a href={results.mainUser.loginUrl} target="_blank" class="slds-button slds-button_neutral loginUrl">Launch</a>
         </div>
       </div>
+      <div if:true={results.expirationDate}>Your org will expire on <strong>{results.expirationDate}</strong>.</div>
     </div>
   </template>
 
