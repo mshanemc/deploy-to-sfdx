@@ -15,6 +15,7 @@ class CDS {
 
     orgId?: string;
     instanceUrl?: string;
+    expirationDate?: Date;
 
     mainUser?: {
         username?: string;
@@ -46,6 +47,7 @@ class CDS {
         this.orgId = options.orgId;
         this.instanceUrl = options.instanceUrl;
         this.mainUser = options.mainUser || {};
+        this.expirationDate = options.expirationDate;
 
         this.additionalUsers = options.additionalUsers || [];
         this.errors = options.errors || [];
@@ -78,6 +80,7 @@ export interface CDSOptions {
 
     orgId?: string;
     instanceUrl?: string;
+    expirationDate?: Date;
 
     mainUser?: {
         username: string;

@@ -168,7 +168,10 @@ const lines = function(msgJSON: deployRequest, lines, redisPub, output: CDS) {
         output.completeTimestamp = new Date();
 
         // used by pools, may be otherwise handy
-        output.instanceUrl = await getInstanceUrl(`tmp/${msgJSON.deployId}`, output.mainUser.username);
+        const displayResults = await getDisplayResults(`tmp/${msgJSON.deployId}`, output.mainUser.username);
+
+        output.instanceUrl = displayResults.instanceUrl;
+        output.expirationDate = displayResults.expirationDate;
 
         await Promise.all([cdsPublish(output), exec('sfdx force:auth:logout -p', { cwd: `tmp/${msgJSON.deployId}` })]);
         return output;
@@ -177,8 +180,8 @@ const lines = function(msgJSON: deployRequest, lines, redisPub, output: CDS) {
 
 export = lines;
 
-const getInstanceUrl = async (path: string, username: string) => {
+const getDisplayResults = async (path: string, username: string) => {
     const displayResults = await exec(`sfdx force:org:display -u ${username} --json`, { cwd: path });
     const displayResultsJSON = <sfdxDisplayResult>JSON.parse(stripcolor(displayResults.stdout)).result;
-    return displayResultsJSON.instanceUrl;
+    return displayResultsJSON;
 };
