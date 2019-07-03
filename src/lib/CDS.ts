@@ -1,11 +1,3 @@
-// implement all the member structures
-
-// constructor with just deployId, optional timestamp
-
-// constructor that takes an existing CDS (from deserialization, for example)
-
-// methods?
-// publish timestamps
 import { lineParserResult } from './types';
 
 class CDS {
@@ -16,6 +8,8 @@ class CDS {
     browserStartTime?: Date; // when the job began
     openTimestamp?: Date; // when the open button became visible, even if more scripts were still running
     buildStartTime?: Date;
+    poolBuildFinishTime?: Date;
+    poolBuildStartTime?: Date;
 
     lineCount?: Number; // how many lines need to run...used for status bar
 
@@ -43,6 +37,8 @@ class CDS {
         this.completeTimestamp = options.completeTimestamp;
         this.browserStartTime = options.browserStartTime = new Date();
         this.openTimestamp = options.openTimestamp;
+        this.poolBuildFinishTime = options.poolBuildFinishTime;
+        this.poolBuildStartTime = options.poolBuildStartTime;
         this.buildStartTime = options.buildStartTime || new Date();
 
         this.lineCount = options.lineCount || 50;
@@ -74,7 +70,9 @@ export interface CDSOptions {
     completeTimestamp?: Date; // when the job completed
     browserStartTime?: Date; // when the job began
     openTimestamp?: Date; // when the open button became visible, even if more scripts were still running
-    buildStartTime?: Date;
+    buildStartTime?: Date; // when the worker took up the build task
+    poolBuildFinishTime?: Date;
+    poolBuildStartTime?: Date;
 
     lineCount?: Number; // how many lines need to run...used for status bar
 
