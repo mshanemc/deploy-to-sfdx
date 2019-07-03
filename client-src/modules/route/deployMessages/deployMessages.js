@@ -1,6 +1,6 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import { CDS } from '../../../../built/lib/CDS';
-import wsSubscribe from '../../messages/wsWire/wsWire';
+import resultsPoll from '../../messages/resultsPoll/resultsPoll';
 
 export default class DeployMessages extends LightningElement {
   @track results = {};
@@ -49,7 +49,7 @@ export default class DeployMessages extends LightningElement {
     return this.results && this.results.herokuResults && this.results.herokuResults.length > 0;
   }
 
-  @wire(wsSubscribe, { uri: location.href.replace(/^http/, 'ws'), log: true, fake: true })
+  @wire(resultsPoll, { deployId: '$deployId' })
   wiredResults({ error, data }) {
     if (error) {
       console.error('error from ws subscribe wire', error);
@@ -60,16 +60,20 @@ export default class DeployMessages extends LightningElement {
   }
 
   async deleteOrg(e) {
-    console.log('delete called');
     e.preventDefault();
     e.stopPropagation();
     const response = await (await fetch('/delete', {
       method: 'POST',
       body: JSON.stringify({
-        username: this.results.mainUser.username
-      })
+        username: this.results.mainUser.username,
+        deployId: this.results.deployId
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })).json();
 
+    console.log(response);
     if (response.status === 302) {
       window.location = response.statusText;
     }

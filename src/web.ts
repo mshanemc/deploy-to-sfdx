@@ -1,40 +1,27 @@
 import * as logger from 'heroku-logger';
 import * as express from 'express';
 import * as ua from 'universal-analytics';
-import * as bodyParser from 'body-parser';
-import * as WebSocket from 'ws';
 import * as path from 'path';
 import * as favicon from 'serve-favicon';
 
-import { cdsExchange, putDeployRequest, getKeys, deleteOrg } from './lib/redisNormal';
-import * as redisSub from './lib/redisSubscribe';
+import { putDeployRequest, getKeys, deleteOrg, cdsRetrieve } from './lib/redisNormal';
 import * as msgBuilder from './lib/deployMsgBuilder';
 import * as utilities from './lib/utilities';
 import { emitLead } from './lib/trialLeadCreate';
 
 import { deployRequest } from './lib/types';
-import { CDS } from './lib/CDS';
 
 const app = express();
 
 const port = process.env.PORT || 8443;
 
-const server = app.listen(port, () => {
+app.listen(port, () => {
     logger.info(`Example app listening on port ${port}!`);
 });
 
-const wss = new WebSocket.Server({ server, clientTracking: true });
-
 app.use(favicon(path.join(__dirname, 'assets/favicons', 'favicon.ico')));
 app.use(express.static('built/assets'));
-
-app.use(
-    bodyParser.urlencoded({
-        extended: true
-    })
-);
-
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.post(
     '/trial',
@@ -57,7 +44,7 @@ app.post(
 app.post(
     '/delete',
     wrapAsync(async (req, res, next) => {
-        await deleteOrg(req.body.username);
+        await deleteOrg(req.body.username, req.body.deployId);
         res.status(302).send('/deleteConfirm');
     })
 );
@@ -95,6 +82,14 @@ app.get(
     })
 );
 
+app.get(
+    '/results/:deployId',
+    wrapAsync(async (req, res, next) => {
+        const results = await cdsRetrieve(req.params.deployId);
+        res.send(results);
+    })
+);
+
 app.get('*', (req, res, next) => {
     setImmediate(() => {
         next(new Error(`Route not found: ${req.url}`));
@@ -109,34 +104,6 @@ app.use((error, req, res, next) => {
     logger.error(`request failed: ${req.url}`);
     logger.error(error);
     return res.redirect(`/error?msg=${error}`);
-});
-
-wss.on('connection', (ws: WebSocket, req) => {
-    logger.debug(`connection on url ${req.url}`);
-
-    // for future use tracking clients
-    ws.url = req.url;
-});
-
-// subscribe to deploy events to share them with the web clients
-redisSub
-    .subscribe(cdsExchange)
-    .then(() => logger.info(`subscribed to Redis channel ${cdsExchange}`))
-    .catch(e => logger.error('unable to subscribe to cdsExchange', e));
-
-redisSub.on('message', (channel, message) => {
-    // logger.debug('heard a message from the worker:');
-    const msgJSON = <CDS>JSON.parse(message);
-
-    wss.clients.forEach(client => {
-        if (client.url.includes(msgJSON.deployId.trim()) && client.readyState === client.OPEN) {
-            client.send(JSON.stringify(msgJSON));
-            // close connection when ALLDONE if the client hasn't already
-            if (msgJSON.complete) {
-                client.close();
-            }
-        }
-    });
 });
 
 function wrapAsync(fn) {

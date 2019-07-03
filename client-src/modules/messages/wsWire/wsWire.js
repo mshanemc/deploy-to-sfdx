@@ -22,6 +22,7 @@ register(wsSubscribe, eventTarget => {
   });
 
   eventTarget.addEventListener('connect', () => {
+    console.log('connect is firing');
     if (config.fake) {
       eventTarget.dispatchEvent(new ValueChangedEvent({ data: fakeData.default }));
     } else {
