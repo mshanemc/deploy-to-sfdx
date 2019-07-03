@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 import * as logger from 'heroku-logger';
 
-import { redis, orgDeleteExchange, getHerokuCDSs, getAppNamesFromHerokuCDSs } from './redisNormal';
+import { redis, orgDeleteExchange, getHerokuCDSs, getAppNamesFromHerokuCDSs, getKeysForCDSs, cdsRetrieve, cdsDelete } from './redisNormal';
 import { poolConfig } from './types';
 import * as utilities from './utilities';
 import { herokuDelete } from './herokuDelete';
@@ -88,4 +88,14 @@ const herokuExpirationCheck = async () => {
     }
 };
 
-export { checkExpiration, skimmer, herokuExpirationCheck };
+const removeOldDeployIds = async () => {
+    const deployIds = await getKeysForCDSs();
+    for (const deployId of deployIds) {
+        const cds = await cdsRetrieve(deployId);
+        if (moment().isAfter(moment(cds.expirationDate).endOf('day'))) {
+            await cdsDelete(deployId);
+        }
+    }
+};
+
+export { checkExpiration, skimmer, herokuExpirationCheck, removeOldDeployIds };

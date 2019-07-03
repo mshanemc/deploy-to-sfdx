@@ -164,6 +164,11 @@ const cdsRetrieve = async (deployId: string) => {
     }
 };
 
+const getKeysForCDSs = async () => {
+    const deployIds = await redis.keys('*-*-*');
+    return deployIds;
+};
+// not all keys...supposed to be getting pooled orgs
 const getKeys = async () => {
     const keys = await redis.keys('*.*');
     const output = [];
@@ -214,6 +219,7 @@ export {
     putDeployRequest,
     putPoolRequest,
     getKeys,
+    getKeysForCDSs,
     getPooledOrg,
     putPooledOrg,
     getPoolRequest,
