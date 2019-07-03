@@ -8,7 +8,7 @@
 // publish timestamps
 import { lineParserResult } from './types';
 
-class CDS  {
+class CDS {
     deployId: string;
     complete: boolean;
 
@@ -21,7 +21,7 @@ class CDS  {
 
     orgId?: string;
     instanceUrl?: string;
-    
+
     mainUser?: {
         username?: string;
         loginUrl?: string;
@@ -61,7 +61,7 @@ export interface HerokuResult {
     appName: string;
     dashboardUrl: string;
     openUrl: string;
-  }
+}
 
 export interface CDSOptions {
     deployId: string;
@@ -123,4 +123,4 @@ export enum commandSummary {
     DEPLOY = 'deploying via metadata api'
 }
 
-export { CDS }
+export { CDS };
