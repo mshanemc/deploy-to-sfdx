@@ -4,12 +4,13 @@ import * as ua from 'universal-analytics';
 import * as path from 'path';
 import * as favicon from 'serve-favicon';
 
-import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve } from './lib/redisNormal';
+import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish } from './lib/redisNormal';
 import * as msgBuilder from './lib/deployMsgBuilder';
 import * as utilities from './lib/utilities';
 import { emitLead } from './lib/trialLeadCreate';
 
 import { deployRequest } from './lib/types';
+import { CDS } from './lib/CDS';
 
 const app = express();
 
@@ -26,17 +27,9 @@ app.use(express.json());
 app.post(
     '/trial',
     wrapAsync(async (req, res, next) => {
-        const message = msgBuilder(req);
+        const message = await commonDeploy(req, '/trial');
         logger.debug('trial request', message);
         emitLead(req.body);
-
-        if (message.visitor) {
-            message.visitor.pageview('/trial').send();
-            message.visitor.event('Repo', message.template).send();
-        }
-
-        utilities.runHerokuBuilder();
-        await putDeployRequest(message);
         res.redirect(`/deploying/trial/${message.deployId.trim()}`);
     })
 );
@@ -57,15 +50,7 @@ app.get(
             return res.redirect(`/userinfo?template=${req.query.template}`);
         }
 
-        const message: deployRequest = msgBuilder(req);
-
-        if (message.visitor) {
-            message.visitor.pageview('/launch').send();
-            message.visitor.event('Repo', message.template).send();
-        }
-
-        utilities.runHerokuBuilder();
-        await putDeployRequest(message);
+        const message = await commonDeploy(req, '/launch');
         return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
     })
 );
@@ -113,6 +98,24 @@ function wrapAsync(fn) {
         fn(req, res, next).catch(next);
     };
 }
+
+const commonDeploy = async (req, url: string) => {
+    const message: deployRequest = msgBuilder(req);
+
+    if (message.visitor) {
+        message.visitor.pageview(url).send();
+        message.visitor.event('Repo', message.template).send();
+    }
+
+    utilities.runHerokuBuilder();
+    await putDeployRequest(message);
+    await cdsPublish(
+        new CDS({
+            deployId: message.deployId
+        })
+    );
+    return message;
+};
 
 process.on('unhandledRejection', e => {
     logger.error('this reached the unhandledRejection handler somehow:', e);
