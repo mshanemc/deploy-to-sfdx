@@ -102,7 +102,7 @@
     "nodemonConfig": {
         "restartable": "rs",
         "watch": [
-            "/src"
+            "src"
         ],
         "ext": "ts",
         "exec": "npm run local:web"
