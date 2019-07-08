@@ -2,6 +2,7 @@ import * as logger from 'heroku-logger';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as stripcolor from 'strip-color';
+import { retry } from '@lifeomic/attempt';
 
 import * as utilities from './utilities';
 import { getPooledOrg, cdsPublish } from './redisNormal';
@@ -11,10 +12,11 @@ import { timesToGA } from './timeTracking';
 import { execProm } from '../lib/execProm';
 
 import { deployRequest } from './types';
+const retryOptions = { maxAttempts: 60, delay: 5000 };
 
-const pooledOrgFinder = async function(deployReq: deployRequest) {
+const pooledOrgFinder = async function(deployReq: deployRequest, forcePool: boolean = false) {
     try {
-        if (!process.env.POOLCONFIG_URL) {
+        if (!process.env.POOLCONFIG_URL && !forcePool) {
             return;
         }
 
@@ -24,13 +26,16 @@ const pooledOrgFinder = async function(deployReq: deployRequest) {
         const uniquePath = path.join(__dirname, '../tmp/pools', cds.orgId);
         fs.ensureDirSync(uniquePath);
 
-        await execProm(
-            // `sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${keypath} --instanceurl ${cds.instanceUrl || 'https://test.salesforce.com'} -s`,
-            `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
-                cds.mainUser.username
-            } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`,
-            { cwd: uniquePath }
-        );
+        // `sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${keypath} --instanceurl ${cds.instanceUrl || 'https://test.salesforce.com'} -s`,
+        const jwtComand = `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
+            cds.mainUser.username
+        } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`;
+
+        if (forcePool) {
+            await retry(async context => execProm(jwtComand, { cwd: uniquePath }), retryOptions);
+        } else {
+            await execProm(jwtComand, { cwd: uniquePath });
+        }
 
         // we may need to put the user's email on it
         if (deployReq.email) {
