@@ -40,7 +40,6 @@
         "@lifeomic/attempt": "^3.0.0",
         "@salesforce-ux/design-system": "^2.9.3",
         "@salesforce/kit": "^1.1.1",
-        "delay": "^4.1.0",
         "express": "^4.16.4",
         "fs-extra": "^7.0.1",
         "heroku-client": "^3.0.7",
@@ -52,17 +51,14 @@
         "serve-favicon": "^2.5.0",
         "shane-sfdx-plugins": "^3.19",
         "strip-color": "^0.1.0",
-        "universal-analytics": "^0.4.20",
-        "ws": "^6.2.0"
+        "universal-analytics": "^0.4.20"
     },
     "devDependencies": {
         "@babel/core": "^7.3.4",
         "@babel/preset-env": "^7.3.4",
         "@salesforce/wire-service-jest-util": "^2.2.5",
-        "@types/async-retry": "^1.4.1",
         "@types/dotenv": "^6.1.0",
         "@types/express": "^4.16.1",
-        "@types/express-ws": "^3.0.0",
         "@types/fs-extra": "^5.0.5",
         "@types/heroku-logger": "^0.1.0",
         "@types/ioredis": "^4.0.10",
@@ -91,7 +87,6 @@
         "puppeteer": "^1.13.0",
         "ts-jest": "^24.0.0",
         "ts-node": "^8.0.3",
-        "tslint": "^5.13.1",
         "typescript": "^3.5.1"
     },
     "husky": {
