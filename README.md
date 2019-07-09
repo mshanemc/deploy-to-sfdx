@@ -65,25 +65,25 @@ The button will start this on free hobby dynos. For real life, I'd recommend a p
 
 If you're going to be doing a lot of users (imagine a workshop where lots of people are pushing the button at the same time) you can scale out more workers so the people last in line don't have to wait so long. Otherwise, it'll spin while the workers are busy processing the deploy request queue.
 
-The oneoffbuilder is the same as the orgbuilder but exits when it's finished with its queue item. They do take about 30 seconds to spin up before starting to build an org, so having "live workers" is better. These give you the ability to scale out work horizontally (booting up a new dyno will be faster than waiting in line behind several other deploys on the always-live workers)
+The oneoffbuilder is the same as the orgbuilder but exits when it's finished with its queue item. They do take ~30 seconds to spin up before starting to build an org, so having "live workers" is better. These give you the ability to scale out work horizontally (booting up a new dyno will be faster than waiting in line behind several other deploys on the always-live workers)
+
+Up to you to balance costs between live workers (orgbuilder) and on-demand (oneoffbuilder)
 
 ---
 
 ## Architectural overview
 
 Nodejs, express run the web server.
-When the web server receives a request, it creates a unique deployID (user-repo-timestamp) and a message on the deploy queue (using Heroku Redis)
-The server redirects the user to a web page which subscribes to a websocket
+When the web server receives a request, it creates a unique deployID (user-repo-timestamp plus a few random digits) and a message on the deploy queue (using Heroku Redis)
+The server redirects the user to a web page which polls an http endpoint (/results/:deployId) for updated results
 
-When a worker starts up, it auths to a devhub via its environment variables.
+When a process starts up, it auths to a devhub via its environment variables.
 Then it listens to the deploy queue and executes jobs
 
 -   clone the repo into local filestorage
 -   execute the orgInit.sh script, or the default create/push/open flow if there isn't one
--   drop the output results of these steps into a broadcast exchange
+-   drop the output results into a redis key (the deployId) so that the results endpoint can find it
 -   delete the local folder and send the ALLDONE message
-
-All the web servers are subscribed to the Redis pub/sub. When they receive messages, they look at the deployID and send the messages down to the matching client.
 
 It runs a plugin that give it powers SFDX doesn't out-of-the-box
 <https://github.com/mshanemc/shane-sfdx-plugins>
@@ -134,8 +134,8 @@ in your `.env` add
 -   `LOCAL_ONLY_KEY_PATH=/Users/shane.mclaughlin/code/certificates/server.key` or your equivalent to where your cert for jwt is
 -   in your `process.env` file, put the Heroku Redis url (it can be the same as you're using in the cloud. **Don't commit this file to your repo.**
 -   `npm install` will get all your modules installed, including my plugin.
--   `npm build` will get the typescript from /src to /built, which is where the executables go.
--   then start this app with `npm run local:web`
+-   `npm run build` will get the typescript and LWC output from /src to /built, which is where the executables go.
+-   then start this app with `npm run local:web` and use localhost:8443
 
 ## Building for Local Dev
 
@@ -175,7 +175,7 @@ That lets you create records, assign permsets, create users, install packages, r
 
 uses Jest.
 
-There's a file called `testRepos` that you'll want to customize with any repos you want to use for verification.
+There's a file called `testRepos` that you'll want to customize with any repos you want to use for verification. It'll probably fail if you use mine.
 
 Run them with `npm run test:unit`. A few of them are not true unit tests...the require a server and redis running, and will try to connect to github for your testRepos. Run each of these commands in a separate terminal.
 
