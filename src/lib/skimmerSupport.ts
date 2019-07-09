@@ -1,10 +1,22 @@
 import * as moment from 'moment';
 import * as logger from 'heroku-logger';
+import { retry } from '@lifeomic/attempt';
 
-import { redis, orgDeleteExchange, getHerokuCDSs, getAppNamesFromHerokuCDSs, getKeysForCDSs, cdsRetrieve, cdsDelete } from './redisNormal';
+import {
+    redis,
+    getDeleteQueueSize,
+    orgDeleteExchange,
+    getHerokuCDSs,
+    getAppNamesFromHerokuCDSs,
+    getKeysForCDSs,
+    cdsRetrieve,
+    cdsDelete,
+    getDeleteRequest
+} from './redisNormal';
 import { poolConfig } from './types';
 import * as utilities from './utilities';
 import { herokuDelete } from './herokuDelete';
+import { auth, getKeypath } from '../lib/hubAuth';
 import { execProm } from '../lib/execProm';
 import { CDS } from './CDS';
 
@@ -98,4 +110,56 @@ const removeOldDeployIds = async () => {
     }
 };
 
-export { checkExpiration, skimmer, herokuExpirationCheck, removeOldDeployIds };
+const processDeleteQueue = async () => {
+    const delQueueInitialSize = await getDeleteQueueSize();
+    const retryOptions = { maxAttempts: 60, delay: 5000 };
+
+    if (delQueueInitialSize > 0) {
+        logger.debug(`deleting ${delQueueInitialSize} orgs`);
+        // auth to the hub
+        const keypath = await getKeypath();
+        await auth();
+
+        // keep deleting until the queue is empty
+        try {
+            while ((await getDeleteQueueSize()) > 0) {
+                const deleteReq = await getDeleteRequest();
+
+                try {
+                    // pull from the delete Request Queue
+                    logger.debug(`deleting org with username ${deleteReq.username}`);
+
+                    await retry(
+                        async context =>
+                            execProm(
+                                `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${deleteReq.username} --jwtkeyfile ${keypath} --instanceurl https://test.salesforce.com -s`
+                            ),
+                        retryOptions
+                    );
+
+                    //delete it
+                    await execProm(`sfdx force:org:delete -p -u ${deleteReq.username}`);
+                } catch (e) {
+                    logger.error(e);
+                    logger.warn(`unable to delete org with username: ${deleteReq.username}`);
+                }
+
+                // go through the herokuCDS for the username
+                for (const appName of await getAppNamesFromHerokuCDSs(deleteReq.username, false)) {
+                    try {
+                        await herokuDelete(appName);
+                    } catch (e) {
+                        logger.error(e);
+                    }
+                    logger.debug(`deleted heroku app with name ${appName}`);
+                }
+            }
+        } catch (e) {
+            logger.error(e);
+        }
+    } else {
+        logger.debug('no orgs to delete');
+    }
+};
+
+export { checkExpiration, skimmer, herokuExpirationCheck, removeOldDeployIds, processDeleteQueue };

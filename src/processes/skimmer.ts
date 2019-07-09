@@ -1,13 +1,13 @@
 import * as logger from 'heroku-logger';
 import * as utilities from '../lib/utilities';
-import { skimmer, herokuExpirationCheck, removeOldDeployIds } from '../lib/skimmerSupport';
+import { skimmer } from '../lib/skimmerSupport';
 import { auth } from '../lib/hubAuth';
 
 (async () => {
     await auth();
     try {
         if (utilities.checkHerokuAPI()) {
-            await Promise.all([skimmer(), herokuExpirationCheck(), removeOldDeployIds()]);
+            await skimmer();
         }
         process.exit(0);
     } catch (err) {
