@@ -622,12 +622,6 @@ a.slds-button:focus {
   flex: none;
 }
 
-.slds-small {
-}
-
-.slds-large {
-}
-
 @media (min-width: 320px) {
 }
 
@@ -656,31 +650,4 @@ a.slds-button:focus {
 }
 
 @media (max-width: 1279px) {
-}
-
-/*! HTML5 Boilerplate v5.2.0 | MIT License | https://html5boilerplate.com/ */
-
-@media print {
-  *,
-  *:before,
-  *:after {
-    background: transparent !important;
-    color: #000 !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-
-  a,
-  a:visited {
-    text-decoration: underline;
-  }
-
-  a[href]:after {
-    content: ' (' attr(href) ')';
-  }
-
-  a[href^='#']:after,
-  a[href^='javascript:']:after {
-    content: '';
-  }
 }

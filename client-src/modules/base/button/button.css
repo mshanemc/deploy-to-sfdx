@@ -603,19 +603,6 @@ button {
 @media (max-width: 1279px) {
 }
 
-/*! HTML5 Boilerplate v5.2.0 | MIT License | https://html5boilerplate.com/ */
-
-@media print {
-  *,
-  *:before,
-  *:after {
-    background: transparent !important;
-    color: #000 !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-}
-
 .slds-button.slds-button_huge {
   padding: 20px;
 }
