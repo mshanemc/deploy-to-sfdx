@@ -17,7 +17,7 @@ export default class Main extends LightningElement {
   }
 
   get deployId() {
-    return this.pathname.replace('/deploying/deployer/', '');
+    return this.pathname.replace('/deploying/deployer/', '').replace('/deploying/trial/', '');
   }
 }
 
