@@ -91,7 +91,7 @@
     },
     "husky": {
         "hooks": {
-            "pre-push": "rm -rf tmp/*; rm -rf src/tmp/* npm run test:unit:local"
+            "pre-push": "rm -rf tmp/*; rm -rf src/tmp/*"
         }
     },
     "nodemonConfig": {
