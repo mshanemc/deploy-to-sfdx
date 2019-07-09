@@ -67,7 +67,11 @@ If you're going to be doing a lot of users (imagine a workshop where lots of peo
 
 The oneoffbuilder is the same as the orgbuilder but exits when it's finished with its queue item. They do take ~30 seconds to spin up before starting to build an org, so having "live workers" is better. These give you the ability to scale out work horizontally (booting up a new dyno will be faster than waiting in line behind several other deploys on the always-live workers)
 
-Up to you to balance costs between live workers (orgbuilder) and on-demand (oneoffbuilder)
+Up to you to balance costs between live workers (orgbuilder) and on-demand (oneoffbuilder).
+
+Add Heroku Scheduler to your app and set `orgdeleter` to run every 10 minutes or so. Deleted orgs go into a deletion queue that isn't actively monitored so this will free up some scratch org capacity for you.
+Then have `dynoskimmer` run every 10 minutes or so...it kills one-off dyno processes that stalled out
+If you're using org pools, you also want to have scheduler running `poolwatcher` (checks actual pools vs. configuration and starts `poolbuilder` processes) and `poolskimmer` (deletes expired orgs from the pools) scheduled.
 
 ---
 
