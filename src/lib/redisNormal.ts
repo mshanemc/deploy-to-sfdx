@@ -14,6 +14,8 @@ const poolDeployExchange = 'poolDeploys';
 const orgDeleteExchange = 'orgDeletes';
 const herokuCDSExchange = 'herokuCDSs';
 
+const days31asSeconds = 31 * 24 * 60 * 60;
+
 // for accessing the redis directly.  Less favored
 const redis = new Redis(process.env.REDIS_URL);
 
@@ -136,11 +138,9 @@ const cdsDelete = async (deployId: string) => {
 };
 
 const cdsPublish = async (cds: CDS) => {
-    // await redis.publish(cdsExchange, JSON.stringify(cds));
     // write the CDS to its own deployId based key on redis
-    // TODO: more clever expiration time
     if (!cds.isPool) {
-        await redis.set(cds.deployId, JSON.stringify(cds));
+        await redis.set(cds.deployId, JSON.stringify(cds), 'EX', days31asSeconds);
     }
 };
 
@@ -150,6 +150,7 @@ const cdsRetrieve = async (deployId: string) => {
         const cds = <CDS>JSON.parse(retrieved);
         return cds;
     } else {
+        logger.warn(`No cds results found for deployId ${deployId}`);
         return new CDS({
             deployId,
             complete: true,
