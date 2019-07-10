@@ -3,7 +3,7 @@ import * as fs from 'fs-extra';
 import * as logger from 'heroku-logger';
 
 import { deployRequest } from './types';
-import { redis, cdsPublish, putHerokuCDS } from './redisNormal';
+import { cdsPublish, putHerokuCDS } from './redisNormal';
 import { lineParse } from './lineParse';
 import * as lineRunner from './lines';
 import { timesToGA } from './timeTracking';
@@ -93,7 +93,7 @@ const build = async (msgJSON: deployRequest) => {
         return clientResult;
     }
 
-    const localLineRunner = new lineRunner(msgJSON, parsedLines, redis, clientResult);
+    const localLineRunner = new lineRunner(msgJSON, parsedLines, clientResult);
 
     try {
         clientResult = <CDS>await localLineRunner.runLines();

@@ -8,75 +8,32 @@ import * as argStripper from './argStripper';
 import { exec } from '../lib/execProm';
 import { CDS, commandSummary, HerokuResult } from './CDS';
 
-const lines = function(msgJSON: deployRequest, lines, redisPub, output: CDS) {
+const lines = function(msgJSON: deployRequest, lines, output: CDS) {
     this.msgJSON = msgJSON;
     this.lines = lines;
-    this.redisPub = redisPub;
 
     this.runLines = async function runLines() {
         logger.debug('starting the line runs');
 
         for (const line of this.lines) {
-            let localLine = line;
+            let localLine = line; //
             let summary: commandSummary;
             let shortForm: string;
 
-            // if (localLine.includes('sfdx') !localLine.includes('--json')) {
-            //   throw new Error(
-            //     `Every line should have included --json by this point.  Cannot process ${localLine}`
-            //   );
-            // }
             logger.debug(localLine);
+            summary = getSummary(localLine, msgJSON);
 
             // corrections and improvements for individual commands
             if (localLine.includes('sfdx force:org:open') && !localLine.includes(' -r')) {
-                summary = commandSummary.OPEN;
                 localLine = `${localLine} -r`;
-            } else if (localLine.includes(':user:password')) {
-                summary = commandSummary.PASSWORD_GEN;
             } else if (localLine.includes(':org:create')) {
                 // handle the shane plugin and the stock commmand
                 // no aliases allowed to keep the deployer from getting confused between deployments
                 localLine = argStripper(localLine, '--setalias');
                 localLine = argStripper(localLine, '-a');
-                summary = commandSummary.ORG_CREATE;
-            } else if (localLine.includes('sfdx force:source:push')) {
-                summary = commandSummary.PUSH;
-            } else if (localLine.includes('sfdx force:source:push')) {
-                summary = commandSummary.PUSH;
-            } else if (localLine.includes('sfdx force:source:push')) {
-                summary = commandSummary.PUSH;
-            } else if (localLine.includes('sfdx force:user:create')) {
-                summary = commandSummary.USER_CREATE;
-            } else if (localLine.includes('sfdx force:apex:execute')) {
-                summary = commandSummary.APEX_EXEC;
-            } else if (localLine.includes('sfdx force:user:permset')) {
-                summary = commandSummary.PERMSET;
-            } else if (localLine.includes('sfdx force:data:')) {
-                summary = commandSummary.DATA;
-            } else if (localLine.includes(':package:install')) {
-                summary = commandSummary.PACKAGE;
-            } else if (localLine.includes('sfdx force:mdapi:deploy')) {
-                summary = commandSummary.DEPLOY;
-            } else if (localLine.includes('sfdx shane:heroku:repo:deploy')) {
-                summary = commandSummary.HEROKU_DEPLOY;
-                if (!process.env.HEROKU_API_KEY) {
-                    // check that heroku API key is defined in process.env
-                    logger.error('there is no HEROKU_API_KEY defined, but shane:heroku:repo:deploy is used in an .orgInit', {
-                        repo: `${msgJSON.username}/${msgJSON.repo}`
-                    });
-                }
-            } else {
-                logger.info('unhandled command will show up directly in the UI', {
-                    command: localLine,
-                    repo: `${msgJSON.username}/${msgJSON.repo}`
-                });
             }
 
-            // the actual work and error handling
             let lineResult;
-
-            // errors that we want to handle
 
             logger.debug(`running line-- ${localLine}`);
 
@@ -140,7 +97,7 @@ const lines = function(msgJSON: deployRequest, lines, redisPub, output: CDS) {
                     });
                 }
 
-                // finally, emit the entire new data structure back to the web server to forward to the client after each line
+                // finally, publish the CDS to redis so clients can access the latest updates
                 cdsPublish(output);
             } catch (e) {
                 if (msgJSON.pool && output.mainUser && output.mainUser.username) {
@@ -184,4 +141,46 @@ const getDisplayResults = async (path: string, username: string) => {
     const displayResults = await exec(`sfdx force:org:display -u ${username} --json`, { cwd: path });
     const displayResultsJSON = <sfdxDisplayResult>JSON.parse(stripcolor(displayResults.stdout)).result;
     return displayResultsJSON;
+};
+
+const getSummary = (localLine: string, msgJSON: deployRequest) => {
+    if (localLine.includes('sfdx force:org:open') && !localLine.includes(' -r')) {
+        return commandSummary.OPEN;
+        // localLine = `${localLine} -r`;
+    } else if (localLine.includes(':user:password')) {
+        return commandSummary.PASSWORD_GEN;
+    } else if (localLine.includes(':org:create')) {
+        // handle the shane plugin and the stock commmand
+        // no aliases allowed to keep the deployer from getting confused between deployments
+        // localLine = argStripper(localLine, '--setalias');
+        // localLine = argStripper(localLine, '-a');
+        return commandSummary.ORG_CREATE;
+    } else if (localLine.includes('sfdx force:source:push')) {
+        return commandSummary.PUSH;
+    } else if (localLine.includes('sfdx force:user:create')) {
+        return commandSummary.USER_CREATE;
+    } else if (localLine.includes('sfdx force:apex:execute')) {
+        return commandSummary.APEX_EXEC;
+    } else if (localLine.includes('sfdx force:user:permset')) {
+        return commandSummary.PERMSET;
+    } else if (localLine.includes('sfdx force:data:')) {
+        return commandSummary.DATA;
+    } else if (localLine.includes(':package:install')) {
+        return commandSummary.PACKAGE;
+    } else if (localLine.includes('sfdx force:mdapi:deploy')) {
+        return commandSummary.DEPLOY;
+    } else if (localLine.includes('sfdx shane:heroku:repo:deploy')) {
+        if (!process.env.HEROKU_API_KEY) {
+            // check that heroku API key is defined in process.env
+            logger.error('there is no HEROKU_API_KEY defined, but shane:heroku:repo:deploy is used in an .orgInit', {
+                repo: `${msgJSON.username}/${msgJSON.repo}`
+            });
+        }
+        return commandSummary.HEROKU_DEPLOY;
+    } else {
+        logger.info('unhandled command will show up directly in the UI', {
+            command: localLine,
+            repo: `${msgJSON.username}/${msgJSON.repo}`
+        });
+    }
 };
