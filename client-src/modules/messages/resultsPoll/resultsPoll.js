@@ -4,7 +4,7 @@ import * as fakeData from '../../route/deployMessages/__tests__/data/fullExample
 import { CDS } from '../../../../built/lib/CDS';
 
 const interval_ms = 1000;
-const timeoutMS = 1000 * 60 * 30;
+const timeoutMS = 1000 * 60 * 30; // 30 minutes, then stop no matter what
 
 export default function resultsPoll(config) {
   // eslint-disable-next-line no-unused-vars
@@ -16,7 +16,6 @@ export default function resultsPoll(config) {
 register(resultsPoll, eventTarget => {
   let config = {};
   let pinger;
-  let pollingStartTimestamp = new Date().valueOf;
 
   eventTarget.addEventListener('config', newConfig => {
     config = newConfig;
@@ -28,6 +27,9 @@ register(resultsPoll, eventTarget => {
       eventTarget.dispatchEvent(new ValueChangedEvent({ data: fakeData.default }));
     } else if (config.deployId) {
       clearInterval(pinger);
+      setTimeout(() => {
+        clearInterval(pinger);
+      }, timeoutMS);
       pinger = setInterval(async () => {
         const results = await (await fetch(`/results/${config.deployId}`)).json();
         if (config.log) {
@@ -35,7 +37,7 @@ register(resultsPoll, eventTarget => {
         }
         const cds = new CDS({ ...results });
         eventTarget.dispatchEvent(new ValueChangedEvent({ data: results }));
-        if (cds.complete || new Date().valueOf() - pollingStartTimestamp > timeoutMS) {
+        if (cds.complete) {
           clearInterval(pinger);
         }
       }, interval_ms);
