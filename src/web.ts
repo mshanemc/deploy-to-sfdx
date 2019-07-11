@@ -77,7 +77,7 @@ app.get(
 
 app.get('*', (req, res, next) => {
     setImmediate(() => {
-        next(new Error(`Route not found: ${req.url}`));
+        next(new Error(`Route not found: ${req.url} on action ${req.method}`));
     });
 });
 
