@@ -5,6 +5,7 @@ import { sleep, retry } from '@lifeomic/attempt';
 import { getTestURL } from './../helpers/testingUtils';
 import { cdsDelete } from './../../src/lib/redisNormal';
 import { CDS } from './../../src/lib/CDS';
+import { processDeleteQueue } from './../../src/lib/skimmerSupport';
 
 const retryOptions = { maxAttempts: 3 };
 
@@ -40,6 +41,7 @@ const deployCheck = async (user: string, repo: string) => {
         }
 
         await cdsDelete(deployId);
+        await processDeleteQueue();
 
         expect(status.complete).toBe(true);
         expect(status.errors).toHaveLength(0);

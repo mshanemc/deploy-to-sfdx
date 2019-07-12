@@ -21,7 +21,15 @@ const pooledOrgFinder = async function(deployReq: deployRequest, forcePool: bool
         }
 
         let cds = await getPooledOrg(await utilities.getKey(deployReq), true);
-        cds = { ...cds, buildStartTime: new Date(), deployId: deployReq.deployId, browserStartTime: deployReq.createdTimestamp || new Date() };
+        cds = {
+            ...cds,
+            buildStartTime: new Date(),
+            deployId: deployReq.deployId,
+            browserStartTime: deployReq.createdTimestamp || new Date(),
+            isPool: false
+        };
+
+        await cdsPublish(cds);
 
         const uniquePath = path.join(__dirname, '../tmp/pools', cds.orgId);
         fs.ensureDirSync(uniquePath);
