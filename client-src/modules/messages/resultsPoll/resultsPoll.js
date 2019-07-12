@@ -37,7 +37,7 @@ register(resultsPoll, eventTarget => {
         }
         const cds = new CDS({ ...results });
         eventTarget.dispatchEvent(new ValueChangedEvent({ data: results }));
-        if (cds.complete && cds.mainUser.loginUrl) {
+        if (cds.complete) {
           clearInterval(pinger);
         }
       }, interval_ms);

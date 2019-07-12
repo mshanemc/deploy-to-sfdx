@@ -26,6 +26,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest, forcePool: bool
             buildStartTime: new Date(),
             deployId: deployReq.deployId,
             browserStartTime: deployReq.createdTimestamp || new Date(),
+            complete: false,
             isPool: false
         };
 
@@ -80,6 +81,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest, forcePool: bool
             loginUrl: utilities.urlFix(openOutput).result.url,
             password
         };
+        cds.complete = true;
 
         logger.debug(`opened : ${openOutput}`);
         await cdsPublish(cds);
