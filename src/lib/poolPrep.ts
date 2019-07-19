@@ -23,7 +23,7 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
 
     // still there?  you must need some more orgs
     if (actualQuantity < targetQuantity) {
-        const inFlight = await getPoolDeployCountByRepo(pool.user, pool.repo, pool.branch);
+        const inFlight = await getPoolDeployCountByRepo(pool);
         const needed = targetQuantity - actualQuantity - inFlight;
         logger.debug(`pool ${poolname} has ${actualQuantity} ready and ${inFlight} in queue out of ${targetQuantity}...`);
 
