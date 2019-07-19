@@ -1,6 +1,8 @@
 import { removeOldDeployIds, herokuExpirationCheck, processDeleteQueue } from '../lib/skimmerSupport';
 
 (async () => {
-    await Promise.all([processDeleteQueue(), removeOldDeployIds(), herokuExpirationCheck()]);
+    await herokuExpirationCheck();
+    await removeOldDeployIds();
+    await processDeleteQueue();
     process.exit(0);
 })();
