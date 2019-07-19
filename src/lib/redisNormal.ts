@@ -43,7 +43,7 @@ const getHerokuCDSs = async () => {
 
 const getAppNamesFromHerokuCDSs = async (salesforceUsername: string, expecting: boolean = true) => {
     // get all the CDSs
-    let herokuCDSs: CDS[] = (await redis.lrange(herokuCDSExchange, 0, -1)).map(queueItem => JSON.parse(queueItem));
+    let herokuCDSs = await getHerokuCDSs();
 
     if (herokuCDSs.length === 0) {
         return [];
@@ -64,9 +64,9 @@ const getAppNamesFromHerokuCDSs = async (salesforceUsername: string, expecting: 
 
     const matched = herokuCDSs.splice(matchedCDSIndex, 1);
 
+    await redis.del(herokuCDSExchange);
     if (herokuCDSs.length > 0) {
         // clear the queue and push the unmatched stuff back
-        await redis.del(herokuCDSExchange);
         await redis.lpush(herokuCDSExchange, ...herokuCDSs.map(cds => JSON.stringify(cds)));
     }
 
