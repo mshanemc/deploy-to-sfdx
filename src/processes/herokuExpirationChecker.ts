@@ -1,10 +1,10 @@
-import { Logger } from 'heroku-logger';
+import * as logger from 'heroku-logger';
 
 import { herokuExpirationCheck } from '../lib/skimmerSupport';
 import { auth } from '../lib/hubAuth';
 
 (async () => {
-    Logger.debug('herokuExpirationCheck started');
+    logger.debug('herokuExpirationCheck started');
 
     await auth();
     await herokuExpirationCheck();
