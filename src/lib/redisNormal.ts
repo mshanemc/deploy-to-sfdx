@@ -171,8 +171,9 @@ const cdsRetrieve = async (deployId: string) => {
 
 const getKeysForCDSs = async () => {
     const deployIds = await redis.keys('*-*-*');
-    return deployIds;
+    return deployIds.filter(id => !id.includes('.'));
 };
+
 // not all keys...supposed to be getting pooled orgs
 const getKeys = async () => {
     const keys = await redis.keys('*.*');
