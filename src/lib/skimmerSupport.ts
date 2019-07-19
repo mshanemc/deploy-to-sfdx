@@ -70,10 +70,10 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
 };
 
 const doesOrgExist = async (username: string) => {
-    const queryResult = await execProm(
-        `sfdx force:data:soql:query -u ${process.env.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`
-    );
     try {
+        const queryResult = await execProm(
+            `sfdx force:data:soql:query -u ${process.env.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`
+        );
         const status = JSON.parse(queryResult.stdout).result.records[0].Status;
 
         if (status === 'Deleted' || status === 'Error') {
