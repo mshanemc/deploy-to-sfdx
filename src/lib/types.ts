@@ -33,6 +33,7 @@ export interface poolConfig {
     repo: string;
     lifeHours: number;
     quantity: number;
+    branch?: string;
 }
 
 export interface sfdxDisplayResult {
