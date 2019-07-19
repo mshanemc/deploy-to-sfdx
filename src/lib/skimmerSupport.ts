@@ -16,7 +16,7 @@ import {
 import { poolConfig } from './types';
 import * as utilities from './utilities';
 import { herokuDelete } from './herokuDelete';
-import { auth, getKeypath } from '../lib/hubAuth';
+import { getKeypath } from '../lib/hubAuth';
 import { execProm } from '../lib/execProm';
 import { CDS } from './CDS';
 
@@ -116,9 +116,6 @@ const processDeleteQueue = async () => {
 
     if (delQueueInitialSize > 0) {
         logger.debug(`deleting ${delQueueInitialSize} orgs`);
-        // auth to the hub
-        const keypath = await getKeypath();
-        await auth();
 
         // keep deleting until the queue is empty
         try {
@@ -132,7 +129,9 @@ const processDeleteQueue = async () => {
                     await retry(
                         async context =>
                             execProm(
-                                `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${deleteReq.username} --jwtkeyfile ${keypath} --instanceurl https://test.salesforce.com -s`
+                                `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
+                                    deleteReq.username
+                                } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`
                             ),
                         retryOptions
                     );
