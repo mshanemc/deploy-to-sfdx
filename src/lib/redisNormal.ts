@@ -204,9 +204,10 @@ const putPooledOrg = async (depReq: deployRequest, poolMessage: CDS) => {
 
 const getPoolDeployRequestQueueSize = async () => redis.llen(poolDeployExchange);
 
-const getPoolDeployCountByRepo = async (username: string, repo: string) => {
+const getPoolDeployCountByRepo = async (username: string, repo: string, branch?: string) => {
     const poolRequests = await redis.lrange(poolDeployExchange, 0, -1);
-    return poolRequests.map(pr => JSON.parse(pr)).filter((pr: deployRequest) => pr.repo === repo && pr.username === username).length;
+    return poolRequests.map(pr => JSON.parse(pr)).filter((pr: deployRequest) => pr.repo === repo && pr.username === username && pr.branch === branch)
+        .length;
 };
 
 export {

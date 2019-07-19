@@ -10,6 +10,10 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
     const targetQuantity = pool.quantity;
     let poolname = `${pool.user}.${pool.repo}`;
 
+    if (pool.branch) {
+        poolname = `${pool.user}.${pool.repo}.${pool.branch}`;
+    }
+
     const actualQuantity = await redis.llen(poolname);
 
     if (actualQuantity >= targetQuantity) {
@@ -19,16 +23,17 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
 
     // still there?  you must need some more orgs
     if (actualQuantity < targetQuantity) {
-        const inFlight = await getPoolDeployCountByRepo(pool.user, pool.repo);
+        const inFlight = await getPoolDeployCountByRepo(pool.user, pool.repo, pool.branch);
         const needed = targetQuantity - actualQuantity - inFlight;
         logger.debug(`pool ${poolname} has ${actualQuantity} ready and ${inFlight} in queue out of ${targetQuantity}...`);
 
         if (needed <= 0) {
             return;
         }
+        const deployId = encodeURIComponent(`${pool.user}-${pool.repo}-${new Date().valueOf()}`);
+
         const username = poolname.split('.')[0];
         const repo = poolname.split('.')[1];
-        const deployId = encodeURIComponent(`${username}-${repo}-${new Date().valueOf()}`);
 
         const message: deployRequest = {
             pool: true,
@@ -46,7 +51,6 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
         // branch support
         if (pool.branch) {
             message.branch = pool.branch;
-            poolname = `${pool.user}.${pool.repo}.${pool.branch}`;
         }
 
         const messages = [];
