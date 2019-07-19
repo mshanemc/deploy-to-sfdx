@@ -88,6 +88,10 @@ const getDeleteRequest = async () => {
     }
 };
 
+const getDeployRequestSize = async () => {
+    return redis.llen(deployRequestExchange);
+};
+
 const getDeployRequest = async (log?: boolean) => {
     const msg = await redis.lpop(deployRequestExchange);
     if (msg) {
@@ -219,6 +223,7 @@ export {
     cdsPublish,
     cdsRetrieve,
     cdsDelete,
+    getDeployRequestSize,
     putDeployRequest,
     putPoolRequest,
     getKeys,
