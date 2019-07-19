@@ -6,10 +6,10 @@ import { isLocal } from './amIlocal';
 import { exec } from '../lib/execProm';
 
 const hubAuthd = async () => {
-    const hubResult = await exec('sfdx force:config:get defaultdevhubusername --json');
-    if (JSON.parse(stripcolor(hubResult.stdout)).status === 0) {
-        return true;
-    }
+    // const hubResult = await exec('sfdx force:config:get defaultdevhubusername --json');
+    // if (JSON.parse(stripcolor(hubResult.stdout)).status === 0) {
+    //     return true;
+    // }
 
     return false;
 };
