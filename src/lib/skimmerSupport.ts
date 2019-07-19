@@ -69,6 +69,25 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
     return `queueing for deletion ${expiredOrgs.length} expired orgs from pool ${poolname}`;
 };
 
+const doesOrgExist = async (username: string) => {
+    const queryResult = await execProm(
+        `sfdx force:data:soql:query -u ${process.env.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`
+    );
+    try {
+        const status = JSON.parse(queryResult.stdout).result.records[0].Status;
+
+        if (status === 'Deleted' || status === 'Error') {
+            return false;
+        } else {
+            return true;
+        }
+    } catch (e) {
+        logger.error(`error checking hub for username ${username}`);
+        logger.error(e);
+        return false;
+    }
+};
+
 const herokuExpirationCheck = async () => {
     const herokuCDSs = await getHerokuCDSs();
 
@@ -78,22 +97,13 @@ const herokuExpirationCheck = async () => {
         } else {
             for (const cds of herokuCDSs) {
                 // see if the org is deleted
-                const queryResult = await execProm(
-                    `sfdx force:data:soql:query -u ${process.env.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${cds.mainUser.username}'" --json`
-                );
-                try {
-                    const status = JSON.parse(queryResult.stdout).result.records[0].Status;
-
-                    if (status === 'Deleted') {
-                        // if deleted, do the heroku delete thing
-                        for (const appName of await getAppNamesFromHerokuCDSs(cds.mainUser.username)) {
-                            await herokuDelete(appName);
-                            logger.debug(`deleted heroku app with name ${appName}`);
-                        }
+                const exists = await doesOrgExist(cds.mainUser.username);
+                if (!exists) {
+                    // if deleted or errored on create, do the heroku delete thing
+                    for (const appName of await getAppNamesFromHerokuCDSs(cds.mainUser.username)) {
+                        await herokuDelete(appName);
+                        logger.debug(`deleted heroku app with name ${appName}`);
                     }
-                } catch (e) {
-                    logger.error(`error checking hub for username ${cds.mainUser.username}`);
-                    logger.error(e);
                 }
             }
         }
@@ -112,7 +122,7 @@ const removeOldDeployIds = async () => {
 
 const processDeleteQueue = async () => {
     const delQueueInitialSize = await getDeleteQueueSize();
-    const retryOptions = { maxAttempts: 60, delay: 5000 };
+    const retryOptions = { maxAttempts: 3, delay: 5000 };
 
     if (delQueueInitialSize > 0) {
         logger.debug(`deleting ${delQueueInitialSize} orgs`);
@@ -120,27 +130,31 @@ const processDeleteQueue = async () => {
         // keep deleting until the queue is empty
         try {
             while ((await getDeleteQueueSize()) > 0) {
+                // pull from the delete Request Queue
                 const deleteReq = await getDeleteRequest();
+                logger.debug(`deleting org with username ${deleteReq.username}`);
 
-                try {
-                    // pull from the delete Request Queue
-                    logger.debug(`deleting org with username ${deleteReq.username}`);
+                const exists = await doesOrgExist(deleteReq.username);
+                if (exists) {
+                    try {
+                        await retry(
+                            async context =>
+                                execProm(
+                                    `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
+                                        deleteReq.username
+                                    } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`
+                                ),
+                            retryOptions
+                        );
 
-                    await retry(
-                        async context =>
-                            execProm(
-                                `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
-                                    deleteReq.username
-                                } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`
-                            ),
-                        retryOptions
-                    );
-
-                    //delete it
-                    await execProm(`sfdx force:org:delete -p -u ${deleteReq.username}`);
-                } catch (e) {
-                    logger.error(e);
-                    logger.warn(`unable to delete org with username: ${deleteReq.username}`);
+                        //delete it
+                        await execProm(`sfdx force:org:delete -p -u ${deleteReq.username}`);
+                    } catch (e) {
+                        logger.error(e);
+                        logger.warn(`unable to delete org with username: ${deleteReq.username}`);
+                    }
+                } else {
+                    logger.debug(`org with username ${deleteReq.username} is already deleted`);
                 }
 
                 // go through the herokuCDS for the username
