@@ -2,7 +2,7 @@ import * as Redis from 'ioredis';
 import * as logger from 'heroku-logger';
 import * as ua from 'universal-analytics';
 
-import { DeleteRequest, deployRequest } from './types';
+import { DeleteRequest, deployRequest, poolConfig } from './types';
 
 import utilities = require('./utilities');
 import { shellSanitize } from './shellSanitize';
@@ -86,6 +86,10 @@ const getDeleteRequest = async () => {
     } else {
         throw new Error('delete request queue is empty');
     }
+};
+
+const getDeployRequestSize = async () => {
+    return redis.llen(deployRequestExchange);
 };
 
 const getDeployRequest = async (log?: boolean) => {
@@ -204,9 +208,11 @@ const putPooledOrg = async (depReq: deployRequest, poolMessage: CDS) => {
 
 const getPoolDeployRequestQueueSize = async () => redis.llen(poolDeployExchange);
 
-const getPoolDeployCountByRepo = async (username: string, repo: string) => {
+const getPoolDeployCountByRepo = async (pool: poolConfig) => {
     const poolRequests = await redis.lrange(poolDeployExchange, 0, -1);
-    return poolRequests.map(pr => JSON.parse(pr)).filter((pr: deployRequest) => pr.repo === repo && pr.username === username).length;
+    return poolRequests
+        .map(pr => JSON.parse(pr))
+        .filter((pr: deployRequest) => pr.repo === pool.repo && pr.username === pool.user && pr.branch === pool.branch).length;
 };
 
 export {
@@ -217,6 +223,7 @@ export {
     cdsPublish,
     cdsRetrieve,
     cdsDelete,
+    getDeployRequestSize,
     putDeployRequest,
     putPoolRequest,
     getKeys,
