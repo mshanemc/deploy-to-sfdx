@@ -16,7 +16,7 @@ const herokuDelete = async (appName: string) => {
 
         return deleteResult;
     } catch (e) {
-        logger.error(`error deleting heroku app ${appName}`, e);
+        logger.error(`error deleting heroku app ${appName}`);
     }
 };
 
