@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as logger from 'heroku-logger';
+import * as stripcolor from 'strip-color';
 
 import { isLocal } from './amIlocal';
 import { exec } from '../lib/execProm';
@@ -27,7 +28,11 @@ const auth = async () => {
     // where will our cert live?
     const keypath = await getKeypath();
 
-    // are we already auth'd?
+    // are we already auth'd?  If so, quit quickly
+    const hubResult = await exec('sfdx force:config:get defaultdevhubusername --json');
+    if (JSON.parse(stripcolor(hubResult.stdout)).status === 0) {
+        return keypath;
+    }
 
     try {
         if (!isLocal()) {
