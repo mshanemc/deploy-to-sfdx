@@ -18,6 +18,7 @@ import * as utilities from './utilities';
 import { herokuDelete } from './herokuDelete';
 import { getKeypath } from '../lib/hubAuth';
 import { execProm } from '../lib/execProm';
+import { getPoolName } from './namedUtilities';
 import { CDS } from './CDS';
 
 const skimmer = async () => {
@@ -33,7 +34,7 @@ const skimmer = async () => {
 };
 
 const checkExpiration = async (pool: poolConfig): Promise<string> => {
-    const poolname = `${pool.user}.${pool.repo}`;
+    const poolname = getPoolName(pool);
     const currentPoolSize = await redis.llen(poolname); // how many orgs are there?
 
     if (currentPoolSize === 0) {

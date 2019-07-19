@@ -4,15 +4,13 @@ import * as utilities from './utilities';
 import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
 import { deployRequest, poolConfig } from './types';
 import { execProm } from '../lib/execProm';
+import { getPoolName } from './namedUtilities';
+
 import * as ua from 'universal-analytics';
 
 export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boolean = true) => {
     const targetQuantity = pool.quantity;
-    let poolname = `${pool.user}.${pool.repo}`;
-
-    if (pool.branch) {
-        poolname = `${pool.user}.${pool.repo}.${pool.branch}`;
-    }
+    const poolname = getPoolName(pool);
 
     const actualQuantity = await redis.llen(poolname);
 
