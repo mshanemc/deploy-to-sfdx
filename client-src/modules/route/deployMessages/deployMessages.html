@@ -28,7 +28,7 @@
         <div class="slds-text-heading_small">Your org is ready!</div>
         <div>
           <base-button label="Delete" variant="destructive" onclick={deleteOrg}></base-button>
-          <a href={results.mainUser.loginUrl} target="_blank" class="slds-button slds-button_neutral loginUrl">Launch</a>
+          <base-button url={results.mainUser.loginUrl} target="_blank" variant="neutral" label="Launch"></base-button>
         </div>
       </div>
       <div if:true={results.expirationDate}>Your org will expire on <strong>{results.expirationDate}</strong>.</div>
@@ -63,8 +63,8 @@
           <div class="slds-notify slds-notify_toast slds-theme_heroku" role="alert">
             <div class="slds-text-heading_small">{herokuResult.appName}</div>
             <div>
-              <a href={herokuResult.openUrl} target="_blank" class="slds-button slds-button_neutral heroku">Open App</a>
-              <a href={herokuResult.dashboardUrl} target="_blank" class="slds-button slds-button_neutral heroku">Open in Heroku</a>
+              <base-button url={herokuResult.openUrl} target="_blank" variant="neutral" label="Open App"></base-button>
+              <base-button url={herokuResult.dashboardUrl} target="_blank" variant="neutral" label="Open in Heroku"></base-button>
             </div>
           </div>
         </div>

@@ -3,7 +3,11 @@ import { LightningElement, api, track } from 'lwc';
 export default class Button extends LightningElement {
   @track styleClass = 'slds-button';
 
+  @api url;
+  @api target = '_blank';
+
   @api disabled;
+
   @api label;
   @api
   get variant() {

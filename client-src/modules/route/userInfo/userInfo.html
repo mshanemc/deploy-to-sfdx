@@ -10,7 +10,9 @@
           <input type="email" id="email" class="slds-input" value={email} oninput={handleEmailChange} />
         </div>
       </div>
-      <a class="slds-button slds-button_brand slds-m-top_small" href={launchUrl}>Go</a>
+      <div class="slds-m-top_large">
+        <base-button variant="brand" url={launchUrl} label="Go"></base-button>
+      </div>
     </div>
   </base-card>
 </template>

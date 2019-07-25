@@ -44,25 +44,6 @@ small {
   font-size: 80%;
 }
 
-button {
-  color: inherit;
-  font: inherit;
-  margin: 0;
-  overflow: visible;
-  text-transform: none;
-  -webkit-appearance: button;
-  cursor: pointer;
-}
-
-button[disabled] {
-  cursor: default;
-}
-
-button::-moz-focus-inner {
-  border: 0;
-  padding: 0;
-}
-
 *,
 *:before,
 *:after {
@@ -123,262 +104,8 @@ ol {
   list-style: none;
 }
 
-a {
-  color: #006dcc;
-  text-decoration: none;
-  transition: color 0.1s linear;
-}
-
-a:hover,
-a:focus {
-  text-decoration: underline;
-  color: #005fb2;
-}
-
-a:active {
-  color: #005fb2;
-}
-
-a,
-button {
-  cursor: pointer;
-}
-
 strong {
   font-weight: 700;
-}
-
-.slds-button.slds-button_first.slds-button_first {
-  border-right: 0;
-  border-radius: 0.25rem 0 0 0.25rem;
-}
-
-.slds-button_small,
-.slds-button--small {
-  line-height: 1.75rem;
-  min-height: 2rem;
-}
-
-.slds-button {
-  position: relative;
-  display: inline-block;
-  padding: 0;
-  background: transparent;
-  background-clip: border-box;
-  border: 1px solid transparent;
-  border-radius: 0.25rem;
-  line-height: 1.875rem;
-  text-decoration: none;
-  color: #0070d2;
-  -webkit-appearance: none;
-  white-space: normal;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-.slds-button:hover,
-.slds-button:focus,
-.slds-button:active,
-.slds-button:visited {
-  text-decoration: none;
-}
-
-.slds-button:hover,
-.slds-button:focus {
-  color: #005fb2;
-}
-
-.slds-button:focus {
-  outline: 0;
-  box-shadow: 0 0 3px #0070d2;
-}
-
-.slds-button:active {
-  color: #005fb2;
-}
-
-.slds-button[disabled],
-.slds-button:disabled {
-  color: #dddbda;
-}
-
-.slds-button[disabled] *,
-.slds-button:disabled * {
-  pointer-events: none;
-}
-
-.slds-button a {
-  color: currentColor;
-}
-
-.slds-button + .slds-button {
-  margin-left: 0.25rem;
-}
-
-a.slds-button {
-  text-align: center;
-}
-
-a.slds-button:focus {
-  outline: 0;
-  box-shadow: 0 0 3px #0070d2;
-}
-
-.slds-button_neutral,
-.slds-button--neutral {
-  padding-left: 1rem;
-  padding-right: 1rem;
-  text-align: center;
-  vertical-align: middle;
-  border: 1px solid #dddbda;
-  transition: border 0.15s linear;
-  border-color: #dddbda;
-  background-color: white;
-}
-
-.slds-button_neutral:hover,
-.slds-button_neutral:focus,
-.slds-button--neutral:hover,
-.slds-button--neutral:focus {
-  background-color: #f4f6f9;
-}
-
-.slds-button_neutral:active,
-.slds-button--neutral:active {
-  background-color: #eef1f6;
-}
-
-.slds-button_neutral[disabled],
-.slds-button_neutral:disabled,
-.slds-button--neutral[disabled],
-.slds-button--neutral:disabled {
-  background-color: white;
-  cursor: default;
-}
-
-.slds-button_destructive,
-.slds-button--destructive {
-  padding-left: 1rem;
-  padding-right: 1rem;
-  text-align: center;
-  vertical-align: middle;
-  border: 1px solid #dddbda;
-  transition: border 0.15s linear;
-  background-color: #c23934;
-  border-color: #c23934;
-  color: white;
-}
-
-.slds-button_destructive:link,
-.slds-button_destructive:visited,
-.slds-button_destructive:active,
-.slds-button--destructive:link,
-.slds-button--destructive:visited,
-.slds-button--destructive:active {
-  color: white;
-}
-
-.slds-button_destructive:hover,
-.slds-button_destructive:focus,
-.slds-button--destructive:hover,
-.slds-button--destructive:focus {
-  background-color: #a61a14;
-  color: white;
-}
-
-.slds-button_destructive:active,
-.slds-button--destructive:active {
-  background-color: #870500;
-  border-color: #870500;
-}
-
-.slds-button_destructive[disabled],
-.slds-button_destructive:disabled,
-.slds-button--destructive[disabled],
-.slds-button--destructive:disabled {
-  background: #c9c7c5;
-  border-color: #c9c7c5;
-  color: white;
-}
-
-.slds-button_text-destructive {
-  padding-left: 1rem;
-  padding-right: 1rem;
-  text-align: center;
-  vertical-align: middle;
-  border: 1px solid #dddbda;
-  transition: border 0.15s linear;
-  border-color: #dddbda;
-  background-color: white;
-  color: #c23934;
-}
-
-.slds-button_text-destructive:hover,
-.slds-button_text-destructive:focus {
-  background-color: #f4f6f9;
-}
-
-.slds-button_text-destructive:active {
-  background-color: #eef1f6;
-}
-
-.slds-button_text-destructive:focus,
-.slds-button_text-destructive:hover {
-  color: #a12b2b;
-}
-
-.slds-button_text-destructive[disabled],
-.slds-button_text-destructive:disabled {
-  color: #dddbda;
-  background-color: white;
-}
-
-.slds-button_success,
-.slds-button--success {
-  padding-left: 1rem;
-  padding-right: 1rem;
-  text-align: center;
-  vertical-align: middle;
-  border: 1px solid #dddbda;
-  transition: border 0.15s linear;
-  background-color: #4bca81;
-  border-color: #4bca81;
-  color: #080707;
-}
-
-.slds-button_success:link,
-.slds-button_success:visited,
-.slds-button_success:active,
-.slds-button--success:link,
-.slds-button--success:visited,
-.slds-button--success:active {
-  color: #080707;
-}
-
-.slds-button_success:hover,
-.slds-button_success:focus,
-.slds-button--success:hover,
-.slds-button--success:focus {
-  background-color: #04844b;
-  border-color: #04844b;
-  color: white;
-}
-
-.slds-button_success:active,
-.slds-button--success:active {
-  background-color: #04844b;
-  border-color: #04844b;
-}
-
-.slds-button_success[disabled],
-.slds-button_success:disabled,
-.slds-button--success[disabled],
-.slds-button--success:disabled {
-  background: #c9c7c5;
-  border-color: #c9c7c5;
-  color: white;
 }
 
 [class*='slds-icon-action-'] {
@@ -949,36 +676,6 @@ a.slds-button:focus {
   flex: none;
 }
 
-@media (min-width: 320px) {
-}
-
-@media (max-width: 319px) {
-}
-
-@media (min-width: 480px) {
-}
-
-@media (max-width: 479px) {
-}
-
-@media (min-width: 768px) {
-}
-
-@media (max-width: 767px) {
-}
-
-@media (min-width: 1024px) {
-}
-
-@media (max-width: 1023px) {
-}
-
-@media (min-width: 1280px) {
-}
-
-@media (max-width: 1279px) {
-}
-
 :host {
   display: flex;
   flex-direction: column;
@@ -989,6 +686,10 @@ a.slds-button:focus {
 }
 
 base-button + .slds-button {
+  margin-left: 1rem;
+}
+
+base-button + base-button {
   margin-left: 1rem;
 }
 
@@ -1006,20 +707,4 @@ base-button + .slds-button {
 
 .slds-theme_heroku {
   background-color: #6762a6;
-}
-
-.slds-button_neutral:hover,
-.slds-button_neutral:focus,
-.slds-button--neutral:hover,
-.slds-button--neutral:focus {
-  background-color: #f4f6f9;
-}
-
-.slds-theme_success a.loginUrl.slds-button_neutral,
-a.heroku.slds-button_neutral {
-  color: initial;
-}
-
-.slds-theme_success a.loginUrl.slds-button_neutral {
-  text-decoration: initial;
 }

@@ -1,5 +1,13 @@
 <template>
-  <button class={styleClass} disabled={disabled} onclick={click}>
-    {label}
-  </button>
+  <!-- a href treated as button -->
+  <template if:true={url}>
+    <a href={url} target={target} class={styleClass}>{label}</a>
+  </template>
+
+  <!-- use a regular button with event -->
+  <template if:false={url}>
+    <button class={styleClass} disabled={disabled} onclick={click}>
+      {label}
+    </button>
+  </template>
 </template>
