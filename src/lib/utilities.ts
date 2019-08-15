@@ -91,7 +91,7 @@ const utilities = {
     // fix double // inside a url by sfdx cli force:org:open
     urlFix: (input: openResult): openResult => {
         if (input.result.url && input.result.url.includes('.com//secur/')) {
-            logger.warn(`multiple slash in open url ${input.result.url}`);
+            // logger.warn(`multiple slash in open url ${input.result.url}`);
             input.result.url = input.result.url.replace('.com//secur/', '.com/secur/');
         }
         return input;
