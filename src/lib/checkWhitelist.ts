@@ -10,20 +10,20 @@ const checkWhitelist = (ghuser: string, ghrepo: string) => {
     }
 
     if (whitelist1) {
-        whitelist1.split(',').forEach(username => {
+        for (const username of whitelist1.split(',')) {
             if (username.trim() === ghuser) {
                 return true;
             }
-        });
+        }
     }
 
     if (whitelist2) {
-        whitelist2.split(',').forEach(repo => {
+        for (const repo of whitelist2.split(',')) {
             logger.debug(`checking whitelist 2 element: ${repo}`);
             if (repo.trim().split('/')[0] === ghuser && repo.trim().split('/')[1] === ghrepo) {
                 return true;
             }
-        });
+        }
     }
 
     return false;
