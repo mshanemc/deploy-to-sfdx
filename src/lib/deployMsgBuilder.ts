@@ -1,6 +1,8 @@
 import * as logger from 'heroku-logger';
 import { deployRequest } from './types';
 import { shellSanitize, filterAlphaHypenUnderscore } from './shellSanitize';
+import { checkWhitelist } from './checkWhitelist';
+
 import * as ua from 'universal-analytics';
 import * as crypto from 'crypto';
 
@@ -35,7 +37,8 @@ const deployMsgBuilder = function(req): deployRequest {
         username,
         repo,
         deployId,
-        createdTimestamp: new Date()
+        createdTimestamp: new Date(),
+        whitelisted: checkWhitelist(username, repo)
     };
 
     if (process.env.UA_ID) {
@@ -71,38 +74,13 @@ const deployMsgBuilder = function(req): deployRequest {
         message.branch = filterAlphaHypenUnderscore(path.split('/tree/')[1]);
     }
 
-    // checking for whitelisting
-    const whitelist1 = process.env.GITHUB_USERNAME_WHITELIST; // comma separated list of username
-    const whitelist2 = process.env.GITHUB_REPO_WHITELIST; // comma separated list of username/repo
-    // logger.debug(`whitelist1 is ${whitelist1}`);
-    // logger.debug(`whitelist2 is ${whitelist2}`);
-
-    if (whitelist1) {
-        whitelist1.split(',').forEach(username => {
-            if (username.trim() === message.username) {
-                message.whitelisted = true;
-                // logger.debug('deploytMsgBuilder: hit whitelist from username');
-            }
-        });
-    }
-
-    if (whitelist2) {
-        whitelist2.split(',').forEach(repo => {
-            logger.debug(`checking whitelist 2 element: ${repo}`);
-            if (repo.trim().split('/')[0] === message.username && repo.trim().split('/')[1] === message.repo) {
-                message.whitelisted = true;
-                // logger.debug('deploytMsgBuilder: hit whitelist from username/repo');
-            }
-        });
-    }
-
     logger.debug('deployMsgBuilder: done', message);
     return message;
 };
 
 export = deployMsgBuilder;
 
-const randomValueHex = len => {
+const randomValueHex = (len: number) => {
     return crypto
         .randomBytes(Math.ceil(len / 2))
         .toString('hex') // convert to hexadecimal format
