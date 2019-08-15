@@ -17,7 +17,7 @@ import { poolConfig } from './types';
 import * as utilities from './utilities';
 import { herokuDelete } from './herokuDelete';
 import { getKeypath } from '../lib/hubAuth';
-import { execProm } from '../lib/execProm';
+import { execProm, exec2JSON } from '../lib/execProm';
 import { getPoolName } from './namedUtilities';
 import { CDS } from './CDS';
 
@@ -72,10 +72,10 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
 
 const doesOrgExist = async (username: string) => {
     try {
-        const queryResult = await execProm(
+        const queryResult = await exec2JSON(
             `sfdx force:data:soql:query -u ${process.env.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`
         );
-        const status = JSON.parse(queryResult.stdout).result.records[0].Status;
+        const status = queryResult.result.records[0].Status;
 
         if (status === 'Deleted' || status === 'Error') {
             return false;
