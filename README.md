@@ -6,6 +6,8 @@ Back end: nodejs/express/typescript + heroku buildpacks
 
 Test: jest
 
+[Video explanation](https://www.youtube.com/watch?v=gyGt386eAqw&t=1297s) (TrailheaDX 2019). Slightly out of date now, but explains what this project does.
+
 ## Purpose
 
 You have a dev hub, and an sfdx repo. You'd like to let people spin up scratch orgs based on the repo, and these people might not feel like using a terminal, cloning the repo, loggin in to a dev hub, and executing sfdx commands.
