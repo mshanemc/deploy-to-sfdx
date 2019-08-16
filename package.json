@@ -49,7 +49,7 @@
         "moment": "^2.24.0",
         "request-promise-native": "^1.0.7",
         "serve-favicon": "^2.5.0",
-        "shane-sfdx-plugins": "^3.24.0",
+        "shane-sfdx-plugins": "^4.1.1",
         "strip-color": "^0.1.0",
         "universal-analytics": "^0.4.20"
     },
