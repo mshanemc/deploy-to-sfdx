@@ -1,11 +1,17 @@
+import { strict } from 'assert';
+import { stringify } from 'querystring';
+
 const shellSanitize = function(input: string) {
-    const evilCharacters = [';', '<', '>', '|', '?', '*', '[', ']', '$', '\\', '(', ')', '{', '}', "'", '&&', '||', '&', '=', '`', '../'];
+    const evilCharacters = [';', '<', '>', '|', '?', '*', '[', ']', '$', '\\', '(', ')', '{', '}', "'", '&&', '||', '&', '=', '`'];
     let ok = true;
     evilCharacters.forEach(punk => {
         if (input.includes(punk)) {
             ok = false;
         }
     });
+    if (input.includes('../')) {
+        return false;
+    }
     return ok;
 };
 
