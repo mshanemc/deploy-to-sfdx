@@ -1,6 +1,3 @@
-import { strict } from 'assert';
-import { stringify } from 'querystring';
-
 const shellSanitize = function(input: string) {
     const evilCharacters = [';', '<', '>', '|', '?', '*', '[', ']', '$', '\\', '(', ')', '{', '}', "'", '&&', '||', '&', '=', '`'];
     let ok = true;
