@@ -4,7 +4,7 @@
     "description": "An application that will deploy an SFDX project from a public Github repo",
     "main": "built/web.js",
     "engines": {
-        "node": "12.8.1"
+        "node": "12.7.0"
     },
     "scripts": {
         "build": "tsc -p ./src && npm run client:build",
