@@ -44,9 +44,10 @@ const auth = async () => {
 
     try {
         if (!isLocal()) {
-            // not local, so link the plugin.  local runs will hae it already linked.
+            // not local, so link the plugins.  local runs will hae it already linked.
             logger.debug('hubAuth: updating plugin');
             await exec('sfdx plugins:link node_modules/shane-sfdx-plugins');
+            await exec('sfdx plugins:link node_modules/sfdx-migration-automatic');
         }
 
         if (process.env.SFDX_PRERELEASE) {
