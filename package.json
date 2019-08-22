@@ -50,7 +50,6 @@
         "request-promise-native": "^1.0.7",
         "serve-favicon": "^2.5.0",
         "shane-sfdx-plugins": "^4.2.5",
-        "sfdx-migration-automatic": "1.4.2",
         "strip-color": "^0.1.0",
         "universal-analytics": "^0.4.20"
     },
