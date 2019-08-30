@@ -6,6 +6,8 @@ Back end: nodejs/express/typescript + heroku buildpacks
 
 Test: jest
 
+[Video explanation](https://youtu.be/gyGt386eAqw?t=1168) from May 2019 (TDX) (some things have changed, especially LWC instead of vue)
+
 ## Purpose
 
 You have a dev hub, and an sfdx repo. You'd like to let people spin up scratch orgs based on the repo, and these people might not feel like using a terminal, cloning the repo, loggin in to a dev hub, and executing sfdx commands.
