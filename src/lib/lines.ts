@@ -104,13 +104,13 @@ const lines = function(msgJSON: deployRequest, lines, output: CDS) {
                     // delete an org if one got created and it's a pool
                     await deleteOrg(output.deployId);
                 }
-                logger.error(`a very serious error occurred on this line...in the catch section: ${e.name}: ${e.message}`);
+                logger.error(`a very serious error occurred on this line...in the catch section: ${e.name}: ${e.message}`, e);
                 // a more serious error...tell the client
                 output.complete = true;
                 output.errors.push({
                     command: localLine,
-                    error: `${e.name}: ${e.message}`,
-                    raw: e
+                    error: `${JSON.parse(e.stdout).name}: ${JSON.parse(e.stdout).message}`,
+                    raw: JSON.parse(e.stdout)
                 });
 
                 cdsPublish(output);
