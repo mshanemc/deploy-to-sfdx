@@ -2,7 +2,7 @@ import { lineParserResult } from './types';
 
 class CDS {
     deployId: string;
-    complete: boolean = false;
+    complete: boolean;
 
     completeTimestamp?: Date; // when the job completed
     browserStartTime?: Date; // when the job began
@@ -23,13 +23,14 @@ class CDS {
         password?: string;
     };
 
-    additionalUsers: additionalUser[] = [];
-    errors: clientError[] = [];
-    commandResults: clientResult[] = [];
-    herokuResults: HerokuResult[] = [];
+    additionalUsers: additionalUser[];
+    errors: clientError[];
+    commandResults: clientResult[];
+    herokuResults: HerokuResult[];
+    currentCommand: string;
 
     poolLines?: lineParserResult;
-    isPool: boolean = false;
+    isPool: boolean;
 
     constructor(options: CDSOptions) {
         this.deployId = options.deployId;
@@ -53,6 +54,7 @@ class CDS {
         this.errors = options.errors || [];
         this.commandResults = options.commandResults || [];
         this.herokuResults = options.herokuResults || [];
+        this.currentCommand = options.currentCommand;
 
         this.poolLines = options.poolLines;
         this.isPool = options.isPool || false;
@@ -92,6 +94,7 @@ export interface CDSOptions {
     errors?: clientError[];
     commandResults?: clientResult[];
     herokuResults?: HerokuResult[];
+    currentCommand?: string;
 
     poolLines?: lineParserResult;
     isPool?: boolean;

@@ -2,7 +2,6 @@
     "compilerOptions": {
         "outDir": "../../lib/server",
         "target": "es2018",
-        "allowSyntheticDefaultImports": true,
         "moduleResolution": "node",
         "esModuleInterop": true,
         "declaration": true,

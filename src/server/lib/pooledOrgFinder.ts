@@ -4,7 +4,7 @@ import * as path from 'path';
 import stripColor from 'strip-color';
 import { retry } from '@lifeomic/attempt';
 
-import * as utilities from './utilities';
+import { utilities } from './utilities';
 import { getPooledOrg, cdsPublish } from './redisNormal';
 import { getKeypath } from './hubAuth';
 import { argStripper } from './argStripper';

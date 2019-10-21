@@ -72,11 +72,20 @@
     </div>
   </template>
 
+  <template if:true={results.currentCommand}>
+    <div class="section slds-m-vertical_large">
+      <base-card>
+        <div>Currently running <b>{results.currentCommand}</b></div>
+      </base-card>
+    </div>
+  </template>
+
   <div class="section slds-m-vertical_large">
     <base-card>
       <div class="slds-m-vertical_large">
-        Open the browser console for more information and the full output of these commands
+        Completed commands (open the browser console to see their full output)
       </div>
+
       <ol class="slds-list_ordered">
         <template for:each={results.commandResults} for:item="commandResult" for:index="index">
           <li key={commandResult.command}>

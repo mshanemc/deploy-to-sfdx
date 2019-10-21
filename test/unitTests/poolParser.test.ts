@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as dotenv from 'dotenv';
 
 import { poolParse } from '../../src/server/lib/poolParse';
-import * as utilities from '../../src/server/lib/utilities';
+import { utilities } from '../../src/server/lib/utilities';
 import { exec } from '../../src/server/lib/execProm';
 
 const username = 'mshanemc';

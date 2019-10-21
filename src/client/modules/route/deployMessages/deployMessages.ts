@@ -1,4 +1,7 @@
 import { LightningElement, api, track, wire } from 'lwc';
+
+import isEqual from 'lodash.isequal';
+
 import { CDS } from '../../../../server/lib/CDS';
 import resultsPoll from '../../messages/resultsPoll/resultsPoll';
 
@@ -59,7 +62,9 @@ export default class DeployMessages extends LightningElement {
     if (error) {
       console.error('error from ws subscribe wire', error);
     } else if (data) {
-      console.log(data);
+      if (!isEqual(this.results, data)) {
+        console.log(data);
+      }
       this.results = data;
     }
   }

@@ -1,6 +1,6 @@
 import logger from 'heroku-logger';
 
-import * as utilities from './utilities';
+import { utilities } from './utilities';
 import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
 import { deployRequest, poolConfig } from './types';
 import { execProm } from './execProm';

@@ -1,0 +1,12 @@
+a#loginUrl,
+a#deleteButton {
+  text-decoration: initial;
+}
+
+a#loginUrl {
+  color: initial;
+}
+
+[v-cloak] {
+  display: none;
+}

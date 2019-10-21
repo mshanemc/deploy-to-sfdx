@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { exec } from 'child_process';
 declare const execProm: typeof exec.__promisify__;
 declare const exec2JSON: (cmd: string, options?: {}) => Promise<any>;

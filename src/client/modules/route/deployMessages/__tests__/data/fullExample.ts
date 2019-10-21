@@ -1,5 +1,6 @@
 const fullExample = {
   deployId: 'mshanemc-process-automation-workshop-df17-1559757015305',
+  currentCommand: 'this is a test command',
   complete: false,
   errors: [
     {

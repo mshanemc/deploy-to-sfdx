@@ -1,6 +1,6 @@
 import logger from 'heroku-logger';
 
-import * as utilities from '../lib/utilities';
+import { utilities } from '../lib/utilities';
 import { getPoolDeployRequestQueueSize } from '../lib/redisNormal';
 import { prepareAll } from '../lib/poolPrep';
 import { execProm } from '../lib/execProm';

@@ -22,6 +22,7 @@ export default class Main extends LightningElement {
 }
 
 const getQueryVariables = () => {
+  // console.log('query var running');
   const output = {};
   const query = window.location.search.substring(1);
 

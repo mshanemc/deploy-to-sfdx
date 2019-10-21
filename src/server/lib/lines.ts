@@ -2,7 +2,7 @@ import logger from 'heroku-logger';
 import stripColor from 'strip-color';
 
 import { deployRequest, sfdxDisplayResult } from './types';
-import * as utilities from './utilities';
+import { utilities } from './utilities';
 import { cdsPublish, deleteOrg } from './redisNormal';
 import { argStripper } from './argStripper';
 import { exec } from './execProm';
@@ -16,7 +16,7 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
         logger.debug('starting the line runs');
 
         for (const line of this.lines) {
-            let localLine = line; //
+            let localLine = line;
             let summary: commandSummary;
             let shortForm: string;
 
@@ -35,7 +35,10 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
 
             let lineResult;
 
+            // show what's currently running before it actually runs
             logger.debug(`running line-- ${localLine}`);
+            output.currentCommand = localLine;
+            cdsPublish(output);
 
             try {
                 lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' });
@@ -98,6 +101,7 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
                 }
 
                 // finally, publish the CDS to redis so clients can access the latest updates
+                output.currentCommand = '';
                 cdsPublish(output);
             } catch (e) {
                 if (msgJSON.pool && output.mainUser && output.mainUser.username) {
@@ -112,7 +116,7 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
                     error: `${JSON.parse(e.stdout).name}: ${JSON.parse(e.stdout).message}`,
                     raw: JSON.parse(e.stdout)
                 });
-
+                output.currentCommand = '';
                 cdsPublish(output);
 
                 // and throw so the requester can do the rest of logging to heroku logs and GA

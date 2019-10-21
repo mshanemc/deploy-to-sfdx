@@ -2,7 +2,7 @@
 // Place this file into the root of your LWC app directory, and configure the files as needed.
 module.exports = {
     // Default directory for the build output
-    buildDir: 'built/assets',
+    // buildDir: 'built/assets',
     // Default mode for build command
     mode: 'development',
     // Clears the build directory on every build
@@ -24,11 +24,13 @@ module.exports = {
     devServer: {
         // port: 8443,
         // host: '0.0.0.0',
-        // open: false,
+        open: false,
         proxy: {
             '/': 'http://localhost:8443'
         },
         stats: 'errors-only'
+        // customConfig: './lib/server/web.js'
+
         // noInfo: true,
         // contentBase: 'client-src'
     },

@@ -3,7 +3,7 @@ import Heroku from 'heroku-client';
 import logger from 'heroku-logger';
 import moment from 'moment';
 
-import utilities from '../lib/utilities';
+import { utilities } from '../lib/utilities';
 import { herokuDyno } from '../lib/types';
 
 const dynoTimeLimit = process.env.DYNO_TIME_LIMIT || 30;

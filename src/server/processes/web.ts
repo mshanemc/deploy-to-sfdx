@@ -3,15 +3,15 @@ import express from 'express';
 
 import ua from 'universal-analytics';
 import path from 'path';
-import favicon from 'serve-favicon';
+// import favicon from 'serve-favicon';
 
-import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish } from './lib/redisNormal';
-import { deployMsgBuilder } from './lib/deployMsgBuilder';
-import utilities from './lib/utilities';
-import { emitLead } from './lib/trialLeadCreate';
+import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish } from '../lib/redisNormal';
+import { deployMsgBuilder } from '../lib/deployMsgBuilder';
+import { utilities } from '../lib/utilities';
+import { emitLead } from '../lib/trialLeadCreate';
 
-import { deployRequest } from './lib/types';
-import { CDS } from './lib/CDS';
+import { deployRequest } from '../lib/types';
+import { CDS } from '../lib/CDS';
 
 const app: express.Application = express();
 
@@ -21,8 +21,8 @@ app.listen(port, () => {
     logger.info(`Example app listening on port ${port}!`);
 });
 
-app.use(favicon(path.join(__dirname, 'assets/favicons', 'favicon.ico')));
-app.use(express.static('built/assets'));
+// app.use(favicon(path.join(__dirname, 'assets/favicons', 'favicon.ico')));
+app.use(express.static('dist'));
 app.use(express.json());
 
 app.post(
@@ -59,7 +59,7 @@ app.get(
 app.get(
     ['/', '/error', '/deploying/:format/:deployId', '/userinfo', '/testform', '/deleteConfirm'],
     (req, res: express.Response, next: express.NextFunction) => {
-        res.sendFile('index.html', { root: path.join(__dirname, '../built/assets') });
+        res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
     }
 );
 

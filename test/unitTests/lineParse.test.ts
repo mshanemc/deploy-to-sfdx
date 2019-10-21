@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 
 import { testRepos } from '../testRepos';
 import { lineParse } from '../../src/server/lib/lineParse';
-import * as utilities from '../../src/server/lib/utilities';
+import { utilities } from '../../src/server/lib/utilities';
 import { sfdxTimeout } from './../helpers/testingUtils';
 import { execProm } from '../../src/server/lib/execProm';
 

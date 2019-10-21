@@ -1,5 +1,5 @@
 import logger from 'heroku-logger';
-import * as utilities from '../lib/utilities';
+import { utilities } from '../lib/utilities';
 import { skimmer } from '../lib/skimmerSupport';
 import { auth } from '../lib/hubAuth';
 

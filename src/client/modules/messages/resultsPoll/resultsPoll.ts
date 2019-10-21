@@ -6,7 +6,13 @@ import { CDS } from '../../../../server/lib/CDS';
 const interval_ms = 1000;
 const timeoutMS = 1000 * 60 * 30; // 30 minutes, then stop no matter what
 
-export default function resultsPoll(config) {
+interface resultsPollConfig {
+  deployId?: string;
+  log?: boolean;
+  fake?: boolean;
+}
+
+export default function resultsPoll(config: resultsPollConfig) {
   // eslint-disable-next-line no-unused-vars
   return new Promise((resolve, reject) => {
     resolve(config);
@@ -14,10 +20,10 @@ export default function resultsPoll(config) {
 }
 
 register(resultsPoll, eventTarget => {
-  let config: any = {};
+  let config: resultsPollConfig = {};
   let pinger;
 
-  eventTarget.addEventListener('config', newConfig => {
+  eventTarget.addEventListener('config', (newConfig: resultsPollConfig) => {
     config = newConfig;
     if (newConfig.log) {
       console.log('new config is', newConfig);

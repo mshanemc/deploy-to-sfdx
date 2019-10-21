@@ -14,4 +14,4 @@ declare const utilities: {
     getCloneCommand: (depReq: deployRequest) => string;
     getArg: (cmd: string, parameter: string) => string;
 };
-export = utilities;
+export { utilities };

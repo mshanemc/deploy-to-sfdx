@@ -139,4 +139,4 @@ const utilities = {
     }
 };
 
-export = utilities;
+export { utilities };

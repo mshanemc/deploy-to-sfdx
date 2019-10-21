@@ -8,7 +8,7 @@ import { lineParse } from './lineParse';
 import { lineRunner } from './lines';
 import { timesToGA } from './timeTracking';
 import { execProm } from './execProm';
-import * as utilities from './utilities';
+import { utilities } from './utilities';
 import { poolParse } from './poolParse';
 import { CDS } from './CDS';
 

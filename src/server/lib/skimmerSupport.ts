@@ -14,7 +14,7 @@ import {
     getDeleteRequest
 } from './redisNormal';
 import { poolConfig } from './types';
-import utilities from './utilities';
+import { utilities } from './utilities';
 import { herokuDelete } from './herokuDelete';
 import { getKeypath } from './hubAuth';
 import { execProm, exec2JSON } from './execProm';

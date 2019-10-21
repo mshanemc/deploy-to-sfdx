@@ -21,6 +21,7 @@ declare class CDS {
     errors: clientError[];
     commandResults: clientResult[];
     herokuResults: HerokuResult[];
+    currentCommand: string;
     poolLines?: lineParserResult;
     isPool: boolean;
     constructor(options: CDSOptions);
@@ -52,6 +53,7 @@ export interface CDSOptions {
     errors?: clientError[];
     commandResults?: clientResult[];
     herokuResults?: HerokuResult[];
+    currentCommand?: string;
     poolLines?: lineParserResult;
     isPool?: boolean;
 }

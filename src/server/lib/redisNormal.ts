@@ -4,7 +4,7 @@ import ua from 'universal-analytics';
 
 import { DeleteRequest, deployRequest, poolConfig } from './types';
 
-import utilities = require('./utilities');
+import { utilities } from './utilities';
 import { shellSanitize } from './shellSanitize';
 import { CDS } from './CDS';
 
