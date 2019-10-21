@@ -1,6 +1,5 @@
 import moment from 'moment';
 import logger from 'heroku-logger';
-import { retry } from '@lifeomic/attempt';
 
 import {
     redis,
@@ -16,8 +15,7 @@ import {
 import { poolConfig } from './types';
 import { utilities } from './utilities';
 import { herokuDelete } from './herokuDelete';
-import { getKeypath } from './hubAuth';
-import { execProm, exec2JSON } from './execProm';
+import { exec2JSON } from './execProm';
 import { getPoolName } from './namedUtilities';
 import { CDS } from './CDS';
 
@@ -123,7 +121,6 @@ const removeOldDeployIds = async () => {
 
 const processDeleteQueue = async () => {
     const delQueueInitialSize = await getDeleteQueueSize();
-    const retryOptions = { maxAttempts: 3, delay: 5000 };
 
     if (delQueueInitialSize > 0) {
         logger.debug(`deleting ${delQueueInitialSize} orgs`);
@@ -133,29 +130,14 @@ const processDeleteQueue = async () => {
             while ((await getDeleteQueueSize()) > 0) {
                 // pull from the delete Request Queue
                 const deleteReq = await getDeleteRequest();
-                logger.debug(`deleting org with username ${deleteReq.username}`);
-
-                const exists = await doesOrgExist(deleteReq.username);
-                if (exists) {
-                    try {
-                        await retry(
-                            async context =>
-                                execProm(
-                                    `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
-                                        deleteReq.username
-                                    } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`
-                                ),
-                            retryOptions
-                        );
-
-                        //delete it
-                        await execProm(`sfdx force:org:delete -p -u ${deleteReq.username}`);
-                    } catch (e) {
-                        logger.error(e);
-                        logger.warn(`unable to delete org with username: ${deleteReq.username}`);
-                    }
-                } else {
-                    logger.debug(`org with username ${deleteReq.username} is already deleted`);
+                try {
+                    logger.debug(`deleting org with username ${deleteReq.username}`);
+                    await exec2JSON(
+                        `sfdx force:data:record:delete -u ${process.env.HUB_USERNAME} -s ActiveScratchOrg -w "SignupUsername='${deleteReq.username}'" --json`
+                    );
+                } catch (e) {
+                    logger.error(e);
+                    logger.warn(`unable to delete org with username: ${deleteReq.username}`);
                 }
 
                 // go through the herokuCDS for the username
