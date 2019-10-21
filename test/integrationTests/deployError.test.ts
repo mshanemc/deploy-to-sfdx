@@ -1,4 +1,4 @@
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 import * as puppeteer from 'puppeteer';
 
 import { getTestURL } from '../helpers/testingUtils';

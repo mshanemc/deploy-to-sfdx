@@ -1,4 +1,4 @@
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 import { testRepos } from '../testRepos';
 
 const folder = 'test/integrationTests/generatedRepos';

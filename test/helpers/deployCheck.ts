@@ -1,11 +1,11 @@
-import * as fs from 'fs-extra';
-import * as request from 'request-promise-native';
+import fs from 'fs-extra';
+import request from 'request-promise-native';
 import { sleep, retry } from '@lifeomic/attempt';
 
 import { getTestURL } from './../helpers/testingUtils';
-import { cdsDelete } from './../../src/lib/redisNormal';
-import { CDS } from './../../src/lib/CDS';
-import { processDeleteQueue } from './../../src/lib/skimmerSupport';
+import { cdsDelete } from '../../src/server/lib/redisNormal';
+import { CDS } from '../../src/server/lib/CDS';
+import { processDeleteQueue } from '../../src/server/lib/skimmerSupport';
 
 const retryOptions = { maxAttempts: 3 };
 
