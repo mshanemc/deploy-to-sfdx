@@ -1,5 +1,4 @@
 import logger from 'heroku-logger';
-import { Request } from 'express';
 import { deployRequest } from './types';
 import { shellSanitize, filterAlphaHypenUnderscore } from './shellSanitize';
 import { checkWhitelist } from './checkWhitelist';
@@ -9,7 +8,7 @@ import * as crypto from 'crypto';
 
 const randomCharactersInDeployId = 2;
 
-const deployMsgBuilder = function(req: Request): deployRequest {
+const deployMsgBuilder = function(req): deployRequest {
     // check for exploits
     const query = req.query;
 

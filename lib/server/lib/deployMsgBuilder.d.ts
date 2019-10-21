@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import { deployRequest } from './types';
-declare const deployMsgBuilder: (req: Request) => deployRequest;
+declare const deployMsgBuilder: (req: any) => deployRequest;
 export { deployMsgBuilder };

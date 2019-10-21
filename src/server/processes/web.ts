@@ -27,7 +27,7 @@ app.use(express.json());
 
 app.post(
     '/trial',
-    wrapAsync(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    wrapAsync(async (req, res, next) => {
         const message = await commonDeploy(req, '/trial');
         logger.debug('trial request', message);
         emitLead(req.body);
@@ -37,7 +37,7 @@ app.post(
 
 app.post(
     '/delete',
-    wrapAsync(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    wrapAsync(async (req, res, next) => {
         await cdsDelete(req.body.deployId);
         res.send({ redirectTo: '/deleteConfirm' });
     })
@@ -45,7 +45,7 @@ app.post(
 
 app.get(
     '/launch',
-    wrapAsync(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    wrapAsync(async (req, res, next) => {
         // allow repos to require the email parameter
         if (req.query.email === 'required') {
             return res.redirect(`/userinfo?template=${req.query.template}`);
@@ -56,16 +56,13 @@ app.get(
     })
 );
 
-app.get(
-    ['/', '/error', '/deploying/:format/:deployId', '/userinfo', '/testform', '/deleteConfirm'],
-    (req, res: express.Response, next: express.NextFunction) => {
-        res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
-    }
-);
+app.get(['/', '/error', '/deploying/:format/:deployId', '/userinfo', '/testform', '/deleteConfirm'], (req, res, next) => {
+    res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
+});
 
 app.get(
     '/pools',
-    wrapAsync(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    wrapAsync(async (req, res, next) => {
         const keys = await getKeys();
         res.send(keys);
     })
@@ -73,19 +70,19 @@ app.get(
 
 app.get(
     '/results/:deployId',
-    wrapAsync(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    wrapAsync(async (req, res, next) => {
         const results = await cdsRetrieve(req.params.deployId);
         res.send(results);
     })
 );
 
-app.get('*', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.get('*', (req, res, next) => {
     setImmediate(() => {
         next(new Error(`Route not found: ${req.url} on action ${req.method}`));
     });
 });
 
-app.use((error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((error, req, res, next) => {
     if (process.env.UA_ID) {
         const visitor = ua(process.env.UA_ID);
         visitor.event('Error', req.query.template).send();
@@ -96,14 +93,14 @@ app.use((error, req: express.Request, res: express.Response, next: express.NextF
 });
 
 function wrapAsync(fn: any) {
-    return function(req: express.Request, res: express.Response, next: express.NextFunction) {
+    return function(req, res, next) {
         // Make sure to `.catch()` any errors and pass them along to the `next()`
         // middleware in the chain, in this case the error handler.
         fn(req, res, next).catch(next);
     };
 }
 
-const commonDeploy = async (req: express.Request, url: string) => {
+const commonDeploy = async (req, url: string) => {
     const message: deployRequest = deployMsgBuilder(req);
 
     if (message.visitor) {

@@ -1,4 +1,7 @@
 const shellSanitize = function(input: string) {
+    if (!input) {
+        return true;
+    }
     const evilCharacters = [';', '<', '>', '|', '?', '*', '[', ']', '$', '\\', '(', ')', '{', '}', "'", '&&', '||', '&', '=', '`'];
     let ok = true;
     evilCharacters.forEach(punk => {

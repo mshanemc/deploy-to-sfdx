@@ -24,7 +24,8 @@ const deleteOrg = async (username: string) => {
     if (shellSanitize(username)) {
         const msg: DeleteRequest = {
             username,
-            delete: true
+            delete: true,
+            created: new Date()
         };
         await redis.rpush(orgDeleteExchange, JSON.stringify(msg));
     } else {

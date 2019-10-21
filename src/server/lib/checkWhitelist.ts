@@ -1,4 +1,4 @@
-import logger from 'heroku-logger';
+// import logger from 'heroku-logger';
 
 // checking for whitelisting
 const checkWhitelist = (ghuser: string, ghrepo: string) => {
@@ -25,7 +25,7 @@ const checkWhitelist = (ghuser: string, ghrepo: string) => {
 
     if (whitelist2) {
         for (const repo of whitelist2.split(',')) {
-            logger.debug(`checking whitelist 2 element: ${repo}`);
+            // logger.debug(`checking whitelist 2 element: ${repo}`);
             if (repo.trim().split('/')[0] === ghuser && repo.trim().split('/')[1] === ghrepo) {
                 return true;
             }

@@ -9,6 +9,7 @@ export interface testRepo {
 export interface DeleteRequest {
     delete: boolean;
     username: string;
+    created?: Date;
 }
 
 export interface deployRequest {
