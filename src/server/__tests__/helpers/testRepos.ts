@@ -118,11 +118,23 @@ export const testRepos = {
         },
         {
             username: 'mshanemc',
+            repo: 'solutions-engagement/tree/df19'
+        },
+        {
+            username: 'mshanemc',
             repo: 'custexp'
         },
         {
             username: 'gabesumner',
             repo: 'solutions-departmental-apps'
+        },
+        {
+            username: 'gabesumner',
+            repo: 'app-builder-wall'
+        },
+        {
+            username: 'gabesumner',
+            repo: 'df19-departmental-productivity'
         }
     ]
 };
