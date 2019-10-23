@@ -172,6 +172,10 @@ describe('lineParserLocalTests', () => {
                     createdTimestamp: new Date()
                 };
 
+                if (repo.branch) {
+                    depReq.branch = repo.branch;
+                }
+
                 test(`tests ${repo.username}/${repo.repo}`, async () => {
                     // git clone it
                     const gitCloneCmd = utilities.getCloneCommand(depReq);

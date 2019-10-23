@@ -16,8 +16,8 @@ const folder = 'src/server/__tests__/integrationTests/generatedRepos';
 import { deployCheck } from './../../helpers/deployCheck';
 import { sfdxTimeout } from './../../helpers/testingUtils';
 
-test('non-pool grab of the org ${testRepo.username}/${testRepo.repo}', async () => {
-    await deployCheck('${testRepo.username}', '${testRepo.repo}');
+test('non-pool grab of the org ${testRepo.username}/${testRepo.repo}/${testRepo.branch}', async () => {
+    await deployCheck(testRepo);
 }, sfdxTimeout);     
 `;
 
@@ -58,7 +58,10 @@ describe('pool for ${testRepo.username}/${testRepo.repo}', () => {
         
 });
 `;
-        await fs.writeFile(`${folder}/${testRepo.username}-${testRepo.repo}.test.ts`, output);
+        const filename = testRepo.branch
+            ? `${folder}/${testRepo.username}-${testRepo.repo}-${testRepo.branch}.test.ts`
+            : `${folder}/${testRepo.username}-${testRepo.repo}.test.ts`;
+        await fs.writeFile(filename, output);
 
         if (testRepo.testPool) {
             await fs.writeFile(`${folder}/${testRepo.username}-${testRepo.repo}-pool.test.ts`, output2);

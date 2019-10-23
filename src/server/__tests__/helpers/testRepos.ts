@@ -1,4 +1,6 @@
-export const testRepos = {
+import { testRepo } from '../../lib/types';
+
+export const testRepos: { [name: string]: testRepo[] } = {
     platformWorkshops: [
         {
             username: 'mshanemc',
@@ -118,7 +120,8 @@ export const testRepos = {
         },
         {
             username: 'mshanemc',
-            repo: 'solutions-engagement/tree/df19'
+            repo: 'solutions-engagement',
+            branch: 'df19'
         },
         {
             username: 'mshanemc',

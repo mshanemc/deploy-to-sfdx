@@ -6,14 +6,17 @@ import { getTestURL } from './../helpers/testingUtils';
 import { cdsDelete } from '../../lib/redisNormal';
 import { CDS } from '../../lib/CDS';
 import { processDeleteQueue } from '../../lib/skimmerSupport';
+import { testRepo } from '../../lib/types';
 
 const retryOptions = { maxAttempts: 3 };
 
-const deployCheck = async (user: string, repo: string) => {
+const deployCheck = async (testRepo: testRepo) => {
     await fs.ensureDir('tmp');
 
     const baseUrl = getTestURL();
-    const url = `https://github.com/${user}/${repo}`;
+    const url = testRepo.branch
+        ? `https://github.com/${testRepo.username}/${testRepo.repo}/tree/${testRepo.branch}`
+        : `https://github.com/${testRepo.username}/${testRepo.repo}`;
 
     await retry(async context => {
         // get the launch page and follow the path
