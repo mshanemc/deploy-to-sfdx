@@ -2,10 +2,13 @@ import * as ua from 'universal-analytics';
 export interface testRepo {
     username: string;
     repo: string;
+    branch?: string;
+    testPool?: boolean;
 }
 export interface DeleteRequest {
     delete: boolean;
     username: string;
+    created?: Date;
 }
 export interface deployRequest {
     repo: string;

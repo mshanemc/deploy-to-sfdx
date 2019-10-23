@@ -16,8 +16,15 @@ const folder = 'src/server/__tests__/integrationTests/generatedRepos';
 import { deployCheck } from './../../helpers/deployCheck';
 import { sfdxTimeout } from './../../helpers/testingUtils';
 
-test('non-pool grab of the org ${testRepo.username}/${testRepo.repo}/${testRepo.branch}', async () => {
-    await deployCheck(testRepo);
+test('non-pool grab of the org ${testRepo.username}/${testRepo.repo}/${testRepo.branch || 'no branch'}', async () => {
+    await deployCheck({
+        username: '${testRepo.username}',
+        repo: '${testRepo.repo}' ${
+            testRepo.branch
+                ? `,
+        branch: '${testRepo.branch}'}`
+                : '}'
+        });
 }, sfdxTimeout);     
 `;
 

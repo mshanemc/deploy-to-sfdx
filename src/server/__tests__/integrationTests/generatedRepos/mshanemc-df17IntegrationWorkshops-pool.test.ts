@@ -22,7 +22,7 @@ describe('pool for mshanemc/df17IntegrationWorkshops', () => {
             const req: deployRequest = {
                 repo: tr.repo,
                 username: tr.username,
-                deployId: 'mshanemc-df17IntegrationWorkshops-pool-1571865184702',
+                deployId: 'mshanemc-df17IntegrationWorkshops-pool-1571866766713',
                 createdTimestamp: new Date(),
                 whitelisted: true
             }
