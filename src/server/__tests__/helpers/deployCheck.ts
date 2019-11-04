@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import request from 'request-promise-native';
+import axios from 'axios';
 import { sleep, retry } from '@lifeomic/attempt';
 
 import { getTestURL } from './../helpers/testingUtils';
@@ -21,9 +21,8 @@ const deployCheck = async (testRepo: testRepo) => {
     await retry(async context => {
         // get the launch page and follow the path
 
-        const startResult = await request({
-            url: `${baseUrl}/launch?template=${url}`,
-            resolveWithFullResponse: true
+        const startResult = await axios({
+            url: `${baseUrl}/launch?template=${url}`
         });
 
         // expect the deploying page redirect.  Get its url so we can check its results by id
@@ -36,9 +35,8 @@ const deployCheck = async (testRepo: testRepo) => {
 
         // fetch get the /results url until it's complete
         while (!status.complete) {
-            status = await request({
-                uri: resultsUrl,
-                json: true
+            status = await axios({
+                url: resultsUrl
             });
             await sleep(1000);
         }

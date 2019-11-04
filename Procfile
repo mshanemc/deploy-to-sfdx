@@ -8,3 +8,4 @@ dynoskimmer: node lib/server/processes/dynoCleanup.js
 orgdeleter: node lib/server/processes/orgDeleter.js
 deployidcleanup: node lib/server/processes/deployIdCleanup.js
 herokucdscheck: node lib/server/processes/herokuExpirationChecker.js
+leadqueue: node lib/server/processes/trialleadCreate.js
