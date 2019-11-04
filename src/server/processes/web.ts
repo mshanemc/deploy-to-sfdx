@@ -76,6 +76,14 @@ app.get(
     })
 );
 
+app.get('/favicons/favicon.ico', (req, res, next) => {
+    res.sendFile('favicon.ico', { root: path.join(__dirname, '../../../dist/resources/favicons') });
+});
+
+app.get('/service-worker.js', (req, res, next) => {
+    res.sendStatus(200);
+});
+
 app.get('*', (req, res, next) => {
     setImmediate(() => {
         next(new Error(`Route not found: ${req.url} on action ${req.method}`));
