@@ -3,7 +3,6 @@ import express from 'express';
 
 import ua from 'universal-analytics';
 import path from 'path';
-// import favicon from 'serve-favicon';
 
 import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish } from '../lib/redisNormal';
 import { deployMsgBuilder } from '../lib/deployMsgBuilder';
