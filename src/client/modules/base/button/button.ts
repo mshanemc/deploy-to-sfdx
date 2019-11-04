@@ -5,6 +5,7 @@ export default class Button extends LightningElement {
 
   @api url;
   @api target = '_blank';
+  _variant = '';
 
   @api disabled;
 
@@ -16,9 +17,6 @@ export default class Button extends LightningElement {
   set variant(value) {
     this._variant = value;
     switch (value) {
-      case 'base':
-        this.styleClass = 'slds-button';
-        break;
       case 'neutral':
         this.styleClass = 'slds-button slds-button_neutral';
         break;
@@ -40,6 +38,8 @@ export default class Button extends LightningElement {
       case 'text-destructive':
         this.styleClass = 'slds-button slds-button_text-destructive';
         break;
+      default:
+        this.styleClass = 'slds-button';
     }
   }
 
