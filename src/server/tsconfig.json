@@ -11,7 +11,7 @@
         "resolveJsonModule": true,
 
         "removeComments": true,
-        "types": ["node", "jest", "express", "ioredis", "fs-extra", "moment", "request", "request-promise-native", "universal-analytics"]
+        "types": ["node", "jest", "express", "ioredis", "fs-extra", "moment", "axios", "request-promise-native", "universal-analytics"]
     },
     // "compileOnSave": true,
     // "include": ["./src/server/**"],
