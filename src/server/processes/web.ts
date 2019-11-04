@@ -4,10 +4,9 @@ import express from 'express';
 import ua from 'universal-analytics';
 import path from 'path';
 
-import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish } from '../lib/redisNormal';
+import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish, putLead } from '../lib/redisNormal';
 import { deployMsgBuilder } from '../lib/deployMsgBuilder';
 import { utilities } from '../lib/utilities';
-import { emitLead } from '../lib/trialLeadCreate';
 
 import { deployRequest } from '../lib/types';
 import { CDS } from '../lib/CDS';
@@ -23,13 +22,14 @@ app.listen(port, () => {
 // app.use(favicon(path.join(__dirname, 'assets/favicons', 'favicon.ico')));
 app.use(express.static('dist'));
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.post(
     '/trial',
     wrapAsync(async (req, res, next) => {
         const message = await commonDeploy(req, '/trial');
         logger.debug('trial request', message);
-        emitLead(req.body);
+        await putLead(req.body);
         res.redirect(`/deploying/trial/${message.deployId.trim()}`);
     })
 );

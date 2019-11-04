@@ -13,6 +13,8 @@ const deployRequestExchange = 'deploys';
 const poolDeployExchange = 'poolDeploys';
 const orgDeleteExchange = 'orgDeletes';
 const herokuCDSExchange = 'herokuCDSs';
+const leadQueue = 'leads';
+const failedLeadQueue = 'failedLeads';
 
 const days31asSeconds = 31 * 24 * 60 * 60;
 
@@ -217,6 +219,27 @@ const getPoolDeployCountByRepo = async (pool: poolConfig) => {
         .filter((pr: deployRequest) => pr.repo === pool.repo && pr.username === pool.user && pr.branch === pool.branch).length;
 };
 
+const putLead = async lead => {
+    if (process.env.sfdcLeadCaptureServlet) {
+        await redis.rpush(leadQueue, JSON.stringify(lead));
+    }
+};
+
+const putFailedLead = async lead => {
+    if (process.env.sfdcLeadCaptureServlet) {
+        await redis.rpush(failedLeadQueue, JSON.stringify(lead));
+    }
+};
+
+const getLead = async () => {
+    const lead = await redis.lpop(leadQueue);
+    return JSON.parse(lead);
+};
+
+const getLeadQueueSize = async () => {
+    return await redis.llen(leadQueue);
+};
+
 export {
     redis,
     deployRequestExchange,
@@ -241,5 +264,9 @@ export {
     deleteOrg,
     putHerokuCDS,
     getAppNamesFromHerokuCDSs,
-    getHerokuCDSs
+    getHerokuCDSs,
+    putLead,
+    getLead,
+    getLeadQueueSize,
+    putFailedLead
 };
