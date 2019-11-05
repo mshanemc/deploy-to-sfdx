@@ -1,4 +1,5 @@
 // asynchronously posts the lead form back to org62
+import querystring from 'querystring';
 import axios from 'axios';
 import logger from 'heroku-logger';
 
@@ -33,7 +34,7 @@ const leadCreate = async function(incoming) {
     const response = await axios.post(sfdcLeadCaptureServlet, {
         // strictSSL: false,
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        data: formPostBody
+        data: querystring.stringify(formPostBody)
         // simple: true
     });
     logger.debug(JSON.stringify(response));
