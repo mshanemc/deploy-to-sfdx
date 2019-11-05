@@ -31,6 +31,8 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
                 // no aliases allowed to keep the deployer from getting confused between deployments
                 localLine = argStripper(localLine, '--setalias');
                 localLine = argStripper(localLine, '-a');
+                localLine = argStripper(localLine, '-v');
+                localLine = argStripper(localLine, '-v');
             }
 
             let lineResult;
