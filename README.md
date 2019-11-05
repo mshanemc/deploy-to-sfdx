@@ -92,7 +92,7 @@ Then it listens to the deploy queue and executes jobs
 -   delete the local folder and send the ALLDONE message
 
 It runs a plugin that give it powers SFDX doesn't out-of-the-box
-<https://github.com/mshanemc/shane-sfdx-plugins>
+<https://github.com/mshanemc/shane-sfdx-plugins> along with `sfdx-migration-automatic` and `@salesforce/analytics`
 
 Put plugins in the package.json dependencies, then linked from source in lib/hubAuth.js. Feel free to add additional plugins using npm install some-plugin-of-yours and then add it in hubAuth.js.
 
