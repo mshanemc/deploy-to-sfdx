@@ -47,8 +47,8 @@ const auth = async () => {
             // not local, so link the plugins.  local runs will hae it already linked.
             logger.debug('hubAuth: updating plugin');
             await exec('sfdx plugins:link node_modules/shane-sfdx-plugins');
-            await exec('sfdx plugins:install @salesforce/analytics'); // analytics sfx plugins
-            await exec(`echo 'y' | sfdx plugins:install sfdx-migration-automatic@1.4.2`);
+            await exec('sfdx plugins:link node_modules/@salesforce/analytics'); // analytics sfx plugins
+            await exec('sfdx plugins:link node_modules/sfdx-migration-automatic');
         }
 
         if (process.env.SFDX_PRERELEASE) {

@@ -37,6 +37,7 @@
     "dependencies": {
         "@lifeomic/attempt": "^3.0.0",
         "@salesforce-ux/design-system": "^2.9.3",
+        "@salesforce/analytics": "0.12.0",
         "@salesforce/kit": "^1.1.1",
         "axios": "^0.19.0",
         "express": "^4.16.4",
@@ -48,6 +49,7 @@
         "moment": "^2.24.0",
         "request-promise-native": "^1.0.7",
         "shane-sfdx-plugins": "^4.9.2",
+        "sfdx-migration-automatic": "1.5.0",
         "strip-color": "^0.1.0",
         "universal-analytics": "^0.4.20"
     },
