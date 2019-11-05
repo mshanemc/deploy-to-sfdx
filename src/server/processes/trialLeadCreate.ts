@@ -30,20 +30,20 @@ const leadCreate = async function(incoming) {
         requestHost
     };
 
-    await axios({
-        url: sfdcLeadCaptureServlet,
-        method: 'POST',
+    const response = await axios.post(sfdcLeadCaptureServlet, {
         // strictSSL: false,
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
         data: formPostBody
         // simple: true
     });
+    logger.debug(JSON.stringify(response));
 };
 
 (async () => {
     logger.debug('Lead queue consumer is up');
     while ((await getLeadQueueSize()) > 0) {
         const lead = await getLead();
+        logger.debug('lead is ', lead);
         try {
             await leadCreate(lead);
         } catch (e) {
