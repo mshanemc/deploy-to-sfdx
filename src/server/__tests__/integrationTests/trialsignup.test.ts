@@ -6,7 +6,7 @@ import { sample } from '../../__tests__/helpers/sampleLead';
 
 // const shouldBeLoaded = 1000;
 
-describe('tests org62 signup stuff', () => {
+describe.skip('tests org62 signup stuff', () => {
     it('calls servlet', async () => {
         const response = await leadCreate(sample);
         console.log(response);
