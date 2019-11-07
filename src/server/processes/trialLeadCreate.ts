@@ -2,7 +2,7 @@ import logger from 'heroku-logger';
 
 import { getLead, getLeadQueueSize, putFailedLead } from '../lib/redisNormal';
 
-import { leadCreate } from './../lib/leadSupport';
+import { leadCreate } from '../lib/leadSupport';
 
 (async () => {
     logger.debug('Lead queue consumer is up');

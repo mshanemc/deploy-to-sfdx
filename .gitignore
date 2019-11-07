@@ -46,7 +46,7 @@ repoList.json
 dump.rdb
 built
 dist
-lib
+/lib
 
 # specialized tests
 test/integrationTests/generatedRepos
