@@ -134,7 +134,6 @@ describe('tests the integration workshop', () => {
             const result = await poolParse(filepath);
             expect(result);
             expect(result.openLine).toContain('sfdx force:org:open');
-            expect(result.passwordLine).toBe('sfdx shane:user:password:set -l User -g User -p sfdx1234 --json');
         },
         timeout
     );

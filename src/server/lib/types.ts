@@ -58,7 +58,6 @@ export interface openResult {
 
 export interface lineParserResult {
     openLine?: string;
-    passwordLine?: string;
 }
 
 // devcenter.heroku.com/articles/platform-api-reference#dyno

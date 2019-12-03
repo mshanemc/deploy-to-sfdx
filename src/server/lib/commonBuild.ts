@@ -73,7 +73,7 @@ const build = async (msgJSON: deployRequest) => {
 
     let parsedLines;
 
-    // reads the lines and removes and stores the open and password lines
+    // reads the lines and removes and stores the org open line(s)
     if (msgJSON.pool) {
         clientResult.poolLines = await poolParse(orgInitPath);
     }

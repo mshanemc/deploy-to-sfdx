@@ -8,7 +8,6 @@ const poolParse = function(path: string): Promise<lineParserResult> {
     let parsedLines = [];
 
     let openLine: string;
-    let passwordLine: string;
 
     return new Promise(function(resolve, reject) {
         readline
@@ -19,8 +18,6 @@ const poolParse = function(path: string): Promise<lineParserResult> {
             .on('line', line => {
                 if (line.startsWith('sfdx force:org:open')) {
                     openLine = line;
-                } else if (line.startsWith('sfdx force:user:password:generate') || line.startsWith('sfdx shane:user:password:set')) {
-                    passwordLine = line;
                 } else {
                     parsedLines.push(line);
                 }
@@ -28,8 +25,7 @@ const poolParse = function(path: string): Promise<lineParserResult> {
             .on('close', () => {
                 fs.writeFile(path, parsedLines.join('\n'), () => {
                     const result: lineParserResult = {
-                        openLine,
-                        passwordLine
+                        openLine
                     };
                     resolve(result);
                 });

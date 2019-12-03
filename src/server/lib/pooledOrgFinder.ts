@@ -1,15 +1,13 @@
 import logger from 'heroku-logger';
 import fs from 'fs-extra';
 import * as path from 'path';
-import stripColor from 'strip-color';
 import { retry } from '@lifeomic/attempt';
 
 import { utilities } from './utilities';
 import { getPooledOrg, cdsPublish } from './redisNormal';
 import { getKeypath } from './hubAuth';
-import { argStripper } from './argStripper';
 import { timesToGA } from './timeTracking';
-import { execProm } from './execProm';
+import { execProm, exec2JSON } from './execProm';
 
 import { deployRequest } from './types';
 const retryOptions = { maxAttempts: 60, delay: 5000 };
@@ -54,32 +52,16 @@ const pooledOrgFinder = async function(deployReq: deployRequest, forcePool: bool
             });
         }
 
-        let password: string;
-
-        if (cds.poolLines.passwordLine) {
-            const stripped = argStripper(cds.poolLines.passwordLine, '--json', true);
-            const passwordSetResult = await execProm(`${stripped} --json`, {
-                cwd: uniquePath
-            });
-
-            // may not have returned anything if it wasn't used
-            if (passwordSetResult) {
-                password = JSON.parse(stripColor(passwordSetResult.stdout)).result.password;
-                logger.debug(`password set to: ${password}`);
-            }
-        }
-
-        const openResult = await execProm(`${cds.poolLines.openLine} --json -r`, {
+        const openOutput = await exec2JSON(`${cds.poolLines.openLine} --json -r`, {
             cwd: uniquePath
         });
-        const openOutput = JSON.parse(stripColor(openResult.stdout));
+        // const openOutput = JSON.parse(stripColor(openResult.stdout));
 
         cds.openTimestamp = new Date();
         cds.completeTimestamp = new Date();
         cds.mainUser = {
             ...cds.mainUser,
-            loginUrl: utilities.urlFix(openOutput).result.url,
-            password
+            loginUrl: utilities.urlFix(openOutput).result.url
         };
         cds.complete = true;
 
