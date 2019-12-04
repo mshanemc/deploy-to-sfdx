@@ -38,17 +38,20 @@
   <template if:true={showPassword}>
     <div class="section slds-m-vertical_large">
       <div>
-        <strong>Note: </strong> Use the Launch button above to login for the first time. These credentials are for other uses (mobile app,
-        integrations). They auth to a sandbox (test.salesforce.com) not production (login.salesforce.com)
+        <strong>Note: </strong> Use the Launch button above to login for the first time
+        <p>The credentials are for other uses (mobile app, integrations).</p>
+        <p>They auth to a sandbox (test.salesforce.com) not production (login.salesforce.com)</p>
+        <p>These credentials/button will continue working after the session-based Launch button stops.</p>
       </div>
 
       <div class="slds-notify slds-notify_toast" role="alert">
-        <div class="slds-notify__content">
-          <div class="slds-text-heading_small ">
-            Your username is&nbsp;
-            <strong>{results.mainUser.username}</strong>&nbsp;and your password is&nbsp;
-            <strong>{results.mainUser.password}</strong>
-          </div>
+        <div class="slds-text-heading_small ">
+          Your username is&nbsp;
+          <strong>{results.mainUser.username}</strong>&nbsp;and your password is&nbsp;
+          <strong>{results.mainUser.password}</strong>
+        </div>
+        <div>
+          <base-button url={results.mainUser.permalink} target="_blank" variant="neutral" label="Launch via credentials"></base-button>
         </div>
       </div>
     </div>
