@@ -9,6 +9,9 @@ const loginURL = (cds: CDS): string => {
     if (cds.mainUser.openPath) {
         startUrl = cds.mainUser.openPath;
     }
+    if (!startUrl.startsWith('/')) {
+        startUrl = `/${startUrl}`;
+    }
     // upgrade to permanent link
     return encodeURI(`https://test.salesforce.com/?un=${cds.mainUser.username}&pw=${cds.mainUser.password}&startURL=${startUrl}`);
 };
