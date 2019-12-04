@@ -3,6 +3,11 @@
 import { utilities } from '../../lib/utilities';
 
 describe('Utilities: getArg', () => {
+    test('gets path from an org open command', () => {
+        const cmd = 'sfdx force:org:open -u something@wahtever.hack -r -p /lightning/something';
+        expect(utilities.getArg(cmd, '-p')).toBe('/lightning/something');
+    });
+
     test('handles getArg with -d', () => {
         const cmd = 'sfdx shane:heroku:repo:deploy -d 500';
         expect(utilities.getArg(cmd, '-d')).toBe('500');

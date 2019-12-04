@@ -8,6 +8,7 @@ import { getPooledOrg, cdsPublish } from './redisNormal';
 import { getKeypath } from './hubAuth';
 import { timesToGA } from './timeTracking';
 import { execProm, exec2JSON } from './execProm';
+import { loginURL } from './loginURL';
 
 import { deployRequest } from './types';
 const retryOptions = { maxAttempts: 60, delay: 5000 };
@@ -63,6 +64,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest, forcePool: bool
             ...cds.mainUser,
             loginUrl: utilities.urlFix(openOutput).result.url
         };
+        cds.mainUser.loginUrl = loginURL(cds);
         cds.complete = true;
 
         logger.debug(`opened : ${openOutput}`);
