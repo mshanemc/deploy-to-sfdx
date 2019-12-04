@@ -7,6 +7,7 @@ import { cdsPublish, deleteOrg } from './redisNormal';
 import { argStripper } from './argStripper';
 import { exec } from './execProm';
 import { CDS, commandSummary, HerokuResult } from './CDS';
+import { loginURL } from './loginURL';
 
 const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS) {
     this.msgJSON = msgJSON;
@@ -59,10 +60,14 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
                         logger.error(`error running line ${localLine} from ${msgJSON.username}/${msgJSON.repo}: ${response.message}`, response);
                     } else {
                         if (summary === commandSummary.OPEN) {
-                            // temporary
                             response = utilities.urlFix(response);
+                            // put the path into the CDS
+                            output.mainUser.openPath = utilities.getArg(localLine, '-p') || utilities.getArg(localLine, '--path');
+                            // temporary
                             output.mainUser.loginUrl = response.result.url;
-                            output.mainUser.username = response.result.username;
+                            output.mainUser.permalink = loginURL(output);
+                            // output.mainUser.username = response.result.username;
+
                             output.openTimestamp = new Date();
                         } else if (summary === commandSummary.ORG_CREATE) {
                             output.orgId = response.result.orgId;
@@ -70,6 +75,8 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
                             shortForm = `created org ${response.result.orgId} with username ${response.result.username}`;
                         } else if (summary === commandSummary.PASSWORD_GEN) {
                             output.mainUser.password = response.result.password;
+                            output.mainUser.permalink = loginURL(output);
+
                             shortForm = `set password to ${response.result.password} for user ${response.result.username ||
                                 output.mainUser.username}`;
                         } else if (summary === commandSummary.HEROKU_DEPLOY) {

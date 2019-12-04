@@ -21,6 +21,8 @@ class CDS {
         username?: string;
         loginUrl?: string;
         password?: string;
+        openPath?: string;
+        permalink?: string;
     };
 
     additionalUsers: additionalUser[];
@@ -88,6 +90,8 @@ export interface CDSOptions {
         username: string;
         loginUrl: string;
         password?: string;
+        openPath?: string;
+        permalink?: string;
     };
 
     additionalUsers?: additionalUser[];
