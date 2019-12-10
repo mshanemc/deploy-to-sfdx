@@ -41,6 +41,10 @@ const deployMsgBuilder = function(req): deployRequest {
         whitelisted: checkWhitelist(username, repo)
     };
 
+    if (req.byoo) {
+        message.byoo = req.byoo;
+    }
+
     if (process.env.UA_ID) {
         message.visitor = ua(process.env.UA_ID);
     }

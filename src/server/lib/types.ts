@@ -28,6 +28,12 @@ export interface deployRequest {
     firstname?: string;
     lastname?: string;
     visitor?: ua.Visitor;
+    byoo?: {
+        accessToken: string;
+        instanceUrl: string;
+        username: string;
+        orgId: string;
+    };
 }
 
 // tells how a pool should be built.  Used in an array from a url like POOLCONFIG_URL=https://deployer-pools.herokuapp.com/pools-dev

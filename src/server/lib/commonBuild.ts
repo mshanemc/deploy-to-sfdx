@@ -50,9 +50,9 @@ const build = async (msgJSON: deployRequest) => {
     if (msgJSON.email) {
         logger.debug('deployQueueCheck: write a file for custom email address', msgJSON);
         const location = `tmp/${msgJSON.deployId}/config/project-scratch-def.json`;
-        const configFileJSON = JSON.parse(fs.readFileSync(location, 'utf8'));
+        const configFileJSON = await fs.readJSON(location);
         configFileJSON.adminEmail = msgJSON.email;
-        fs.writeFileSync(location, JSON.stringify(configFileJSON), 'utf8');
+        await fs.writeJSON(location, configFileJSON);
     }
 
     const orgInitPath = `tmp/${msgJSON.deployId}/orgInit.sh`;
@@ -71,13 +71,12 @@ const build = async (msgJSON: deployRequest) => {
         );
     }
 
-    let parsedLines;
-
     // reads the lines and removes and stores the org open line(s)
     if (msgJSON.pool) {
         clientResult.poolLines = await poolParse(orgInitPath);
     }
 
+    let parsedLines: string[];
     try {
         parsedLines = await lineParse(msgJSON);
         clientResult.lineCount = parsedLines.length + 1; //1 extra to account for the git clone command

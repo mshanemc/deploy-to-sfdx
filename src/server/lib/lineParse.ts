@@ -11,6 +11,13 @@ const lineParse = function(msgJSON: deployRequest): Promise<string[]> {
 
     return new Promise((resolve, reject) => {
         const parsedLines = [];
+        // stuff we have to do for byoo
+
+        if (msgJSON.byoo) {
+            parsedLines.push(
+                `sfdx force:config:set defaultdevhubusername= defaultusername='${msgJSON.byoo.accessToken}' instanceUrl='${msgJSON.byoo.instanceUrl}'`
+            );
+        }
 
         readline
             .createInterface({
@@ -21,7 +28,11 @@ const lineParse = function(msgJSON: deployRequest): Promise<string[]> {
                 line = line.trim();
                 if (line && line.length > 0 && !line.startsWith('#!/bin/bash') && !line.startsWith('#')) {
                     logger.debug(`lineParse: Line: ${line}`);
-                    if (msgJSON.whitelisted) {
+
+                    // stuff we don't do for byoo
+                    if (msgJSON.byoo && omitIfByoo(line)) {
+                        logger.info(`skipping ${line} because byoo`);
+                    } else if (msgJSON.whitelisted) {
                         // if the user or repo is on the whitelist, we'll let you execute whatever you like, except empty lines!
                         parsedLines.push(jsonify(line));
                     } else if (!shellSanitize(line)) {
@@ -63,6 +74,16 @@ const jsonify = (line: string): string => {
     } else {
         return line;
     }
+};
+
+const omitIfByoo = (line: string) => {
+    if (line.includes('org:create')) {
+        return true;
+    }
+    if (line.includes('user:password')) {
+        return true;
+    }
+    return false;
 };
 
 export { lineParse, jsonify };

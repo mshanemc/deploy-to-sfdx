@@ -43,11 +43,12 @@
         "heroku-client": "^3.0.7",
         "heroku-logger": "^0.3.3",
         "ioredis": "^4.6.2",
+        "jsforce": "^1.9.3",
         "lodash.isequal": "^4.5.0",
         "moment": "^2.24.0",
         "request-promise-native": "^1.0.7",
-        "shane-sfdx-plugins": "^4.9.3",
         "sfdx-migration-automatic": "1.5.0",
+        "shane-sfdx-plugins": "^4.9.3",
         "strip-color": "^0.1.0",
         "universal-analytics": "^0.4.20"
     },

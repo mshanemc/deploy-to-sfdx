@@ -8252,7 +8252,7 @@ jsforce@1.8.5:
     request "^2.72.0"
     xml2js "^0.4.16"
 
-jsforce@^1.9.1:
+jsforce@^1.9.1, jsforce@^1.9.3:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/jsforce/-/jsforce-1.9.3.tgz#caea681c0fd8dcea79459b81c2019f4425eacd12"
   integrity sha512-NJiBoTfsSElVZnh1MO7zv8anDPdy6vBVG19SEJ5pQtE+QJKFksjy4tpXbyzVyBft5Lo6Npr1HIPUP+RkVd9weQ==
