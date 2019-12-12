@@ -1,4 +1,4 @@
-import { poolConfig } from './types';
+import { poolConfig, ProjectJSON } from './types';
 
 const getPoolName = (pool: poolConfig) => {
     if (pool.branch) {
@@ -7,4 +7,9 @@ const getPoolName = (pool: poolConfig) => {
     return `${pool.user}.${pool.repo}`;
 };
 
-export { getPoolName };
+const getPackageDirsFromFile = (projectJSON: ProjectJSON) => {
+    const packageDirs = projectJSON.packageDirectories.map(dir => dir.path);
+    return packageDirs.join(',');
+};
+
+export { getPoolName, getPackageDirsFromFile };

@@ -1,8 +1,10 @@
 import logger from 'heroku-logger';
 import stripColor from 'strip-color';
+import * as fs from 'fs-extra';
 
 import { deployRequest, sfdxDisplayResult } from './types';
 import { utilities } from './utilities';
+import { getPackageDirsFromFile } from './namedUtilities';
 import { cdsPublish, deleteOrg } from './redisNormal';
 import { argStripper } from './argStripper';
 import { exec } from './execProm';
@@ -37,6 +39,11 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
             } else if (msgJSON.byoo && localLine.includes('sfdx force:user:permset:assign')) {
                 // the username on byoo deploys is a accesstoken, which confuses the standard permset assign command
                 localLine = localLine.replace('force:user', 'shane:user');
+            } else if (msgJSON.byoo && localLine.includes('sfdx force:source:push')) {
+                // source push only works on scratch org or other source-tracking-enabled orgs.
+                // get the packageDirectories from the folder and modify the push command to deploy those instead
+                const project = await fs.readJSON(`tmp/${msgJSON.deployId}/sfdx-project.json`);
+                localLine = localLine.replace('sfdx force:source:push', `sfdx force:source:deploy -p ${getPackageDirsFromFile(project)}`);
             }
 
             let lineResult;
