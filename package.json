@@ -6,7 +6,7 @@
     "scripts": {
         "build": "lwc-services build -m production && tsc -b ./src/server",
         "local": "npm run build && heroku local dynoskimmer=1 && heroku local poolskimmer=1 && heroku local oneoffbuilder=1 && heroku local poolwatcher=1 && heroku local pooldeployer=1 && heroku local orgdeleter=1 && heroku local web=1,orgbuilder=5",
-        "local:web": "yarn build && heroku local web=1,orgbuilder=5",
+        "local:web": "yarn build && heroku local web=1,orgbuilder=1",
         "local:clean": "heroku local orgdeleter=1",
         "prettier": "prettier --write '**/*.{css,html,js,json,md,yaml,yml}'",
         "start": "node .",
