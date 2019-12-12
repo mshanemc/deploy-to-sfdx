@@ -34,6 +34,9 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
                 localLine = argStripper(localLine, '-a');
                 localLine = argStripper(localLine, '-v');
                 localLine = argStripper(localLine, '-v');
+            } else if (msgJSON.byoo && localLine.includes('sfdx force:user:permset:assign')) {
+                // the username on byoo deploys is a accesstoken, which confuses the standard permset assign command
+                localLine = localLine.replace('force:user', 'shane:user');
             }
 
             let lineResult;
