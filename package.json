@@ -48,7 +48,7 @@
         "moment": "^2.24.0",
         "request-promise-native": "^1.0.7",
         "sfdx-migration-automatic": "https://github.com/mshanemc/sfdx-migration-automatic#issue-3---json-overflow",
-        "shane-sfdx-plugins": "^4.13.1",
+        "shane-sfdx-plugins": "^4.14.2",
         "strip-color": "^0.1.0",
         "universal-analytics": "^0.4.20"
     },
