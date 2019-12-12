@@ -15,3 +15,7 @@ div {
   align-items: center;
   justify-content: space-evenly;
 }
+
+base-button {
+  margin-right: 1rem;
+}
