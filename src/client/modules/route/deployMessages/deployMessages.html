@@ -27,7 +27,9 @@
       <div class="slds-notify_toast slds-theme_success">
         <div class="slds-text-heading_small">Your org is ready!</div>
         <div>
-          <base-button label="Delete" variant="destructive" onclick={deleteOrg}></base-button>
+          <template if:true={showDelete}>
+            <base-button label="Delete" variant="destructive" onclick={deleteOrg}></base-button>
+          </template>
           <base-button url={results.mainUser.loginUrl} target="_blank" variant="neutral" label="Launch"></base-button>
         </div>
       </div>

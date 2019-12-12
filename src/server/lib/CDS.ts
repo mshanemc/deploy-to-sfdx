@@ -33,6 +33,7 @@ class CDS {
 
     poolLines?: lineParserResult;
     isPool: boolean;
+    isByoo: boolean;
 
     constructor(options: CDSOptions) {
         this.deployId = options.deployId;
@@ -60,6 +61,7 @@ class CDS {
 
         this.poolLines = options.poolLines;
         this.isPool = options.isPool || false;
+        this.isByoo = options.isByoo || false;
     }
 }
 
@@ -102,6 +104,7 @@ export interface CDSOptions {
 
     poolLines?: lineParserResult;
     isPool?: boolean;
+    isByoo?: boolean;
 }
 
 interface clientError {

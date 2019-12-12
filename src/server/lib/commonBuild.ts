@@ -18,7 +18,8 @@ const build = async (msgJSON: deployRequest) => {
     let clientResult = new CDS({
         deployId: msgJSON.deployId,
         browserStartTime: msgJSON.createdTimestamp,
-        isPool: msgJSON.pool
+        isPool: msgJSON.pool,
+        isByoo: msgJSON.byoo && typeof msgJSON.byoo.accessToken === 'string'
     });
 
     // get something to redis as soon as possible
