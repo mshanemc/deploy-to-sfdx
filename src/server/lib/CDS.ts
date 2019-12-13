@@ -17,13 +17,7 @@ class CDS {
     instanceUrl?: string;
     expirationDate?: Date;
 
-    mainUser?: {
-        username?: string;
-        loginUrl?: string;
-        password?: string;
-        openPath?: string;
-        permalink?: string;
-    };
+    mainUser?: MainUser;
 
     additionalUsers: additionalUser[];
     errors: clientError[];
@@ -88,13 +82,7 @@ export interface CDSOptions {
     instanceUrl?: string;
     expirationDate?: Date;
 
-    mainUser?: {
-        username: string;
-        loginUrl: string;
-        password?: string;
-        openPath?: string;
-        permalink?: string;
-    };
+    mainUser?: MainUser;
 
     additionalUsers?: additionalUser[];
     errors?: clientError[];
@@ -105,6 +93,14 @@ export interface CDSOptions {
     poolLines?: lineParserResult;
     isPool?: boolean;
     isByoo?: boolean;
+}
+
+interface MainUser {
+    username?: string;
+    loginUrl?: string;
+    password?: string;
+    openPath?: string;
+    permalink?: string;
 }
 
 interface clientError {
