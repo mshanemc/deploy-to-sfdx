@@ -8,13 +8,14 @@ import jsforce from 'jsforce';
 import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish, putLead } from '../lib/redisNormal';
 import { deployMsgBuilder } from '../lib/deployMsgBuilder';
 import { utilities } from '../lib/utilities';
+import { processWrapper } from '../lib/processWrapper';
 
 import { deployRequest } from '../lib/types';
 import { CDS } from '../lib/CDS';
 
 const app: express.Application = express();
 
-const port = process.env.PORT || 8443;
+const port = processWrapper.PORT;
 
 app.listen(port, () => {
     logger.info(`Example app listening on port ${port}!`);
@@ -88,9 +89,9 @@ app.get(
     '/authUrl',
     wrapAsync(async (req, res, next) => {
         const byooOauth2 = new jsforce.OAuth2({
-            redirectUri: process.env.BYOO_CALLBACK_URI || `http://localhost:${port}/token`,
-            clientId: process.env.BYOO_CONSUMERKEY,
-            clientSecret: process.env.BYOO_SECRET,
+            redirectUri: processWrapper.BYOO_CALLBACK_URI || `http://localhost:${port}/token`,
+            clientId: processWrapper.BYOO_CONSUMERKEY,
+            clientSecret: processWrapper.BYOO_SECRET,
             loginUrl: req.query.base_url
         });
         res.send(
@@ -108,9 +109,9 @@ app.get(
         const state = JSON.parse(req.query.state);
 
         const byooOauth2 = new jsforce.OAuth2({
-            redirectUri: process.env.BYOO_CALLBACK_URI || `http://localhost:${port}/token`,
-            clientId: process.env.BYOO_CONSUMERKEY,
-            clientSecret: process.env.BYOO_SECRET,
+            redirectUri: processWrapper.BYOO_CALLBACK_URI || `http://localhost:${port}/token`,
+            clientId: processWrapper.BYOO_CONSUMERKEY,
+            clientSecret: processWrapper.BYOO_SECRET,
             loginUrl: state.base_url
         });
         const conn = new jsforce.Connection({ oauth2: byooOauth2 });
@@ -142,8 +143,8 @@ app.get('*', (req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
-    if (process.env.UA_ID) {
-        const visitor = ua(process.env.UA_ID);
+    if (processWrapper.UA_ID) {
+        const visitor = ua(processWrapper.UA_ID);
         visitor.event('Error', req.query.template).send();
     }
     logger.error(`request failed: ${req.url}`);

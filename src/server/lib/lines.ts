@@ -10,6 +10,7 @@ import { argStripper } from './argStripper';
 import { exec } from './execProm';
 import { CDS, commandSummary, HerokuResult } from './CDS';
 import { loginURL } from './loginURL';
+import { processWrapper } from './processWrapper';
 
 const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS) {
     this.msgJSON = msgJSON;
@@ -196,8 +197,8 @@ const getSummary = (localLine: string, msgJSON: deployRequest) => {
     } else if (localLine.includes('sfdx force:mdapi:deploy')) {
         return commandSummary.DEPLOY;
     } else if (localLine.includes('sfdx shane:heroku:repo:deploy')) {
-        if (!process.env.HEROKU_API_KEY) {
-            // check that heroku API key is defined in process.env
+        if (!processWrapper.HEROKU_API_KEY) {
+            // check that heroku API key is defined in processWrapper
             logger.error('there is no HEROKU_API_KEY defined, but shane:heroku:repo:deploy is used in an .orgInit', {
                 repo: `${msgJSON.username}/${msgJSON.repo}`
             });

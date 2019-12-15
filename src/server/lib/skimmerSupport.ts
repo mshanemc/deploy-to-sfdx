@@ -18,6 +18,7 @@ import { herokuDelete } from './herokuDelete';
 import { exec2JSON } from './execProm';
 import { getPoolName } from './namedUtilities';
 import { CDS } from './CDS';
+import { processWrapper } from '../lib/processWrapper';
 
 const skimmer = async () => {
     const pools = await utilities.getPoolConfig();
@@ -71,7 +72,7 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
 const doesOrgExist = async (username: string) => {
     try {
         const queryResult = await exec2JSON(
-            `sfdx force:data:soql:query -u ${process.env.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`
+            `sfdx force:data:soql:query -u ${processWrapper.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`
         );
         const status = queryResult.result.records[0].Status;
 
@@ -91,7 +92,7 @@ const herokuExpirationCheck = async () => {
     const herokuCDSs = await getHerokuCDSs();
 
     if (herokuCDSs.length > 0) {
-        if (!process.env.HEROKU_API_KEY) {
+        if (!processWrapper.HEROKU_API_KEY) {
             logger.warn('there is no heroku API key');
         } else {
             for (const cds of herokuCDSs) {
@@ -133,7 +134,7 @@ const processDeleteQueue = async () => {
                 try {
                     logger.debug(`deleting org with username ${deleteReq.username}`);
                     await exec2JSON(
-                        `sfdx force:data:record:delete -u ${process.env.HUB_USERNAME} -s ActiveScratchOrg -w "SignupUsername='${deleteReq.username}'" --json`
+                        `sfdx force:data:record:delete -u ${processWrapper.HUB_USERNAME} -s ActiveScratchOrg -w "SignupUsername='${deleteReq.username}'" --json`
                     );
                 } catch (e) {
                     logger.error(e);

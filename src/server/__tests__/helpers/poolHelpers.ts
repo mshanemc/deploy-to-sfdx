@@ -7,6 +7,7 @@ import { getKeypath } from '../../lib/hubAuth';
 import { exec } from '../../lib/execProm';
 import { retry } from '@lifeomic/attempt';
 import { CDS } from '../../lib/CDS';
+import { processWrapper } from '../../lib/processWrapper';
 
 const retryOptions = { maxAttempts: 90, delay: 5000 };
 const requestAddToPool = async (testRepo: testRepo, quantity: number = 1) => {
@@ -59,7 +60,7 @@ const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) =
             await retry(
                 async context =>
                     exec(
-                        `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
+                        `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
                             poolOrg.mainUser.username
                         } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`
                     ),
@@ -68,17 +69,7 @@ const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) =
             await retry(
                 async context =>
                     exec(
-                        `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
-                            poolOrg.mainUser.username
-                        } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`
-                    ),
-                retryOptions
-            );
-
-            await retry(
-                async context =>
-                    exec(
-                        `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
+                        `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
                             poolOrg.mainUser.username
                         } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`
                     ),
@@ -88,7 +79,17 @@ const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) =
             await retry(
                 async context =>
                     exec(
-                        `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
+                        `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
+                            poolOrg.mainUser.username
+                        } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`
+                    ),
+                retryOptions
+            );
+
+            await retry(
+                async context =>
+                    exec(
+                        `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
                             poolOrg.mainUser.username
                         } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`
                     ),
@@ -98,7 +99,7 @@ const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) =
             const result = await retry(
                 async context =>
                     exec(
-                        `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
+                        `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
                             poolOrg.mainUser.username
                         } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`
                     ),

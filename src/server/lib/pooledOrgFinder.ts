@@ -11,11 +11,12 @@ import { execProm, exec2JSON } from './execProm';
 import { loginURL } from './loginURL';
 
 import { deployRequest } from './types';
+import { processWrapper } from './processWrapper';
 const retryOptions = { maxAttempts: 60, delay: 5000 };
 
 const pooledOrgFinder = async function(deployReq: deployRequest, forcePool: boolean = false) {
     try {
-        if (!process.env.POOLCONFIG_URL && !forcePool) {
+        if (!processWrapper.POOLCONFIG_URL && !forcePool) {
             return;
         }
 
@@ -34,8 +35,8 @@ const pooledOrgFinder = async function(deployReq: deployRequest, forcePool: bool
         const uniquePath = path.join(__dirname, '../tmp/pools', cds.orgId);
         fs.ensureDirSync(uniquePath);
 
-        // `sfdx force:auth:jwt:grant --json --clientid ${process.env.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${keypath} --instanceurl ${cds.instanceUrl || 'https://test.salesforce.com'} -s`,
-        const jwtComand = `sfdx force:auth:jwt:grant --clientid ${process.env.CONSUMERKEY} --username ${
+        // `sfdx force:auth:jwt:grant --json --clientid ${processWrapper.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${keypath} --instanceurl ${cds.instanceUrl || 'https://test.salesforce.com'} -s`,
+        const jwtComand = `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
             cds.mainUser.username
         } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`;
 

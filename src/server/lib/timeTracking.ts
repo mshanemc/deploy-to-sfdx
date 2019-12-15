@@ -1,6 +1,7 @@
 import logger from 'heroku-logger';
 import { deployRequest } from './types';
 import { CDS } from './CDS';
+import { processWrapper } from './processWrapper';
 
 const timesToGA = async (msgJSON: deployRequest, CDS: CDS) => {
     if (!msgJSON.visitor) {
@@ -8,7 +9,7 @@ const timesToGA = async (msgJSON: deployRequest, CDS: CDS) => {
         return;
     }
 
-    const repo = `${process.env.SFDX_PRERELEASE ? 'prerelease' : 'regular'}/${msgJSON.template || msgJSON.repo}`;
+    const repo = `${processWrapper.SFDX_PRERELEASE ? 'prerelease' : 'regular'}/${msgJSON.template || msgJSON.repo}`;
 
     // log command stuff from the pool after it builds, but then exit and don't hit the high-level metrics for end user experience.
     if (msgJSON.pool) {

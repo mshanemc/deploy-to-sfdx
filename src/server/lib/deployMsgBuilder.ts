@@ -5,6 +5,8 @@ import { checkWhitelist } from './checkWhitelist';
 import { getDeployId } from './namedUtilities';
 import ua from 'universal-analytics';
 
+import { processWrapper } from '../lib/processWrapper';
+
 const deployMsgBuilder = function(req): deployRequest {
     // check for exploits
     const query = req.query;
@@ -41,8 +43,8 @@ const deployMsgBuilder = function(req): deployRequest {
         message.byoo = req.byoo;
     }
 
-    if (process.env.UA_ID) {
-        message.visitor = ua(process.env.UA_ID);
+    if (processWrapper.UA_ID) {
+        message.visitor = ua(processWrapper.UA_ID);
     }
 
     if (query.email) {

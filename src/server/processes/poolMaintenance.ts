@@ -4,14 +4,13 @@ import { utilities } from '../lib/utilities';
 import { getPoolDeployRequestQueueSize } from '../lib/redisNormal';
 import { prepareAll } from '../lib/poolPrep';
 import { execProm } from '../lib/execProm';
-
-const maxPoolBuilders = parseInt(process.env.maxPoolBuilders) || 50;
+import { processWrapper } from '../lib/processWrapper';
 
 (async () => {
     if (utilities.checkHerokuAPI()) {
-        const currentNeed = Math.min(maxPoolBuilders, await getPoolDeployRequestQueueSize());
+        const currentNeed = Math.min(processWrapper.maxPoolBuilders, await getPoolDeployRequestQueueSize());
 
-        if (currentNeed === maxPoolBuilders) {
+        if (currentNeed === processWrapper.maxPoolBuilders) {
             logger.warn('the poolDeploys queue seems really large');
         }
 

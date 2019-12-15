@@ -3,7 +3,9 @@ import axios from 'axios';
 // import logger from 'heroku-logger';
 import querystring from 'querystring';
 
-const sfdcLeadCaptureServlet = process.env.sfdcLeadCaptureServlet;
+import { processWrapper } from './processWrapper';
+
+const sfdcLeadCaptureServlet = processWrapper.sfdcLeadCaptureServlet;
 const requestPage = '/form.html';
 const resultPage = '/conf.html';
 const requestHost = 'www.salesforce.com';
