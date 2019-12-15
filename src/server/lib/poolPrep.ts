@@ -4,7 +4,7 @@ import { utilities } from './utilities';
 import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
 import { deployRequest, poolConfig } from './types';
 import { execProm } from './execProm';
-import { getPoolName } from './namedUtilities';
+import { getPoolName, getDeployId } from './namedUtilities';
 
 import ua from 'universal-analytics';
 
@@ -28,7 +28,7 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
         if (needed <= 0) {
             return;
         }
-        const deployId = encodeURIComponent(`${pool.user}-${pool.repo}-${new Date().valueOf()}`);
+        const deployId = getDeployId(pool.user, pool.repo);
 
         const username = poolname.split('.')[0];
         const repo = poolname.split('.')[1];
