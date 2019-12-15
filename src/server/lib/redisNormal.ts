@@ -1,3 +1,7 @@
+// the purpose of this file is to wrap any interaction with Redis.
+//  This lets us keep key names in a single place, and handle any validate / stringify / parse operations.
+// Users of this file just get/put/delete things as if redis is fancier than it really is
+
 import Redis from 'ioredis';
 import logger from 'heroku-logger';
 import ua from 'universal-analytics';
@@ -36,7 +40,9 @@ const deleteOrg = async (username: string) => {
 };
 
 const putHerokuCDS = async (cds: CDS) => {
-    return await redis.lpush(herokuCDSExchange, JSON.stringify(cds));
+    if (cds.herokuResults.length > 0) {
+        await redis.lpush(herokuCDSExchange, JSON.stringify(cds));
+    }
 };
 
 const getHerokuCDSs = async () => {
