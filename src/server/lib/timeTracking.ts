@@ -3,15 +3,18 @@ import { deployRequest } from './types';
 import { CDS } from './CDS';
 
 const timesToGA = async (msgJSON: deployRequest, CDS: CDS) => {
-    if (msgJSON.pool || !msgJSON.template) {
-        // for simpliciy, we only send metrics from pools when they get used.
-        return;
-    }
     if (!msgJSON.visitor) {
         // also, if there is no GA hooked up, don't try this
         return;
     }
-    const repo = `${process.env.SFDX_PRERELEASE ? 'prerelease' : 'regular'}/${msgJSON.template}`;
+
+    const repo = `${process.env.SFDX_PRERELEASE ? 'prerelease' : 'regular'}/${msgJSON.template || msgJSON.repo}`;
+
+    // log command stuff from the pool after it builds, but then exit and don't hit the high-level metrics for end user experience.
+    if (msgJSON.pool) {
+        await iterateCommandResults(repo, CDS, msgJSON);
+        return;
+    }
 
     try {
         // end user experience
@@ -24,6 +27,17 @@ const timesToGA = async (msgJSON: deployRequest, CDS: CDS) => {
         logger.warn('acutal GA error', e);
     }
 
+    // do the command timestamps if it was never a pool
+    if (!CDS.poolBuildFinishTime) {
+        await iterateCommandResults(repo, CDS, msgJSON);
+    }
+};
+
+const timeBetweenStringified = (start: Date, end: Date): string => {
+    return (new Date(end).getTime() - new Date(start).getTime()).toString();
+};
+
+const iterateCommandResults = async (repo: string, CDS: CDS, msgJSON: deployRequest) => {
     try {
         // how long did the user wait until the open button appears
         CDS.commandResults.forEach(commandResult => {
@@ -43,7 +57,3 @@ const timesToGA = async (msgJSON: deployRequest, CDS: CDS) => {
 };
 
 export { timesToGA };
-
-const timeBetweenStringified = (start: Date, end: Date): string => {
-    return (new Date(end).getTime() - new Date(start).getTime()).toString();
-};
