@@ -18,7 +18,7 @@ import { herokuDelete } from './herokuDelete';
 import { exec2JSON } from './execProm';
 import { getPoolName } from './namedUtilities';
 import { CDS } from './CDS';
-import { processWrapper } from '../lib/processWrapper';
+import { processWrapper } from './processWrapper';
 
 const skimmer = async () => {
     const pools = await utilities.getPoolConfig();

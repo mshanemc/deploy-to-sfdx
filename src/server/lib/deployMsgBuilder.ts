@@ -5,7 +5,7 @@ import { checkWhitelist } from './checkWhitelist';
 import { getDeployId } from './namedUtilities';
 import ua from 'universal-analytics';
 
-import { processWrapper } from '../lib/processWrapper';
+import { processWrapper } from './processWrapper';
 
 const deployMsgBuilder = function(req): deployRequest {
     // check for exploits

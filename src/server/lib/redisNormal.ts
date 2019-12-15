@@ -11,7 +11,7 @@ import { DeleteRequest, deployRequest, poolConfig } from './types';
 import { utilities } from './utilities';
 import { shellSanitize } from './shellSanitize';
 import { CDS } from './CDS';
-import { processWrapper } from '../lib/processWrapper';
+import { processWrapper } from './processWrapper';
 
 const cdsExchange = 'deployMsg';
 const deployRequestExchange = 'deploys';

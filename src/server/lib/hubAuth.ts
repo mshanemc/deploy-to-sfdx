@@ -4,7 +4,7 @@ import logger from 'heroku-logger';
 
 import { isLocal } from './amIlocal';
 import { exec } from './execProm';
-import { processWrapper } from '../lib/processWrapper';
+import { processWrapper } from './processWrapper';
 
 // const hubAuthd = async () => {
 //     // const hubResult = await exec('sfdx force:config:get defaultdevhubusername --json');
