@@ -3,41 +3,48 @@ import { deployRequest } from './types';
 import { CDS } from './CDS';
 
 const timesToGA = (msgJSON: deployRequest, CDS: CDS) => {
-    if (msgJSON.template) {
-        try {
+    if (msgJSON.pool || !msgJSON.template) {
+        // for simpliciy, we only send metrics from pools when they get used.
+        return;
+    }
+    if (!msgJSON.visitor) {
+        // also, if there is no GA hooked up, don't try this
+        return;
+    }
+    const repo = `${process.env.SFDX_PRERELEASE ? 'prerelease' : 'regular'}/${msgJSON.template}`;
+
+    try {
+        // how long did the user wait until the open button appears
+        msgJSON.visitor.timing('time until open button appears', repo, timeBetweenStringified(CDS.browserStartTime, CDS.openTimestamp)).send();
+        // how long between when the user requested the build and the build began
+        msgJSON.visitor.timing('time in queue', repo, timeBetweenStringified(CDS.browserStartTime, CDS.buildStartTime)).send();
+        msgJSON.visitor.timing('time to build', repo, timeBetweenStringified(CDS.buildStartTime, CDS.completeTimestamp)).send();
+        msgJSON.visitor.timing('time until fully deployed', repo, timeBetweenStringified(CDS.browserStartTime, CDS.completeTimestamp)).send();
+    } catch (e) {
+        logger.warn('GA timestamps not firing', msgJSON);
+        logger.warn('acutal GA error', e);
+    }
+
+    try {
+        // how long did the user wait until the open button appears
+        CDS.commandResults.forEach(commandResult => {
             msgJSON.visitor
                 .timing(
-                    'time in queue',
-                    msgJSON.template,
-                    (new Date(CDS.buildStartTime).getTime() - new Date(CDS.browserStartTime).getTime()).toString()
+                    'commandTiming',
+                    repo,
+                    timeBetweenStringified(commandResult.commandStartTimestamp, commandResult.commandCompleteTimestamp),
+                    commandResult.command
                 )
                 .send();
-            msgJSON.visitor
-                .timing(
-                    'time to build',
-                    msgJSON.template,
-                    (new Date(CDS.completeTimestamp).getTime() - new Date(CDS.buildStartTime).getTime()).toString()
-                )
-                .send();
-            msgJSON.visitor
-                .timing(
-                    'time until fully deployed',
-                    msgJSON.template,
-                    (new Date(CDS.completeTimestamp).getTime() - new Date(CDS.browserStartTime).getTime()).toString()
-                )
-                .send();
-            msgJSON.visitor
-                .timing(
-                    'time until open button appears',
-                    msgJSON.template,
-                    (new Date(CDS.openTimestamp).getTime() - new Date(CDS.browserStartTime).getTime()).toString()
-                )
-                .send();
-        } catch (e) {
-            logger.warn('GA timestamps not firing', msgJSON);
-            logger.warn('acutal GA error', e);
-        }
+        });
+    } catch (e) {
+        logger.warn('GA command timestamps not firing', msgJSON);
+        logger.warn('acutal GA error', e);
     }
 };
 
 export { timesToGA };
+
+const timeBetweenStringified = (start: Date, end: Date): string => {
+    return (new Date(end).getTime() - new Date(start).getTime()).toString();
+};

@@ -5,11 +5,11 @@ class CDS {
     complete: boolean;
 
     completeTimestamp?: Date; // when the job completed
-    browserStartTime?: Date; // when the job began
+    browserStartTime?: Date; // when the deploy was requested by a user
     openTimestamp?: Date; // when the open button became visible, even if more scripts were still running
-    buildStartTime?: Date;
-    poolBuildFinishTime?: Date;
-    poolBuildStartTime?: Date;
+    buildStartTime?: Date; // when the build started, excluding pool time
+    poolBuildFinishTime?: Date; // when the build finished, pools only
+    poolBuildStartTime?: Date; // when the build started, pools only
 
     lineCount?: Number; // how many lines need to run...used for status bar
 
@@ -114,6 +114,8 @@ interface clientResult {
     summary?: commandSummary; // ex: instead of outputting all the apex class stuff, just summarize that apex was executed.
     shortForm?: string;
     raw: string; // goes to logs
+    commandStartTimestamp?: Date;
+    commandCompleteTimestamp?: Date;
 }
 
 interface additionalUser {

@@ -19,6 +19,7 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
         logger.debug('starting the line runs');
 
         for (const line of this.lines) {
+            const lineStartTimestamp = new Date();
             let localLine = line;
             let summary: commandSummary;
             let shortForm: string;
@@ -110,7 +111,9 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
                         command: line,
                         summary,
                         raw: response,
-                        shortForm
+                        shortForm,
+                        commandStartTimestamp: lineStartTimestamp,
+                        commandCompleteTimestamp: new Date()
                     });
                 } else {
                     output.commandResults.push({
