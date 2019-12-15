@@ -97,18 +97,13 @@ const build = async (msgJSON: deployRequest) => {
 
     try {
         clientResult = <CDS>await localLineRunner.runLines();
-        timesToGA(msgJSON, clientResult);
     } catch (e) {
         logger.error('deployQueueCheck: Deployment error', msgJSON);
         logger.error('deployQueueCheck: Deployment error', e);
     }
 
-    await fs.remove(`tmp/${msgJSON.deployId}`);
+    await Promise.all([timesToGA(msgJSON, clientResult), fs.remove(`tmp/${msgJSON.deployId}`), putHerokuCDS(clientResult)]);
 
-    // store in herokuCDS queue for synchronized deletion
-    if (clientResult.herokuResults.length > 0) {
-        await putHerokuCDS(clientResult);
-    }
     return clientResult;
 };
 
