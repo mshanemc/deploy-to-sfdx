@@ -68,8 +68,8 @@ const pooledOrgFinder = async function(deployReq: deployRequest, forcePool: bool
         cds.complete = true;
 
         logger.debug(`opened : ${openOutput}`);
-        await cdsPublish(cds);
-        timesToGA(deployReq, cds);
+        await Promise.all([cdsPublish(cds), timesToGA(deployReq, cds)]);
+
         return cds;
     } catch (e) {
         logger.warn('pooledOrgFinder');
