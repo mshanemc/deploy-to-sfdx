@@ -8,6 +8,7 @@ import { lineParse } from './lineParse';
 import { lineRunner } from './lines';
 import { timesToGA } from './timeTracking';
 import { poolParse } from './poolParse';
+import { utilities } from './utilities';
 import { CDS } from './CDS';
 import { prepOrgInit, prepProjectScratchDef, gitClone } from './prepLocalRepo';
 
@@ -15,6 +16,7 @@ const build = async (msgJSON: deployRequest) => {
     let clientResult = new CDS({
         deployId: msgJSON.deployId,
         browserStartTime: msgJSON.createdTimestamp,
+        currentCommand: utilities.getCloneCommand(msgJSON),
         isPool: msgJSON.pool,
         isByoo: msgJSON.byoo && typeof msgJSON.byoo.accessToken === 'string'
     });
@@ -25,12 +27,14 @@ const build = async (msgJSON: deployRequest) => {
     // clone the repo
     clientResult = await gitClone(msgJSON, clientResult);
     await cdsPublish(clientResult);
-    if (clientResult.errors) {
+    if (clientResult.errors.length > 0) {
         return clientResult;
     }
 
     // figure out the org init file and optionally set the email
-    const [orgInitPath] = await Promise.all([prepOrgInit(msgJSON), prepProjectScratchDef(msgJSON)]);
+    const orgInitPath = await prepOrgInit(msgJSON);
+    await prepProjectScratchDef(msgJSON);
+    // const [orgInitPath, ...toss] = await Promise.all([prepOrgInit(msgJSON), prepProjectScratchDef(msgJSON)]);
 
     // reads the lines and removes and stores the org open line(s)
     if (msgJSON.pool) {
