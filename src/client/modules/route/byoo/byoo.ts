@@ -10,7 +10,6 @@ export default class Byoo extends LightningElement {
     return window.location.href.replace('byoo', 'launch');
   }
   async connectedCallback() {
-    console.log(' in connectedCallback');
     const authURL = `/authURL?template=${this.template}`;
     this.regularURL = await (await fetch(authURL)).text();
     this.sandboxURL = await (await fetch(`${authURL}&base_url=https://test.salesforce.com`)).text();
