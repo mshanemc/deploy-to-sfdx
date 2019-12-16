@@ -52,6 +52,7 @@ Create a connected app for JWT auth, with certificates, per the SFDX setup guide
 -   `GITHUB_REPO_WHITELIST` lets you whitelist username/repo combinations. It's a comma-separated list. Ex: `mshanemc/DF17integrationWorkshops,torvalds/linux`
 -   if you need to use the prerelease version of the sfdx plugin, then set `SFDX_PRERELEASE` to true.
 -   org pools -- see below for details
+-   BYOO (bring your own org) -- see below for details
 
 What's whitelisting do? Normally, this app will parse your orgInit.sh and throw an error if you're doing any funny business. BUT if you're on the whitelist, the app owner trusts you and you can do things with bash metacharacters (think &&, |, >) and execute non-sfdx commands (grep, rm, whatever!) etc. BE CAREFUL!
 
@@ -95,6 +96,18 @@ It runs a plugin that give it powers SFDX doesn't out-of-the-box
 <https://github.com/mshanemc/shane-sfdx-plugins> along with `sfdx-migration-automatic` and `@salesforce/analytics`
 
 Put plugins in the package.json dependencies, then linked from source in lib/hubAuth.js. Feel free to add additional plugins using npm install some-plugin-of-yours and then add it in hubAuth.js.
+
+---
+
+## BYOO Bring your own org (optional, mildly dangerous)
+
+Let people deploy from a repo to an existing org, and run some scripts. Set the BYOO environment variables to match a connected app (it needs to be a separate connected app from the one your hub uses because that one uses cert/jwt to auth, and this one won't have a cert). You'll need to set the appropriate callback URIs for the /token page.
+
+Users sign into their app, and then the deployer connects that instead of using a new scratch org. Password commands are omitted from the scripts, since that would be cruel.
+
+Change the launcher url from `.../launch?template=...` to `.../byoo?template=...` to use the BYOO feature.
+
+The page warns people about the risks of executing scripts in a non-scratch org. Expect failures because you don't know what features are available.
 
 ---
 
