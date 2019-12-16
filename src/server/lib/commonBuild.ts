@@ -7,14 +7,11 @@ import { cdsPublish, putHerokuCDS } from './redisNormal';
 import { lineParse } from './lineParse';
 import { lineRunner } from './lines';
 import { timesToGA } from './timeTracking';
-import { execProm } from './execProm';
-import { utilities } from './utilities';
 import { poolParse } from './poolParse';
 import { CDS } from './CDS';
+import { prepOrgInit, prepProjectScratchDef, gitClone } from './prepLocalRepo';
 
 const build = async (msgJSON: deployRequest) => {
-    fs.ensureDirSync('tmp');
-
     let clientResult = new CDS({
         deployId: msgJSON.deployId,
         browserStartTime: msgJSON.createdTimestamp,
@@ -23,54 +20,17 @@ const build = async (msgJSON: deployRequest) => {
     });
 
     // get something to redis as soon as possible
+    await Promise.all([fs.ensureDir('tmp'), cdsPublish(clientResult)]);
+
+    // clone the repo
+    clientResult = await gitClone(msgJSON, clientResult);
     await cdsPublish(clientResult);
-
-    const gitCloneCmd = utilities.getCloneCommand(msgJSON);
-
-    try {
-        const gitCloneResult = await execProm(gitCloneCmd, { cwd: 'tmp' });
-        logger.debug(`deployQueueCheck: ${gitCloneResult.stderr}`);
-        clientResult.commandResults.push({
-            command: gitCloneCmd,
-            raw: gitCloneResult.stderr
-        });
-        await cdsPublish(clientResult);
-    } catch (err) {
-        logger.warn(`deployQueueCheck: bad repo--https://github.com/${msgJSON.username}/${msgJSON.repo}.git`);
-        clientResult.errors.push({
-            command: gitCloneCmd,
-            error: err.stderr,
-            raw: err
-        });
-        clientResult.complete = true;
-        await cdsPublish(clientResult);
+    if (clientResult.errors) {
         return clientResult;
     }
 
-    // if you passed in a custom email address, we need to edit the config file and add the adminEmail property
-    if (msgJSON.email) {
-        logger.debug('deployQueueCheck: write a file for custom email address', msgJSON);
-        const location = `tmp/${msgJSON.deployId}/config/project-scratch-def.json`;
-        const configFileJSON = await fs.readJSON(location);
-        configFileJSON.adminEmail = msgJSON.email;
-        await fs.writeJSON(location, configFileJSON);
-    }
-
-    const orgInitPath = `tmp/${msgJSON.deployId}/orgInit.sh`;
-
-    // grab the deploy script from the repo
-    logger.debug(`deployQueueCheck: going to look in the directory ${orgInitPath}`);
-
-    // use the default file if there's not one
-    if (!fs.existsSync(orgInitPath)) {
-        logger.debug('deployQueueCheck: no orgInit.sh.  Will use default');
-        fs.writeFileSync(
-            orgInitPath,
-            `sfdx force:org:create -f config/project-scratch-def.json -s -d 1
-        sfdx force:source:push
-        sfdx force:org:open`
-        );
-    }
+    // figure out the org init file and optionally set the email
+    const [orgInitPath] = await Promise.all([prepOrgInit(msgJSON), prepProjectScratchDef(msgJSON)]);
 
     // reads the lines and removes and stores the org open line(s)
     if (msgJSON.pool) {
