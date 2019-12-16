@@ -6,6 +6,9 @@ export default class Byoo extends LightningElement {
   @track sandboxURL;
   @track regularURL;
 
+  get scratchUrl() {
+    return window.location.href.replace('byoo', 'launch');
+  }
   async connectedCallback() {
     console.log(' in connectedCallback');
     const authURL = `/authURL?template=${this.template}`;
