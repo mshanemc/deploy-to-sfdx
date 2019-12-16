@@ -61,6 +61,16 @@ app.get(['/', '/error', '/deploying/:format/:deployId', '/userinfo', '/byoo', '/
     res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
 });
 
+app.get(['/byoo'], (req, res, next) => {
+    if (processWrapper.BYOO_CALLBACK_URI && processWrapper.BYOO_CONSUMERKEY && processWrapper.BYOO_SECRET) {
+        res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
+    } else {
+        setImmediate(() => {
+            next(new Error(`Connected app credentials not properly configured for Bring Your Own Org feature`));
+        });
+    }
+});
+
 app.get(
     '/pools',
     wrapAsync(async (req, res, next) => {
