@@ -1,4 +1,7 @@
-import { poolConfig } from './types';
+import { poolConfig, ProjectJSON } from './types';
+import * as crypto from 'crypto';
+
+const randomCharactersInDeployId = 2;
 
 const getPoolName = (pool: poolConfig) => {
     if (pool.branch) {
@@ -7,4 +10,20 @@ const getPoolName = (pool: poolConfig) => {
     return `${pool.user}.${pool.repo}`;
 };
 
-export { getPoolName };
+const getPackageDirsFromFile = (projectJSON: ProjectJSON) => {
+    const packageDirs = projectJSON.packageDirectories.map(dir => dir.path);
+    return packageDirs.join(',');
+};
+
+const getDeployId = (username: string, repo: string) => {
+    return encodeURIComponent(`${username}-${repo}-${new Date().valueOf()}${randomValueHex(randomCharactersInDeployId)}`);
+};
+
+const randomValueHex = (len: number) => {
+    return crypto
+        .randomBytes(Math.ceil(len / 2))
+        .toString('hex') // convert to hexadecimal format
+        .slice(0, len); // return required number of characters
+};
+
+export { getPoolName, getPackageDirsFromFile, getDeployId };

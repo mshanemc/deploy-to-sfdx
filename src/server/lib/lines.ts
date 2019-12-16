@@ -1,13 +1,16 @@
 import logger from 'heroku-logger';
 import stripColor from 'strip-color';
+import * as fs from 'fs-extra';
 
 import { deployRequest, sfdxDisplayResult } from './types';
 import { utilities } from './utilities';
+import { getPackageDirsFromFile } from './namedUtilities';
 import { cdsPublish, deleteOrg } from './redisNormal';
 import { argStripper } from './argStripper';
 import { exec } from './execProm';
 import { CDS, commandSummary, HerokuResult } from './CDS';
 import { loginURL } from './loginURL';
+import { processWrapper } from './processWrapper';
 
 const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS) {
     this.msgJSON = msgJSON;
@@ -17,6 +20,7 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
         logger.debug('starting the line runs');
 
         for (const line of this.lines) {
+            const lineStartTimestamp = new Date();
             let localLine = line;
             let summary: commandSummary;
             let shortForm: string;
@@ -34,6 +38,14 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
                 localLine = argStripper(localLine, '-a');
                 localLine = argStripper(localLine, '-v');
                 localLine = argStripper(localLine, '-v');
+            } else if (msgJSON.byoo && localLine.includes('sfdx force:user:permset:assign')) {
+                // the username on byoo deploys is a accesstoken, which confuses the standard permset assign command
+                localLine = localLine.replace('force:user', 'shane:user');
+            } else if (msgJSON.byoo && localLine.includes('sfdx force:source:push')) {
+                // source push only works on scratch org or other source-tracking-enabled orgs.
+                // get the packageDirectories from the folder and modify the push command to deploy those instead
+                const project = await fs.readJSON(`tmp/${msgJSON.deployId}/sfdx-project.json`);
+                localLine = localLine.replace('sfdx force:source:push', `sfdx force:source:deploy -p ${getPackageDirsFromFile(project)}`);
             }
 
             let lineResult;
@@ -100,7 +112,9 @@ const lineRunner = function(msgJSON: deployRequest, lines: string[], output: CDS
                         command: line,
                         summary,
                         raw: response,
-                        shortForm
+                        shortForm,
+                        commandStartTimestamp: lineStartTimestamp,
+                        commandCompleteTimestamp: new Date()
                     });
                 } else {
                     output.commandResults.push({
@@ -183,8 +197,8 @@ const getSummary = (localLine: string, msgJSON: deployRequest) => {
     } else if (localLine.includes('sfdx force:mdapi:deploy')) {
         return commandSummary.DEPLOY;
     } else if (localLine.includes('sfdx shane:heroku:repo:deploy')) {
-        if (!process.env.HEROKU_API_KEY) {
-            // check that heroku API key is defined in process.env
+        if (!processWrapper.HEROKU_API_KEY) {
+            // check that heroku API key is defined in processWrapper
             logger.error('there is no HEROKU_API_KEY defined, but shane:heroku:repo:deploy is used in an .orgInit', {
                 repo: `${msgJSON.username}/${msgJSON.repo}`
             });

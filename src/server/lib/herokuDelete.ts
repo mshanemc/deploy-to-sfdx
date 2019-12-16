@@ -1,10 +1,12 @@
 import request from 'request-promise-native';
 import logger from 'heroku-logger';
 
+import { processWrapper } from '../lib/processWrapper';
+
 const herokuDelete = async (appName: string) => {
     const headers = {
         Accept: 'application/vnd.heroku+json; version=3',
-        Authorization: `Bearer ${process.env.HEROKU_API_KEY}`
+        Authorization: `Bearer ${processWrapper.HEROKU_API_KEY}`
     };
 
     try {

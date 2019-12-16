@@ -3,17 +3,19 @@ import express from 'express';
 
 import ua from 'universal-analytics';
 import path from 'path';
+import jsforce from 'jsforce';
 
 import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish, putLead } from '../lib/redisNormal';
 import { deployMsgBuilder } from '../lib/deployMsgBuilder';
 import { utilities } from '../lib/utilities';
+import { processWrapper } from '../lib/processWrapper';
 
 import { deployRequest } from '../lib/types';
 import { CDS } from '../lib/CDS';
 
 const app: express.Application = express();
 
-const port = process.env.PORT || 8443;
+const port = processWrapper.PORT;
 
 app.listen(port, () => {
     logger.info(`Example app listening on port ${port}!`);
@@ -55,8 +57,18 @@ app.get(
     })
 );
 
-app.get(['/', '/error', '/deploying/:format/:deployId', '/userinfo', '/testform', '/deleteConfirm'], (req, res, next) => {
+app.get(['/', '/error', '/deploying/:format/:deployId', '/userinfo', '/byoo', '/testform', '/deleteConfirm'], (req, res, next) => {
     res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
+});
+
+app.get(['/byoo'], (req, res, next) => {
+    if (processWrapper.BYOO_CALLBACK_URI && processWrapper.BYOO_CONSUMERKEY && processWrapper.BYOO_SECRET) {
+        res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
+    } else {
+        setImmediate(() => {
+            next(new Error(`Connected app credentials not properly configured for Bring Your Own Org feature`));
+        });
+    }
 });
 
 app.get(
@@ -83,6 +95,57 @@ app.get('/service-worker.js', (req, res, next) => {
     res.sendStatus(200);
 });
 
+app.get(
+    '/authUrl',
+    wrapAsync(async (req, res, next) => {
+        const byooOauth2 = new jsforce.OAuth2({
+            redirectUri: processWrapper.BYOO_CALLBACK_URI || `http://localhost:${port}/token`,
+            clientId: processWrapper.BYOO_CONSUMERKEY,
+            clientSecret: processWrapper.BYOO_SECRET,
+            loginUrl: req.query.base_url
+        });
+        res.send(
+            byooOauth2.getAuthorizationUrl({
+                scope: 'api id web openid',
+                state: JSON.stringify(req.query)
+            })
+        );
+    })
+);
+
+app.get(
+    '/token',
+    wrapAsync(async (req, res, next) => {
+        const state = JSON.parse(req.query.state);
+
+        const byooOauth2 = new jsforce.OAuth2({
+            redirectUri: processWrapper.BYOO_CALLBACK_URI || `http://localhost:${port}/token`,
+            clientId: processWrapper.BYOO_CONSUMERKEY,
+            clientSecret: processWrapper.BYOO_SECRET,
+            loginUrl: state.base_url
+        });
+        const conn = new jsforce.Connection({ oauth2: byooOauth2 });
+        const userinfo = await conn.authorize(req.query.code);
+
+        // put the request in the queue
+        const message = await commonDeploy(
+            {
+                query: {
+                    template: state.template
+                },
+                byoo: {
+                    accessToken: conn.accessToken,
+                    instanceUrl: conn.instanceUrl,
+                    username: userinfo.id,
+                    orgId: userinfo.organizationId
+                }
+            },
+            'byoo'
+        );
+        return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
+    })
+);
+
 app.get('*', (req, res, next) => {
     setImmediate(() => {
         next(new Error(`Route not found: ${req.url} on action ${req.method}`));
@@ -90,8 +153,8 @@ app.get('*', (req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
-    if (process.env.UA_ID) {
-        const visitor = ua(process.env.UA_ID);
+    if (processWrapper.UA_ID) {
+        const visitor = ua(processWrapper.UA_ID);
         visitor.event('Error', req.query.template).send();
     }
     logger.error(`request failed: ${req.url}`);
@@ -126,7 +189,6 @@ const commonDeploy = async (req, url: string) => {
     );
     return message;
 };
-
 // process.on('unhandledRejection', e => {
 //     logger.error('this reached the unhandledRejection handler somehow:', e);
 // });

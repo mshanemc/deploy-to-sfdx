@@ -57,6 +57,10 @@ export default class DeployMessages extends LightningElement {
     return this.results && this.results.herokuResults && this.results.herokuResults.length > 0;
   }
 
+  get showDelete() {
+    return this.results && !this.results.isByoo;
+  }
+
   @wire(resultsPoll, { deployId: '$deployId' })
   wiredResults({ error, data }) {
     if (error) {

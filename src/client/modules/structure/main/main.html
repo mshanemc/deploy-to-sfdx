@@ -28,6 +28,10 @@
     <template if:true={isTestform}>
       <route-test-form></route-test-form>
     </template>
+
+    <template if:true={isByoo}>
+      <route-byoo template={params.template}></route-byoo>
+    </template>
   </div>
 
   <structure-footer></structure-footer>

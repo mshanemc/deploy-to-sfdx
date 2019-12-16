@@ -3,9 +3,11 @@ import logger from 'heroku-logger';
 import { auth } from './hubAuth';
 import { getPoolRequest, putPooledOrg } from './redisNormal';
 import { build } from './commonBuild';
+import { deployRequest } from './types';
 
 export async function poolBuild() {
-    let msgJSON;
+    let msgJSON: undefined | deployRequest;
+
     try {
         msgJSON = await getPoolRequest(true);
     } catch (e) {

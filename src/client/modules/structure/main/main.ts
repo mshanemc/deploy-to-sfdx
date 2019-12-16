@@ -11,6 +11,7 @@ export default class Main extends LightningElement {
   @track isDelete = this.pathname === '/deleteConfirm';
   @track isUserInfo = this.pathname === '/userinfo';
   @track isTestform = this.pathname === '/testform';
+  @track isByoo = this.pathname.startsWith('/byoo');
 
   get paramsDebug() {
     return JSON.stringify(this.params);

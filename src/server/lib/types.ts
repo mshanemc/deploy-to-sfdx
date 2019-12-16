@@ -28,6 +28,12 @@ export interface deployRequest {
     firstname?: string;
     lastname?: string;
     visitor?: ua.Visitor;
+    byoo?: {
+        accessToken: string;
+        instanceUrl: string;
+        username: string;
+        orgId: string;
+    };
 }
 
 // tells how a pool should be built.  Used in an array from a url like POOLCONFIG_URL=https://deployer-pools.herokuapp.com/pools-dev
@@ -66,4 +72,20 @@ export interface herokuDyno {
     created_at: Date;
     id: string;
     command: string;
+}
+
+export interface ProjectJSON {
+    packageDirectories: PackageDirectory[];
+    namespace?: string;
+    sfdcLoginUrl?: string;
+    sourceApiVersion?: string;
+    packageAliases?: { [key: string]: string };
+}
+
+interface PackageDirectory {
+    path: string;
+    default?: boolean;
+    package?: string;
+    versionName?: string;
+    versionNumber?: string;
 }

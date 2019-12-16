@@ -3,6 +3,7 @@ import request from 'request-promise-native';
 
 import { deployRequest, poolConfig, openResult } from './types';
 import { isLocal } from './amIlocal';
+import { processWrapper } from './processWrapper';
 
 const exec = require('child_process').exec;
 
@@ -24,11 +25,11 @@ const utilities = {
 
     getPoolConfig: async (): Promise<poolConfig[]> => {
         // TODO: fallback as a singleton?
-        if (!process.env.POOLCONFIG_URL) {
+        if (!processWrapper.POOLCONFIG_URL) {
             return [];
         }
         try {
-            return JSON.parse(await request(process.env.POOLCONFIG_URL));
+            return JSON.parse(await request(processWrapper.POOLCONFIG_URL));
         } catch (error) {
             throw new Error(error);
         }
@@ -49,8 +50,8 @@ const utilities = {
     },
 
     runHerokuBuilder: (): void => {
-        if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME && !isLocal()) {
-            exec(`heroku run:detached oneoffbuilder -a ${process.env.HEROKU_APP_NAME}`);
+        if (processWrapper.HEROKU_API_KEY && processWrapper.HEROKU_APP_NAME && !isLocal()) {
+            exec(`heroku run:detached oneoffbuilder -a ${processWrapper.HEROKU_APP_NAME}`);
         } else if (isLocal()) {
             logger.debug('run one-off dynos via heroku local');
             exec('heroku local oneoffbuilder');
@@ -60,8 +61,8 @@ const utilities = {
     },
 
     getPoolDeployerCommand: (): string => {
-        if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME && !isLocal()) {
-            return `heroku run:detached pooldeployer -a ${process.env.HEROKU_APP_NAME}`;
+        if (processWrapper.HEROKU_API_KEY && processWrapper.HEROKU_APP_NAME && !isLocal()) {
+            return `heroku run:detached pooldeployer -a ${processWrapper.HEROKU_APP_NAME}`;
         } else if (isLocal()) {
             logger.debug('run poolbuilder dynos via heroku local');
             return 'heroku local pooldeployer';
@@ -72,7 +73,7 @@ const utilities = {
 
     checkHerokuAPI: (): boolean => {
         // we allow not to exist if running locally
-        if (process.env.HEROKU_API_KEY || isLocal()) {
+        if (processWrapper.HEROKU_API_KEY || isLocal()) {
             return true;
         } else {
             throw new Error('HEROKU_API_KEY is not defined!');

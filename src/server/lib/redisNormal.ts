@@ -1,3 +1,7 @@
+// the purpose of this file is to wrap any interaction with Redis.
+//  This lets us keep key names in a single place, and handle any validate / stringify / parse operations.
+// Users of this file just get/put/delete things as if redis is fancier than it really is
+
 import Redis from 'ioredis';
 import logger from 'heroku-logger';
 import ua from 'universal-analytics';
@@ -7,6 +11,7 @@ import { DeleteRequest, deployRequest, poolConfig } from './types';
 import { utilities } from './utilities';
 import { shellSanitize } from './shellSanitize';
 import { CDS } from './CDS';
+import { processWrapper } from './processWrapper';
 
 const cdsExchange = 'deployMsg';
 const deployRequestExchange = 'deploys';
@@ -19,7 +24,7 @@ const failedLeadQueue = 'failedLeads';
 const days31asSeconds = 31 * 24 * 60 * 60;
 
 // for accessing the redis directly.  Less favored
-const redis = new Redis(process.env.REDIS_URL);
+const redis = new Redis(processWrapper.REDIS_URL);
 
 const deleteOrg = async (username: string) => {
     logger.debug(`org delete requested for ${username}`);
@@ -36,7 +41,9 @@ const deleteOrg = async (username: string) => {
 };
 
 const putHerokuCDS = async (cds: CDS) => {
-    return await redis.lpush(herokuCDSExchange, JSON.stringify(cds));
+    if (cds.herokuResults.length > 0) {
+        await redis.lpush(herokuCDSExchange, JSON.stringify(cds));
+    }
 };
 
 const getHerokuCDSs = async () => {
@@ -101,8 +108,8 @@ const getDeployRequest = async (log?: boolean) => {
         const msgJSON = <deployRequest>JSON.parse(msg);
         // hook back up the UA events since they're lost in the queue
 
-        if (process.env.UA_ID && msgJSON.visitor) {
-            msgJSON.visitor = ua(process.env.UA_ID);
+        if (processWrapper.UA_ID && msgJSON.visitor) {
+            msgJSON.visitor = ua(processWrapper.UA_ID);
         }
         if (log) {
             logger.debug(`deployQueueCheck: found a msg for ${msgJSON.deployId}`, msgJSON);
@@ -220,13 +227,13 @@ const getPoolDeployCountByRepo = async (pool: poolConfig) => {
 };
 
 const putLead = async lead => {
-    if (process.env.sfdcLeadCaptureServlet) {
+    if (processWrapper.sfdcLeadCaptureServlet) {
         await redis.rpush(leadQueue, JSON.stringify(lead));
     }
 };
 
 const putFailedLead = async lead => {
-    if (process.env.sfdcLeadCaptureServlet) {
+    if (processWrapper.sfdcLeadCaptureServlet) {
         await redis.rpush(failedLeadQueue, JSON.stringify(lead));
     }
 };

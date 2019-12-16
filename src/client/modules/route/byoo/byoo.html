@@ -1,0 +1,23 @@
+<template>
+  <base-card>
+    <template if:true={template}>
+      <p>Oh, you want to deploy <a href={template} target="_blank">{template}</a> to an org you own?</p>
+      <p>
+        This is going to install stuff, run scripts, and generally make changes to an org. <b>Make sure that you're signing in to the right org!</b>
+      </p>
+      <p>If so, sign in to it so the deployer can access it.</p>
+      <base-button url={regularURL} target="_self" variant="neutral" label="Deploy to a Regular Org"></base-button>
+      <base-button url={sandboxURL} target="_self" variant="brand" label="Deploy to a Sandbox/Scratch Org"></base-button>
+      <p>Don't have an org handy that you want to use? You can borrow one of mine.</p>
+      <base-button url={scratchUrl} target="_self" variant="neutral" label="Deploy to a Scratch Org"></base-button>
+    </template>
+
+    <template if:false={template}>
+      <base-illustration
+        variant="WalkthroughNotAvailable"
+        size="large"
+        heading="You need to include a template parameter in the url, which points to an accessible github repo url."
+      ></base-illustration>
+    </template>
+  </base-card>
+</template>

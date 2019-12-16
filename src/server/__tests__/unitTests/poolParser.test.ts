@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 import { poolParse } from '../../lib/poolParse';
 import { utilities } from '../../lib/utilities';
 import { exec } from '../../lib/execProm';
+import { processWrapper } from '../../lib/processWrapper';
 
 const username = 'mshanemc';
 
@@ -16,9 +17,9 @@ describe('poolURLTest', () => {
     test.skip(
         'gets an array of objects',
         async () => {
-            if (process.env.POOLCONFIG_URL) {
+            if (processWrapper.POOLCONFIG_URL) {
                 // the pool is sane
-                expect(process.env.POOLCONFIG_URL).toBeInstanceOf('string');
+                expect(processWrapper.POOLCONFIG_URL).toBeInstanceOf('string');
 
                 const result = await utilities.getPoolConfig();
 
@@ -38,9 +39,9 @@ describe('poolURLTest', () => {
     test.skip(
         'gets an object from the array',
         async () => {
-            if (process.env.POOLCONFIG_URL) {
+            if (processWrapper.POOLCONFIG_URL) {
                 // the pool is sane
-                expect(process.env.POOLCONFIG_URL).toBeInstanceOf('string');
+                expect(processWrapper.POOLCONFIG_URL).toBeInstanceOf('string');
 
                 const result = await utilities.getPoolConfig();
 

@@ -9,7 +9,6 @@ export default class UserInfo extends LightningElement {
   }
 
   handleEmailChange(event) {
-    console.log(event.path[0].value);
     this.email = event.path[0].value;
   }
 }

@@ -1,9 +1,10 @@
 // import logger from 'heroku-logger';
+import { processWrapper } from './processWrapper';
 
 // checking for whitelisting
 const checkWhitelist = (ghuser: string, ghrepo: string) => {
-    const whitelist1 = process.env.GITHUB_USERNAME_WHITELIST; // comma separated list of username
-    const whitelist2 = process.env.GITHUB_REPO_WHITELIST; // comma separated list of username/repo
+    const whitelist1 = processWrapper.GITHUB_USERNAME_WHITELIST; // comma separated list of username
+    const whitelist2 = processWrapper.GITHUB_REPO_WHITELIST; // comma separated list of username/repo
 
     // logger.warn(`whitelist is ${whitelist1}`);
 

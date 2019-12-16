@@ -2,11 +2,10 @@ import logger from 'heroku-logger';
 import { deployRequest } from './types';
 import { shellSanitize, filterAlphaHypenUnderscore } from './shellSanitize';
 import { checkWhitelist } from './checkWhitelist';
-
+import { getDeployId } from './namedUtilities';
 import ua from 'universal-analytics';
-import * as crypto from 'crypto';
 
-const randomCharactersInDeployId = 2;
+import { processWrapper } from './processWrapper';
 
 const deployMsgBuilder = function(req): deployRequest {
     // check for exploits
@@ -27,8 +26,7 @@ const deployMsgBuilder = function(req): deployRequest {
     const username = filterAlphaHypenUnderscore(path.split('/')[0]);
     const repo = filterAlphaHypenUnderscore(path.split('/')[1]);
 
-    const deployId = encodeURIComponent(`${username}-${repo}-${new Date().valueOf()}${randomValueHex(randomCharactersInDeployId)}`);
-
+    const deployId = getDeployId(username, repo);
     logger.debug(`deployMsgBuilder: template is ${template}`);
 
     const message: deployRequest = {
@@ -41,8 +39,12 @@ const deployMsgBuilder = function(req): deployRequest {
         whitelisted: checkWhitelist(username, repo)
     };
 
-    if (process.env.UA_ID) {
-        message.visitor = ua(process.env.UA_ID);
+    if (req.byoo) {
+        message.byoo = req.byoo;
+    }
+
+    if (processWrapper.UA_ID) {
+        message.visitor = ua(processWrapper.UA_ID);
     }
 
     if (query.email) {
@@ -79,10 +81,3 @@ const deployMsgBuilder = function(req): deployRequest {
 };
 
 export { deployMsgBuilder };
-
-const randomValueHex = (len: number) => {
-    return crypto
-        .randomBytes(Math.ceil(len / 2))
-        .toString('hex') // convert to hexadecimal format
-        .slice(0, len); // return required number of characters
-};

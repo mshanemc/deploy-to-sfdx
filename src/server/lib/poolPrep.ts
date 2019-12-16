@@ -1,12 +1,12 @@
 import logger from 'heroku-logger';
+import ua from 'universal-analytics';
 
 import { utilities } from './utilities';
 import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
 import { deployRequest, poolConfig } from './types';
 import { execProm } from './execProm';
-import { getPoolName } from './namedUtilities';
-
-import ua from 'universal-analytics';
+import { getPoolName, getDeployId } from './namedUtilities';
+import { processWrapper } from './processWrapper';
 
 export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boolean = true) => {
     const targetQuantity = pool.quantity;
@@ -28,7 +28,7 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
         if (needed <= 0) {
             return;
         }
-        const deployId = encodeURIComponent(`${pool.user}-${pool.repo}-${new Date().valueOf()}`);
+        const deployId = getDeployId(pool.user, pool.repo);
 
         const username = poolname.split('.')[0];
         const repo = poolname.split('.')[1];
@@ -42,8 +42,8 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
             createdTimestamp: new Date()
         };
 
-        if (process.env.UA_ID) {
-            message.visitor = ua(process.env.UA_ID);
+        if (processWrapper.UA_ID) {
+            message.visitor = ua(processWrapper.UA_ID);
         }
 
         // branch support

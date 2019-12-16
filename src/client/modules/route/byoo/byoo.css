@@ -1,0 +1,21 @@
+.slds-text-heading_medium,
+.slds-text-heading--medium {
+  font-weight: 300;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+div {
+  padding-top: 1rem;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+base-button {
+  margin-right: 1rem;
+}

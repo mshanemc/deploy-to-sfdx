@@ -5,25 +5,24 @@ import moment from 'moment';
 
 import { utilities } from '../lib/utilities';
 import { herokuDyno } from '../lib/types';
-
-const dynoTimeLimit = process.env.DYNO_TIME_LIMIT || 30;
+import { processWrapper } from '../lib/processWrapper';
 
 (async () => {
     // validations that we can process these
-    if (!utilities.checkHerokuAPI() || !process.env.HEROKU_APP_NAME) {
+    if (!utilities.checkHerokuAPI() || !processWrapper.HEROKU_APP_NAME) {
         logger.error('dynoCleanup cannot run');
         process.exit(1);
     }
 
     try {
-        const heroku = new Heroku({ token: process.env.HEROKU_API_KEY });
-        const runDynos = <herokuDyno[]>await heroku.get(`/apps/${process.env.HEROKU_APP_NAME}/dynos`);
+        const heroku = new Heroku({ token: processWrapper.HEROKU_API_KEY });
+        const runDynos = <herokuDyno[]>await heroku.get(`/apps/${processWrapper.HEROKU_APP_NAME}/dynos`);
 
         await Promise.all(
             runDynos
                 .filter(dyno => dyno.type === 'run')
-                .filter(dyno => moment(dyno.created_at).isBefore(moment().subtract(dynoTimeLimit, 'minutes')))
-                .map(dyno => heroku.post(`/apps/${process.env.HEROKU_APP_NAME}/dynos/${dyno.id}/actions/stop`))
+                .filter(dyno => moment(dyno.created_at).isBefore(moment().subtract(processWrapper.DYNO_TIME_LIMIT, 'minutes')))
+                .map(dyno => heroku.post(`/apps/${processWrapper.HEROKU_APP_NAME}/dynos/${dyno.id}/actions/stop`))
         );
     } catch (err) {
         logger.error('dynoCleanup', err);
