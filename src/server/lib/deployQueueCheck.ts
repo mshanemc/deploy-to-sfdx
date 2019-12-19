@@ -4,12 +4,12 @@ import { getDeployRequest } from './redisNormal';
 import { pooledOrgFinder } from './pooledOrgFinder';
 import { build } from './commonBuild';
 
-import { deployRequest } from './types';
+import { DeployRequest } from './types';
 
-const check = async () => {
+const check = async (): Promise<boolean> => {
     // pull the oldest thing on the queue
     // will throw an error if the queue is empty.  handle somewhere
-    let msgJSON: deployRequest;
+    let msgJSON: DeployRequest;
 
     try {
         msgJSON = await getDeployRequest(true);

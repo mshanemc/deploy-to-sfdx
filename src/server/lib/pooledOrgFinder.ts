@@ -10,14 +10,14 @@ import { timesToGA } from './timeTracking';
 import { execProm, exec2JSON } from './execProm';
 import { loginURL } from './loginURL';
 
-import { deployRequest } from './types';
+import { DeployRequest } from './types';
 import { processWrapper } from './processWrapper';
 const retryOptions = { maxAttempts: 60, delay: 5000 };
 
-const pooledOrgFinder = async function(deployReq: deployRequest, forcePool: boolean = false) {
+const pooledOrgFinder = async function(deployReq: DeployRequest, forcePool = false) {
     try {
         if (!processWrapper.POOLCONFIG_URL && !forcePool) {
-            return;
+            return undefined;
         }
 
         let cds = await getPooledOrg(await utilities.getKey(deployReq), true);
@@ -41,7 +41,7 @@ const pooledOrgFinder = async function(deployReq: deployRequest, forcePool: bool
         } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`;
 
         if (forcePool) {
-            await retry(async context => execProm(jwtComand, { cwd: uniquePath }), retryOptions);
+            await retry(async () => execProm(jwtComand, { cwd: uniquePath }), retryOptions);
         } else {
             await execProm(jwtComand, { cwd: uniquePath });
         }

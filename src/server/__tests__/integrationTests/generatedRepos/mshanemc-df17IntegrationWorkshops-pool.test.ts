@@ -2,7 +2,7 @@
 import { sfdxTimeout } from './../../helpers/testingUtils';
 import { requestAddToPool, requestBuildPool } from './../../helpers/poolHelpers';
 import { pooledOrgFinder } from './../../../lib/pooledOrgFinder'; 
-import { deployRequest } from './../../../lib/types';
+import { DeployRequest } from './../../../lib/types';
 import { cdsDelete } from './../../../lib/redisNormal';
 
 const tr = {
@@ -19,10 +19,10 @@ describe('pool for mshanemc/df17IntegrationWorkshops', () => {
         }, sfdxTimeout);  
     
         test('retrieves an org from the pool for mshanemc/df17IntegrationWorkshops', async () => {
-            const req: deployRequest = {
+            const req: DeployRequest = {
                 repo: tr.repo,
                 username: tr.username,
-                deployId: 'mshanemc-df17IntegrationWorkshops-pool-1571866766713',
+                deployId: 'mshanemc-df17IntegrationWorkshops-pool-1576772349673',
                 createdTimestamp: new Date(),
                 whitelisted: true
             }

@@ -1,5 +1,14 @@
 {
-    "extends": "airbnb-base",
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint", "prettier"],
+    "settings": {
+        "import/resolver": {
+            "node": {
+                "extensions": [".js", ".jsx", ".ts", ".tsx"]
+            }
+        }
+    },
+    "extends": ["plugin:@typescript-eslint/recommended", "prettier"],
     "parserOptions": {
         "ecmaVersion": 2017
     },
@@ -140,6 +149,16 @@
         "global-strict": [0, "never"],
         "guard-for-in": 0,
         "handle-callback-err": 0,
+        "import/extensions": [
+            "error",
+            "ignorePackages",
+            {
+                "js": "never",
+                "jsx": "never",
+                "ts": "never",
+                "tsx": "never"
+            }
+        ],
         "indent": 0,
         "key-spacing": 0,
         "linebreak-style": [0, "windows"],
@@ -155,7 +174,7 @@
         "operator-assignment": [0, "always"],
         "padded-blocks": 0,
         "quote-props": 0,
-        "quotes": ["error", "single"],
+        "quotes": ["error", "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
         "radix": 0,
         "semi": 2,
         "semi-spacing": [

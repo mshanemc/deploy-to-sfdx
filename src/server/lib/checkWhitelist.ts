@@ -2,7 +2,7 @@
 import { processWrapper } from './processWrapper';
 
 // checking for whitelisting
-const checkWhitelist = (ghuser: string, ghrepo: string) => {
+const checkWhitelist = (ghuser: string, ghrepo: string): boolean => {
     const whitelist1 = processWrapper.GITHUB_USERNAME_WHITELIST; // comma separated list of username
     const whitelist2 = processWrapper.GITHUB_REPO_WHITELIST; // comma separated list of username/repo
 

@@ -1,6 +1,6 @@
-import { testRepo } from '../../lib/types';
+import { TestRepo } from '../../lib/types';
 
-export const testRepos: { [name: string]: testRepo[] } = {
+export const testRepos: { [name: string]: TestRepo[] } = {
     platformWorkshops: [
         {
             username: 'mshanemc',

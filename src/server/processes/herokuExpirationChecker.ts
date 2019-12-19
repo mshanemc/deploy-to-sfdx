@@ -8,5 +8,6 @@ import { auth } from '../lib/hubAuth';
 
     await auth();
     await herokuExpirationCheck();
+    // eslint-disable-next-line no-process-exit
     process.exit(0);
 })();

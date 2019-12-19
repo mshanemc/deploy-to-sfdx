@@ -20,6 +20,7 @@ const herokuDelete = async (appName: string) => {
     } catch (e) {
         logger.error(`error deleting heroku app ${appName}`);
     }
+    return undefined;
 };
 
 export { herokuDelete };

@@ -1,3 +1,5 @@
+/* eslint-disable no-process-exit */
+/* eslint-disable no-await-in-loop */
 import logger from 'heroku-logger';
 
 import { getLead, getLeadQueueSize, putFailedLead } from '../lib/redisNormal';

@@ -1,4 +1,3 @@
-/* globals it, describe */
 import { deployMsgBuilder } from '../../lib/deployMsgBuilder';
 
 describe('urlTestsMaster', () => {
@@ -52,7 +51,7 @@ describe('urlTestsBranch', () => {
             }
         };
 
-        expect(() => deployMsgBuilder(req)).toThrowError();
+        expect(() => deployMsgBuilder(req)).toThrow();
     });
 });
 

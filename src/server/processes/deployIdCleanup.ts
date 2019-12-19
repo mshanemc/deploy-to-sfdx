@@ -1,3 +1,4 @@
+/* eslint-disable no-process-exit */
 import logger from 'heroku-logger';
 import { removeOldDeployIds } from '../lib/skimmerSupport';
 // import { auth } from '../lib/hubAuth';

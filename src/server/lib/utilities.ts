@@ -1,14 +1,14 @@
 import logger from 'heroku-logger';
 import request from 'request-promise-native';
 
-import { deployRequest, poolConfig, openResult } from './types';
+import { DeployRequest, PoolConfig, OpenResult } from './types';
 import { isLocal } from './amIlocal';
 import { processWrapper } from './processWrapper';
 
 const exec = require('child_process').exec;
 
 const utilities = {
-    getKey: async (msgJSON: deployRequest): Promise<string> => {
+    getKey: async (msgJSON: DeployRequest): Promise<string> => {
         if (!msgJSON.username) {
             throw new Error('msg does not have username');
         }
@@ -23,7 +23,7 @@ const utilities = {
         return key;
     },
 
-    getPoolConfig: async (): Promise<poolConfig[]> => {
+    getPoolConfig: async (): Promise<PoolConfig[]> => {
         // TODO: fallback as a singleton?
         if (!processWrapper.POOLCONFIG_URL) {
             return [];
@@ -35,18 +35,14 @@ const utilities = {
         }
     },
 
-    getPool: async (username: string, repo: string): Promise<poolConfig> => {
+    getPool: async (username: string, repo: string): Promise<PoolConfig> => {
         const pools = await module.exports.getPoolConfig();
         if (!pools || !pools.find) {
-            return;
+            return undefined;
         }
 
-        const foundPool = pools.find(pool => pool.user === username && pool.repo === repo);
-        if (!foundPool) {
-            // go back and build it the normal way!
-        } else {
-            return foundPool;
-        }
+        const foundPool: PoolConfig = pools.find(pool => pool.user === username && pool.repo === repo);
+        return foundPool;
     },
 
     runHerokuBuilder: (): void => {
@@ -68,6 +64,7 @@ const utilities = {
             return 'heroku local pooldeployer';
         } else {
             logger.warn('unable to run pooldeployers...missing api key or app name');
+            return undefined;
         }
     },
 
@@ -90,7 +87,7 @@ const utilities = {
     },
 
     // fix double // inside a url by sfdx cli force:org:open
-    urlFix: (input: openResult): openResult => {
+    urlFix: (input: OpenResult): OpenResult => {
         if (input.result.url && input.result.url.includes('.com//secur/')) {
             // logger.warn(`multiple slash in open url ${input.result.url}`);
             input.result.url = input.result.url.replace('.com//secur/', '.com/secur/');
@@ -98,11 +95,8 @@ const utilities = {
         return input;
     },
 
-    getCloneCommand: (depReq: deployRequest) => {
-        return `git clone -b ${depReq.branch || 'master'} --single-branch https://github.com/${depReq.username}/${depReq.repo}.git ${
-            depReq.deployId
-        }`;
-    },
+    getCloneCommand: (depReq: DeployRequest): string =>
+        `git clone -b ${depReq.branch || 'master'} --single-branch https://github.com/${depReq.username}/${depReq.repo}.git ${depReq.deployId}`,
 
     getArg: (cmd: string, parameter: string): string => {
         cmd = cmd.concat(' ');
@@ -115,6 +109,7 @@ const utilities = {
 
         // quickly return if it doesn't exist
         if (!cmd.includes(bufferedParam)) {
+            return undefined;
         } else {
             // find the string
             const paramStartIndex = cmd.indexOf(' '.concat(parameter).concat(' ')) + 1;
@@ -123,6 +118,7 @@ const utilities = {
             const paramValueStart = paramEndIndex + 2;
             let paramValueEnd;
             // if it starts with a ` or ' or " we need to find the other end.  Otherwise, it's a space
+            // eslint-disable-next-line quotes
             if (cmd.charAt(paramValueStart) === '"' || cmd.charAt(paramValueStart) === "'" || cmd.charAt(paramValueStart) === '`') {
                 // logger.debug(`it is a quoted string starting with ${cmd.charAt(paramValueStart)}`);
                 const quoteEnd = cmd.indexOf(cmd.charAt(paramValueStart), paramValueStart + 1);

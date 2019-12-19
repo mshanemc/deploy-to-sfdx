@@ -1,5 +1,3 @@
-/* globals it, describe */
-
 import { utilities } from '../../lib/utilities';
 
 describe('Utilities: getArg', () => {

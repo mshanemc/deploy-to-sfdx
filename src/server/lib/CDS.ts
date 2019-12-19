@@ -1,4 +1,5 @@
-import { lineParserResult } from './types';
+/* eslint-disable @typescript-eslint/class-name-casing */
+import { LineParserResult } from './types';
 
 class CDS {
     deployId: string;
@@ -11,7 +12,7 @@ class CDS {
     poolBuildFinishTime?: Date; // when the build finished, pools only
     poolBuildStartTime?: Date; // when the build started, pools only
 
-    lineCount?: Number; // how many lines need to run...used for status bar
+    lineCount?: number; // how many lines need to run...used for status bar
 
     orgId?: string;
     instanceUrl?: string;
@@ -25,7 +26,7 @@ class CDS {
     herokuResults: HerokuResult[];
     currentCommand: string;
 
-    poolLines?: lineParserResult;
+    poolLines?: LineParserResult;
     isPool: boolean;
     isByoo: boolean;
 
@@ -76,7 +77,7 @@ export interface CDSOptions {
     poolBuildFinishTime?: Date;
     poolBuildStartTime?: Date;
 
-    lineCount?: Number; // how many lines need to run...used for status bar
+    lineCount?: number; // how many lines need to run...used for status bar
 
     orgId?: string;
     instanceUrl?: string;
@@ -90,7 +91,7 @@ export interface CDSOptions {
     herokuResults?: HerokuResult[];
     currentCommand?: string;
 
-    poolLines?: lineParserResult;
+    poolLines?: LineParserResult;
     isPool?: boolean;
     isByoo?: boolean;
 }
@@ -106,6 +107,7 @@ interface MainUser {
 interface clientError {
     command: string;
     error: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     raw: any;
 }
 

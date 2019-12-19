@@ -6,7 +6,7 @@ import Redis from 'ioredis';
 import logger from 'heroku-logger';
 import ua from 'universal-analytics';
 
-import { DeleteRequest, deployRequest, poolConfig } from './types';
+import { DeleteRequest, DeployRequest, PoolConfig } from './types';
 
 import { utilities } from './utilities';
 import { shellSanitize } from './shellSanitize';
@@ -51,9 +51,9 @@ const getHerokuCDSs = async () => {
     return CDSs;
 };
 
-const getAppNamesFromHerokuCDSs = async (salesforceUsername: string, expecting: boolean = true) => {
+const getAppNamesFromHerokuCDSs = async (salesforceUsername: string, expecting = true) => {
     // get all the CDSs
-    let herokuCDSs = await getHerokuCDSs();
+    const herokuCDSs = await getHerokuCDSs();
 
     if (herokuCDSs.length === 0) {
         return [];
@@ -84,28 +84,24 @@ const getAppNamesFromHerokuCDSs = async (salesforceUsername: string, expecting: 
     return matched[0].herokuResults.map(result => result.appName);
 };
 
-const getDeleteQueueSize = async () => {
-    return await redis.llen(orgDeleteExchange);
-};
+const getDeleteQueueSize = async () => redis.llen(orgDeleteExchange);
 
 const getDeleteRequest = async () => {
     const msg = await redis.lpop(orgDeleteExchange);
     if (msg) {
-        const msgJSON = <DeleteRequest>JSON.parse(msg);
+        const msgJSON = JSON.parse(msg) as DeleteRequest;
         return msgJSON;
     } else {
         throw new Error('delete request queue is empty');
     }
 };
 
-const getDeployRequestSize = async () => {
-    return redis.llen(deployRequestExchange);
-};
+const getDeployRequestSize = async () => redis.llen(deployRequestExchange);
 
 const getDeployRequest = async (log?: boolean) => {
     const msg = await redis.lpop(deployRequestExchange);
     if (msg) {
-        const msgJSON = <deployRequest>JSON.parse(msg);
+        const msgJSON = JSON.parse(msg) as DeployRequest;
         // hook back up the UA events since they're lost in the queue
 
         if (processWrapper.UA_ID && msgJSON.visitor) {
@@ -120,19 +116,24 @@ const getDeployRequest = async (log?: boolean) => {
     }
 };
 
-const putDeployRequest = async (depReq: deployRequest, log?: boolean) => {
+const putDeployRequest = async (depReq: DeployRequest, log?: boolean) => {
     await redis.rpush(deployRequestExchange, JSON.stringify(depReq));
-    logger.debug('redis: added to deploy queue', depReq);
+    if (log) {
+        logger.debug('redis: added to deploy queue', depReq);
+    }
 };
 
-const putPoolRequest = async (poolReq: deployRequest, log?: boolean) => {
+const putPoolRequest = async (poolReq: DeployRequest, log?: boolean) => {
     await redis.rpush(poolDeployExchange, JSON.stringify(poolReq));
+    if (log) {
+        logger.debug('redis: added to pool queue', poolReq);
+    }
 };
 
 const getPoolRequest = async (log?: boolean) => {
     const msg = await redis.lpop(poolDeployExchange);
     if (msg) {
-        const msgJSON = <deployRequest>JSON.parse(msg);
+        const msgJSON = JSON.parse(msg) as DeployRequest;
         if (log) {
             logger.debug('poolQueueCheck: found a msg', msgJSON);
         }
@@ -145,7 +146,7 @@ const getPoolRequest = async (log?: boolean) => {
 const cdsDelete = async (deployId: string) => {
     const retrieved = await redis.get(deployId);
     if (retrieved) {
-        const cds = <CDS>JSON.parse(retrieved);
+        const cds = JSON.parse(retrieved) as CDS;
         await deleteOrg(cds.mainUser.username);
     }
     await redis.del(deployId);
@@ -161,7 +162,7 @@ const cdsPublish = async (cds: CDS) => {
 const cdsRetrieve = async (deployId: string) => {
     const retrieved = await redis.get(deployId);
     if (retrieved) {
-        const cds = <CDS>JSON.parse(retrieved);
+        const cds = JSON.parse(retrieved) as CDS;
         return cds;
     } else {
         logger.warn(`No cds results found for deployId ${deployId}`);
@@ -189,6 +190,7 @@ const getKeys = async () => {
     const keys = await redis.keys('*.*');
     const output = [];
     for (const key of keys) {
+        // eslint-disable-next-line no-await-in-loop
         const size = await redis.llen(key);
         output.push({
             repo: key,
@@ -202,7 +204,7 @@ const getKeys = async () => {
 const getPooledOrg = async (key: string, log?: boolean): Promise<CDS> => {
     const msg = await redis.lpop(key);
     if (msg) {
-        const poolOrg = <CDS>JSON.parse(msg);
+        const poolOrg = JSON.parse(msg) as CDS;
         if (log) {
             logger.debug(`pooledOrgFinder: found an org in ${key}`, poolOrg);
         }
@@ -212,18 +214,18 @@ const getPooledOrg = async (key: string, log?: boolean): Promise<CDS> => {
     }
 };
 
-const putPooledOrg = async (depReq: deployRequest, poolMessage: CDS) => {
+const putPooledOrg = async (depReq: DeployRequest, poolMessage: CDS) => {
     const key = await utilities.getKey(depReq);
     await redis.rpush(key, JSON.stringify(poolMessage));
 };
 
 const getPoolDeployRequestQueueSize = async () => redis.llen(poolDeployExchange);
 
-const getPoolDeployCountByRepo = async (pool: poolConfig) => {
+const getPoolDeployCountByRepo = async (pool: PoolConfig) => {
     const poolRequests = await redis.lrange(poolDeployExchange, 0, -1);
     return poolRequests
         .map(pr => JSON.parse(pr))
-        .filter((pr: deployRequest) => pr.repo === pool.repo && pr.username === pool.user && pr.branch === pool.branch).length;
+        .filter((pr: DeployRequest) => pr.repo === pool.repo && pr.username === pool.user && pr.branch === pool.branch).length;
 };
 
 const putLead = async lead => {
@@ -243,9 +245,7 @@ const getLead = async () => {
     return JSON.parse(lead);
 };
 
-const getLeadQueueSize = async () => {
-    return await redis.llen(leadQueue);
-};
+const getLeadQueueSize = async () => redis.llen(leadQueue);
 
 export {
     redis,

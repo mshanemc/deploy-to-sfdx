@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import fs from 'fs-extra';
 import request from 'request-promise-native';
 import { sleep, retry } from '@lifeomic/attempt';
@@ -6,11 +7,11 @@ import { getTestURL } from './../helpers/testingUtils';
 import { cdsDelete } from '../../lib/redisNormal';
 import { CDS } from '../../lib/CDS';
 import { processDeleteQueue } from '../../lib/skimmerSupport';
-import { testRepo } from '../../lib/types';
+import { TestRepo } from '../../lib/types';
 
 const retryOptions = { maxAttempts: 3 };
 
-const deployCheck = async (testRepo: testRepo) => {
+const deployCheck = async (testRepo: TestRepo) => {
     await fs.ensureDir('tmp');
 
     const baseUrl = getTestURL();
@@ -18,7 +19,7 @@ const deployCheck = async (testRepo: testRepo) => {
         ? `https://github.com/${testRepo.username}/${testRepo.repo}/tree/${testRepo.branch}`
         : `https://github.com/${testRepo.username}/${testRepo.repo}`;
 
-    await retry(async context => {
+    await retry(async () => {
         // get the launch page and follow the path
 
         const startResult = await request({

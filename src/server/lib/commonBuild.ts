@@ -2,7 +2,7 @@
 import fs from 'fs-extra';
 import logger from 'heroku-logger';
 
-import { deployRequest } from './types';
+import { DeployRequest } from './types';
 import { cdsPublish, putHerokuCDS } from './redisNormal';
 import { lineParse } from './lineParse';
 import { lineRunner } from './lines';
@@ -12,7 +12,7 @@ import { utilities } from './utilities';
 import { CDS } from './CDS';
 import { prepOrgInit, prepProjectScratchDef, gitClone } from './prepLocalRepo';
 
-const build = async (msgJSON: deployRequest) => {
+const build = async (msgJSON: DeployRequest): Promise<CDS> => {
     let clientResult = new CDS({
         deployId: msgJSON.deployId,
         browserStartTime: msgJSON.createdTimestamp,
@@ -60,7 +60,7 @@ const build = async (msgJSON: deployRequest) => {
     const localLineRunner = new lineRunner(msgJSON, parsedLines, clientResult);
 
     try {
-        clientResult = <CDS>await localLineRunner.runLines();
+        clientResult = (await localLineRunner.runLines()) as CDS;
     } catch (e) {
         logger.error('deployQueueCheck: Deployment error', msgJSON);
         logger.error('deployQueueCheck: Deployment error', e);

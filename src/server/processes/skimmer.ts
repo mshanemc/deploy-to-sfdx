@@ -1,3 +1,4 @@
+/* eslint-disable no-process-exit */
 import logger from 'heroku-logger';
 import { utilities } from '../lib/utilities';
 import { skimmer } from '../lib/skimmerSupport';

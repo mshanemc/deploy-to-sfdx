@@ -64,7 +64,7 @@ describe('argStripperTest', () => {
     });
 
     test('handles single quoted strings with lots of spaces', () => {
-        const cmd2 = "sfdx shane:heroku:repo:deploy -g 'Some Quoted String' -r ducati-demo-server -t autodeployed-demos";
+        const cmd2 = `sfdx shane:heroku:repo:deploy -g 'Some Quoted String' -r ducati-demo-server -t autodeployed-demos`;
 
         expect(argStripper(cmd2, '-g', false)).toBe('sfdx shane:heroku:repo:deploy -r ducati-demo-server -t autodeployed-demos');
     });

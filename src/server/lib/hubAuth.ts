@@ -15,7 +15,7 @@ import { processWrapper } from './processWrapper';
 //     return false;
 // };
 
-const getKeypath = async () => {
+const getKeypath = async (): Promise<string> => {
     if (isLocal()) {
         // I'm fairly local
         // logger.debug('hubAuth...using local key');
@@ -32,9 +32,10 @@ const getKeypath = async () => {
         }
         return '/app/tmp/server.key';
     }
+    return undefined;
 };
 
-const auth = async () => {
+const auth = async (): Promise<string> => {
     // where will our cert live?
     const keypath = await getKeypath();
 
@@ -69,6 +70,7 @@ const auth = async () => {
         );
     } catch (err) {
         logger.error('hubAuth', err);
+        // eslint-disable-next-line no-process-exit
         process.exit(1);
     }
     logger.debug('hubAuth: complete');

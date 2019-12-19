@@ -1,10 +1,11 @@
+/* eslint-disable no-process-exit */
 // uses the heroku API to look for one-off dynos that have been up too long (whatever that is defined as)
 import Heroku from 'heroku-client';
 import logger from 'heroku-logger';
 import moment from 'moment';
 
 import { utilities } from '../lib/utilities';
-import { herokuDyno } from '../lib/types';
+import { HerokuDyno } from '../lib/types';
 import { processWrapper } from '../lib/processWrapper';
 
 (async () => {
@@ -16,7 +17,7 @@ import { processWrapper } from '../lib/processWrapper';
 
     try {
         const heroku = new Heroku({ token: processWrapper.HEROKU_API_KEY });
-        const runDynos = <herokuDyno[]>await heroku.get(`/apps/${processWrapper.HEROKU_APP_NAME}/dynos`);
+        const runDynos = (await heroku.get(`/apps/${processWrapper.HEROKU_APP_NAME}/dynos`)) as HerokuDyno[];
 
         await Promise.all(
             runDynos

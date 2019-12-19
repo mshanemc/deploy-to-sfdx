@@ -1,15 +1,15 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
 
-import { lineParserResult } from './types';
+import { LineParserResult } from './types';
 
 // returns the open command after making changes to local FS (removing the line from the file)
-const poolParse = function(path: string): Promise<lineParserResult> {
-    let parsedLines = [];
+const poolParse = function(path: string): Promise<LineParserResult> {
+    const parsedLines = [];
 
     let openLine: string;
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve) {
         readline
             .createInterface({
                 input: fs.createReadStream(path),
@@ -24,7 +24,7 @@ const poolParse = function(path: string): Promise<lineParserResult> {
             })
             .on('close', () => {
                 fs.writeFile(path, parsedLines.join('\n'), () => {
-                    const result: lineParserResult = {
+                    const result: LineParserResult = {
                         openLine
                     };
                     resolve(result);

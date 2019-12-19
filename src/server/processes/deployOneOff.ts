@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import logger from 'heroku-logger';
 import checkQueue from '../lib/deployQueueCheck';
 import { auth } from '../lib/hubAuth';
@@ -11,5 +12,6 @@ import { getDeployRequestSize } from '../lib/redisNormal';
         await checkQueue();
     }
 
+    // eslint-disable-next-line no-process-exit
     process.exit(0);
 })();

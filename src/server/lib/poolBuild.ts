@@ -3,10 +3,10 @@ import logger from 'heroku-logger';
 import { auth } from './hubAuth';
 import { getPoolRequest, putPooledOrg } from './redisNormal';
 import { build } from './commonBuild';
-import { deployRequest } from './types';
+import { DeployRequest } from './types';
 
-export async function poolBuild() {
-    let msgJSON: undefined | deployRequest;
+export async function poolBuild(): Promise<boolean> {
+    let msgJSON: undefined | DeployRequest;
 
     try {
         msgJSON = await getPoolRequest(true);

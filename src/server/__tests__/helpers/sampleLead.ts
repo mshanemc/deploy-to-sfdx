@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 const sample = {
     skipForm: 'false',
     hasLeadCapture: 'true',
@@ -30,7 +31,7 @@ const sample = {
     UserEmail: 'reggie@shaneformtesting.org',
     userNameErrMsg: 'This email is already in use. Try another.',
     UserPhone: '7850484333',
-    CompanyName: `Shanes form testing, ltd`,
+    CompanyName: 'Shanes form testing, ltd',
     CompanyEmployees: '10',
     CompanyCountry: 'US',
     CompanyState: 'Texas',

@@ -10,7 +10,7 @@ import { deployMsgBuilder } from '../lib/deployMsgBuilder';
 import { utilities } from '../lib/utilities';
 import { processWrapper } from '../lib/processWrapper';
 
-import { deployRequest } from '../lib/types';
+import { DeployRequest } from '../lib/types';
 import { CDS } from '../lib/CDS';
 
 const app: express.Application = express();
@@ -25,6 +25,34 @@ app.listen(port, () => {
 app.use(express.static('dist'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+function wrapAsync(fn: any) {
+    return function(req, res, next) {
+        // Make sure to `.catch()` any errors and pass them along to the `next()`
+        // middleware in the chain, in this case the error handler.
+        fn(req, res, next).catch(next);
+    };
+}
+
+const commonDeploy = async (req, url: string) => {
+    const message: DeployRequest = deployMsgBuilder(req);
+
+    if (message.visitor) {
+        message.visitor.pageview(url).send();
+        if (typeof message.template === 'string') {
+            message.visitor.event('Repo', message.template).send();
+        }
+    }
+
+    utilities.runHerokuBuilder();
+    await putDeployRequest(message);
+    await cdsPublish(
+        new CDS({
+            deployId: message.deployId
+        })
+    );
+    return message;
+};
 
 app.post(
     '/trial',
@@ -66,7 +94,7 @@ app.get(['/byoo'], (req, res, next) => {
         res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
     } else {
         setImmediate(() => {
-            next(new Error(`Connected app credentials not properly configured for Bring Your Own Org feature`));
+            next(new Error('Connected app credentials not properly configured for Bring Your Own Org feature'));
         });
     }
 });
@@ -162,33 +190,6 @@ app.use((error, req, res, next) => {
     return res.redirect(`/error?msg=${error}`);
 });
 
-function wrapAsync(fn: any) {
-    return function(req, res, next) {
-        // Make sure to `.catch()` any errors and pass them along to the `next()`
-        // middleware in the chain, in this case the error handler.
-        fn(req, res, next).catch(next);
-    };
-}
-
-const commonDeploy = async (req, url: string) => {
-    const message: deployRequest = deployMsgBuilder(req);
-
-    if (message.visitor) {
-        message.visitor.pageview(url).send();
-        if (typeof message.template === 'string') {
-            message.visitor.event('Repo', message.template).send();
-        }
-    }
-
-    utilities.runHerokuBuilder();
-    await putDeployRequest(message);
-    await cdsPublish(
-        new CDS({
-            deployId: message.deployId
-        })
-    );
-    return message;
-};
 // process.on('unhandledRejection', e => {
 //     logger.error('this reached the unhandledRejection handler somehow:', e);
 // });

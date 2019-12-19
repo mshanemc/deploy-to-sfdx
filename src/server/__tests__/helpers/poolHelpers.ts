@@ -1,5 +1,5 @@
 import { preparePoolByName } from '../../lib/poolPrep';
-import { testRepo } from '../../lib/types';
+import { TestRepo } from '../../lib/types';
 import { redis } from '../../lib/redisNormal';
 // import utilities = require('../../lib/utilities');
 import { poolBuild } from '../../lib/poolBuild';
@@ -10,7 +10,7 @@ import { CDS } from '../../lib/CDS';
 import { processWrapper } from '../../lib/processWrapper';
 
 const retryOptions = { maxAttempts: 90, delay: 5000 };
-const requestAddToPool = async (testRepo: testRepo, quantity: number = 1) => {
+const requestAddToPool = async (testRepo: TestRepo, quantity = 1) => {
     // add to pool
     await preparePoolByName(
         {
@@ -24,7 +24,7 @@ const requestAddToPool = async (testRepo: testRepo, quantity: number = 1) => {
 
     // verify exists in poolRequests
     const allMessages = await redis.lrange('poolDeploys', 0, -1);
-    const msg = allMessages.map(msg => JSON.parse(msg)).find(msg => msg.repo === testRepo.repo);
+    const msg = allMessages.map(msgIterator => JSON.parse(msgIterator)).find(msgIterator => msgIterator.repo === testRepo.repo);
 
     expect(msg.username).toBe(testRepo.username);
     expect(msg.repo).toBe(testRepo.repo);
@@ -33,20 +33,20 @@ const requestAddToPool = async (testRepo: testRepo, quantity: number = 1) => {
     return true;
 };
 
-const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) => {
+const requestBuildPool = async (testRepo: TestRepo, requireAuthable?: boolean) => {
     const buildResult = await poolBuild();
     expect(buildResult).toBe(true);
 
     // verify not in poolRequests
     const allMessages = await redis.lrange('poolDeploys', 0, -1);
-    const msg = allMessages.map(msg => JSON.parse(msg)).find(msg => msg.repo === testRepo.repo);
+    const msg = allMessages.map(msgIterator => JSON.parse(msgIterator)).find(msgIterator => msgIterator.repo === testRepo.repo);
     expect(msg).toBeFalsy();
 
     // verify in the pool for that repo
     const repoPoolSize = await redis.llen(`${testRepo.username}.${testRepo.repo}`);
     expect(repoPoolSize).toBe(1);
 
-    const poolOrg = <CDS>JSON.parse(await redis.lpop(`${testRepo.username}.${testRepo.repo}`));
+    const poolOrg = JSON.parse(await redis.lpop(`${testRepo.username}.${testRepo.repo}`)) as CDS;
     expect(poolOrg.deployId).toContain(testRepo.repo);
     expect(poolOrg.deployId).toContain(testRepo.username);
     expect(typeof poolOrg.poolLines.openLine).toBe('string');
@@ -58,7 +58,7 @@ const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) =
             // we do this several times to increase the odds of the pool actually working...the first ones to get through sometimes doesn't hit on the findPooledOrg, but many times seems to be pretty sure.
             // it's still flappy sometimes, though
             await retry(
-                async context =>
+                async () =>
                     exec(
                         `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
                             poolOrg.mainUser.username
@@ -67,7 +67,7 @@ const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) =
                 retryOptions
             );
             await retry(
-                async context =>
+                async () =>
                     exec(
                         `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
                             poolOrg.mainUser.username
@@ -77,7 +77,7 @@ const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) =
             );
 
             await retry(
-                async context =>
+                async () =>
                     exec(
                         `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
                             poolOrg.mainUser.username
@@ -87,7 +87,7 @@ const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) =
             );
 
             await retry(
-                async context =>
+                async () =>
                     exec(
                         `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
                             poolOrg.mainUser.username
@@ -96,8 +96,8 @@ const requestBuildPool = async (testRepo: testRepo, requireAuthable?: boolean) =
                 retryOptions
             );
 
-            const result = await retry(
-                async context =>
+            await retry(
+                async () =>
                     exec(
                         `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
                             poolOrg.mainUser.username

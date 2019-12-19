@@ -47,7 +47,6 @@ describe('sanitize tests', () => {
     });
 
     test('passes empty', () => {
-        const input = 'mshanemc && gsumner';
         expect(shellSanitize('')).toBe(true);
     });
 });

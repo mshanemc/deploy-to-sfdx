@@ -1,16 +1,16 @@
 import {
     redis,
     deleteOrg,
-    deployRequestExchange,
+    // deployRequestExchange,
     getDeployRequest,
-    cdsExchange,
-    cdsPublish,
+    // cdsExchange,
+    // cdsPublish,
     putDeployRequest,
     putPoolRequest,
-    getKeys,
-    getPooledOrg,
-    putPooledOrg,
-    getPoolRequest,
+    // getKeys,
+    // getPooledOrg,
+    // putPooledOrg,
+    // getPoolRequest,
     getPoolDeployRequestQueueSize,
     getPoolDeployCountByRepo,
     putHerokuCDS,
@@ -18,11 +18,11 @@ import {
     getAppNamesFromHerokuCDSs
 } from '../../lib/redisNormal';
 
-import { deployRequest, poolConfig } from '../../lib/types';
+import { DeployRequest, PoolConfig } from '../../lib/types';
 import { CDS } from '../../lib/CDS';
 
 jest.setTimeout(7000);
-const deployMsgTest: deployRequest = {
+const deployMsgTest: DeployRequest = {
     repo: 'testRepo',
     username: 'mshanemc',
     deployId: 'this-is-the-deploy-id',
@@ -51,7 +51,10 @@ test('tests HerokuCDS functions', async () => {
             username: 'test2@mailinator.com',
             loginUrl: 'x'
         },
-        herokuResults: [{ appName: 'testApp2a', openUrl: 'x', dashboardUrl: 'x' }, { appName: 'testApp2b', openUrl: 'x', dashboardUrl: 'x' }],
+        herokuResults: [
+            { appName: 'testApp2a', openUrl: 'x', dashboardUrl: 'x' },
+            { appName: 'testApp2b', openUrl: 'x', dashboardUrl: 'x' }
+        ],
         deployId: 'test2'
     });
 
@@ -89,7 +92,7 @@ test('blocks deletes with bad usernames', async () => {
 });
 
 test('allows deletes with good usernames', async () => {
-    expect(deleteOrg('sweet@you.good')).resolves.toBeUndefined();
+    await expect(deleteOrg('sweet@you.good')).resolves.toBeUndefined();
     const result = await deleteOrg('sweet@you.good');
     expect(result).toBeUndefined();
 });
@@ -98,7 +101,7 @@ test('properly counts poolDeploys', async () => {
     const username = 'mshanemc';
     const mainRepo = 'redisTestRepo1';
 
-    const pool: poolConfig = {
+    const pool: PoolConfig = {
         user: username,
         repo: mainRepo,
         quantity: 1,
@@ -108,7 +111,7 @@ test('properly counts poolDeploys', async () => {
     const originalPoolSize = await getPoolDeployRequestQueueSize();
     const originalMainRepoSize = await getPoolDeployCountByRepo(pool);
 
-    const req: deployRequest = {
+    const req: DeployRequest = {
         username: username,
         repo: mainRepo,
         deployId: encodeURIComponent(`${username}-${mainRepo}-${new Date().valueOf()}`),
@@ -117,7 +120,7 @@ test('properly counts poolDeploys', async () => {
         createdTimestamp: new Date()
     };
 
-    const req2: deployRequest = {
+    const req2: DeployRequest = {
         username: username,
         repo: 'redisTestRepo2',
         deployId: encodeURIComponent(`${username}-else-${new Date().valueOf()}`),

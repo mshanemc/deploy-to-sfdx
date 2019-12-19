@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import logger from 'heroku-logger';
 import * as util from 'util';
 import { auth } from '../lib/hubAuth';
@@ -11,6 +12,7 @@ const setTimeoutPromise = util.promisify(setTimeout);
     await auth();
     let processedSomething = true;
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
         processedSomething = await checkQueue();
 

@@ -7,5 +7,6 @@ import { auth } from '../lib/hubAuth';
     logger.debug('orgDeleter started');
     await auth();
     await processDeleteQueue();
+    // eslint-disable-next-line no-process-exit
     process.exit(0);
 })();

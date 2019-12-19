@@ -45,7 +45,7 @@ describe("tests the skimmer's expiration checks", () => {
     test('handles pool with expired orgs', async () => {
         // create a pool of stuff
         await redis.del('mshanemc.mixedpool');
-        let orgs: CDS[] = new Array(3).fill(fineOrg);
+        const orgs: CDS[] = new Array(3).fill(fineOrg);
 
         expect(orgs.length).toBe(3);
 

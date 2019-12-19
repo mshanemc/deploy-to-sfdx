@@ -24,6 +24,7 @@ const argStripper = function(cmd: string, parameter: string, noarg?: boolean): s
         const paramValueStart = paramEndIndex + 2;
         let paramValueEnd;
         // if it starts with a ` or ' or " we need to find the other end.  Otherwise, it's a space
+        // eslint-disable-next-line quotes
         if (cmd.charAt(paramValueStart) === '"' || cmd.charAt(paramValueStart) === "'" || cmd.charAt(paramValueStart) === '`') {
             // logger.debug(`it is a quoted string starting with ${cmd.charAt(paramValueStart)}`);
             const quoteEnd = cmd.indexOf(cmd.charAt(paramValueStart), paramValueStart + 1);

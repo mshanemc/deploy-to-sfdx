@@ -3,12 +3,12 @@ import ua from 'universal-analytics';
 
 import { utilities } from './utilities';
 import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
-import { deployRequest, poolConfig } from './types';
+import { DeployRequest, PoolConfig } from './types';
 import { execProm } from './execProm';
 import { getPoolName, getDeployId } from './namedUtilities';
 import { processWrapper } from './processWrapper';
 
-export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boolean = true) => {
+export const preparePoolByName = async (pool: PoolConfig, createHerokuDynos = true): Promise<void> => {
     const targetQuantity = pool.quantity;
     const poolname = getPoolName(pool);
 
@@ -33,7 +33,7 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
         const username = poolname.split('.')[0];
         const repo = poolname.split('.')[1];
 
-        const message: deployRequest = {
+        const message: DeployRequest = {
             pool: true,
             username,
             repo,
@@ -63,6 +63,7 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
 
         if (createHerokuDynos) {
             while (builders < needed && builders < 50) {
+                // eslint-disable-next-line no-await-in-loop
                 await execProm(builderCommand);
                 builders++;
             }
@@ -70,8 +71,8 @@ export const preparePoolByName = async (pool: poolConfig, createHerokuDynos: boo
     }
 };
 
-export const prepareAll = async () => {
-    const pools = <poolConfig[]>await utilities.getPoolConfig();
+export const prepareAll = async (): Promise<void> => {
+    const pools = (await utilities.getPoolConfig()) as PoolConfig[];
     logger.debug(`preparing ${pools.length} pools`);
 
     await Promise.all(pools.map(pool => preparePoolByName(pool)));

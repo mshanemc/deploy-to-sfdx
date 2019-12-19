@@ -4,9 +4,28 @@ import * as readline from 'readline';
 
 import { shellSanitize } from './shellSanitize';
 import { argStripper } from './argStripper';
-import { deployRequest } from './types';
+import { DeployRequest } from './types';
 
-const lineParse = function(msgJSON: deployRequest): Promise<string[]> {
+const jsonify = (line: string): string => {
+    if (line.startsWith('sfdx ')) {
+        // TODO: handling for & at the end of line for background runs
+        return `${argStripper(line, '--json', true)} --json`;
+    } else {
+        return line;
+    }
+};
+
+const omitIfByoo = (line: string) => {
+    if (line.includes('org:create')) {
+        return true;
+    }
+    if (line.includes('user:password')) {
+        return true;
+    }
+    return false;
+};
+
+const lineParse = function(msgJSON: DeployRequest): Promise<string[]> {
     logger.debug('lineParse: started');
 
     return new Promise((resolve, reject) => {
@@ -65,25 +84,6 @@ const lineParse = function(msgJSON: deployRequest): Promise<string[]> {
                 resolve(parsedLines.filter(line => line !== ''));
             });
     });
-};
-
-const jsonify = (line: string): string => {
-    if (line.startsWith('sfdx ')) {
-        // TODO: handling for & at the end of line for background runs
-        return `${argStripper(line, '--json', true)} --json`;
-    } else {
-        return line;
-    }
-};
-
-const omitIfByoo = (line: string) => {
-    if (line.includes('org:create')) {
-        return true;
-    }
-    if (line.includes('user:password')) {
-        return true;
-    }
-    return false;
 };
 
 export { lineParse, jsonify };

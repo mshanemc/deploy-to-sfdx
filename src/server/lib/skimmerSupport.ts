@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import moment from 'moment';
 import logger from 'heroku-logger';
 
@@ -12,7 +13,7 @@ import {
     cdsDelete,
     getDeleteRequest
 } from './redisNormal';
-import { poolConfig } from './types';
+import { PoolConfig } from './types';
 import { utilities } from './utilities';
 import { herokuDelete } from './herokuDelete';
 import { exec2JSON } from './execProm';
@@ -20,19 +21,7 @@ import { getPoolName } from './namedUtilities';
 import { CDS } from './CDS';
 import { processWrapper } from './processWrapper';
 
-const skimmer = async () => {
-    const pools = await utilities.getPoolConfig();
-    const promises: Promise<string>[] = [];
-
-    pools.forEach(pool => {
-        promises.push(checkExpiration(pool));
-    });
-
-    const results = await Promise.all(promises);
-    results.forEach(result => logger.debug(result));
-};
-
-const checkExpiration = async (pool: poolConfig): Promise<string> => {
+const checkExpiration = async (pool: PoolConfig): Promise<string> => {
     const poolname = getPoolName(pool);
     const currentPoolSize = await redis.llen(poolname); // how many orgs are there?
 
@@ -69,7 +58,19 @@ const checkExpiration = async (pool: poolConfig): Promise<string> => {
     return `queueing for deletion ${expiredOrgs.length} expired orgs from pool ${poolname}`;
 };
 
-const doesOrgExist = async (username: string) => {
+const skimmer = async (): Promise<void> => {
+    const pools = await utilities.getPoolConfig();
+    const promises: Promise<string>[] = [];
+
+    pools.forEach(pool => {
+        promises.push(checkExpiration(pool));
+    });
+
+    const results = await Promise.all(promises);
+    results.forEach(result => logger.debug(result));
+};
+
+const doesOrgExist = async (username: string): Promise<boolean> => {
     try {
         const queryResult = await exec2JSON(
             `sfdx force:data:soql:query -u ${processWrapper.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`
@@ -88,7 +89,7 @@ const doesOrgExist = async (username: string) => {
     }
 };
 
-const herokuExpirationCheck = async () => {
+const herokuExpirationCheck = async (): Promise<void> => {
     const herokuCDSs = await getHerokuCDSs();
 
     if (herokuCDSs.length > 0) {
@@ -110,7 +111,7 @@ const herokuExpirationCheck = async () => {
     }
 };
 
-const removeOldDeployIds = async () => {
+const removeOldDeployIds = async (): Promise<void> => {
     const deployIds = await getKeysForCDSs();
     for (const deployId of deployIds) {
         const cds = await cdsRetrieve(deployId);
@@ -120,7 +121,7 @@ const removeOldDeployIds = async () => {
     }
 };
 
-const processDeleteQueue = async () => {
+const processDeleteQueue = async (): Promise<void> => {
     const delQueueInitialSize = await getDeleteQueueSize();
 
     if (delQueueInitialSize > 0) {

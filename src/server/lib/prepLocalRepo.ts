@@ -1,33 +1,37 @@
 import * as fs from 'fs-extra';
 import logger from 'heroku-logger';
-import { deployRequest } from './types';
+import { DeployRequest } from './types';
 import { utilities } from './utilities';
 import { CDS } from './CDS';
 import { execProm } from './execProm';
 
-const gitClone = async (msgJSON: deployRequest, CDS: CDS) => {
+const orgInitDefault = `sfdx force:org:create -f config/project-scratch-def.json -s -d 1
+sfdx force:source:push
+sfdx force:org:open`;
+
+const gitClone = async (msgJSON: DeployRequest, cds: CDS): Promise<CDS> => {
     const gitCloneCmd = utilities.getCloneCommand(msgJSON);
 
     try {
         const gitCloneResult = await execProm(gitCloneCmd, { cwd: 'tmp' });
         logger.debug(`deployQueueCheck: ${gitCloneResult.stderr}`);
-        CDS.commandResults.push({
+        cds.commandResults.push({
             command: gitCloneCmd,
             raw: gitCloneResult.stderr
         });
     } catch (err) {
         logger.warn(`deployQueueCheck: bad repo--https://github.com/${msgJSON.username}/${msgJSON.repo}.git`);
-        CDS.errors.push({
+        cds.errors.push({
             command: gitCloneCmd,
             error: err.stderr,
             raw: err
         });
-        CDS.complete = true;
+        cds.complete = true;
     }
-    return CDS;
+    return cds;
 };
 
-const prepOrgInit = async (msgJSON: deployRequest) => {
+const prepOrgInit = async (msgJSON: DeployRequest): Promise<string> => {
     const orgInitPath = `tmp/${msgJSON.deployId}/orgInit.sh`;
     logger.debug(`deployQueueCheck: going to look in the directory ${orgInitPath}`);
 
@@ -45,7 +49,7 @@ const prepOrgInit = async (msgJSON: deployRequest) => {
     return orgInitPath;
 };
 
-const prepProjectScratchDef = async (msgJSON: deployRequest) => {
+const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
     // if you passed in a custom email address, we need to edit the config file and add the adminEmail property
 
     if (msgJSON.email) {
@@ -58,7 +62,3 @@ const prepProjectScratchDef = async (msgJSON: deployRequest) => {
 };
 
 export { prepOrgInit, prepProjectScratchDef, gitClone };
-
-const orgInitDefault = `sfdx force:org:create -f config/project-scratch-def.json -s -d 1
-sfdx force:source:push
-sfdx force:org:open`;

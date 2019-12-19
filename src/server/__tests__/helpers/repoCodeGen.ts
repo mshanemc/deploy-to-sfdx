@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import fs from 'fs-extra';
 import { testRepos } from './testRepos';
 
@@ -32,7 +33,7 @@ test('non-pool grab of the org ${testRepo.username}/${testRepo.repo}/${testRepo.
 import { sfdxTimeout } from './../../helpers/testingUtils';
 import { requestAddToPool, requestBuildPool } from './../../helpers/poolHelpers';
 import { pooledOrgFinder } from './../../../lib/pooledOrgFinder'; 
-import { deployRequest } from './../../../lib/types';
+import { DeployRequest } from './../../../lib/types';
 import { cdsDelete } from './../../../lib/redisNormal';
 
 const tr = {
@@ -49,7 +50,7 @@ describe('pool for ${testRepo.username}/${testRepo.repo}', () => {
         }, sfdxTimeout);  
     
         test('retrieves an org from the pool for ${testRepo.username}/${testRepo.repo}', async () => {
-            const req: deployRequest = {
+            const req: DeployRequest = {
                 repo: tr.repo,
                 username: tr.username,
                 deployId: '${testRepo.username}-${testRepo.repo}-pool-${new Date().valueOf()}',

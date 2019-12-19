@@ -6,7 +6,7 @@ import { utilities } from '../../lib//utilities';
 import { sfdxTimeout } from '../helpers/testingUtils';
 import { execProm } from '../../lib/execProm';
 
-import { deployRequest } from '../../lib//types';
+import { DeployRequest } from '../../lib//types';
 
 const testDir = 'tmp'; // has to match what's expected by the parser
 const deployId = 'testDepId';
@@ -15,14 +15,14 @@ const testOrgInitLoc = `${testFileLoc}/orgInit.sh`;
 
 // const timeOutLocalFS = 3000;
 
-const testDepReqWL: deployRequest = {
+const testDepReqWL: DeployRequest = {
     deployId,
     repo: 'testItOut',
     whitelisted: true,
     createdTimestamp: new Date()
 };
 
-const testDepReq: deployRequest = {
+const testDepReq: DeployRequest = {
     deployId,
     repo: 'testItOut',
     whitelisted: false,
@@ -114,7 +114,7 @@ describe('lineParserLocalTests', () => {
             const fileContents = 'cat ../tmp > somewhereElse';
             await fs.writeFile(testOrgInitLoc, fileContents);
             //  await expect(deleteOrg('hack@you.bad;wget')).rejects.toEqual(Error('invalid username hack@you.bad;wget'));
-            expect(lineParse(testDepReq)).rejects.toEqual(
+            await expect(lineParse(testDepReq)).rejects.toEqual(
                 `ERROR: Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${fileContents}`
             );
         });
@@ -123,7 +123,7 @@ describe('lineParserLocalTests', () => {
             // save a local orgIinit.sh in matching deploytId
             const fileContents = 'sfdx force:org:open -u sneaky';
             await fs.writeFile(testOrgInitLoc, fileContents);
-            expect(lineParse(testDepReq)).rejects.toEqual(
+            await expect(lineParse(testDepReq)).rejects.toEqual(
                 `ERROR: Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${fileContents}`
             );
         });
@@ -132,7 +132,7 @@ describe('lineParserLocalTests', () => {
             // save a local orgIinit.sh in matching deploytId
             const fileContents = 'echo "hello world"';
             await fs.writeFile(testOrgInitLoc, fileContents);
-            expect(lineParse(testDepReq)).rejects.toEqual(
+            await expect(lineParse(testDepReq)).rejects.toEqual(
                 `ERROR: Commands must start with sfdx or be comments (security, yo!).  Your command: ${fileContents}`
             );
         });
@@ -164,7 +164,7 @@ describe('lineParserLocalTests', () => {
         for (const prop in testRepos) {
             testRepos[prop].forEach(repo => {
                 const loopedDeployId = `test-${repo.username}-${repo.repo}`;
-                const depReq: deployRequest = {
+                const depReq: DeployRequest = {
                     whitelisted: true,
                     deployId: loopedDeployId,
                     repo: repo.repo,
@@ -180,7 +180,7 @@ describe('lineParserLocalTests', () => {
                     // git clone it
                     const gitCloneCmd = utilities.getCloneCommand(depReq);
                     await execProm(gitCloneCmd, { cwd: testDir });
-                    const parsedLines = await lineParse(depReq);
+                    await lineParse(depReq);
                 });
             });
         }

@@ -1,5 +1,5 @@
 import logger from 'heroku-logger';
-import { deployRequest } from './types';
+import { DeployRequest } from './types';
 import { shellSanitize, filterAlphaHypenUnderscore } from './shellSanitize';
 import { checkWhitelist } from './checkWhitelist';
 import { getDeployId } from './namedUtilities';
@@ -7,7 +7,7 @@ import ua from 'universal-analytics';
 
 import { processWrapper } from './processWrapper';
 
-const deployMsgBuilder = function(req): deployRequest {
+const deployMsgBuilder = function(req): DeployRequest {
     // check for exploits
     const query = req.query;
 
@@ -29,7 +29,7 @@ const deployMsgBuilder = function(req): deployRequest {
     const deployId = getDeployId(username, repo);
     logger.debug(`deployMsgBuilder: template is ${template}`);
 
-    const message: deployRequest = {
+    const message: DeployRequest = {
         template,
         path,
         username,

@@ -1,7 +1,7 @@
 import * as ua from 'universal-analytics';
 
 // list of repos used for testing.  See testRepos.ts
-export interface testRepo {
+export interface TestRepo {
     username: string;
     repo: string;
     branch?: string;
@@ -14,7 +14,7 @@ export interface DeleteRequest {
     created?: Date;
 }
 
-export interface deployRequest {
+export interface DeployRequest {
     repo: string;
     createdTimestamp: Date;
     deployId: string;
@@ -37,7 +37,7 @@ export interface deployRequest {
 }
 
 // tells how a pool should be built.  Used in an array from a url like POOLCONFIG_URL=https://deployer-pools.herokuapp.com/pools-dev
-export interface poolConfig {
+export interface PoolConfig {
     user: string;
     repo: string;
     lifeHours: number;
@@ -45,7 +45,7 @@ export interface poolConfig {
     branch?: string;
 }
 
-export interface sfdxDisplayResult {
+export interface SfdxDisplayResult {
     username: string;
     id: string;
     instanceUrl?: string;
@@ -53,7 +53,7 @@ export interface sfdxDisplayResult {
 }
 
 // result of force:org:open --json
-export interface openResult {
+export interface OpenResult {
     status: number;
     result: {
         url: string;
@@ -62,12 +62,12 @@ export interface openResult {
     };
 }
 
-export interface lineParserResult {
+export interface LineParserResult {
     openLine?: string;
 }
 
 // devcenter.heroku.com/articles/platform-api-reference#dyno
-export interface herokuDyno {
+export interface HerokuDyno {
     type: string;
     created_at: Date;
     id: string;

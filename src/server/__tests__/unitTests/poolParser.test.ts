@@ -1,4 +1,3 @@
-/* globals it, describe, before, after */
 import fs from 'fs-extra';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
@@ -74,9 +73,9 @@ describe('tests the crash course workshop', () => {
     test(
         'works for a org:open only file',
         async () => {
-            expect(fs.existsSync(filepath));
+            expect(fs.existsSync(filepath)).toBe(true);
             const result = await poolParse(filepath);
-            expect(result);
+            expect(result).toBeTruthy();
             expect(result.openLine).toBe('sfdx force:org:open');
         },
         timeout
@@ -102,9 +101,9 @@ describe('tests the trial', () => {
     test(
         'works for a org:open with a path',
         async () => {
-            expect(fs.existsSync(filepath));
+            expect(fs.existsSync(filepath)).toBe(true);
             const result = await poolParse(filepath);
-            expect(result);
+            expect(result).toBeTruthy();
             expect(result.openLine).toContain('sfdx force:org:open');
             expect(result.openLine).toContain('-p');
         },
@@ -131,9 +130,9 @@ describe('tests the integration workshop', () => {
     test(
         'works with custom user password set',
         async () => {
-            expect(fs.existsSync(filepath));
+            expect(fs.existsSync(filepath)).toBe(true);
             const result = await poolParse(filepath);
-            expect(result);
+            expect(result).toBeTruthy();
             expect(result.openLine).toContain('sfdx force:org:open');
         },
         timeout

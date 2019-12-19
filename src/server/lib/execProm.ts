@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { exec } from 'child_process';
 import stripColor from 'strip-color';
 import * as util from 'util';

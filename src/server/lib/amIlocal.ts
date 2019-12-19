@@ -1,5 +1,3 @@
-const isLocal = (): boolean => {
-    return process.cwd() !== '/app';
-};
+const isLocal = (): boolean => process.cwd() !== '/app';
 
 export { isLocal };
