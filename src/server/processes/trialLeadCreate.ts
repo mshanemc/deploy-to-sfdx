@@ -8,11 +8,11 @@ import { leadCreate } from '../lib/leadSupport';
     logger.debug('Lead queue consumer is up');
     while ((await getLeadQueueSize()) > 0) {
         const lead = await getLead();
-        logger.debug('lead is ', lead);
+        // logger.debug('lead is ', lead);
         try {
             await leadCreate(lead);
         } catch (e) {
-            logger.error('error in trialLeadCreate', e);
+            // logger.error('error in trialLeadCreate', e);
             await putFailedLead(lead);
         }
     }
