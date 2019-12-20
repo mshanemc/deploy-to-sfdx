@@ -3,11 +3,6 @@
     "version": "0.0.1",
     "description": "An application that will deploy an SFDX project from a public  Github repo",
     "main": "lib/processes/web.js",
-    "engines": {
-        "yarn": "1.19.1",
-        "node": "10.17.0",
-        "npm": "6.11.3"
-    },
     "scripts": {
         "build": "lwc-services build -m production && tsc -b ./src/server",
         "local": "npm run build && heroku local dynoskimmer=1 && heroku local poolskimmer=1 && heroku local oneoffbuilder=1 && heroku local poolwatcher=1 && heroku local pooldeployer=1 && heroku local orgdeleter=1 && heroku local web=1,orgbuilder=5",
