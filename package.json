@@ -5,7 +5,8 @@
     "main": "lib/processes/web.js",
     "engines": {
         "yarn": "1.19.1",
-        "node": "10.17.0"
+        "node": "10.17.0",
+        "npm": "6.11.3"
     },
     "scripts": {
         "build": "lwc-services build -m production && tsc -b ./src/server",
