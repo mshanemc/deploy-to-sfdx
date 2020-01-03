@@ -12,7 +12,7 @@ module.exports = {
     moduleDir: './src/client/modules',
     // Array of directories where to look for additional
     // modules that don't live in `moduleDir`
-    localModulesDirs: ['node_modules'],
+    localModulesDirs: ['./node_modules/@mshanemc/lwc-oss-base/src/modules'],
     // Defines the directory layout. Using `namespaced` is easiest. Or so.
     layout: 'namespaced',
     // Default directory for source files

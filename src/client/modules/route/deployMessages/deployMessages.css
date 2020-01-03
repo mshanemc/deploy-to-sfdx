@@ -121,35 +121,6 @@ strong {
   stroke-width: 1.125px;
 }
 
-.slds-card {
-  position: relative;
-  padding: 0;
-  background: white;
-  border: 1px solid #dddbda;
-  border-radius: 0.25rem;
-  background-clip: padding-box;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
-}
-
-.slds-card + .slds-card {
-  margin-top: 1rem;
-}
-
-.slds-card__body {
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
-.slds-card__body:empty {
-  display: none;
-}
-
-.slds-card .slds-card {
-  background: white;
-  border: 0;
-  box-shadow: none;
-}
-
 .slds-template_default {
   padding: 0.75rem;
 }

@@ -1,7 +1,7 @@
 <template>
   <template if:false={results.complete}>
     <div class="section slds-m-vertical_large">
-      <base-progress-bar description={loadingDescription} progress={completionPercentage}></base-progress-bar>
+      <base-progress-bar description={loadingDescription} value={completionPercentage}></base-progress-bar>
     </div>
   </template>
 
