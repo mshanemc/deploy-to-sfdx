@@ -36,13 +36,15 @@ const lineParse = function(msgJSON: DeployRequest): Promise<string[]> {
 
         if (msgJSON.byoo) {
             // check for bash metacharacters in packageDirectories that'll deploy on byoo
-            const projectJSON = await fse.readJSON(`tmp/${msgJSON.deployId}/sfdx-project.json`);
-            const packageDirs = projectJSON.packageDirectories.map(dir => dir.path);
-            packageDirs.forEach(dir => {
-                if (!shellSanitize(dir)) {
-                    reject(`security error on projectJSON: ${dir}`);
-                }
+            fse.readJSON(`tmp/${msgJSON.deployId}/sfdx-project.json`).then(projectJSON => {
+                const packageDirs = projectJSON.packageDirectories.map(dir => dir.path);
+                packageDirs.forEach(dir => {
+                    if (!shellSanitize(dir)) {
+                        reject(`security error on projectJSON: ${dir}`);
+                    }
+                });
             });
+
             parsedLines.push(
                 `sfdx force:config:set defaultdevhubusername= defaultusername='${msgJSON.byoo.accessToken}' instanceUrl='${msgJSON.byoo.instanceUrl}'`
             );
