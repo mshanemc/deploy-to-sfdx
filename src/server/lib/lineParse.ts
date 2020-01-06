@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as fse from 'fs-extra';
 
 import logger from 'heroku-logger';
 import * as readline from 'readline';
@@ -35,16 +34,6 @@ const lineParse = function(msgJSON: DeployRequest): Promise<string[]> {
         // stuff we have to do for byoo
 
         if (msgJSON.byoo) {
-            // check for bash metacharacters in packageDirectories that'll deploy on byoo
-            fse.readJSON(`tmp/${msgJSON.deployId}/sfdx-project.json`).then(projectJSON => {
-                const packageDirs = projectJSON.packageDirectories.map(dir => dir.path);
-                packageDirs.forEach(dir => {
-                    if (!shellSanitize(dir)) {
-                        reject(`security error on projectJSON: ${dir}`);
-                    }
-                });
-            });
-
             parsedLines.push(
                 `sfdx force:config:set defaultdevhubusername= defaultusername='${msgJSON.byoo.accessToken}' instanceUrl='${msgJSON.byoo.instanceUrl}'`
             );
