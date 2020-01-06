@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "target": "es2018"
+    "target": "es2019",
+    "module": "commonjs"
   },
   "typeAcquisition": {
     "include": ["jest"]

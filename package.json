@@ -34,7 +34,7 @@
     "homepage": "https://github.com/mshanemc/deploy-to-sfdx#readme",
     "dependencies": {
         "@lifeomic/attempt": "^3.0.0",
-        "@mshanemc/lwc-oss-base": "^0.1.0",
+        "@mshanemc/lwc-oss-base": "^0.3.0",
         "@mshanemc/sfdx-migration-automatic": "^0.2.1",
         "@salesforce-ux/design-system": "^2.9.3",
         "@salesforce/analytics": "0.14.0",
@@ -48,6 +48,7 @@
         "jsforce": "^1.9.3",
         "lodash.isequal": "^4.5.0",
         "moment": "^2.24.0",
+        "navigo": "^7.1.2",
         "request-promise-native": "^1.0.7",
         "shane-sfdx-plugins": "^4.14.4",
         "strip-color": "^0.1.0",

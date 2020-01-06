@@ -1,42 +1,14 @@
-import { LightningElement, track } from 'lwc';
+import { LightningElement } from 'lwc';
+import { lwcRouter } from '@mshanemc/lwc-oss-base/src/modules/base/router/router';
+import { routeTable } from './routes';
 
 export default class Main extends LightningElement {
-  @track pathname = window.location.pathname;
-  @track params = getQueryVariables();
+  routeableArea = 'primary-content';
 
-  @track isHome = this.pathname === '/';
-  @track isError = this.pathname === '/error';
-  @track isDeployer = this.pathname.startsWith('/deploying/deployer/');
-  @track isTrial = this.pathname.startsWith('/deploying/trial/');
-  @track isDelete = this.pathname === '/deleteConfirm';
-  @track isUserInfo = this.pathname === '/userinfo';
-  @track isTestform = this.pathname === '/testform';
-  @track isByoo = this.pathname.startsWith('/byoo');
-
-  get paramsDebug() {
-    return JSON.stringify(this.params);
-  }
-
-  get deployId() {
-    return this.pathname.replace('/deploying/deployer/', '').replace('/deploying/trial/', '');
+  renderedCallback() {
+    const router = new lwcRouter({
+      targetElement: this.template.querySelector(`.${this.routeableArea}`),
+      routeTable
+    });
   }
 }
-
-const getQueryVariables = () => {
-  // console.log('query var running');
-  const output = {};
-  const query = window.location.search.substring(1);
-
-  if (query.length === 0) {
-    return output;
-  }
-  const params = query.split('&');
-
-  params.forEach(param => {
-    const pair = param.split('=');
-    output[pair[0]] = pair[1];
-  });
-
-  console.log(output);
-  return output;
-};
