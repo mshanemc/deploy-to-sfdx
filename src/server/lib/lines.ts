@@ -94,8 +94,23 @@ const lineRunner = function(msgJSON: DeployRequest, lines: string[], output: CDS
             } else if (msgJSON.byoo && localLine.includes('sfdx force:source:push')) {
                 // source push only works on scratch org or other source-tracking-enabled orgs.
                 // get the packageDirectories from the folder and modify the push command to deploy those instead
+                logger.debug(`byoo and source:push: ${localLine}`);
                 const project = await fs.readJSON(`tmp/${msgJSON.deployId}/sfdx-project.json`);
-                localLine = localLine.replace('sfdx force:source:push', `sfdx force:source:deploy -p ${getPackageDirsFromFile(project)}`);
+
+                try {
+                    localLine = localLine.replace('sfdx force:source:push', `sfdx force:source:deploy -p ${getPackageDirsFromFile(project)}`);
+                } catch (e) {
+                    const message = `security error on projectJSON: ${localLine}`;
+                    logger.error(message);
+
+                    output.errors.push({
+                        command: localLine,
+                        error: message,
+                        raw: localLine
+                    });
+                    cdsPublish(output);
+                    throw new Error(message);
+                }
             } else if (localLine.includes('sfdx automig:load')) {
                 // if the script didn't supply the concise line, make sure it's there.
                 localLine = `${argStripper(localLine, '--concise', true)} --concise`;
