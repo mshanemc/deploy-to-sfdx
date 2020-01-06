@@ -1,5 +1,6 @@
 import { PoolConfig, ProjectJSON } from './types';
 import * as crypto from 'crypto';
+import { shellSanitize } from './shellSanitize';
 
 const randomValueHex = (len: number): string =>
     crypto
@@ -18,6 +19,11 @@ const getPoolName = (pool: PoolConfig): string => {
 
 const getPackageDirsFromFile = (projectJSON: ProjectJSON): string => {
     const packageDirs = projectJSON.packageDirectories.map(dir => dir.path);
+    packageDirs.forEach(dir => {
+        if (!shellSanitize(dir)) {
+            throw new Error(`security error on projectJSON: ${dir}`);
+        }
+    });
     return packageDirs.join(',');
 };
 
