@@ -30,6 +30,8 @@ Create a connected app for JWT auth, with certificates, per the SFDX setup guide
 
 ## Environment variables
 
+you can find a list of all the env vars in <https://github.com/mshanemc/deploy-to-sfdx/blob/master/src/server/lib/processWrapper.ts>
+
 ### Required
 
 -   `HUB_USERNAME` the username from your dev hub
