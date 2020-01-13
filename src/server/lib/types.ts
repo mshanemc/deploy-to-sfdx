@@ -22,7 +22,6 @@ export interface DeployRequest {
     pool?: boolean;
     whitelisted?: boolean;
     branch?: string;
-    path?: string;
     template?: string;
     email?: string;
     firstname?: string;

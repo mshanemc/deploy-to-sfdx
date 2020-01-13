@@ -31,7 +31,6 @@ const deployMsgBuilder = function(req): DeployRequest {
 
     const message: DeployRequest = {
         template,
-        path,
         username,
         repo,
         deployId,
