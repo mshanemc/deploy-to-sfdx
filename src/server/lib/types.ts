@@ -89,3 +89,15 @@ interface PackageDirectory {
     versionName?: string;
     versionNumber?: string;
 }
+
+export interface ScratchDef {
+    orgName?: string;
+    description?: string;
+    features?: string[];
+    template?: string;
+    edition?: string;
+    username?: string;
+    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    settings?: { [key: string]: any };
+}
