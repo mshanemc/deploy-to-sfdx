@@ -77,6 +77,7 @@ app.get(
     wrapAsync(async (req, res, next) => {
         console.log(req.query.template);
         // allow repos to require the email parameter
+        // TODO: handle array of templates
         if (req.query.email === 'required') {
             return res.redirect(`/userinfo?template=${req.query.template}`);
         }
@@ -184,6 +185,7 @@ app.get('*', (req, res, next) => {
 app.use((error, req, res, next) => {
     if (processWrapper.UA_ID) {
         const visitor = ua(processWrapper.UA_ID);
+        // TODO handle array of templates
         visitor.event('Error', req.query.template).send();
     }
     logger.error(`request failed: ${req.url}`);
