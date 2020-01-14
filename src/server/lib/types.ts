@@ -15,14 +15,13 @@ export interface DeleteRequest {
 }
 
 export interface DeployRequest {
-    repo: string;
+    repo: string; // deprecated...moving to array to support multi
     createdTimestamp: Date;
     deployId: string;
-    username?: string;
+    username?: string; // deprecated...moving to array to support multi
     pool?: boolean;
-    whitelisted?: boolean;
-    branch?: string;
-    template?: string;
+    whitelisted?: boolean; // deprecated...moving to array to support multi
+    branch?: string; // deprecated...moving to array to support multi
     email?: string;
     firstname?: string;
     lastname?: string;
@@ -33,6 +32,15 @@ export interface DeployRequest {
         username: string;
         orgId: string;
     };
+    repos?: DeployRequestRepo[]; // new version to hold multiples, support more sources
+}
+
+export interface DeployRequestRepo {
+    source: string; // defaults to github for now
+    username: string;
+    repo: string;
+    branch?: string;
+    whitelisted?: boolean;
 }
 
 // tells how a pool should be built.  Used in an array from a url like POOLCONFIG_URL=https://deployer-pools.herokuapp.com/pools-dev

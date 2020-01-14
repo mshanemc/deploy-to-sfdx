@@ -1,5 +1,5 @@
 import logger from 'heroku-logger';
-import { DeployRequest } from './types';
+import { DeployRequest, DeployRequestRepo } from './types';
 import { shellSanitize, filterAlphaHypenUnderscore } from './shellSanitize';
 import { checkWhitelist } from './checkWhitelist';
 import { getDeployId } from './namedUtilities';
@@ -7,35 +7,58 @@ import ua from 'universal-analytics';
 
 import { processWrapper } from './processWrapper';
 
-const deployMsgBuilder = function(req): DeployRequest {
-    // check for exploits
-    const query = req.query;
-
+const validateQuery = (query): void => {
     for (const prop in query) {
         if (!shellSanitize(query[prop])) {
             throw new Error(`unsafe query parameter ${prop}`);
         }
     }
 
-    if (!query.template || !query.template.includes('https://github.com/')) {
+    if (!query.template) {
         throw 'There should be a github repo in that url.  Example: /launch?template=https://github.com/you/repo';
     }
+};
 
-    const template = query.template;
-    const path = template.replace('https://github.com/', '');
-    const username = filterAlphaHypenUnderscore(path.split('/')[0]);
-    const repo = filterAlphaHypenUnderscore(path.split('/')[1]);
+const deployMsgBuilder = function(req): DeployRequest {
+    validateQuery(req.query); // check for exploits
+    const query = req.query;
+    let templates = [];
 
-    const deployId = getDeployId(username, repo);
-    logger.debug(`deployMsgBuilder: template is ${template}`);
+    // now it'll definitely be an array!
+    if (Array.isArray(query.template)) {
+        templates = query.template;
+    } else {
+        templates.push(query.template);
+    }
+
+    const repos = [];
+
+    for (const template of templates) {
+        const path = template.replace('https://github.com/', '');
+
+        logger.debug(`deployMsgBuilder: template is ${template}`);
+        const username = filterAlphaHypenUnderscore(path.split('/')[0]);
+        const repo = filterAlphaHypenUnderscore(path.split('/')[1]);
+        const repoForDR: DeployRequestRepo = {
+            source: 'github',
+            username,
+            repo,
+            branch: path.includes('/tree/') ? filterAlphaHypenUnderscore(path.split('/tree/')[1]) : undefined,
+            whitelisted: checkWhitelist(username, repo)
+        };
+        repos.push(repoForDR);
+    }
+
+    const deployId = getDeployId(repos[0].username, repos[0].repo);
 
     const message: DeployRequest = {
-        template,
-        username,
-        repo,
+        username: repos[0].username,
+        repo: repos[0].repo,
+        branch: repos[0].branch,
         deployId,
         createdTimestamp: new Date(),
-        whitelisted: checkWhitelist(username, repo)
+        whitelisted: checkWhitelist(repos[0].username, repos[0].repo),
+        repos
     };
 
     if (req.byoo) {
@@ -68,11 +91,6 @@ const deployMsgBuilder = function(req): DeployRequest {
 
     if (query.pool) {
         message.pool = true;
-    }
-
-    if (path.includes('/tree/')) {
-        // we're dealing with a branch.  Only allow alphanumeric, hyphen, underscore
-        message.branch = filterAlphaHypenUnderscore(path.split('/tree/')[1]);
     }
 
     logger.debug('deployMsgBuilder: done', message);

@@ -10,6 +10,7 @@ sfdx force:source:push
 sfdx force:org:open`;
 
 const gitClone = async (msgJSON: DeployRequest, cds: CDS): Promise<CDS> => {
+    // single repo option
     const gitCloneCmd = utilities.getCloneCommand(msgJSON);
 
     try {

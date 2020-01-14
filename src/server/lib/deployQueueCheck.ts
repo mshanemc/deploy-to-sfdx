@@ -19,7 +19,7 @@ const check = async (): Promise<boolean> => {
     }
 
     try {
-        msgJSON.visitor.event('Deploy Request', msgJSON.template).send();
+        msgJSON.visitor.event('Deploy Request', `${msgJSON.username}-${msgJSON.repo}`).send();
     } catch (e) {
         logger.warn('failed to send GA event');
     }

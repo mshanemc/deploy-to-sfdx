@@ -39,8 +39,8 @@ const commonDeploy = async (req, url: string) => {
 
     if (message.visitor) {
         message.visitor.pageview(url).send();
-        if (typeof message.template === 'string') {
-            message.visitor.event('Repo', message.template).send();
+        if (typeof message.username === 'string' && typeof message.repo === 'string') {
+            message.visitor.event('Repo', `${message.username}-${message.repo}`).send();
         }
     }
 
@@ -75,6 +75,7 @@ app.post(
 app.get(
     '/launch',
     wrapAsync(async (req, res, next) => {
+        console.log(req.query.template);
         // allow repos to require the email parameter
         if (req.query.email === 'required') {
             return res.redirect(`/userinfo?template=${req.query.template}`);

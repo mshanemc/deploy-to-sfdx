@@ -77,15 +77,6 @@ const utilities = {
         }
     },
 
-    loggerFunction: (result: { stdout: string; stderr: string }): void => {
-        if (result.stdout) {
-            logger.debug(result.stdout);
-        }
-        if (result.stderr) {
-            logger.debug(result.stderr);
-        }
-    },
-
     // fix double // inside a url by sfdx cli force:org:open
     urlFix: (input: OpenResult): OpenResult => {
         if (input.result.url && input.result.url.includes('.com//secur/')) {
