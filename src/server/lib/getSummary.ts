@@ -4,7 +4,7 @@ import { commandSummary } from './CDS';
 import { processWrapper } from './processWrapper';
 
 export const getSummary = (localLine: string, msgJSON: DeployRequest): commandSummary => {
-    if (localLine.includes('sfdx force:org:open') && !localLine.includes(' -r')) {
+    if (localLine.includes('sfdx force:org:open')) {
         return commandSummary.OPEN;
         // localLine = `${localLine} -r`;
     } else if (localLine.includes(':user:password')) {

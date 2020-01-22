@@ -1,9 +1,10 @@
 import logger from 'heroku-logger';
 import * as readline from 'readline';
 import * as fs from 'fs-extra';
+import { commandRewriter, getCommandsWithFileFlagsMap } from '../lib/flagTypeFromCommandHelp';
 
 const fileToLines = (filePath: string): Promise<string[]> => {
-    const parsedLines = [];
+    let parsedLines = [];
     return new Promise(resolve => {
         readline
             .createInterface({
@@ -17,8 +18,15 @@ const fileToLines = (filePath: string): Promise<string[]> => {
                 }
                 parsedLines.push(line);
             })
-            .on('close', () => {
+            .on('close', async () => {
                 // you have all the parsed lines
+                // TODO: translate to base command, and if necessary, prepand the filepath to certain flag arguments
+                // normal tmp/deployid/orgInit.sh.  multirepo: tmp/deployid/repo/orgInit.sh
+                if (filePath.split('/').length > 3) {
+                    console.log(filePath);
+                    const commandMap = await getCommandsWithFileFlagsMap();
+                    parsedLines = await Promise.all(parsedLines.map(line => commandRewriter(filePath.split('/')[2], line, commandMap)));
+                }
                 logger.debug(`fileToLines: Lines from ${filePath}: ${parsedLines.join(',')}`);
                 resolve(parsedLines.filter(line => line !== ''));
             });

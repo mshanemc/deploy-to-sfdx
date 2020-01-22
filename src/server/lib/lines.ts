@@ -4,7 +4,7 @@ import stripColor from 'strip-color';
 
 import { DeployRequest, SfdxDisplayResult } from './types';
 import { utilities } from './utilities';
-import { getArg } from './namedUtilities';
+import { getArg, isByoo } from './namedUtilities';
 import { lineParse } from './lineParse';
 import { cdsPublish, deleteOrg } from './redisNormal';
 import { exec, exec2JSON } from './execProm';
@@ -20,7 +20,7 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
     let lines;
     try {
         lines = await lineParse(msgJSON);
-        output.lineCount = lines.length + 1;
+        output.lineCount = isByoo(msgJSON) ? lines.length + 2 : lines.length + 1;
         await cdsPublish(output); //1 extra to account for the git clone command
     } catch (e) {
         output.errors.push({
@@ -116,7 +116,7 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
             }
 
             // finally, publish the CDS to redis so clients can access the latest updates
-            cdsPublish({ ...output, currentCommand: '' });
+            cdsPublish({ ...output, currentCommand: undefined });
         } catch (e) {
             if (msgJSON.pool && output.mainUser && output.mainUser.username) {
                 // delete an org if one got created and it's a pool
@@ -129,7 +129,7 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                 error: `${JSON.parse(e.stdout).name}: ${JSON.parse(e.stdout).message}`,
                 raw: JSON.parse(e.stdout)
             });
-            output = { ...output, complete: true, currentCommand: '' };
+            output = { ...output, complete: true, currentCommand: undefined };
             cdsPublish(output);
 
             // and throw so the requester can do the rest of logging to heroku logs and GA
@@ -143,6 +143,7 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
         ...output,
         complete: true,
         completeTimestamp: new Date(),
+        currentCommand: undefined,
         instanceUrl: displayResults.instanceUrl,
         expirationDate: displayResults.expirationDate
     };

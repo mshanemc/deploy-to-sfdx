@@ -1,10 +1,10 @@
 import fs from 'fs-extra';
 
-import { testRepos } from '../helpers/testRepos';
+// import { testRepos } from '../helpers/testRepos';
 import { lineParse, securityAssertions, jsonify, byooFilter, getMaxDays, multiOrgCorrections } from '../../lib/lineParse';
-import { getCloneCommands } from '../../lib/namedUtilities';
-import { sfdxTimeout } from '../helpers/testingUtils';
-import { execProm } from '../../lib/execProm';
+// import { getCloneCommands } from '../../lib/namedUtilities';
+// import { sfdxTimeout } from '../helpers/testingUtils';
+// import { execProm } from '../../lib/execProm';
 
 import { DeployRequest } from '../../lib//types';
 import { filesToLines } from '../../lib/fileToLines';
