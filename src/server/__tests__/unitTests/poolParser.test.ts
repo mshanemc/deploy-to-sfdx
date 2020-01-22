@@ -59,7 +59,7 @@ describe('poolURLTest', () => {
     );
 });
 
-describe('tests the crash course workshop', () => {
+describe.skip('tests the crash course workshop', () => {
     const repo = 'df17AppBuilding';
     const tmpDir = path.join(__dirname, '../../poolParsed');
     const filepath = path.join(tmpDir, repo, 'orgInit.sh');
@@ -87,7 +87,7 @@ describe('tests the crash course workshop', () => {
     });
 });
 
-describe('tests the trial', () => {
+describe.skip('tests the trial', () => {
     const repo = 'platformTrial';
     const tmpDir = path.join(__dirname, '../../poolParserTestRepoTrial');
     const filepath = path.join(tmpDir, repo, 'orgInit.sh');
@@ -116,7 +116,7 @@ describe('tests the trial', () => {
     }, timeout);
 });
 
-describe('tests the integration workshop', () => {
+describe.skip('tests the integration workshop', () => {
     const repo = 'DF17integrationWorkshops';
     const tmpDir = path.join(__dirname, '../../poolPraseIntegration');
     const filepath = path.join(tmpDir, repo, 'orgInit.sh');

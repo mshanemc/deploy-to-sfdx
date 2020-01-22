@@ -44,7 +44,9 @@ describe('makes a valid file', () => {
             projectJSONs: [fileSimple, MultiPathsWithDefaults],
             localFilePaths: ['fileSimple', 'MultiPathsWithDefaults']
         });
-        for (const dir of result.packageDirectories) {
+        expect(result.packageDirectories[0].default).toBe(true);
+
+        for (const dir of result.packageDirectories.slice(1)) {
             expect(dir.default).toBeFalsy();
         }
     });
