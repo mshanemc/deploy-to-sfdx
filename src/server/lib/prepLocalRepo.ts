@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import logger from 'heroku-logger';
 import { DeployRequest } from './types';
-import { getCloneCommands, isMultiRepo } from './namedUtilities';
+import { getCloneCommands, isMultiRepo, isByoo } from './namedUtilities';
 import { CDS } from './CDS';
 import { execProm } from './execProm';
 import { buildScratchDef } from './multirepo/buildScratchDefs';
@@ -48,7 +48,7 @@ const prepOrgInit = async (msgJSON: DeployRequest): Promise<string> => {
     const orgInitPath = `tmp/${msgJSON.deployId}/orgInit.sh`;
     logger.debug(`deployQueueCheck: going to look in the directory ${orgInitPath}`);
 
-    if (msgJSON.byoo) {
+    if (isByoo(msgJSON)) {
         const byooInitPath = `tmp/${msgJSON.deployId}/byooInit.sh`;
         if (fs.existsSync(byooInitPath)) {
             // it's byoo and you have a special byoo file that supercedes orgInit.sh
