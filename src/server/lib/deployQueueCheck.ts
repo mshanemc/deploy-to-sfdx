@@ -3,6 +3,7 @@ import logger from 'heroku-logger';
 import { getDeployRequest } from './redisNormal';
 import { pooledOrgFinder } from './pooledOrgFinder';
 import { build } from './commonBuild';
+import { isByoo } from './namedUtilities';
 
 import { DeployRequest } from './types';
 
@@ -25,7 +26,7 @@ const check = async (): Promise<boolean> => {
     }
 
     // don't use org pools for byoo
-    if (!msgJSON.byoo && (await pooledOrgFinder(msgJSON))) {
+    if (!isByoo(msgJSON) && (await pooledOrgFinder(msgJSON))) {
         logger.debug('deployQueueCheck: using a pooled org');
     } else {
         await build(msgJSON);
