@@ -19,7 +19,7 @@ const validateQuery = (query): void => {
     }
 };
 
-const deployMsgBuilder = function(req): DeployRequest {
+const deployMsgBuilder = (req): DeployRequest => {
     validateQuery(req.query); // check for exploits
     const query = req.query;
     let templates = [];

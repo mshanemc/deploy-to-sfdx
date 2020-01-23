@@ -13,10 +13,14 @@ describe("tests the skimmer's expiration checks", () => {
     test('handles empty pool', async () => {
         await redis.del('mshanemc.notapool');
         const result = await checkExpiration({
-            user: 'mshanemc',
-            repo: 'notapool',
             lifeHours: 12,
-            quantity: 4
+            quantity: 4,
+            repos: [
+                {
+                    username: 'mshanemc',
+                    repo: 'notapool'
+                }
+            ]
         });
         expect(result).toBe(`pool mshanemc.notapool is empty`);
         await redis.del('mshanemc.notapool');
@@ -33,10 +37,14 @@ describe("tests the skimmer's expiration checks", () => {
 
         await redis.rpush('mshanemc.finepool', ...messages);
         const result = await checkExpiration({
-            user: 'mshanemc',
-            repo: 'finepool',
             lifeHours: 12,
-            quantity: 4
+            quantity: 4,
+            repos: [
+                {
+                    username: 'mshanemc',
+                    repo: 'finepool'
+                }
+            ]
         });
         expect(result).toBe(`all the orgs in pool mshanemc.finepool are fine`);
         await redis.del('mshanemc.finepool');
@@ -69,10 +77,14 @@ describe("tests the skimmer's expiration checks", () => {
 
         await redis.rpush('mshanemc.mixedpool', ...messages);
         const result = await checkExpiration({
-            user: 'mshanemc',
-            repo: 'mixedpool',
             lifeHours: 12,
-            quantity: 4
+            quantity: 4,
+            repos: [
+                {
+                    username: 'mshanemc',
+                    repo: 'mixedpool'
+                }
+            ]
         });
         expect(result).toBe(`queueing for deletion 2 expired orgs from pool mshanemc.mixedpool`);
         await redis.del('mshanemc.mixedpool');

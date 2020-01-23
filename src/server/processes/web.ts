@@ -75,11 +75,13 @@ app.post(
 app.get(
     '/launch',
     wrapAsync(async (req, res, next) => {
-        console.log(req.query.template);
         // allow repos to require the email parameter
-        // TODO: handle array of templates
         if (req.query.email === 'required') {
-            return res.redirect(`/userinfo?template=${req.query.template}`);
+            return res.redirect(
+                Array.isArray(req.query.template)
+                    ? `/userinfo?template=${req.query.template[0]}&template=${req.query.template.slice(1).join('&template=')}`
+                    : `/userinfo?template=${req.query.template}`
+            );
         }
 
         const message = await commonDeploy(req, '/launch');

@@ -9,9 +9,9 @@ describe('urlTestsMaster', () => {
         };
 
         const message = deployMsgBuilder(req);
-        expect(message.repo).toBe('cg4Integrate');
-        expect(message.username).toBe('mshanemc');
-        expect(message.branch).toBeUndefined();
+        expect(message.repos[0].repo).toBe('cg4Integrate');
+        expect(message.repos[0].username).toBe('mshanemc');
+        expect(message.repos[0].branch).toBeUndefined();
 
         // multi
         expect(message.repos).toHaveLength(1);
@@ -22,8 +22,8 @@ describe('urlTestsMaster', () => {
         expect(message.deployId).toBeTruthy();
         // username-repo-timestamp
         expect(message.deployId.split('-').length).toBe(3);
-        expect(message.deployId.split('-')[0]).toBe(message.username);
-        expect(message.deployId.split('-')[1]).toBe(message.repo);
+        expect(message.deployId.split('-')[0]).toBe(message.repos[0].username);
+        expect(message.deployId.split('-')[1]).toBe(message.repos[0].repo);
     });
 });
 
@@ -36,9 +36,6 @@ describe('urlTestsBranch', () => {
         };
 
         const message = deployMsgBuilder(req);
-        expect(message.username).toBe('mshanemc');
-        expect(message.repo).toBe('cg4Integrate');
-        expect(message.branch).toBe('passwordSet');
         expect(message.firstname).toBeUndefined();
         expect(message.lastname).toBeUndefined();
         expect(message.email).toBeUndefined();
@@ -53,8 +50,8 @@ describe('urlTestsBranch', () => {
         expect(message.deployId).toBeTruthy();
         // username-repo-timestamp
         expect(message.deployId.split('-').length).toBe(3);
-        expect(message.deployId.split('-')[0]).toBe(message.username);
-        expect(message.deployId.split('-')[1]).toBe(message.repo);
+        expect(message.deployId.split('-')[0]).toBe(message.repos[0].username);
+        expect(message.deployId.split('-')[1]).toBe(message.repos[0].repo);
     });
 
     test('prevents bad urls', () => {
@@ -81,9 +78,9 @@ describe('userinfo', () => {
 
         const message = deployMsgBuilder(req);
 
-        expect(message.username).toBe('mshanemc');
-        expect(message.repo).toBe('cg4Integrate');
-        expect(message.branch).toBe('passwordSet');
+        expect(message.repos[0].username).toBe('mshanemc');
+        expect(message.repos[0].repo).toBe('cg4Integrate');
+        expect(message.repos[0].branch).toBe('passwordSet');
         expect(message.firstname).toBe('shane');
         expect(message.lastname).toBe('mclaughlin');
         expect(message.email).toBe('shane.mclaughlin@salesforce.com');
@@ -91,8 +88,8 @@ describe('userinfo', () => {
         expect(message.deployId).toBeTruthy();
         // username-repo-timestamp
         expect(message.deployId.split('-').length).toBe(3);
-        expect(message.deployId.split('-')[0]).toBe(message.username);
-        expect(message.deployId.split('-')[1]).toBe(message.repo);
+        expect(message.deployId.split('-')[0]).toBe(message.repos[0].username);
+        expect(message.deployId.split('-')[1]).toBe(message.repos[0].repo);
     });
 });
 
@@ -119,8 +116,8 @@ describe('multi-template', () => {
         expect(message.deployId).toBeTruthy();
         // username-repo-timestamp
         expect(message.deployId.split('-').length).toBe(3);
-        expect(message.deployId.split('-')[0]).toBe(message.username);
-        expect(message.deployId.split('-')[1]).toBe(message.repo);
+        expect(message.deployId.split('-')[0]).toBe(message.repos[0].username);
+        expect(message.deployId.split('-')[1]).toBe(message.repos[0].repo);
     });
 
     test('handles breanch in array of tempalte', () => {
@@ -145,7 +142,7 @@ describe('multi-template', () => {
         expect(message.deployId).toBeTruthy();
         // username-repo-timestamp
         expect(message.deployId.split('-').length).toBe(3);
-        expect(message.deployId.split('-')[0]).toBe(message.username);
-        expect(message.deployId.split('-')[1]).toBe(message.repo);
+        expect(message.deployId.split('-')[0]).toBe(message.repos[0].username);
+        expect(message.deployId.split('-')[1]).toBe(message.repos[0].repo);
     });
 });

@@ -14,7 +14,6 @@ describe('deployReq test-deploy-iding', () => {
     test('handles single repo', () => {
         const req: DeployRequest = {
             ...baseObj,
-            repo: repo1,
             repos: [
                 {
                     username,
@@ -34,7 +33,6 @@ describe('deployReq test-deploy-iding', () => {
     test('handles single repo with branch', () => {
         const req: DeployRequest = {
             ...baseObj,
-            repo: repo1,
             repos: [
                 {
                     username,
@@ -55,7 +53,6 @@ describe('deployReq test-deploy-iding', () => {
     test('handles multi repo', () => {
         const req: DeployRequest = {
             ...baseObj,
-            repo: repo1,
             repos: [
                 {
                     username,

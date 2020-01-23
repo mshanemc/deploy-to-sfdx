@@ -32,7 +32,7 @@ export interface DeployRequest {
 }
 
 export interface DeployRequestRepo {
-    source: string; // defaults to github for now
+    source?: string; // defaults to github for now
     username: string;
     repo: string;
     branch?: string;

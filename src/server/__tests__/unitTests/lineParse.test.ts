@@ -20,7 +20,6 @@ const harmlessCommandWithJson = `${harmlessCommand} --json`;
 
 const testDepReqWL: DeployRequest = {
     deployId,
-    repo: 'testItOut',
     createdTimestamp: new Date(),
     repos: [
         {
@@ -34,7 +33,6 @@ const testDepReqWL: DeployRequest = {
 
 const testDepReqWLMulti: DeployRequest = {
     deployId,
-    repo: 'testItOut',
     createdTimestamp: new Date(),
     repos: [
         {
@@ -159,7 +157,7 @@ describe('end-to-end tests', () => {
         expect(results.every(line => line.includes(' --json'))).toBe(true);
     });
 
-    test('multi byoo', async () => {});
+    test.skip('multi byoo', async () => {});
 
     afterAll(async () => {
         await fs.remove(testDir);

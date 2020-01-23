@@ -23,8 +23,12 @@ import { CDS } from '../../lib/CDS';
 
 jest.setTimeout(7000);
 const deployMsgTest: DeployRequest = {
-    repo: 'testRepo',
-    username: 'mshanemc',
+    repos: [
+        {
+            repo: 'testRepo',
+            username: 'mshanemc'
+        }
+    ],
     deployId: 'this-is-the-deploy-id',
     createdTimestamp: new Date()
 };
@@ -102,29 +106,41 @@ test('properly counts poolDeploys', async () => {
     const mainRepo = 'redisTestRepo1';
 
     const pool: PoolConfig = {
-        user: username,
-        repo: mainRepo,
         quantity: 1,
-        lifeHours: 12
+        lifeHours: 12,
+        repos: [
+            {
+                repo: mainRepo,
+                username: 'mshanemc'
+            }
+        ]
     };
 
     const originalPoolSize = await getPoolDeployRequestQueueSize();
     const originalMainRepoSize = await getPoolDeployCountByRepo(pool);
 
+    // console.log(`original size is ${originalMainRepoSize}`);
+
     const req: DeployRequest = {
-        username: username,
-        repo: mainRepo,
+        repos: [
+            {
+                repo: mainRepo,
+                username
+            }
+        ],
         deployId: encodeURIComponent(`${username}-${mainRepo}-${new Date().valueOf()}`),
-        whitelisted: true,
         pool: true,
         createdTimestamp: new Date()
     };
 
     const req2: DeployRequest = {
-        username: username,
-        repo: 'redisTestRepo2',
-        deployId: encodeURIComponent(`${username}-else-${new Date().valueOf()}`),
-        whitelisted: true,
+        repos: [
+            {
+                repo: 'redisTestRepo2',
+                username
+            }
+        ],
+        deployId: encodeURIComponent(`${username}-redisTestRepo2-${new Date().valueOf()}`),
         pool: true,
         createdTimestamp: new Date()
     };
