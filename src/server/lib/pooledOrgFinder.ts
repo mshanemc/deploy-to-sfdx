@@ -4,6 +4,7 @@ import * as path from 'path';
 import { retry } from '@lifeomic/attempt';
 
 import { utilities } from './utilities';
+import { getPoolKey } from './namedUtilities';
 import { getPooledOrg, cdsPublish } from './redisNormal';
 import { getKeypath } from './hubAuth';
 import { timesToGA } from './timeTracking';
@@ -17,10 +18,10 @@ const retryOptions = { maxAttempts: 60, delay: 5000 };
 const pooledOrgFinder = async function(deployReq: DeployRequest, forcePool = false) {
     try {
         if (!processWrapper.POOLCONFIG_URL && !forcePool) {
-            return undefined;
+            return undefined; // not set up for pools, exit quickly
         }
 
-        let cds = await getPooledOrg(await utilities.getKey(deployReq), true);
+        let cds = await getPooledOrg(getPoolKey(deployReq), true);
         cds = {
             ...cds,
             buildStartTime: new Date(),
@@ -30,10 +31,8 @@ const pooledOrgFinder = async function(deployReq: DeployRequest, forcePool = fal
             isPool: false
         };
 
-        await cdsPublish(cds);
-
         const uniquePath = path.join(__dirname, '../tmp/pools', cds.orgId);
-        fs.ensureDirSync(uniquePath);
+        await Promise.all([cdsPublish(cds), fs.ensureDir(uniquePath)]);
 
         // `sfdx force:auth:jwt:grant --json --clientid ${processWrapper.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${keypath} --instanceurl ${cds.instanceUrl || 'https://test.salesforce.com'} -s`,
         const jwtComand = `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
@@ -57,17 +56,26 @@ const pooledOrgFinder = async function(deployReq: DeployRequest, forcePool = fal
         const openOutput = await exec2JSON(`${cds.poolLines.openLine} --json -r`, {
             cwd: uniquePath
         });
-        // const openOutput = JSON.parse(stripColor(openResult.stdout));
 
-        cds.openTimestamp = new Date();
-        cds.completeTimestamp = new Date();
-        cds.mainUser = {
-            ...cds.mainUser,
-            loginUrl: utilities.urlFix(openOutput).result.url
+        // cds.openTimestamp = new Date();
+        // cds.completeTimestamp = new Date();
+        // cds.mainUser = {
+        //     ...cds.mainUser,
+        //     loginUrl: utilities.urlFix(openOutput).result.url
+        // };
+        // cds.mainUser.permalink = loginURL(cds);
+        // cds.complete = true;
+        cds = {
+            ...cds,
+            complete: true,
+            openTimestamp: new Date(),
+            completeTimestamp: new Date(),
+            mainUser: {
+                ...cds.mainUser,
+                permalink: loginURL(cds),
+                loginUrl: utilities.urlFix(openOutput).result.url
+            }
         };
-        cds.mainUser.permalink = loginURL(cds);
-        cds.complete = true;
-
         logger.debug(`opened : ${openOutput}`);
         await Promise.all([cdsPublish(cds), timesToGA(deployReq, cds)]);
 

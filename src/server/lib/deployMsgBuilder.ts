@@ -52,12 +52,8 @@ const deployMsgBuilder = function(req): DeployRequest {
     const deployId = getDeployId(repos[0].username, repos[0].repo);
 
     const message: DeployRequest = {
-        username: repos[0].username,
-        repo: repos[0].repo,
-        branch: repos[0].branch,
         deployId,
         createdTimestamp: new Date(),
-        whitelisted: checkWhitelist(repos[0].username, repos[0].repo),
         repos
     };
 

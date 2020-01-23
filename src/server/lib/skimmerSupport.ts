@@ -14,10 +14,9 @@ import {
     getDeleteRequest
 } from './redisNormal';
 import { PoolConfig } from './types';
-import { utilities } from './utilities';
 import { herokuDelete } from './herokuDelete';
 import { exec2JSON } from './execProm';
-import { getPoolName } from './namedUtilities';
+import { getPoolName, getPoolConfig } from './namedUtilities';
 import { CDS } from './CDS';
 import { processWrapper } from './processWrapper';
 
@@ -59,7 +58,7 @@ const checkExpiration = async (pool: PoolConfig): Promise<string> => {
 };
 
 const skimmer = async (): Promise<void> => {
-    const pools = await utilities.getPoolConfig();
+    const pools = await getPoolConfig();
     const promises: Promise<string>[] = [];
 
     pools.forEach(pool => {
@@ -89,23 +88,27 @@ const doesOrgExist = async (username: string): Promise<boolean> => {
     }
 };
 
+/**
+ * If an org has already expired or been deleted (including due to  errors on org:create) then this will delete its related Heroku apps
+ */
 const herokuExpirationCheck = async (): Promise<void> => {
     const herokuCDSs = await getHerokuCDSs();
 
-    if (herokuCDSs.length > 0) {
-        if (!processWrapper.HEROKU_API_KEY) {
-            logger.warn('there is no heroku API key');
-        } else {
-            for (const cds of herokuCDSs) {
-                // see if the org is deleted
-                const exists = await doesOrgExist(cds.mainUser.username);
-                if (!exists) {
-                    // if deleted or errored on create, do the heroku delete thing
-                    for (const appName of await getAppNamesFromHerokuCDSs(cds.mainUser.username)) {
-                        await herokuDelete(appName);
-                        logger.debug(`deleted heroku app with name ${appName}`);
-                    }
-                }
+    if (herokuCDSs.length <= 0) {
+        return;
+    }
+    if (!processWrapper.HEROKU_API_KEY) {
+        logger.warn('there is no heroku API key');
+        return;
+    }
+
+    for (const cds of herokuCDSs) {
+        // see if the org is deleted
+        if (!(await doesOrgExist(cds.mainUser.username))) {
+            // if deleted or errored on create, do the heroku delete thing
+            for (const appName of await getAppNamesFromHerokuCDSs(cds.mainUser.username)) {
+                await herokuDelete(appName);
+                logger.debug(`deleted heroku app with name ${appName}`);
             }
         }
     }
@@ -132,24 +135,23 @@ const processDeleteQueue = async (): Promise<void> => {
             while ((await getDeleteQueueSize()) > 0) {
                 // pull from the delete Request Queue
                 const deleteReq = await getDeleteRequest();
-                try {
-                    logger.debug(`deleting org with username ${deleteReq.username}`);
-                    await exec2JSON(
-                        `sfdx force:data:record:delete -u ${processWrapper.HUB_USERNAME} -s ActiveScratchOrg -w "SignupUsername='${deleteReq.username}'" --json`
-                    );
-                } catch (e) {
+                logger.debug(`deleting org with username ${deleteReq.username}`);
+
+                await exec2JSON(
+                    `sfdx force:data:record:delete -u ${processWrapper.HUB_USERNAME} -s ActiveScratchOrg -w "SignupUsername='${deleteReq.username}'" --json`
+                ).catch(e => {
                     logger.error(e);
                     logger.warn(`unable to delete org with username: ${deleteReq.username}`);
-                }
+                });
 
                 // go through the herokuCDS for the username
                 for (const appName of await getAppNamesFromHerokuCDSs(deleteReq.username, false)) {
                     try {
                         await herokuDelete(appName);
+                        logger.debug(`deleted heroku app with name ${appName}`);
                     } catch (e) {
                         logger.error(e);
                     }
-                    logger.debug(`deleted heroku app with name ${appName}`);
                 }
             }
         } catch (e) {

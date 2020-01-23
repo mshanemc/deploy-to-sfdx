@@ -8,6 +8,8 @@ import jsforce from 'jsforce';
 import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish, putLead } from '../lib/redisNormal';
 import { deployMsgBuilder } from '../lib/deployMsgBuilder';
 import { utilities } from '../lib/utilities';
+import { getPoolKey } from '../lib/namedUtilities';
+
 import { processWrapper } from '../lib/processWrapper';
 
 import { DeployRequest } from '../lib/types';
@@ -39,9 +41,7 @@ const commonDeploy = async (req, url: string) => {
 
     if (message.visitor) {
         message.visitor.pageview(url).send();
-        if (typeof message.username === 'string' && typeof message.repo === 'string') {
-            message.visitor.event('Repo', `${message.username}-${message.repo}`).send();
-        }
+        message.visitor.event('Repo', getPoolKey(message, '-')).send();
     }
 
     utilities.runHerokuBuilder();

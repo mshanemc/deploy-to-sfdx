@@ -15,13 +15,9 @@ export interface DeleteRequest {
 }
 
 export interface DeployRequest {
-    repo: string; // deprecated...moving to array to support multi
     createdTimestamp: Date;
     deployId: string;
-    username?: string; // deprecated...moving to array to support multi
     pool?: boolean;
-    whitelisted?: boolean; // deprecated...moving to array to support multi
-    branch?: string; // deprecated...moving to array to support multi
     email?: string;
     firstname?: string;
     lastname?: string;
@@ -45,11 +41,15 @@ export interface DeployRequestRepo {
 
 // tells how a pool should be built.  Used in an array from a url like POOLCONFIG_URL=https://deployer-pools.herokuapp.com/pools-dev
 export interface PoolConfig {
-    user: string;
-    repo: string;
     lifeHours: number;
     quantity: number;
-    branch?: string;
+    repos?: DeployRequestRepo[];
+}
+
+export interface PoolConfigDeprecated extends PoolConfig {
+    username?: string; // deprecated.  Use repos for multi
+    repo?: string; // deprecated.  Use repos for multi
+    branch?: string; // deprecated.  Use repos for multi
 }
 
 export interface SfdxDisplayResult {

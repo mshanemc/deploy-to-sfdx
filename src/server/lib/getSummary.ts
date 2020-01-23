@@ -33,14 +33,14 @@ export const getSummary = (localLine: string, msgJSON: DeployRequest): commandSu
         if (!processWrapper.HEROKU_API_KEY) {
             // check that heroku API key is defined in processWrapper
             logger.error('there is no HEROKU_API_KEY defined, but shane:heroku:repo:deploy is used in an .orgInit', {
-                repo: `${msgJSON.username}/${msgJSON.repo}`
+                repo: `${msgJSON.repos[0].username}/${msgJSON.repos[0].repo}`
             });
         }
         return commandSummary.HEROKU_DEPLOY;
     } else {
         logger.info('unhandled command will show up directly in the UI', {
             command: localLine,
-            repo: `${msgJSON.username}/${msgJSON.repo}`
+            repo: `${msgJSON.repos[0].username}/${msgJSON.repos[0].repo}`
         });
         return undefined;
     }

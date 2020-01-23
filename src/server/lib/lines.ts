@@ -32,7 +32,13 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
         cdsPublish(output);
         return output;
     }
-
+    // remove the open line(s) for pools and put them on the CDS
+    if (msgJSON.pool) {
+        output.poolLines = {
+            openLine: lines.find(line => line.includes('org:open'))
+        };
+        lines = lines.filter(line => !line.includes('org:open'));
+    }
     logger.debug('starting the line runs');
 
     for (const localLine of lines) {
@@ -62,7 +68,10 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                         error: response.message,
                         raw: response
                     });
-                    logger.error(`error running line ${localLine} from ${msgJSON.username}/${msgJSON.repo}: ${response.message}`, response);
+                    logger.error(
+                        `error running line ${localLine} from deploy that includes ${msgJSON.repos[0].username}/${msgJSON.repos[0].repo}: ${response.message}`,
+                        response
+                    );
                 } else {
                     if (summary === commandSummary.OPEN) {
                         response = utilities.urlFix(response);

@@ -5,7 +5,7 @@ import { utilities } from './utilities';
 import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
 import { DeployRequest, PoolConfig } from './types';
 import { execProm } from './execProm';
-import { getPoolName, getDeployId } from './namedUtilities';
+import { getPoolName, getDeployId, getPoolConfig } from './namedUtilities';
 import { processWrapper } from './processWrapper';
 
 export const preparePoolByName = async (pool: PoolConfig, createHerokuDynos = true): Promise<void> => {
@@ -28,30 +28,21 @@ export const preparePoolByName = async (pool: PoolConfig, createHerokuDynos = tr
         if (needed <= 0) {
             return;
         }
-        const deployId = getDeployId(pool.user, pool.repo);
-
-        const username = poolname.split('.')[0];
-        const repo = poolname.split('.')[1];
+        const deployId = getDeployId(pool.repos[0].username, pool.repos[0].repo);
 
         const message: DeployRequest = {
             pool: true,
-            username,
-            repo,
             deployId,
-            whitelisted: true,
-            createdTimestamp: new Date()
+            createdTimestamp: new Date(),
+            repos: pool.repos
         };
 
         if (processWrapper.UA_ID) {
             message.visitor = ua(processWrapper.UA_ID);
         }
 
-        // branch support
-        if (pool.branch) {
-            message.branch = pool.branch;
-        }
-
         const messages = [];
+
         while (messages.length < needed) {
             messages.push(putPoolRequest(message));
         }
@@ -62,7 +53,7 @@ export const preparePoolByName = async (pool: PoolConfig, createHerokuDynos = tr
         const builderCommand = utilities.getPoolDeployerCommand();
 
         if (createHerokuDynos) {
-            while (builders < needed && builders < 50) {
+            while (builders < Math.min(needed, processWrapper.maxPoolBuilders)) {
                 // eslint-disable-next-line no-await-in-loop
                 await execProm(builderCommand);
                 builders++;
@@ -72,7 +63,7 @@ export const preparePoolByName = async (pool: PoolConfig, createHerokuDynos = tr
 };
 
 export const prepareAll = async (): Promise<void> => {
-    const pools = (await utilities.getPoolConfig()) as PoolConfig[];
+    const pools = await getPoolConfig();
     logger.debug(`preparing ${pools.length} pools`);
 
     await Promise.all(pools.map(pool => preparePoolByName(pool)));

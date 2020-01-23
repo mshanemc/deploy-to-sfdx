@@ -32,7 +32,7 @@ const prepareRepo = async (msgJSON: DeployRequest, cds: CDS): Promise<CDS> => {
                 raw: gitCloneResult.stderr
             });
         } catch (err) {
-            logger.warn(`deployQueueCheck: bad repo--https://github.com/${msgJSON.username}/${msgJSON.repo}.git`);
+            logger.warn(`deployQueueCheck: bad repo--${command}`);
             cds.errors.push({
                 command,
                 error: err.stderr,

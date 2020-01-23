@@ -1,21 +1,28 @@
-import { PoolConfig, ProjectJSON, DeployRequest } from './types';
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable no-use-before-define */
 import * as crypto from 'crypto';
-import { shellSanitize } from './shellSanitize';
+import request from 'request-promise-native';
 
-const randomValueHex = (len: number): string =>
-    crypto
-        .randomBytes(Math.ceil(len / 2))
-        .toString('hex') // convert to hexadecimal format
-        .slice(0, len); // return required number of characters
+import { PoolConfig, ProjectJSON, DeployRequest, DeployRequestRepo, PoolConfigDeprecated } from './types';
+import { shellSanitize } from './shellSanitize';
+import { processWrapper } from './processWrapper';
 
 const randomCharactersInDeployId = 2;
 
-const getPoolName = (pool: PoolConfig): string => {
-    if (pool.branch) {
-        return `${pool.user}.${pool.repo}.${pool.branch}`;
-    }
-    return `${pool.user}.${pool.repo}`;
-};
+const randomValueHex = (len: number): string =>
+    crypto
+        .randomBytes(Math.ceil(len / randomCharactersInDeployId))
+        .toString('hex') // convert to hexadecimal format
+        .slice(0, len); // return required number of characters
+
+const getKeyFromRepos = (repos: DeployRequestRepo[], separator = '.'): string =>
+    repos
+        .map(item =>
+            item.branch ? `${item.username}${separator}${item.repo}${separator}${item.branch}` : `${item.username}${separator}${item.repo}`
+        )
+        .join(separator);
+
+const getPoolName = (pool: PoolConfig): string => getKeyFromRepos(pool.repos);
 
 const getPackageDirsFromFile = (projectJSON: ProjectJSON): string => {
     const packageDirs = projectJSON.packageDirectories.map(dir => dir.path);
@@ -93,4 +100,47 @@ const getArg = (cmd: string, parameter: string): string => {
     }
 };
 
-export { getPoolName, getPackageDirsFromFile, getDeployId, getCloneCommands, isMultiRepo, isByoo, getArg };
+const getPoolKey = (msgJSON: DeployRequest, separator = '.'): string => {
+    if (!msgJSON.repos || msgJSON.repos.length === 0) {
+        throw new Error('msg does not have repos');
+    }
+
+    // we prefer repos over single-properties, but will use them as a temporary fallback
+    return getKeyFromRepos(msgJSON.repos, separator);
+};
+
+const getPoolConfig = async (): Promise<PoolConfig[]> => {
+    if (!processWrapper.POOLCONFIG_URL) {
+        return [];
+    }
+    try {
+        const pools = JSON.parse(await request(processWrapper.POOLCONFIG_URL)) as PoolConfigDeprecated[];
+        return pools.map(pool => poolConversion(pool));
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
+const poolConversion = (oldPool: PoolConfigDeprecated): PoolConfig => {
+    // remove stuff we no longer use
+    const newPool: PoolConfig = {
+        lifeHours: oldPool.lifeHours,
+        quantity: oldPool.quantity
+    };
+    if (oldPool.repos) {
+        newPool.repos = oldPool.repos;
+    } else {
+        newPool.repos = [
+            {
+                username: oldPool.username,
+                repo: oldPool.repo,
+                branch: oldPool.branch,
+                whitelisted: true,
+                source: 'github'
+            }
+        ];
+    }
+    return newPool;
+};
+
+export { getPoolName, getPackageDirsFromFile, getDeployId, getCloneCommands, isMultiRepo, isByoo, getArg, getPoolKey, getPoolConfig };

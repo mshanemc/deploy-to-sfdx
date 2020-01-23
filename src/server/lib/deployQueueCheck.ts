@@ -3,7 +3,7 @@ import logger from 'heroku-logger';
 import { getDeployRequest } from './redisNormal';
 import { pooledOrgFinder } from './pooledOrgFinder';
 import { build } from './commonBuild';
-import { isByoo } from './namedUtilities';
+import { isByoo, getPoolKey } from './namedUtilities';
 
 import { DeployRequest } from './types';
 
@@ -20,7 +20,7 @@ const check = async (): Promise<boolean> => {
     }
 
     try {
-        msgJSON.visitor.event('Deploy Request', `${msgJSON.username}-${msgJSON.repo}`).send();
+        msgJSON.visitor.event('Deploy Request', getPoolKey(msgJSON, '-')).send();
     } catch (e) {
         logger.warn('failed to send GA event');
     }
