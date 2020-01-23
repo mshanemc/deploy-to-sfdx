@@ -35,6 +35,9 @@ const getKeypath = async (): Promise<string> => {
     return undefined;
 };
 
+const buildJWTAuthCommand = async (username = processWrapper.HUB_USERNAME) =>
+    `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${username} --jwtkeyfile ${await getKeypath()}`;
+
 const auth = async (): Promise<string> => {
     // where will our cert live?
     const keypath = await getKeypath();
@@ -63,11 +66,7 @@ const auth = async (): Promise<string> => {
             await exec('heroku update');
         }
 
-        await exec(
-            `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
-                processWrapper.HUB_USERNAME
-            } --jwtkeyfile ${await keypath} --setdefaultdevhubusername -a hub --json`
-        );
+        await exec(`${await buildJWTAuthCommand()} --setdefaultdevhubusername -a hub --json`);
     } catch (err) {
         logger.error('hubAuth', err);
         // eslint-disable-next-line no-process-exit
@@ -77,4 +76,4 @@ const auth = async (): Promise<string> => {
     return keypath;
 };
 
-export { auth, getKeypath };
+export { auth, getKeypath, buildJWTAuthCommand };

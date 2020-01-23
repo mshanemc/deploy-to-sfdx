@@ -83,6 +83,9 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                         // output.mainUser.username = response.result.username;
 
                         output.openTimestamp = new Date();
+                        output.poolLines = {
+                            openLine: localLine
+                        };
                     } else if (summary === commandSummary.ORG_CREATE) {
                         output.orgId = response.result.orgId;
                         output.mainUser.username = response.result.username;
