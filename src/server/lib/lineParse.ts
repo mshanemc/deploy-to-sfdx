@@ -111,7 +111,7 @@ const multiOrgCorrections = (lines: string[]): string[] => {
         return lines;
     }
 
-    // TODO: rewrite relative paths on files?
+    // TODO: only one open command?
 };
 
 const getMaxDays = (lines: string[]): number =>

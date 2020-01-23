@@ -138,15 +138,20 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
     } //end of the loop
 
     // used by pools, may be otherwise handy
-    const displayResults = await getDisplayResults(`tmp/${msgJSON.deployId}`, output.mainUser.username);
     output = {
         ...output,
         complete: true,
         completeTimestamp: new Date(),
-        currentCommand: undefined,
-        instanceUrl: displayResults.instanceUrl,
-        expirationDate: displayResults.expirationDate
+        currentCommand: undefined
     };
+    if (!isByoo(msgJSON)) {
+        const displayResults = await getDisplayResults(`tmp/${msgJSON.deployId}`, output.mainUser.username);
+        output = {
+            ...output,
+            instanceUrl: displayResults.instanceUrl,
+            expirationDate: displayResults.expirationDate
+        };
+    }
 
     await Promise.all([cdsPublish(output), exec('sfdx force:auth:logout -p', { cwd: `tmp/${msgJSON.deployId}` })]);
     return output;

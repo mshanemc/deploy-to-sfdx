@@ -134,6 +134,7 @@ app.get(
             clientSecret: processWrapper.BYOO_SECRET,
             loginUrl: req.query.base_url
         });
+        console.log('state will be', JSON.stringify(req.query));
         res.send(
             byooOauth2.getAuthorizationUrl({
                 scope: 'api id web openid',
@@ -147,7 +148,7 @@ app.get(
     '/token',
     wrapAsync(async (req, res, next) => {
         const state = JSON.parse(req.query.state);
-
+        console.log(`state`, state);
         const byooOauth2 = new jsforce.OAuth2({
             redirectUri: processWrapper.BYOO_CALLBACK_URI || `http://localhost:${port}/token`,
             clientId: processWrapper.BYOO_CONSUMERKEY,
