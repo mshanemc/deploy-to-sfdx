@@ -35,7 +35,7 @@ const getKeypath = async (): Promise<string> => {
     return undefined;
 };
 
-const buildJWTAuthCommand = async (username = processWrapper.HUB_USERNAME) =>
+const buildJWTAuthCommand = async (username = processWrapper.HUB_USERNAME): Promise<string> =>
     `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${username} --jwtkeyfile ${await getKeypath()}`;
 
 const auth = async (): Promise<string> => {
