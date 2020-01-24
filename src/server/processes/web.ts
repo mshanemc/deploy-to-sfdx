@@ -131,7 +131,7 @@ app.get(
     '/authUrl',
     wrapAsync(async (req, res, next) => {
         const byooOauth2 = new jsforce.OAuth2({
-            redirectUri: processWrapper.BYOO_CALLBACK_URI || `http://localhost:${port}/token`,
+            redirectUri: processWrapper.BYOO_CALLBACK_URI ?? `http://localhost:${port}/token`,
             clientId: processWrapper.BYOO_CONSUMERKEY,
             clientSecret: processWrapper.BYOO_SECRET,
             loginUrl: req.query.base_url
@@ -152,7 +152,7 @@ app.get(
         const state = JSON.parse(req.query.state);
         console.log(`state`, state);
         const byooOauth2 = new jsforce.OAuth2({
-            redirectUri: processWrapper.BYOO_CALLBACK_URI || `http://localhost:${port}/token`,
+            redirectUri: processWrapper.BYOO_CALLBACK_URI ?? `http://localhost:${port}/token`,
             clientId: processWrapper.BYOO_CONSUMERKEY,
             clientSecret: processWrapper.BYOO_SECRET,
             loginUrl: state.base_url

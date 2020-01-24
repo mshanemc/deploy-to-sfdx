@@ -8,7 +8,7 @@ import { execProm } from './execProm';
 import { getPoolName, getDeployId, getPoolConfig } from './namedUtilities';
 import { processWrapper } from './processWrapper';
 
-export const preparePoolByName = async (pool: PoolConfig, createHerokuDynos = true): Promise<void> => {
+export const preparePoolByName = async (pool: PoolConfig) => {
     const targetQuantity = pool.quantity;
     const poolname = getPoolName(pool);
 
@@ -28,18 +28,14 @@ export const preparePoolByName = async (pool: PoolConfig, createHerokuDynos = tr
         if (needed <= 0) {
             return;
         }
-        const deployId = getDeployId(pool.repos[0].username, pool.repos[0].repo);
 
         const message: DeployRequest = {
             pool: true,
-            deployId,
+            deployId: getDeployId(pool.repos[0].username, pool.repos[0].repo),
             createdTimestamp: new Date(),
-            repos: pool.repos
+            repos: pool.repos,
+            visitor: processWrapper.UA_ID ? ua(processWrapper.UA_ID) : undefined
         };
-
-        if (processWrapper.UA_ID) {
-            message.visitor = ua(processWrapper.UA_ID);
-        }
 
         const messages = [];
 
@@ -49,17 +45,23 @@ export const preparePoolByName = async (pool: PoolConfig, createHerokuDynos = tr
         await Promise.all(messages);
 
         logger.debug(`...Requesting ${needed} more org for ${poolname}...`);
-        let builders = 0;
-        const builderCommand = utilities.getPoolDeployerCommand();
-
-        if (createHerokuDynos) {
-            while (builders < Math.min(needed, processWrapper.maxPoolBuilders)) {
-                // eslint-disable-next-line no-await-in-loop
-                await execProm(builderCommand);
-                builders++;
-            }
-        }
     }
+};
+
+export const startPoolDeployers = async quantityRequested => {
+    let builders = 0;
+    const builderCommand = utilities.getPoolDeployerCommand();
+
+    if (quantityRequested >= processWrapper.maxPoolBuilders) {
+        logger.warn('the poolDeploys queue seems really large');
+    }
+
+    while (builders < Math.min(quantityRequested, processWrapper.maxPoolBuilders)) {
+        // eslint-disable-next-line no-await-in-loop
+        await execProm(builderCommand);
+        builders++;
+    }
+    logger.debug(`started ${builders} builders for poolQueue`);
 };
 
 export const prepareAll = async (): Promise<void> => {

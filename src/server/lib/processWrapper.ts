@@ -1,5 +1,5 @@
 const processWrapper = {
-    PORT: process.env.PORT || 8443,
+    PORT: process.env.PORT ?? 8443,
 
     // devhub authentication and plugin config
     LOCAL_ONLY_KEY_PATH: process.env.LOCAL_ONLY_KEY_PATH,
@@ -18,7 +18,7 @@ const processWrapper = {
     GITHUB_REPO_WHITELIST: process.env.GITHUB_REPO_WHITELIST,
 
     // org pool stuff
-    maxPoolBuilders: parseInt(process.env.maxPoolBuilders) || 50,
+    maxPoolBuilders: parseInt(process.env.maxPoolBuilders) ?? 50,
     POOLCONFIG_URL: process.env.POOLCONFIG_URL,
 
     // heroku integration stuff
@@ -26,7 +26,7 @@ const processWrapper = {
     REDIS_URL: process.env.REDIS_URL,
 
     HEROKU_API_KEY: process.env.HEROKU_API_KEY,
-    DYNO_TIME_LIMIT: parseInt(process.env.DYNO_TIME_LIMIT) || 30,
+    DYNO_TIME_LIMIT: parseInt(process.env.DYNO_TIME_LIMIT) ?? 30,
 
     // google analytics
     UA_ID: process.env.UA_ID,

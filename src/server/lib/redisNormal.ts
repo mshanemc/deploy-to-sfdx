@@ -16,7 +16,7 @@ import equal from 'fast-deep-equal';
 
 const cdsExchange = 'deployMsg';
 const deployRequestExchange = 'deploys';
-const poolDeployExchange = 'poolDeploys';
+export const poolDeployExchange = 'poolDeploys';
 const orgDeleteExchange = 'orgDeletes';
 const herokuCDSExchange = 'herokuCDSs';
 const leadQueue = 'leads';

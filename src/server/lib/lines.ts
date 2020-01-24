@@ -1,14 +1,13 @@
 /* eslint-disable no-await-in-loop */
 import logger from 'heroku-logger';
-import stripColor from 'strip-color';
 
 import { DeployRequest, SfdxDisplayResult } from './types';
 import { utilities } from './utilities';
 import { getArg, isByoo } from './namedUtilities';
 import { lineParse } from './lineParse';
 import { cdsPublish, deleteOrg } from './redisNormal';
-import { exec, exec2JSON } from './execProm';
-import { CDS, commandSummary, HerokuResult } from './CDS';
+import { exec, exec2JSON, exec2String } from './execProm';
+import { CDS, commandSummary, HerokuResult, ClientResult, ClientError } from './CDS';
 import { loginURL } from './loginURL';
 import { getSummary } from './getSummary';
 
@@ -42,23 +41,24 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
     logger.debug('starting the line runs');
 
     for (const localLine of lines) {
-        const lineStartTimestamp = new Date();
-        let shortForm: string;
-        const summary = getSummary(localLine, msgJSON);
-
-        // corrections and improvements for individual commands
-        let lineResult;
-
-        // show what's currently running in the UI before it actually runs
         logger.debug(`running line-- ${localLine}`);
+        // show what's currently running in the UI before it actually runs
         output.currentCommand = localLine;
         cdsPublish(output);
 
-        try {
-            lineResult = await exec(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' });
+        const summary = getSummary(localLine, msgJSON);
 
+        const commandResult: ClientResult = {
+            commandStartTimestamp: new Date(),
+            command: localLine,
+            summary
+        };
+
+        try {
             if (localLine.includes('--json')) {
-                let response = JSON.parse(stripColor(lineResult.stdout));
+                // lineResult =
+
+                let response = await exec2JSON(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' });
                 // returned a reasonable error but not a full-on throw
 
                 if (response.status !== 0) {
@@ -75,12 +75,9 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                 } else {
                     if (summary === commandSummary.OPEN) {
                         response = utilities.urlFix(response);
-                        // put the path into the CDS
-                        output.mainUser.openPath = getArg(localLine, '-p') || getArg(localLine, '--path');
-                        // temporary
-                        output.mainUser.loginUrl = response.result.url;
+                        output.mainUser.openPath = getArg(localLine, '-p') ?? getArg(localLine, '--path');
+                        output.mainUser.loginUrl = response.result.url; // only good for session token
                         output.mainUser.permalink = loginURL(output);
-                        // output.mainUser.username = response.result.username;
 
                         output.openTimestamp = new Date();
                         output.poolLines = {
@@ -89,41 +86,40 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                     } else if (summary === commandSummary.ORG_CREATE) {
                         output.orgId = response.result.orgId;
                         output.mainUser.username = response.result.username;
-                        shortForm = `created org ${response.result.orgId} with username ${response.result.username}`;
+                        commandResult.shortForm = `created org ${response.result.orgId} with username ${response.result.username}`;
                     } else if (summary === commandSummary.PASSWORD_GEN) {
                         output.mainUser.password = response.result.password;
                         output.mainUser.permalink = loginURL(output);
 
-                        shortForm = `set password to ${response.result.password} for user ${response.result.username || output.mainUser.username}`;
+                        commandResult.shortForm = `set password to ${response.result.password} for user ${response.result.username ??
+                            output.mainUser.username}`;
                     } else if (summary === commandSummary.HEROKU_DEPLOY) {
                         const HR: HerokuResult = {
                             appName: response.result.app.name,
                             dashboardUrl: `https://dashboard.heroku.com/apps/${response.result.app.name}`,
                             openUrl: response.result.resolved_success_url
                         };
-                        shortForm = `created heroku app with name ${response.result.app.name}`;
+                        commandResult.shortForm = `created heroku app with name ${response.result.app.name}`;
                         output.herokuResults.push(HR);
                     } else if (summary === commandSummary.USER_CREATE) {
                         output.additionalUsers.push({
                             username: response.result.fields.username
                         });
-                        shortForm = `created user with username ${response.result.fields.username}`;
+                        commandResult.shortForm = `created user with username ${response.result.fields.username}`;
                     }
                 }
 
                 // always
                 output.commandResults.push({
-                    command: localLine,
-                    summary,
+                    ...commandResult,
                     raw: response,
-                    shortForm,
-                    commandStartTimestamp: lineStartTimestamp,
                     commandCompleteTimestamp: new Date()
                 });
             } else {
+                // run with string output only
                 output.commandResults.push({
                     command: localLine,
-                    raw: lineResult
+                    raw: await exec2String(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' })
                 });
             }
 
@@ -136,12 +132,26 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
             }
             logger.error(`a very serious error occurred on this line...in the catch section: ${e.name}: ${e.message}`, e);
             // a more serious error...tell the client
-            output.errors.push({
-                command: localLine,
-                error: `${JSON.parse(e.stdout).name}: ${JSON.parse(e.stdout).message}`,
-                raw: JSON.parse(e.stdout)
-            });
-            output = { ...output, complete: true, currentCommand: undefined };
+            output = outputAddError(
+                {
+                    ...output,
+                    complete: true,
+                    currentCommand: undefined
+                    // errors: [
+                    //     ...output.errors,
+                    //     {
+                    //         command: localLine,
+                    //         error: `${JSON.parse(e.stdout).name}: ${JSON.parse(e.stdout).message}`,
+                    //         raw: JSON.parse(e.stdout)
+                    //     }
+                    // ]
+                },
+                {
+                    command: localLine,
+                    error: `${JSON.parse(e.stdout).name}: ${JSON.parse(e.stdout).message}`,
+                    raw: JSON.parse(e.stdout)
+                }
+            );
             cdsPublish(output);
 
             // and throw so the requester can do the rest of logging to heroku logs and GA
@@ -170,3 +180,10 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
 };
 
 export { lineRunner };
+
+const outputAddError = (output: CDS, newError: ClientError): CDS => {
+    return {
+        ...output,
+        errors: [...output.errors, newError]
+    };
+};

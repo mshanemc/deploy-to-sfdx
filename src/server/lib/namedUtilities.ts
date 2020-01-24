@@ -40,14 +40,14 @@ const getDeployId = (username: string, repo: string): string =>
 const getCloneCommands = (depReq: DeployRequest): string[] => {
     if (depReq.repos.length === 1) {
         return [
-            `git clone -b ${depReq.repos[0].branch || 'master'} --single-branch https://github.com/${depReq.repos[0].username}/${
+            `git clone -b ${depReq.repos[0].branch ?? 'master'} --single-branch https://github.com/${depReq.repos[0].username}/${
                 depReq.repos[0].repo
             }.git ${depReq.deployId}`
         ];
     }
     return depReq.repos.map(
         repo =>
-            `git clone -b ${repo.branch || 'master'} --single-branch https://github.com/${repo.username}/${repo.repo}.git ${depReq.deployId}/${
+            `git clone -b ${repo.branch ?? 'master'} --single-branch https://github.com/${repo.username}/${repo.repo}.git ${depReq.deployId}/${
                 repo.repo
             }`
     );
