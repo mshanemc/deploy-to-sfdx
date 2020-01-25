@@ -9,6 +9,7 @@ import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish, putLead 
 import { deployMsgBuilder } from '../lib/deployMsgBuilder';
 import { utilities } from '../lib/utilities';
 import { getPoolKey } from '../lib/namedUtilities';
+import { multiTemplateURLBuilder } from '../lib/multiTemplateURLBuilder';
 
 import { processWrapper } from '../lib/processWrapper';
 
@@ -77,11 +78,7 @@ app.get(
     wrapAsync(async (req, res, next) => {
         // allow repos to require the email parameter
         if (req.query.email === 'required') {
-            return res.redirect(
-                Array.isArray(req.query.template)
-                    ? `/userinfo?template=${req.query.template[0]}&template=${req.query.template.slice(1).join('&template=')}`
-                    : `/userinfo?template=${req.query.template}`
-            );
+            return res.redirect(multiTemplateURLBuilder(req.query.template, '/userinfo'));
         }
 
         const message = await commonDeploy(req, '/launch');
@@ -136,7 +133,7 @@ app.get(
             clientSecret: processWrapper.BYOO_SECRET,
             loginUrl: req.query.base_url
         });
-        console.log('state will be', JSON.stringify(req.query));
+        // console.log('state will be', JSON.stringify(req.query));
         res.send(
             byooOauth2.getAuthorizationUrl({
                 scope: 'api id web openid',
@@ -150,7 +147,7 @@ app.get(
     '/token',
     wrapAsync(async (req, res, next) => {
         const state = JSON.parse(req.query.state);
-        console.log(`state`, state);
+        // console.log(`state`, state);
         const byooOauth2 = new jsforce.OAuth2({
             redirectUri: processWrapper.BYOO_CALLBACK_URI ?? `http://localhost:${port}/token`,
             clientId: processWrapper.BYOO_CONSUMERKEY,

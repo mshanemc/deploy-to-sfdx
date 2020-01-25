@@ -7,6 +7,7 @@ import { DeployRequest, PoolConfig } from './types';
 import { execProm } from './execProm';
 import { getPoolName, getDeployId, getPoolConfig } from './namedUtilities';
 import { processWrapper } from './processWrapper';
+import { checkWhitelist } from './checkWhitelist';
 
 export const preparePoolByName = async (pool: PoolConfig) => {
     const targetQuantity = pool.quantity;
@@ -33,7 +34,7 @@ export const preparePoolByName = async (pool: PoolConfig) => {
             pool: true,
             deployId: getDeployId(pool.repos[0].username, pool.repos[0].repo),
             createdTimestamp: new Date(),
-            repos: pool.repos,
+            repos: pool.repos.map(repo => ({ ...repo, whitelisted: checkWhitelist(repo.username, repo.repo) })),
             visitor: processWrapper.UA_ID ? ua(processWrapper.UA_ID) : undefined
         };
 

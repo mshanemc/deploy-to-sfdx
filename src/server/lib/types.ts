@@ -1,10 +1,7 @@
 import * as ua from 'universal-analytics';
 
 // list of repos used for testing.  See testRepos.ts
-export interface TestRepo {
-    username: string;
-    repo: string;
-    branch?: string;
+export interface TestRepo extends DeployRequestRepo {
     testPool?: boolean;
 }
 

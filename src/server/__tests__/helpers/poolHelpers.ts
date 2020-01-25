@@ -11,19 +11,18 @@ import { CDS } from '../../lib/CDS';
 const retryOptions = { maxAttempts: 90, delay: 5000 };
 const requestAddToPool = async (testRepo: TestRepo, quantity = 1) => {
     // add to pool
-    await preparePoolByName(
-        {
-            repos: [
-                {
-                    username: testRepo.username,
-                    repo: testRepo.repo
-                }
-            ],
-            quantity,
-            lifeHours: 1
-        },
-        false
-    );
+    await preparePoolByName({
+        repos: [
+            {
+                username: testRepo.username,
+                repo: testRepo.repo,
+                whitelisted: testRepo.whitelisted,
+                branch: testRepo.branch
+            }
+        ],
+        quantity,
+        lifeHours: 1
+    });
 
     // verify exists in poolRequests
     const allMessages = await redis.lrange('poolDeploys', 0, -1);

@@ -7,7 +7,8 @@ import { cdsDelete } from './../../../lib/redisNormal';
 
 const tr = {
     username: 'mshanemc',
-    repo: 'df17IntegrationWorkshops'
+    repo: 'df17IntegrationWorkshops',
+    whitelisted: true
 };
 
 describe('pool for mshanemc/df17IntegrationWorkshops', () => {
@@ -20,11 +21,13 @@ describe('pool for mshanemc/df17IntegrationWorkshops', () => {
     
         test('retrieves an org from the pool for mshanemc/df17IntegrationWorkshops', async () => {
             const req: DeployRequest = {
-                repo: tr.repo,
-                username: tr.username,
-                deployId: 'mshanemc-df17IntegrationWorkshops-pool-1576772349673',
+                deployId: 'mshanemc-df17IntegrationWorkshops-pool-1579902269369',
                 createdTimestamp: new Date(),
-                whitelisted: true
+                repos: [{
+                    whitelisted: true,
+                    username: tr.username,
+                    repo: tr.repo,
+                }]
             }
             const foundInPool = await pooledOrgFinder(req, true);
             expect(foundInPool).toBeTruthy();

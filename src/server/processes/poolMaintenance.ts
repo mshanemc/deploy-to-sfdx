@@ -13,8 +13,7 @@ import { prepareAll } from '../lib/poolPrep';
             prepareAll()
         ]);
         // kick off more builders to deal with anything you just added to the queue
-        await startPoolDeployers(await getPoolDeployRequestQueueSize()),
-
+        await startPoolDeployers(await getPoolDeployRequestQueueSize());
     }
     process.exit(0);
 })();

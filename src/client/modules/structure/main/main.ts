@@ -2,7 +2,7 @@ import { LightningElement, track } from 'lwc';
 
 export default class Main extends LightningElement {
   @track pathname = window.location.pathname;
-  @track params = getQueryVariables();
+  @track params = this.getQueryVariables();
 
   @track isHome = this.pathname === '/';
   @track isError = this.pathname === '/error';
@@ -20,27 +20,31 @@ export default class Main extends LightningElement {
   get deployId() {
     return this.pathname.replace('/deploying/deployer/', '').replace('/deploying/trial/', '');
   }
-}
 
-const getQueryVariables = () => {
-  // console.log('query var running');
-  const output = {};
-  const query = window.location.search.substring(1);
+  getQueryVariables(): QueryAsArrays {
+    // console.log('query var running');
+    const output = {};
+    const query = window.location.search.substring(1);
 
-  if (query.length === 0) {
+    if (query.length === 0) {
+      return output;
+    }
+    const params = query.split('&');
+
+    params.forEach(param => {
+      const pair = param.split('=');
+      if (output[pair[0]]) {
+        output[pair[0]] = [...output[pair[0]], pair[1]];
+      } else {
+        output[pair[0]] = [pair[1]];
+      }
+    });
+
+    console.log(output);
     return output;
   }
-  const params = query.split('&');
+}
 
-  params.forEach(param => {
-    const pair = param.split('=');
-    if (output[pair[0]]) {
-      output[pair[0]] = [...output[pair[0]], pair[1]];
-    } else {
-      output[pair[0]] = [pair[1]];
-    }
-  });
-
-  console.log(output);
-  return output;
-};
+interface QueryAsArrays {
+  [key: string]: string[];
+}

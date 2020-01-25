@@ -1,4 +1,5 @@
 import { LightningElement, api, track } from 'lwc';
+import { multiTemplateURLBuilder } from '../../../../server/lib/multiTemplateURLBuilder';
 
 export default class Byoo extends LightningElement {
   @api template;
@@ -10,10 +11,7 @@ export default class Byoo extends LightningElement {
     return window.location.href.replace('byoo', 'launch');
   }
   async connectedCallback() {
-    let authURL = `/authURL?template=${this.template[0]}`;
-    if (this.template.length > 1) {
-      authURL = `${authURL}&template=${this.template.slice(1).join('&template=')}`;
-    }
+    const authURL = multiTemplateURLBuilder(this.template, '/authURL');
     console.log(authURL);
     this.regularURL = await (await fetch(authURL)).text();
     this.sandboxURL = await (await fetch(`${authURL}&base_url=https://test.salesforce.com`)).text();

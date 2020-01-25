@@ -11,16 +11,17 @@ const basePC: PoolConfig = {
     repos: [
         {
             username,
-            repo: 'repo1'
+            repo: 'repo1',
+            whitelisted: false
         }
     ]
 };
 
 const poolname = getPoolName(basePC);
 
-describe('argStripperTest', () => {
+describe('poolPrep Test', () => {
     beforeAll(async () => {
-        await redis.del(poolname);
+        await redis.del(poolDeployExchange);
     });
 
     test('preps a pool with nothing in the queue', async () => {
@@ -52,6 +53,6 @@ describe('argStripperTest', () => {
     });
 
     afterAll(async () => {
-        await redis.del(poolname);
+        await redis.del(poolDeployExchange);
     });
 });

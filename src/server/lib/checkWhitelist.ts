@@ -6,7 +6,7 @@ const checkWhitelist = (ghuser: string, ghrepo: string): boolean => {
     const whitelist1 = processWrapper.GITHUB_USERNAME_WHITELIST; // comma separated list of username
     const whitelist2 = processWrapper.GITHUB_REPO_WHITELIST; // comma separated list of username/repo
 
-    // logger.warn(`whitelist is ${whitelist1}`);
+    console.log(`whitelist is ${whitelist1} and ${whitelist2}`);
 
     if (!whitelist1 && !whitelist2) {
         // logger.debug('no whitelists, returning early');

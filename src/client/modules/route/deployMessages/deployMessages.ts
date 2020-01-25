@@ -15,7 +15,7 @@ export default class DeployMessages extends LightningElement {
   }
 
   set deployId(value) {
-    this._deployId = value;
+    this._deployId = value[0];
     this.results = new CDS({
       deployId: this.deployId
     });
@@ -61,7 +61,7 @@ export default class DeployMessages extends LightningElement {
   }
 
   @wire(resultsPoll, { deployId: '$deployId' })
-  wiredResults({ error, data }) {
+  wiredResults({ error, data }: { error: any; data: CDS }) {
     if (error) {
       console.error('error from ws subscribe wire', error);
     } else if (data) {
