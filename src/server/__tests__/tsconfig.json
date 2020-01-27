@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "allowJs": false,
-        "target": "es2017",
+        "target": "es2019",
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "moduleResolution": "node",
