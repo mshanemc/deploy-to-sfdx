@@ -210,6 +210,11 @@
   resolved "https://registry.yarnpkg.com/@babel/helper-plugin-utils/-/helper-plugin-utils-7.0.0.tgz#bbb3fbee98661c569034237cc03967ba99b4f250"
   integrity sha512-CYAOUCARwExnEixLdB6sDm2dIJ/YgEAKDM1MOeMeZu9Ld/bDgVo8aiWrXwcY7OBh+1Ea2uUcVRcxKk0GJvW7QA==
 
+"@babel/helper-plugin-utils@^7.8.0":
+  version "7.8.3"
+  resolved "https://registry.yarnpkg.com/@babel/helper-plugin-utils/-/helper-plugin-utils-7.8.3.tgz#9ea293be19babc0f52ff8ca88b34c3611b208670"
+  integrity sha512-j+fq49Xds2smCUNYmEHF9kGNkhbet6yVIBp4e6oeQpH1RUs/Ir06xUKzDjDkGcaaokPiTNs2JBWHjaE4csUkZQ==
+
 "@babel/helper-regex@^7.0.0", "@babel/helper-regex@^7.4.4":
   version "7.5.5"
   resolved "https://registry.yarnpkg.com/@babel/helper-regex/-/helper-regex-7.5.5.tgz#0aa6824f7100a2e0e89c1527c23936c152cab351"
@@ -403,6 +408,13 @@
   integrity sha512-0oNLWNH4k5ZbBVfAwiTU53rKFWIeTh6ZlaWOXWJc4ywxs0tjz5fc3uZ6jKAnZSxN98eXVgg7bJIuzjX+3SXY+A==
   dependencies:
     "@babel/helper-plugin-utils" "^7.0.0"
+
+"@babel/plugin-syntax-dynamic-import@^7.0.0":
+  version "7.8.3"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-dynamic-import/-/plugin-syntax-dynamic-import-7.8.3.tgz#62bf98b2da3cd21d626154fc96ee5b3cb68eacb3"
+  integrity sha512-5gdGbFon+PszYzqs83S3E5mpi7/y/8M9eC90MRTZfduQOYW76ig6SOSPNe41IG5LoP3FGBn2N0RjVDSQiS94kQ==
+  dependencies:
+    "@babel/helper-plugin-utils" "^7.8.0"
 
 "@babel/plugin-syntax-dynamic-import@^7.7.4":
   version "7.7.4"
@@ -1310,6 +1322,16 @@
   resolved "https://registry.yarnpkg.com/@lwc/features/-/features-1.1.1.tgz#fe56cd148612a5746703251620d89d3087f0fd23"
   integrity sha512-QcwsNH6aYsrZ+rSTDAK6YM/B8c9I+TNM03m70KD8E874tMrs330mtZGDRB1YKc/EpwL4R1o6yNEgVNw3y6h+WA==
 
+"@lwc/jest-preset@^4.3.1":
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/@lwc/jest-preset/-/jest-preset-4.3.1.tgz#ee44386745db62653aa27e0356797101f72d3c22"
+  integrity sha512-nU3gmu234hTJE+mboljwvkw/JORHgEbS3wPD6f9GCsDEnLu0nSUD6R7XiNeePf6CRdwir2MvG5UFMzpq73fqXA==
+  dependencies:
+    "@lwc/jest-resolver" "4.3.1"
+    "@lwc/jest-serializer" "4.3.1"
+    "@lwc/jest-transformer" "4.3.1"
+    jest-environment-jsdom-fifteen "^1.0.2"
+
 "@lwc/jest-preset@muenzpraeger/lwc-jest-preset-ts-fix":
   version "1.1.0-alpha1"
   resolved "https://codeload.github.com/muenzpraeger/lwc-jest-preset-ts-fix/tar.gz/5f2a28563055cbf674dc97f3b184bab0d4c849e2"
@@ -1325,6 +1347,11 @@
   resolved "https://registry.yarnpkg.com/@lwc/jest-resolver/-/jest-resolver-1.1.0-alpha1.tgz#09ed751dd0d41ba1a340dab67e58f39fd526237d"
   integrity sha512-jexhw4p78jWbnv28eRWTLCdBHnfycUCaaY642njrfXlJQYuu//HTVqqi3anmWF/fEs9nd7zcpCR+UTe+tv5lwQ==
 
+"@lwc/jest-resolver@4.3.1":
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/@lwc/jest-resolver/-/jest-resolver-4.3.1.tgz#541482e1838f5cc9b2d01d1822709a0f8a01d03e"
+  integrity sha512-q6xWqMPjbNAUUTZl3kCQnowSxW6em/iM4FOelF42kI927aDAqEtl1iYRAHgY6WnP5DoQSsfN5YEwX1vSi4CxzQ==
+
 "@lwc/jest-resolver@muenzpraeger/lwc-jest-resolver-resolution-fix":
   version "2.2.0"
   resolved "https://codeload.github.com/muenzpraeger/lwc-jest-resolver-resolution-fix/tar.gz/772221f6dce07cddacb73cde21685fd16cad51db"
@@ -1333,6 +1360,13 @@
   version "1.1.0-alpha1"
   resolved "https://registry.yarnpkg.com/@lwc/jest-serializer/-/jest-serializer-1.1.0-alpha1.tgz#de346a584fd7f080e6811b6f32aaf6c9da1fcb87"
   integrity sha512-kP3f/9YtdVNqtfMPe0txDp2xUbEe6pSFoBJXbd1u1tEMJYY/lFzG8OfS+DCQMFoMaOkGIWtV5+K1Vd66u3sHew==
+  dependencies:
+    pretty-format "~24.8.0"
+
+"@lwc/jest-serializer@4.3.1":
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/@lwc/jest-serializer/-/jest-serializer-4.3.1.tgz#4af65a8ab13cd3c55302cf94a0581d88c5047a56"
+  integrity sha512-O7a9elO2yyN5VlE9mNdkmYCzMxx/Bn7Op3OvCLdwWTNBGuoGAGzDmkSQX+Ld6hg0V/udF7p6dNV9JdWZF59Ywg==
   dependencies:
     pretty-format "~24.8.0"
 
@@ -1347,6 +1381,17 @@
     "@babel/preset-typescript" "7.1.0"
     "@babel/template" "~7.1.2"
     "@lwc/errors" "1.0.0"
+    babel-preset-jest "^24.0.0"
+
+"@lwc/jest-transformer@4.3.1":
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/@lwc/jest-transformer/-/jest-transformer-4.3.1.tgz#68d75f67cf12ed2df1dff611ed68507856dca533"
+  integrity sha512-bOSPz2r7Iy6zSV1Iv4kpoJKCFKfboIrsYjDcfU6WRDFDTdR4u2blFLOYHVlNSj9jy4FDBJ1GlHaJWOxfAjsQyA==
+  dependencies:
+    "@babel/core" "7.1.0"
+    "@babel/plugin-transform-modules-commonjs" "7.1.0"
+    "@babel/template" "~7.1.2"
+    babel-plugin-transform-dynamic-import "^2.1.0"
     babel-preset-jest "^24.0.0"
 
 "@lwc/module-resolver@1.1.1":
@@ -1691,10 +1736,10 @@
   dependencies:
     tslib "^1.10.0"
 
-"@salesforce/wire-service-jest-util@^2.2.5":
-  version "2.2.5"
-  resolved "https://registry.yarnpkg.com/@salesforce/wire-service-jest-util/-/wire-service-jest-util-2.2.5.tgz#b62c7f2a23eb849f8dbdc855634eaa1142a679c9"
-  integrity sha512-eOU8F4RQdPUXShocWHsEx+eHuPorzvCHUlWM5VDne4jfL6MY1C351UrrSGXqjnZFaFBjJrpS2P1eGq0UjCnJLw==
+"@salesforce/wire-service-jest-util@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@salesforce/wire-service-jest-util/-/wire-service-jest-util-2.3.0.tgz#9f0397df063440714bfea0a4b410262958176fd5"
+  integrity sha512-azaDjiC9TIh9+bp5ZZphBQJHCHhEaRN/COPOs7Wrz+NBMSZ1tuOXd7x/eMzgneQIOUcKqASAT61nFZuok6gz9A==
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
@@ -2939,6 +2984,13 @@ babel-plugin-jest-hoist@^24.9.0:
   integrity sha512-2EMA2P8Vp7lG0RAzr4HXqtYwacfMErOuv1U3wrvxHX6rD1sV6xS3WXG3r8TRQ2r6w8OhvSdWt+z41hQNwNm3Xw==
   dependencies:
     "@types/babel__traverse" "^7.0.6"
+
+babel-plugin-transform-dynamic-import@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-transform-dynamic-import/-/babel-plugin-transform-dynamic-import-2.1.0.tgz#3ce618dd983c072b6e2135f527d46092fb45d80e"
+  integrity sha512-ja4NWc37+7bV6/uJKCERJEGHEyK1DXgXp8teHvjKC4Jsj3Ib484dJdamFIBtSb40JFniyWZo6ML46usVvfdsSg==
+  dependencies:
+    "@babel/plugin-syntax-dynamic-import" "^7.0.0"
 
 babel-plugin-transform-proxy-compat@0.21.7:
   version "0.21.7"
@@ -7908,7 +7960,7 @@ jest-each@^24.9.0:
     jest-util "^24.9.0"
     pretty-format "^24.9.0"
 
-jest-environment-jsdom-fifteen@^1.0.0:
+jest-environment-jsdom-fifteen@^1.0.0, jest-environment-jsdom-fifteen@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/jest-environment-jsdom-fifteen/-/jest-environment-jsdom-fifteen-1.0.2.tgz#49a0af55e0d32737a6114a1575dd714702ad63b0"
   integrity sha512-nfrnAfwklE1872LIB31HcjM65cWTh1wzvMSp10IYtPJjLDUbTTvDpajZgIxUnhRmzGvogdHDayCIlerLK0OBBg==

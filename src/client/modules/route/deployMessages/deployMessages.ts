@@ -15,7 +15,7 @@ export default class DeployMessages extends LightningElement {
   }
 
   set deployId(value) {
-    this._deployId = value[0];
+    this._deployId = value;
     this.results = new CDS({
       deployId: this.deployId
     });

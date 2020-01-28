@@ -94,7 +94,7 @@ describe('userinfo', () => {
 });
 
 describe('multi-template', () => {
-    test('handles array of tempalte', () => {
+    test('handles array of template', () => {
         const req = {
             query: {
                 template: ['https://github.com/mshanemc/cg4Integrate', 'https://github.com/mshanemc/df17IntegrationWorkshops']
@@ -120,7 +120,7 @@ describe('multi-template', () => {
         expect(message.deployId.split('-')[1]).toBe(message.repos[0].repo);
     });
 
-    test('handles breanch in array of tempalte', () => {
+    test('handles branch in array of template', () => {
         const req = {
             query: {
                 template: ['https://github.com/mshanemc/cg4Integrate/tree/passwordSet', 'https://github.com/mshanemc/df17IntegrationWorkshops']

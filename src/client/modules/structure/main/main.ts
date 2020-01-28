@@ -1,4 +1,5 @@
 import { LightningElement, track } from 'lwc';
+import { parseQuery } from './parseQueryVars';
 
 export default class Main extends LightningElement {
   @track pathname = window.location.pathname;
@@ -21,30 +22,8 @@ export default class Main extends LightningElement {
     return this.pathname.replace('/deploying/deployer/', '').replace('/deploying/trial/', '');
   }
 
-  getQueryVariables(): QueryAsArrays {
+  getQueryVariables() {
     // console.log('query var running');
-    const output = {};
-    const query = window.location.search.substring(1);
-
-    if (query.length === 0) {
-      return output;
-    }
-    const params = query.split('&');
-
-    params.forEach(param => {
-      const pair = param.split('=');
-      if (output[pair[0]]) {
-        output[pair[0]] = [...output[pair[0]], pair[1]];
-      } else {
-        output[pair[0]] = [pair[1]];
-      }
-    });
-
-    console.log(output);
-    return output;
+    return parseQuery(window.location.search.substring(1));
   }
-}
-
-interface QueryAsArrays {
-  [key: string]: string[];
 }
