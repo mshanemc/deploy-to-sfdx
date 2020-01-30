@@ -4,7 +4,9 @@
     "description": "An application that will deploy an SFDX project from a public  Github repo",
     "main": "lib/processes/web.js",
     "scripts": {
-        "build": "lwc-services build -m production && tsc -b ./src/server",
+        "build": "yarn build:client && yarn build:server",
+        "build:server": "tsc -b ./src/server",
+        "build:client": "lwc-services build -m production",
         "local": "npm run build && heroku local dynoskimmer=1 && heroku local poolskimmer=1 && heroku local oneoffbuilder=1 && heroku local poolwatcher=1 && heroku local pooldeployer=1 && heroku local orgdeleter=1 && heroku local web=1,orgbuilder=5",
         "local:web": "yarn build && heroku local web=1,orgbuilder=1",
         "local:clean": "heroku local orgdeleter=1",

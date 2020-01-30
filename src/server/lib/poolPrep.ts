@@ -50,6 +50,9 @@ export const preparePoolByName = async (pool: PoolConfig) => {
 };
 
 export const startPoolDeployers = async quantityRequested => {
+    if (quantityRequested === 0) return;
+    logger.debug(`received request for ${quantityRequested} builders.  Max allowed is ${processWrapper.maxPoolBuilders}`);
+
     let builders = 0;
     const builderCommand = utilities.getPoolDeployerCommand();
 
@@ -58,9 +61,10 @@ export const startPoolDeployers = async quantityRequested => {
     }
 
     while (builders < Math.min(quantityRequested, processWrapper.maxPoolBuilders)) {
+        logger.debug(`run with builders ${builders}`);
         // eslint-disable-next-line no-await-in-loop
         await execProm(builderCommand);
-        builders++;
+        builders += 1;
     }
     logger.debug(`started ${builders} builders for poolQueue`);
 };
