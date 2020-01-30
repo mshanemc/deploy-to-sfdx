@@ -61,7 +61,6 @@ export const startPoolDeployers = async quantityRequested => {
     }
 
     while (builders < Math.min(quantityRequested, processWrapper.maxPoolBuilders)) {
-        logger.debug(`run with builders ${builders}`);
         // eslint-disable-next-line no-await-in-loop
         await execProm(builderCommand);
         builders += 1;
