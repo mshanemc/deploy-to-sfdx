@@ -132,7 +132,7 @@ const poolConversion = (oldPool: PoolConfigDeprecated): PoolConfig => {
     } else {
         newPool.repos = [
             {
-                username: oldPool.username,
+                username: oldPool.user,
                 repo: oldPool.repo,
                 branch: oldPool.branch,
                 whitelisted: true,

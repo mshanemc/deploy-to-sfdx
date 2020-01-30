@@ -44,7 +44,7 @@ export interface PoolConfig {
 }
 
 export interface PoolConfigDeprecated extends PoolConfig {
-    username?: string; // deprecated.  Use repos for multi
+    user?: string; // deprecated.  Use repos for multi
     repo?: string; // deprecated.  Use repos for multi
     branch?: string; // deprecated.  Use repos for multi
 }
