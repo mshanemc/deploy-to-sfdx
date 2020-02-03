@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import * as fs from 'fs-extra';
 
-import logger from 'heroku-logger';
+// import logger from 'heroku-logger';
 
 import { shellSanitize } from './shellSanitize';
 import { argStripper } from './argStripper';
@@ -48,7 +48,7 @@ const securityAssertions = (line: string): string => {
     return line;
 };
 
-// corrections and improvements for individual commands
+// corrections and improvements for individual commands, always runs
 const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
     // we ALWAYS want -r instead of real open on our server
     if (line.includes('sfdx force:org:open') && !line.includes(' -r')) {
@@ -73,45 +73,30 @@ const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
         // if the script didn't supply the concise line, make sure it's there.
         return `${argStripper(line, '--concise', true)} --concise`;
     }
-    if (isByoo(msgJSON) && line.includes('sfdx force:source:push')) {
-        // source push only works on scratch org or other source-tracking-enabled orgs.
-        // get the packageDirectories from the folder and modify the push command to deploy those instead
-        logger.debug(`byoo and source:push: ${line}`);
+    if (line.includes('sfdx force:source:push') && isByoo(msgJSON) && isMultiRepo(msgJSON)) {
         const project = fs.readJSONSync(`tmp/${msgJSON.deployId}/sfdx-project.json`);
         return line.replace('sfdx force:source:push', `sfdx force:source:deploy -p ${getPackageDirsFromFile(project)}`);
-        // try {
-        //     line = line.replace('sfdx force:source:push', `sfdx force:source:deploy -p ${getPackageDirsFromFile(project)}`);
-        // } catch (e) {
-        //     const message = `security error on projectJSON: ${line}`;
-        //     logger.error(message);
-
-        //     output.errors.push({
-        //         command: line,
-        //         error: message,
-        //         raw: line
-        //     });
-        //     cdsPublish(output);
-        //     throw new Error(message);
-        // }
     }
     return line;
 };
 
-const multiOrgCorrections = (lines: string[]): string[] => {
-    // only one password allowed for (multi org).  [BYOO will have them already removed at this stage]
-    const passwordLines = lines.filter(line => line.includes('user:password'));
+const thereCanBeOnlyOne = (lines: string[], textSoSearchFor: string) => {
+    const passwordLines = lines.filter(line => line.includes(textSoSearchFor));
 
     if (passwordLines.length > 1) {
-        const firstOccurence = lines.findIndex(line => line.includes('user:password'));
+        const firstOccurence = lines.findIndex(line => line.includes(textSoSearchFor));
         return [
             ...lines.slice(0, firstOccurence + 1), // start until the first occurrence, inclusive
-            ...lines.slice(firstOccurence + 2).filter(line => !line.includes('user:password')) // and none of the occurrences after that
+            ...lines.slice(firstOccurence + 2).filter(line => !line.includes(textSoSearchFor)) // and none of the occurrences after that
         ];
     } else {
         return lines;
     }
+};
 
-    // TODO: only one open command?
+const multiOrgCorrections = (lines: string[]): string[] => {
+    // only one password allowed for (multi org).  [BYOO will have them already removed at this stage]
+    return thereCanBeOnlyOne(lines, 'user:password');
 };
 
 const getMaxDays = (lines: string[]): number =>
@@ -140,14 +125,14 @@ const lineParse = async (msgJSON: DeployRequest): Promise<string[]> => {
         parsedLines.unshift(
             `sfdx force:config:set defaultdevhubusername= defaultusername='${msgJSON.byoo.accessToken}' instanceUrl='${msgJSON.byoo.instanceUrl}' --json`
         );
-    } else if (isMultiRepo(msgJSON)) {
-        //not byoo, but is multirepo
+    }
+
+    if (!isByoo(msgJSON) && isMultiRepo(msgJSON)) {
         // remove all the creates and put it at the beginning
         parsedLines = [
             `sfdx force:org:create -f config/project-scratch-def.json -d ${getMaxDays(parsedLines)} -s --json`,
             ...parsedLines.filter(line => !line.includes('org:create'))
         ];
-        // we need to create an org before we do anything else.  There's some edge cases where we do some scripts FIRST but let's avoid those for now
     }
 
     if (isMultiRepo(msgJSON)) {
