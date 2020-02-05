@@ -20,7 +20,8 @@ const getKeyFromRepos = (repos: DeployRequestRepo[], separator = '.'): string =>
         .map(item =>
             item.branch ? `${item.username}${separator}${item.repo}${separator}${item.branch}` : `${item.username}${separator}${item.repo}`
         )
-        .join(separator);
+        .join(separator)
+        .toLowerCase();
 
 const getPoolName = (pool: PoolConfig): string => getKeyFromRepos(pool.repos);
 
