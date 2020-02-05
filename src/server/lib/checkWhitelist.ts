@@ -16,7 +16,7 @@ const checkWhitelist = (ghuser: string, ghrepo: string): boolean => {
 
     if (whitelist1) {
         for (const username of whitelist1.split(',')) {
-            if (username.trim() === ghuser) {
+            if (username.trim().toLowerCase() === ghuser.toLowerCase()) {
                 // logger.debug(`matched ${username} and ${ghuser}`);
                 return true;
             }
@@ -27,7 +27,16 @@ const checkWhitelist = (ghuser: string, ghrepo: string): boolean => {
     if (whitelist2) {
         for (const repo of whitelist2.split(',')) {
             // logger.debug(`checking whitelist 2 element: ${repo}`);
-            if (repo.trim().split('/')[0] === ghuser && repo.trim().split('/')[1] === ghrepo) {
+            if (
+                repo
+                    .trim()
+                    .split('/')[0]
+                    .toLowerCase() === ghuser.toLowerCase() &&
+                repo
+                    .trim()
+                    .split('/')[1]
+                    .toLowerCase() === ghrepo.toLowerCase()
+            ) {
                 return true;
             }
         }

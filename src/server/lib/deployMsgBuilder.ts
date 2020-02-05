@@ -37,13 +37,13 @@ const deployMsgBuilder = (req): DeployRequest => {
         const path = template.replace('https://github.com/', '');
 
         logger.debug(`deployMsgBuilder: template is ${template}`);
-        const username = filterAlphaHypenUnderscore(path.split('/')[0]);
-        const repo = filterAlphaHypenUnderscore(path.split('/')[1]);
+        const username = filterAlphaHypenUnderscore(path.split('/')[0]).toLowerCase();
+        const repo = filterAlphaHypenUnderscore(path.split('/')[1]).toLowerCase();
         const repoForDR: DeployRequestRepo = {
             source: 'github',
             username,
             repo,
-            branch: path.includes('/tree/') ? filterAlphaHypenUnderscore(path.split('/tree/')[1]) : undefined,
+            branch: path.includes('/tree/') ? filterAlphaHypenUnderscore(path.split('/tree/')[1]).toLowerCase() : undefined,
             whitelisted: checkWhitelist(username, repo)
         };
         repos.push(repoForDR);
