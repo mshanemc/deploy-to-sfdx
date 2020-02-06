@@ -20,6 +20,8 @@ import { getPoolName, getPoolConfig } from './namedUtilities';
 import { CDS } from './CDS';
 import { processWrapper } from './processWrapper';
 
+const hoursToKeepBYOO = 12;
+
 const checkExpiration = async (pool: PoolConfig): Promise<string> => {
     const poolname = getPoolName(pool);
     const currentPoolSize = await redis.llen(poolname); // how many orgs are there?
@@ -116,12 +118,18 @@ const herokuExpirationCheck = async (): Promise<void> => {
 
 const removeOldDeployIds = async (): Promise<void> => {
     const deployIds = await getKeysForCDSs();
-    for (const deployId of deployIds) {
-        const cds = await cdsRetrieve(deployId);
-        if (moment().isAfter(moment(cds.expirationDate).endOf('day'))) {
-            await cdsDelete(deployId);
-        }
-    }
+    const CDSs = await Promise.all(deployIds.map(deployId => cdsRetrieve(deployId)));
+    await Promise.all(
+        CDSs.map(cds => {
+            if (!cds.expirationDate && moment().diff(moment(cds.browserStartTime), 'hours') > hoursToKeepBYOO) {
+                return cdsDelete(cds.deployId);
+            }
+            if (cds.expirationDate && moment().isAfter(moment(cds.expirationDate).endOf('day'))) {
+                return cdsDelete(cds.deployId);
+            }
+            return undefined;
+        }).filter(item => item)
+    );
 };
 
 const processDeleteQueue = async (): Promise<void> => {
