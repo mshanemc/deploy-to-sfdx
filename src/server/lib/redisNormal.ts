@@ -9,7 +9,7 @@ import ua from 'universal-analytics';
 import { DeleteRequest, DeployRequest, PoolConfig } from './types';
 
 import { getPoolKey } from './namedUtilities';
-import { shellSanitize } from './shellSanitize';
+import { filterUnsanitized } from './shellSanitize';
 import { CDS } from './CDS';
 import { processWrapper } from './processWrapper';
 import equal from 'fast-deep-equal';
@@ -29,16 +29,12 @@ const redis = new Redis(processWrapper.REDIS_URL);
 
 const deleteOrg = async (username: string): Promise<void> => {
     logger.debug(`org delete requested for ${username}`);
-    if (shellSanitize(username)) {
-        const msg: DeleteRequest = {
-            username,
-            delete: true,
-            created: new Date()
-        };
-        await redis.rpush(orgDeleteExchange, JSON.stringify(msg));
-    } else {
-        throw new Error(`invalid username ${username}`);
-    }
+    const msg: DeleteRequest = {
+        username: filterUnsanitized(username),
+        delete: true,
+        created: new Date()
+    };
+    await redis.rpush(orgDeleteExchange, JSON.stringify(msg));
 };
 
 const putHerokuCDS = async (cds: CDS): Promise<void> => {

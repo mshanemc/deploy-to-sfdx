@@ -4,7 +4,7 @@ import * as crypto from 'crypto';
 import request from 'request-promise-native';
 
 import { PoolConfig, ProjectJSON, DeployRequest, DeployRequestRepo, PoolConfigDeprecated } from './types';
-import { shellSanitize } from './shellSanitize';
+import { filterUnsanitized } from './shellSanitize';
 import { processWrapper } from './processWrapper';
 
 const randomCharactersInDeployId = 2;
@@ -25,15 +25,11 @@ const getKeyFromRepos = (repos: DeployRequestRepo[], separator = '.'): string =>
 
 const getPoolName = (pool: PoolConfig): string => getKeyFromRepos(pool.repos);
 
-const getPackageDirsFromFile = (projectJSON: ProjectJSON): string => {
-    const packageDirs = projectJSON.packageDirectories.map(dir => dir.path);
-    packageDirs.forEach(dir => {
-        if (!shellSanitize(dir)) {
-            throw new Error(`security error on projectJSON: ${dir}`);
-        }
-    });
-    return packageDirs.join(',');
-};
+const getPackageDirsFromFile = (projectJSON: ProjectJSON): string =>
+    projectJSON.packageDirectories
+        .map(dir => dir.path)
+        .map(dir => filterUnsanitized(dir))
+        .join(',');
 
 const getDeployId = (username: string, repo: string): string =>
     encodeURIComponent(`${username}-${repo}-${new Date().valueOf()}${randomValueHex(randomCharactersInDeployId)}`);
