@@ -137,14 +137,6 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                     ...output,
                     complete: true,
                     currentCommand: undefined
-                    // errors: [
-                    //     ...output.errors,
-                    //     {
-                    //         command: localLine,
-                    //         error: `${JSON.parse(e.stdout).name}: ${JSON.parse(e.stdout).message}`,
-                    //         raw: JSON.parse(e.stdout)
-                    //     }
-                    // ]
                 },
                 {
                     command: localLine,
@@ -173,9 +165,11 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
             instanceUrl: displayResults.instanceUrl,
             expirationDate: displayResults.expirationDate
         };
+        await Promise.all([cdsPublish(output), exec('sfdx force:auth:logout -p', { cwd: `tmp/${msgJSON.deployId}` })]);
+    } else {
+        // logging out of byoo orgs doesn't exist
+        await cdsPublish(output);
     }
-
-    await Promise.all([cdsPublish(output), exec('sfdx force:auth:logout -p', { cwd: `tmp/${msgJSON.deployId}` })]);
     return output;
 };
 
