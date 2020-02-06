@@ -20,8 +20,8 @@ const getKeyFromRepos = (repos: DeployRequestRepo[], separator = '.'): string =>
         .map(item =>
             item.branch ? `${item.username}${separator}${item.repo}${separator}${item.branch}` : `${item.username}${separator}${item.repo}`
         )
-        .join(separator)
-        .toLowerCase();
+        .map(item => item.toLowerCase())
+        .join(separator);
 
 const getPoolName = (pool: PoolConfig): string => getKeyFromRepos(pool.repos);
 
@@ -135,7 +135,7 @@ const poolConversion = (oldPool: PoolConfigDeprecated): PoolConfig => {
             {
                 username: oldPool.user.toLowerCase(),
                 repo: oldPool.repo.toLowerCase(),
-                branch: oldPool.branch.toLowerCase(),
+                branch: oldPool.branch ? oldPool.branch.toLowerCase() : undefined,
                 whitelisted: true,
                 source: 'github'
             }
