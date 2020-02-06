@@ -9,13 +9,13 @@ describe('urlTestsMaster', () => {
         };
 
         const message = deployMsgBuilder(req);
-        expect(message.repos[0].repo).toBe('cg4Integrate');
+        expect(message.repos[0].repo).toBe('cg4integrate');
         expect(message.repos[0].username).toBe('mshanemc');
         expect(message.repos[0].branch).toBeUndefined();
 
         // multi
         expect(message.repos).toHaveLength(1);
-        expect(message.repos[0].repo).toBe('cg4Integrate');
+        expect(message.repos[0].repo).toBe('cg4integrate');
         expect(message.repos[0].username).toBe('mshanemc');
         expect(message.repos[0].branch).toBeUndefined();
 
@@ -44,8 +44,8 @@ describe('urlTestsBranch', () => {
         expect(message.repos).toHaveLength(1);
 
         expect(message.repos[0].username).toBe('mshanemc');
-        expect(message.repos[0].repo).toBe('cg4Integrate');
-        expect(message.repos[0].branch).toBe('passwordSet');
+        expect(message.repos[0].repo).toBe('cg4integrate');
+        expect(message.repos[0].branch).toBe('passwordset');
 
         expect(message.deployId).toBeTruthy();
         // username-repo-timestamp
@@ -79,8 +79,8 @@ describe('userinfo', () => {
         const message = deployMsgBuilder(req);
 
         expect(message.repos[0].username).toBe('mshanemc');
-        expect(message.repos[0].repo).toBe('cg4Integrate');
-        expect(message.repos[0].branch).toBe('passwordSet');
+        expect(message.repos[0].repo).toBe('cg4integrate');
+        expect(message.repos[0].branch).toBe('passwordset');
         expect(message.firstname).toBe('shane');
         expect(message.lastname).toBe('mclaughlin');
         expect(message.email).toBe('shane.mclaughlin@salesforce.com');
@@ -105,11 +105,11 @@ describe('multi-template', () => {
 
         // multi
         expect(message.repos).toHaveLength(2);
-        expect(message.repos[0].repo).toBe('cg4Integrate');
+        expect(message.repos[0].repo).toBe('cg4integrate');
         expect(message.repos[0].username).toBe('mshanemc');
         expect(message.repos[0].branch).toBeUndefined();
 
-        expect(message.repos[1].repo).toBe('df17IntegrationWorkshops');
+        expect(message.repos[1].repo).toBe('df17integrationworkshops');
         expect(message.repos[1].username).toBe('mshanemc');
         expect(message.repos[1].branch).toBeUndefined();
 
@@ -131,11 +131,11 @@ describe('multi-template', () => {
 
         // multi
         expect(message.repos).toHaveLength(2);
-        expect(message.repos[0].repo).toBe('cg4Integrate');
+        expect(message.repos[0].repo).toBe('cg4integrate');
         expect(message.repos[0].username).toBe('mshanemc');
-        expect(message.repos[0].branch).toBe('passwordSet');
+        expect(message.repos[0].branch).toBe('passwordset');
 
-        expect(message.repos[1].repo).toBe('df17IntegrationWorkshops');
+        expect(message.repos[1].repo).toBe('df17integrationworkshops');
         expect(message.repos[1].username).toBe('mshanemc');
         expect(message.repos[1].branch).toBeUndefined();
 

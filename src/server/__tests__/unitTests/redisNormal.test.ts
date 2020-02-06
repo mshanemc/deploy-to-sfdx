@@ -92,7 +92,7 @@ test('can get a message from the deploy queue', async () => {
 });
 
 test('blocks deletes with bad usernames', async () => {
-    await expect(deleteOrg('hack@you.bad;wget')).rejects.toEqual(Error('invalid username hack@you.bad;wget'));
+    await expect(deleteOrg('hack@you.bad;wget')).rejects.toEqual(Error(`invalid characters in 'hack@you.bad;wget'`));
 });
 
 test('allows deletes with good usernames', async () => {
