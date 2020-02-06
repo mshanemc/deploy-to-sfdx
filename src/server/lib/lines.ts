@@ -22,12 +22,14 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
         output.lineCount = isByoo(msgJSON) ? lines.length + 2 : lines.length + 1;
         await cdsPublish(output); //1 extra to account for the git clone command
     } catch (e) {
-        output.errors.push({
-            command: 'line parsing',
-            error: e,
-            raw: e
-        });
-        output.complete = true;
+        output = outputAddError(
+            { ...output, complete: true },
+            {
+                command: 'line parsing',
+                error: e,
+                raw: e
+            }
+        );
         cdsPublish(output);
         return output;
     }
