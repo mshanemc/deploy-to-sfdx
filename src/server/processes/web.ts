@@ -46,12 +46,15 @@ const commonDeploy = async (req, url: string) => {
     }
 
     utilities.runHerokuBuilder();
-    await putDeployRequest(message);
-    await cdsPublish(
-        new CDS({
-            deployId: message.deployId
-        })
-    );
+    await Promise.all([
+        putDeployRequest(message),
+        cdsPublish(
+            new CDS({
+                deployId: message.deployId
+            })
+        )
+    ]);
+
     return message;
 };
 

@@ -28,6 +28,8 @@ const processWrapper = {
     HEROKU_API_KEY: process.env.HEROKU_API_KEY,
     DYNO_TIME_LIMIT: process.env.DYNO_TIME_LIMIT ? parseInt(process.env.DYNO_TIME_LIMIT) : 30,
 
+    // single-repo deployer
+    SINGLE_REPO: process.env.SINGLE_REPO,
     // google analytics
     UA_ID: process.env.UA_ID,
 
