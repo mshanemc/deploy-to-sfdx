@@ -19,74 +19,56 @@ const validateQuery = (query): void => {
     }
 };
 
+const makesTemplates = (templateParam): string[] => {
+    if (processWrapper.SINGLE_REPO) {
+        return [processWrapper.SINGLE_REPO];
+    }
+    if (Array.isArray(templateParam.template)) {
+        return templateParam.template;
+    }
+    // now it'll definitely be an array!
+    return [templateParam.template];
+};
+
 const deployMsgBuilder = (req): DeployRequest => {
     validateQuery(req.query); // check for exploits
-    const query = req.query;
-    let templates = [];
-
-    // now it'll definitely be an array!
-    if (Array.isArray(query.template)) {
-        templates = query.template;
-    } else {
-        templates.push(query.template);
-    }
-
-    const repos = [];
-
-    for (const template of templates) {
-        const path = template.replace('https://github.com/', '');
-
+    const repos = makesTemplates(req.query.template).map(template => {
         logger.debug(`deployMsgBuilder: template is ${template}`);
+        const path = template.replace('https://github.com/', '');
         const username = filterAlphaHypenUnderscore(path.split('/')[0]).toLowerCase();
         const repo = filterAlphaHypenUnderscore(path.split('/')[1]).toLowerCase();
-        const repoForDR: DeployRequestRepo = {
+        return {
             source: 'github',
             username,
             repo,
             branch: path.includes('/tree/') ? filterAlphaHypenUnderscore(path.split('/tree/')[1]).toLowerCase() : undefined,
             whitelisted: checkWhitelist(username, repo)
         };
-        repos.push(repoForDR);
-    }
-
-    const deployId = getDeployId(repos[0].username, repos[0].repo);
+    });
 
     const message: DeployRequest = {
-        deployId,
+        deployId: getDeployId(repos[0].username, repos[0].repo),
         createdTimestamp: new Date(),
-        repos
+        repos,
+        byoo: req.byoo,
+        visitor: processWrapper.UA_ID ? ua(processWrapper.UA_ID) : undefined,
+        email: req.query.email,
+        firstname: req.query.firstname,
+        lastname: req.query.lastname,
+        pool: req.query.pool
     };
 
-    if (req.byoo) {
-        message.byoo = req.byoo;
+    if (req.query.email) {
+        message.email = req.query.email;
     }
 
-    if (processWrapper.UA_ID) {
-        message.visitor = ua(processWrapper.UA_ID);
-    }
-
-    if (query.email) {
-        message.email = query.email;
-    }
-
+    // posting from trial form
     if (req.body && req.body.UserEmail) {
         if (shellSanitize(req.body.UserEmail)) {
             message.email = req.body.UserEmail;
         } else {
             throw new Error(`invalid email address in form post ${req.body.UserEmail}`);
         }
-    }
-
-    if (query.firstname) {
-        message.firstname = query.firstname;
-    }
-
-    if (query.lastname) {
-        message.lastname = query.lastname;
-    }
-
-    if (query.pool) {
-        message.pool = true;
     }
 
     logger.debug('deployMsgBuilder: done', message);
