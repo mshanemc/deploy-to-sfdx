@@ -61,9 +61,8 @@ const commonDeploy = async (req, url: string) => {
 app.post(
     '/trial',
     wrapAsync(async (req, res, next) => {
-        const message = await commonDeploy(req, '/trial');
+        const [message] = await Promise.all([commonDeploy(req, '/trial'), putLead(req.body)]);
         logger.debug('trial request', message);
-        await putLead(req.body);
         res.redirect(`/deploying/trial/${message.deployId.trim()}`);
     })
 );
