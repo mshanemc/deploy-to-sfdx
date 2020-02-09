@@ -112,7 +112,13 @@ const getPoolConfig = async (): Promise<PoolConfig[]> => {
     }
     try {
         const pools = JSON.parse(await request(processWrapper.POOLCONFIG_URL)) as PoolConfigDeprecated[];
-        return pools.map(pool => poolConversion(pool));
+        if (!processWrapper.SINGLE_REPO) {
+            return pools.map(pool => poolConversion(pool));
+        }
+        // single repo env config...ignore non-matching pools
+        return pools
+            .map(pool => poolConversion(pool))
+            .filter(pool => pool.repos.length === 1 && processWrapper.SINGLE_REPO.includes(`${pool.repos[0].repo}/${pool.repos[0].username}`));
     } catch (error) {
         throw new Error(error);
     }
@@ -122,12 +128,8 @@ const poolConversion = (oldPool: PoolConfigDeprecated): PoolConfig => {
     // remove stuff we no longer use
     const newPool: PoolConfig = {
         lifeHours: oldPool.lifeHours,
-        quantity: oldPool.quantity
-    };
-    if (oldPool.repos) {
-        newPool.repos = oldPool.repos;
-    } else {
-        newPool.repos = [
+        quantity: oldPool.quantity,
+        repos: oldPool.repos ?? [
             {
                 username: oldPool.user.toLowerCase(),
                 repo: oldPool.repo.toLowerCase(),
@@ -135,8 +137,9 @@ const poolConversion = (oldPool: PoolConfigDeprecated): PoolConfig => {
                 whitelisted: true,
                 source: 'github'
             }
-        ];
-    }
+        ]
+    };
+
     return newPool;
 };
 
