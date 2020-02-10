@@ -1,5 +1,5 @@
 import logger from 'heroku-logger';
-import { DeployRequest, DeployRequestRepo } from './types';
+import { DeployRequest } from './types';
 import { shellSanitize, filterAlphaHypenUnderscore } from './shellSanitize';
 import { checkWhitelist } from './checkWhitelist';
 import { getDeployId } from './namedUtilities';
@@ -23,11 +23,11 @@ const makesTemplates = (templateParam): string[] => {
     if (processWrapper.SINGLE_REPO) {
         return [processWrapper.SINGLE_REPO];
     }
-    if (Array.isArray(templateParam.template)) {
-        return templateParam.template;
+    if (Array.isArray(templateParam)) {
+        return templateParam;
     }
     // now it'll definitely be an array!
-    return [templateParam.template];
+    return [templateParam];
 };
 
 const deployMsgBuilder = (req): DeployRequest => {
