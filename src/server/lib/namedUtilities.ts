@@ -63,11 +63,6 @@ const isByoo = (depReq: DeployRequest): boolean => !!depReq.byoo;
 const getArg = (cmd: string, parameter: string): string => {
     cmd = cmd.concat(' ');
     const bufferedParam = ' '.concat(parameter).concat(' ');
-    // takes a command line command and removes a parameter.  Make noarg true if it's a flag (parameter with no arguments), like sfdx force:org:create -s
-
-    // ex:
-    // cmd = 'sfdx force:org:create -f config/project-scratch-def.json -s -a vol -d 1';
-    // parameter = '-a'
 
     // quickly return if it doesn't exist
     if (!cmd.includes(bufferedParam)) {
@@ -110,18 +105,14 @@ const getPoolConfig = async (): Promise<PoolConfig[]> => {
     if (!processWrapper.POOLCONFIG_URL) {
         return [];
     }
-    try {
-        const pools = JSON.parse(await request(processWrapper.POOLCONFIG_URL)) as PoolConfigDeprecated[];
-        if (!processWrapper.SINGLE_REPO) {
-            return pools.map(pool => poolConversion(pool));
-        }
-        // single repo env config...ignore non-matching pools
-        return pools
-            .map(pool => poolConversion(pool))
-            .filter(pool => pool.repos.length === 1 && processWrapper.SINGLE_REPO.includes(`${pool.repos[0].repo}/${pool.repos[0].username}`));
-    } catch (error) {
-        throw new Error(error);
+    const pools = JSON.parse(await request(processWrapper.POOLCONFIG_URL)) as PoolConfigDeprecated[];
+    if (!processWrapper.SINGLE_REPO) {
+        return pools.map(pool => poolConversion(pool));
     }
+    // single repo env config...ignore non-matching pools
+    return pools
+        .map(pool => poolConversion(pool))
+        .filter(pool => pool.repos.length === 1 && processWrapper.SINGLE_REPO.includes(`${pool.repos[0].repo}/${pool.repos[0].username}`));
 };
 
 const poolConversion = (oldPool: PoolConfigDeprecated): PoolConfig => {
