@@ -31,6 +31,9 @@ describe('reads lines from file', () => {
         expect(lines.length).toBe(1);
         expect(lines[0]).toEqual(lineToKeep);
     });
+    afterAll(async () => {
+        await fs.remove(filename);
+    });
 });
 
 describe('reads lines from array of files', () => {
@@ -47,5 +50,9 @@ describe('reads lines from array of files', () => {
         expect(result.length).toBe(2);
         expect(result[0]).toEqual('file1');
         expect(result[1]).toEqual('file2');
+    });
+
+    afterAll(async () => {
+        await Promise.all([fs.remove('file1'), fs.remove('file2')]);
     });
 });
