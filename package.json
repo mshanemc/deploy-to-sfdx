@@ -48,7 +48,7 @@
         "moment": "^2.24.0",
         "request-promise-native": "^1.0.7",
         "@mshanemc/sfdx-migration-automatic": "^0.2.1",
-        "shane-sfdx-plugins": "^4.14.4",
+        "shane-sfdx-plugins": "^4.17.3",
         "strip-color": "^0.1.0",
         "universal-analytics": "^0.4.20"
     },
