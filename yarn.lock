@@ -2485,6 +2485,11 @@ address@1.1.2, address@^1.0.1:
   resolved "https://registry.yarnpkg.com/address/-/address-1.1.2.tgz#bf1116c9c758c51b7a933d296b72c221ed9428b6"
   integrity sha512-aT6camzM4xEA54YVJYSqxz1kv4IHnQZRtThJJHhUMRExaU5spC7jX5ugSwTaTgJliIgs4VhZOk7htClvQ/LmRA==
 
+aes-js@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/aes-js/-/aes-js-3.1.2.tgz#db9aabde85d5caabbfc0d4f2a4446960f627146a"
+  integrity sha512-e5pEa2kBnBOgR4Y/p20pskXI74UEz7de8ZGVo58asOtvSVG5YAbJeELPZxOmt+Bnz3rX753YKhfIn4X4l1PPRQ==
+
 agent-base@4, agent-base@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-4.3.0.tgz#8165f01c436009bccad0b1d122f05ed770efc6ee"
@@ -12605,10 +12610,10 @@ shallow-clone@^0.1.2:
     lazy-cache "^0.2.3"
     mixin-object "^2.0.1"
 
-shane-sfdx-plugins@^4.17.3:
-  version "4.17.3"
-  resolved "https://registry.yarnpkg.com/shane-sfdx-plugins/-/shane-sfdx-plugins-4.17.3.tgz#14439b0af7c4f8624df279fb352d6f96b9e46c07"
-  integrity sha512-uOPHT0HGda2Ny2L9WDcQj3Y8reVMBl+t/pPNHGQfsbzlJjoxtxLnhpawyxeTE/d78Xpv6pOOOvpBFlsogalHgQ==
+shane-sfdx-plugins@^4.19.0:
+  version "4.19.0"
+  resolved "https://registry.yarnpkg.com/shane-sfdx-plugins/-/shane-sfdx-plugins-4.19.0.tgz#0569d1dbc0e0eeffd8df526e844c337211e94908"
+  integrity sha512-pXu1/2E/xxsVLSrB4yPZOua8/pxkxG6N3LDx4xSa22ceXLNpO9I8hNpj4k5uP6YDnLWpQcbQ7MmSyPicchBE+g==
   dependencies:
     "@lifeomic/attempt" "^3.0.0"
     "@oclif/command" "^1.5.12"
@@ -12618,6 +12623,7 @@ shane-sfdx-plugins@^4.17.3:
     "@salesforce/core" "^2.1.6"
     "@salesforce/kit" "^1.2.1"
     "@salesforce/ts-types" "^1.2.1"
+    aes-js "^3.1.2"
     chalk "^2.4.2"
     cli-ux "^5.2.0"
     csv-split-stream "^1.0.2"
@@ -12626,6 +12632,7 @@ shane-sfdx-plugins@^4.17.3:
     json2csv "^4.3.5"
     jsonwebtoken "^8.5.1"
     lodash "^4.17.11"
+    moment "^2.24.0"
     npm "^6.8.0"
     puppeteer "^1.12.2"
     puppeteer-core "^1.12.2"
