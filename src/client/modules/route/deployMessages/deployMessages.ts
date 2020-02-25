@@ -29,9 +29,8 @@ export default class DeployMessages extends LightningElement {
     try {
       if (typeof this.results.lineCount === 'number') {
         return (this.results.commandResults.length / this.results.lineCount) * 100 || 1;
-      } else {
-        return 1;
       }
+      return 1;
     } catch (e) {
       return 1;
     }
@@ -62,7 +61,7 @@ export default class DeployMessages extends LightningElement {
   }
 
   @wire(resultsPoll, { deployId: '$deployId' })
-  wiredResults({ error, data }) {
+  wiredResults({ error, data }: { error: any; data: CDS }) {
     if (error) {
       console.error('error from ws subscribe wire', error);
     } else if (data) {
@@ -76,15 +75,17 @@ export default class DeployMessages extends LightningElement {
   async deleteOrg(e) {
     e.preventDefault();
     e.stopPropagation();
-    const response = await (await fetch('/delete', {
-      method: 'POST',
-      body: JSON.stringify({
-        deployId: this.results.deployId
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })).json();
+    const response = await (
+      await fetch('/delete', {
+        method: 'POST',
+        body: JSON.stringify({
+          deployId: this.results.deployId
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    ).json();
 
     console.log(response);
     window.location = response.redirectTo;

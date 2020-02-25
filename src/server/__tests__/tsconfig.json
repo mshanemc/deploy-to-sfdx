@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "allowJs": false,
-        "target": "es2017",
+        "target": "es2019",
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "moduleResolution": "node",
@@ -9,5 +9,6 @@
         "removeComments": true,
         "types": ["node", "jest", "express", "ioredis", "fs-extra", "moment", "axios", "request-promise-native", "universal-analytics"]
     },
+
     "compileOnSave": true
 }

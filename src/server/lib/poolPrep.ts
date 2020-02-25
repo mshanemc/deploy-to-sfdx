@@ -5,10 +5,11 @@ import { utilities } from './utilities';
 import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
 import { DeployRequest, PoolConfig } from './types';
 import { execProm } from './execProm';
-import { getPoolName, getDeployId } from './namedUtilities';
+import { getPoolName, getDeployId, getPoolConfig } from './namedUtilities';
 import { processWrapper } from './processWrapper';
+import { checkWhitelist } from './checkWhitelist';
 
-export const preparePoolByName = async (pool: PoolConfig, createHerokuDynos = true): Promise<void> => {
+export const preparePoolByName = async (pool: PoolConfig) => {
     const targetQuantity = pool.quantity;
     const poolname = getPoolName(pool);
 
@@ -28,51 +29,47 @@ export const preparePoolByName = async (pool: PoolConfig, createHerokuDynos = tr
         if (needed <= 0) {
             return;
         }
-        const deployId = getDeployId(pool.user, pool.repo);
-
-        const username = poolname.split('.')[0];
-        const repo = poolname.split('.')[1];
 
         const message: DeployRequest = {
             pool: true,
-            username,
-            repo,
-            deployId,
-            whitelisted: true,
-            createdTimestamp: new Date()
+            deployId: getDeployId(pool.repos[0].username, pool.repos[0].repo),
+            createdTimestamp: new Date(),
+            repos: pool.repos.map(repo => ({ ...repo, whitelisted: checkWhitelist(repo.username, repo.repo) })),
+            visitor: processWrapper.UA_ID ? ua(processWrapper.UA_ID) : undefined
         };
 
-        if (processWrapper.UA_ID) {
-            message.visitor = ua(processWrapper.UA_ID);
-        }
-
-        // branch support
-        if (pool.branch) {
-            message.branch = pool.branch;
-        }
-
         const messages = [];
+
         while (messages.length < needed) {
             messages.push(putPoolRequest(message));
         }
         await Promise.all(messages);
 
         logger.debug(`...Requesting ${needed} more org for ${poolname}...`);
-        let builders = 0;
-        const builderCommand = utilities.getPoolDeployerCommand();
-
-        if (createHerokuDynos) {
-            while (builders < needed && builders < 50) {
-                // eslint-disable-next-line no-await-in-loop
-                await execProm(builderCommand);
-                builders++;
-            }
-        }
     }
 };
 
+export const startPoolDeployers = async quantityRequested => {
+    if (quantityRequested === 0) return;
+    logger.debug(`received request for ${quantityRequested} builders.  Max allowed is ${processWrapper.maxPoolBuilders}`);
+
+    let builders = 0;
+    const builderCommand = utilities.getPoolDeployerCommand();
+
+    if (quantityRequested >= processWrapper.maxPoolBuilders) {
+        logger.warn('the poolDeploys queue seems really large');
+    }
+
+    while (builders < Math.min(quantityRequested, processWrapper.maxPoolBuilders)) {
+        // eslint-disable-next-line no-await-in-loop
+        await execProm(builderCommand);
+        builders += 1;
+    }
+    logger.debug(`started ${builders} builders for poolQueue`);
+};
+
 export const prepareAll = async (): Promise<void> => {
-    const pools = (await utilities.getPoolConfig()) as PoolConfig[];
+    const pools = await getPoolConfig();
     logger.debug(`preparing ${pools.length} pools`);
 
     await Promise.all(pools.map(pool => preparePoolByName(pool)));

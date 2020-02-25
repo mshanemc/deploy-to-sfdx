@@ -1,34 +1,35 @@
 import { utilities } from '../../lib/utilities';
+import { getArg } from '../../lib/namedUtilities';
 
 describe('Utilities: getArg', () => {
     test('gets path from an org open command', () => {
         const cmd = 'sfdx force:org:open -u something@wahtever.hack -r -p /lightning/something';
-        expect(utilities.getArg(cmd, '-p')).toBe('/lightning/something');
+        expect(getArg(cmd, '-p')).toBe('/lightning/something');
     });
 
     test('handles getArg with -d', () => {
         const cmd = 'sfdx shane:heroku:repo:deploy -d 500';
-        expect(utilities.getArg(cmd, '-d')).toBe('500');
+        expect(getArg(cmd, '-d')).toBe('500');
     });
 
     test('handles getArg with --days', () => {
         const cmd = 'sfdx shane:heroku:repo:deploy --days 500 --json';
-        expect(utilities.getArg(cmd, '--days')).toBe('500');
+        expect(getArg(cmd, '--days')).toBe('500');
     });
 
     test('handles getArg with -d after single param', () => {
         const cmd = 'sfdx shane:heroku:repo:deploy --json --days 500';
-        expect(utilities.getArg(cmd, '--days')).toBe('500');
+        expect(getArg(cmd, '--days')).toBe('500');
     });
 
     test('handles getArg with ` after single param', () => {
         const cmd = 'sfdx shane:heroku:repo:deploy -f --name `basename "${PWD}"` --json --days 500';
-        expect(utilities.getArg(cmd, '--name')).toBe('`basename "${PWD}"`');
+        expect(getArg(cmd, '--name')).toBe('`basename "${PWD}"`');
     });
 
     test('handles getArg with ` after single param with more string after that', () => {
         const cmd = 'sfdx shane:heroku:repo:deploy -f --name `basename "${PWD}"`-stg --json --days 500';
-        expect(utilities.getArg(cmd, '--name')).toBe('`basename "${PWD}"`-stg');
+        expect(getArg(cmd, '--name')).toBe('`basename "${PWD}"`-stg');
     });
 
     test('parses url with double //', () => {

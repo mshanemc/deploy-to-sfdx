@@ -6,8 +6,6 @@ const checkWhitelist = (ghuser: string, ghrepo: string): boolean => {
     const whitelist1 = processWrapper.GITHUB_USERNAME_WHITELIST; // comma separated list of username
     const whitelist2 = processWrapper.GITHUB_REPO_WHITELIST; // comma separated list of username/repo
 
-    // logger.warn(`whitelist is ${whitelist1}`);
-
     if (!whitelist1 && !whitelist2) {
         // logger.debug('no whitelists, returning early');
 
@@ -16,7 +14,7 @@ const checkWhitelist = (ghuser: string, ghrepo: string): boolean => {
 
     if (whitelist1) {
         for (const username of whitelist1.split(',')) {
-            if (username.trim() === ghuser) {
+            if (username.trim().toLowerCase() === ghuser.toLowerCase()) {
                 // logger.debug(`matched ${username} and ${ghuser}`);
                 return true;
             }
@@ -27,7 +25,16 @@ const checkWhitelist = (ghuser: string, ghrepo: string): boolean => {
     if (whitelist2) {
         for (const repo of whitelist2.split(',')) {
             // logger.debug(`checking whitelist 2 element: ${repo}`);
-            if (repo.trim().split('/')[0] === ghuser && repo.trim().split('/')[1] === ghrepo) {
+            if (
+                repo
+                    .trim()
+                    .split('/')[0]
+                    .toLowerCase() === ghuser.toLowerCase() &&
+                repo
+                    .trim()
+                    .split('/')[1]
+                    .toLowerCase() === ghrepo.toLowerCase()
+            ) {
                 return true;
             }
         }

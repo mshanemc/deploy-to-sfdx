@@ -1,19 +1,9 @@
 import * as fs from 'fs';
 import logger from 'heroku-logger';
-// import * as stripcolor from 'strip-color';
 
 import { isLocal } from './amIlocal';
 import { exec } from './execProm';
 import { processWrapper } from './processWrapper';
-
-// const hubAuthd = async () => {
-//     // const hubResult = await exec('sfdx force:config:get defaultdevhubusername --json');
-//     // if (JSON.parse(stripcolor(hubResult.stdout)).status === 0) {
-//     //     return true;
-//     // }
-
-//     return false;
-// };
 
 const getKeypath = async (): Promise<string> => {
     if (isLocal()) {
@@ -35,14 +25,12 @@ const getKeypath = async (): Promise<string> => {
     return undefined;
 };
 
+const buildJWTAuthCommand = async (username = processWrapper.HUB_USERNAME): Promise<string> =>
+    `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${username} --jwtkeyfile ${await getKeypath()}`;
+
 const auth = async (): Promise<string> => {
     // where will our cert live?
     const keypath = await getKeypath();
-
-    // are we already auth'd?  If so, quit quickly
-    // if (await hubAuthd()) {
-    //     return keypath;
-    // }
 
     try {
         if (!isLocal()) {
@@ -63,11 +51,7 @@ const auth = async (): Promise<string> => {
             await exec('heroku update');
         }
 
-        await exec(
-            `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
-                processWrapper.HUB_USERNAME
-            } --jwtkeyfile ${await keypath} --setdefaultdevhubusername -a hub --json`
-        );
+        await exec(`${await buildJWTAuthCommand()} --setdefaultdevhubusername -a hub --json`);
     } catch (err) {
         logger.error('hubAuth', err);
         // eslint-disable-next-line no-process-exit
@@ -77,4 +61,4 @@ const auth = async (): Promise<string> => {
     return keypath;
 };
 
-export { auth, getKeypath };
+export { auth, getKeypath, buildJWTAuthCommand };

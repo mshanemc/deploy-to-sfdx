@@ -60,6 +60,7 @@ module.exports = {
     // A set of global variables that need to be available in all test environments
     // globals: {},
 
+    maxConcurrency: 10,
     // An array of directory names to be searched recursively up from the requiring module's location
     // moduleDirectories: [
     //   "node_modules"
@@ -119,7 +120,7 @@ module.exports = {
     // runner: "jest-runner",
 
     // The paths to modules that run some code to configure or set up the testing environment before each test
-    // setupFiles: [],
+    setupFiles: ['dotenv/config'],
 
     // A list of paths to modules that run some code to configure or set up the testing framework before each test
     // setupFilesAfterEnv: [],
@@ -128,7 +129,7 @@ module.exports = {
     // snapshotSerializers: [],
 
     // The test environment that will be used for testing
-    testEnvironment: 'node'
+    testEnvironment: 'node',
 
     // Options that will be passed to the testEnvironment
     // testEnvironmentOptions: {},
@@ -137,10 +138,10 @@ module.exports = {
     // testLocationInResults: false,
 
     // The glob patterns Jest uses to detect test files
-    // testMatch: [
-    //   "**/__tests__/**/*.[jt]s?(x)",
-    //   "**/?(*.)+(spec|test).[tj]s?(x)"
-    // ],
+    testMatch: [
+        //   "**/__tests__/**/*.[jt]s?(x)",
+        '**/integrationTests/**/?(*.)+(spec|test).[tj]s?(x)'
+    ]
 
     // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
     // testPathIgnorePatterns: [

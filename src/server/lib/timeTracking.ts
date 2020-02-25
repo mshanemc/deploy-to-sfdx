@@ -2,8 +2,10 @@ import logger from 'heroku-logger';
 import { DeployRequest } from './types';
 import { CDS } from './CDS';
 import { processWrapper } from './processWrapper';
+import { getPoolKey } from './namedUtilities';
 
 const timeBetweenStringified = (start: Date, end: Date): string => (new Date(end).getTime() - new Date(start).getTime()).toString();
+
 const iterateCommandResults = async (repo: string, cds: CDS, msgJSON: DeployRequest): Promise<void> => {
     try {
         // how long did the user wait until the open button appears
@@ -29,7 +31,7 @@ const timesToGA = async (msgJSON: DeployRequest, cds: CDS): Promise<void> => {
         return;
     }
 
-    const repo = `${processWrapper.SFDX_PRERELEASE ? 'prerelease' : 'regular'}/${msgJSON.template || msgJSON.repo}`;
+    const repo = `${processWrapper.SFDX_PRERELEASE ? 'prerelease' : 'regular'}/${getPoolKey(msgJSON, '-')}`;
 
     // log command stuff from the pool after it builds, but then exit and don't hit the high-level metrics for end user experience.
     if (msgJSON.pool) {

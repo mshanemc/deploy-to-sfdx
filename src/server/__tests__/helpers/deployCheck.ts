@@ -8,22 +8,30 @@ import { cdsDelete } from '../../lib/redisNormal';
 import { CDS } from '../../lib/CDS';
 import { processDeleteQueue } from '../../lib/skimmerSupport';
 import { TestRepo } from '../../lib/types';
+import { multiTemplateURLBuilder } from '../../lib/multiTemplateURLBuilder';
 
 const retryOptions = { maxAttempts: 3 };
+const baseUrl = getTestURL();
 
 const deployCheck = async (testRepo: TestRepo) => {
     await fs.ensureDir('tmp');
+    return deployCheckMulti([testRepo]);
+};
 
-    const baseUrl = getTestURL();
-    const url = testRepo.branch
-        ? `https://github.com/${testRepo.username}/${testRepo.repo}/tree/${testRepo.branch}`
-        : `https://github.com/${testRepo.username}/${testRepo.repo}`;
+const deployCheckMulti = async (testRepos: TestRepo[]) => {
+    await fs.ensureDir('tmp');
+    const urls = testRepos.map(testRepo =>
+        testRepo.branch
+            ? `https://github.com/${testRepo.username}/${testRepo.repo}/tree/${testRepo.branch}`
+            : `https://github.com/${testRepo.username}/${testRepo.repo}`
+    );
+
+    // console.debug(`URLS are`, urls);
 
     await retry(async () => {
         // get the launch page and follow the path
-
         const startResult = await request({
-            url: `${baseUrl}/launch?template=${url}`,
+            url: multiTemplateURLBuilder(urls, `${baseUrl}/launch`),
             resolveWithFullResponse: true
         });
 
@@ -55,5 +63,4 @@ const deployCheck = async (testRepo: TestRepo) => {
         return status;
     }, retryOptions);
 };
-
-export { deployCheck };
+export { deployCheck, deployCheckMulti };

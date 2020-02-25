@@ -1,4 +1,3 @@
-/* globals describe */
 import { argStripper } from '../../lib/argStripper';
 
 describe('argStripperTest', () => {

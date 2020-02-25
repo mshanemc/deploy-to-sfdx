@@ -1,10 +1,7 @@
 import * as ua from 'universal-analytics';
 
 // list of repos used for testing.  See testRepos.ts
-export interface TestRepo {
-    username: string;
-    repo: string;
-    branch?: string;
+export interface TestRepo extends DeployRequestRepo {
     testPool?: boolean;
 }
 
@@ -15,15 +12,9 @@ export interface DeleteRequest {
 }
 
 export interface DeployRequest {
-    repo: string;
     createdTimestamp: Date;
     deployId: string;
-    username?: string;
     pool?: boolean;
-    whitelisted?: boolean;
-    branch?: string;
-    path?: string;
-    template?: string;
     email?: string;
     firstname?: string;
     lastname?: string;
@@ -34,15 +25,28 @@ export interface DeployRequest {
         username: string;
         orgId: string;
     };
+    repos?: DeployRequestRepo[]; // new version to hold multiples, support more sources
+}
+
+export interface DeployRequestRepo {
+    source?: string; // defaults to github for now
+    username: string;
+    repo: string;
+    branch?: string;
+    whitelisted?: boolean;
 }
 
 // tells how a pool should be built.  Used in an array from a url like POOLCONFIG_URL=https://deployer-pools.herokuapp.com/pools-dev
 export interface PoolConfig {
-    user: string;
-    repo: string;
     lifeHours: number;
     quantity: number;
-    branch?: string;
+    repos?: DeployRequestRepo[];
+}
+
+export interface PoolConfigDeprecated extends PoolConfig {
+    user?: string; // deprecated.  Use repos for multi
+    repo?: string; // deprecated.  Use repos for multi
+    branch?: string; // deprecated.  Use repos for multi
 }
 
 export interface SfdxDisplayResult {
@@ -88,4 +92,16 @@ interface PackageDirectory {
     package?: string;
     versionName?: string;
     versionNumber?: string;
+}
+
+export interface ScratchDef {
+    orgName?: string;
+    description?: string;
+    features?: string[];
+    template?: string;
+    edition?: string;
+    username?: string;
+    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    settings?: { [key: string]: any };
 }

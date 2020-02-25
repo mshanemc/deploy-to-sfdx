@@ -1,7 +1,14 @@
 <template>
   <base-card>
     <template if:true={template}>
-      <p>Oh, you want to deploy <a href={template} target="_blank">{template}</a> to an org you own?</p>
+      <p>
+        Oh, you want to deploy&nbsp;
+        <template iterator:it={template}>
+          <span key={it.value} if:false={it.last}><a href={it.value} target="_blank">{it.value}</a> and&nbsp;</span>
+          <span key={it.value} if:true={it.last}><a href={it.value} target="_blank">{it.value}</a></span>
+        </template>
+        &nbsp;to an org you own?
+      </p>
       <p>
         This is going to install stuff, run scripts, and generally make changes to an org. <b>Make sure that you're signing in to the right org!</b>
       </p>

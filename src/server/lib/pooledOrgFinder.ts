@@ -3,9 +3,11 @@ import fs from 'fs-extra';
 import * as path from 'path';
 import { retry } from '@lifeomic/attempt';
 
+import { buildJWTAuthCommand } from './hubAuth';
+import { CDS } from './CDS';
 import { utilities } from './utilities';
+import { getPoolKey } from './namedUtilities';
 import { getPooledOrg, cdsPublish } from './redisNormal';
-import { getKeypath } from './hubAuth';
 import { timesToGA } from './timeTracking';
 import { execProm, exec2JSON } from './execProm';
 import { loginURL } from './loginURL';
@@ -14,13 +16,13 @@ import { DeployRequest } from './types';
 import { processWrapper } from './processWrapper';
 const retryOptions = { maxAttempts: 60, delay: 5000 };
 
-const pooledOrgFinder = async function(deployReq: DeployRequest, forcePool = false) {
+const pooledOrgFinder = async function(deployReq: DeployRequest, forcePool = false): Promise<CDS> {
     try {
         if (!processWrapper.POOLCONFIG_URL && !forcePool) {
-            return undefined;
+            return undefined; // not set up for pools, exit quickly
         }
 
-        let cds = await getPooledOrg(await utilities.getKey(deployReq), true);
+        let cds = await getPooledOrg(getPoolKey(deployReq), true);
         cds = {
             ...cds,
             buildStartTime: new Date(),
@@ -30,15 +32,10 @@ const pooledOrgFinder = async function(deployReq: DeployRequest, forcePool = fal
             isPool: false
         };
 
-        await cdsPublish(cds);
-
         const uniquePath = path.join(__dirname, '../tmp/pools', cds.orgId);
-        fs.ensureDirSync(uniquePath);
+        await Promise.all([cdsPublish(cds), fs.ensureDir(uniquePath)]);
 
-        // `sfdx force:auth:jwt:grant --json --clientid ${processWrapper.CONSUMERKEY} --username ${ cds.mainUser.username } --jwtkeyfile ${keypath} --instanceurl ${cds.instanceUrl || 'https://test.salesforce.com'} -s`,
-        const jwtComand = `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${
-            cds.mainUser.username
-        } --jwtkeyfile ${await getKeypath()} --instanceurl https://test.salesforce.com -s`;
+        const jwtComand = `${await buildJWTAuthCommand(cds.mainUser.username)} --instanceurl https://test.salesforce.com -s`;
 
         if (forcePool) {
             await retry(async () => execProm(jwtComand, { cwd: uniquePath }), retryOptions);
@@ -54,20 +51,20 @@ const pooledOrgFinder = async function(deployReq: DeployRequest, forcePool = fal
             });
         }
 
-        const openOutput = await exec2JSON(`${cds.poolLines.openLine} --json -r`, {
+        const openOutput = await exec2JSON(cds.poolLines.openLine, {
             cwd: uniquePath
         });
-        // const openOutput = JSON.parse(stripColor(openResult.stdout));
-
-        cds.openTimestamp = new Date();
-        cds.completeTimestamp = new Date();
-        cds.mainUser = {
-            ...cds.mainUser,
-            loginUrl: utilities.urlFix(openOutput).result.url
+        cds = {
+            ...cds,
+            complete: true,
+            openTimestamp: new Date(),
+            completeTimestamp: new Date(),
+            mainUser: {
+                ...cds.mainUser,
+                permalink: loginURL(cds),
+                loginUrl: utilities.urlFix(openOutput).result.url
+            }
         };
-        cds.mainUser.permalink = loginURL(cds);
-        cds.complete = true;
-
         logger.debug(`opened : ${openOutput}`);
         await Promise.all([cdsPublish(cds), timesToGA(deployReq, cds)]);
 
@@ -75,7 +72,7 @@ const pooledOrgFinder = async function(deployReq: DeployRequest, forcePool = fal
     } catch (e) {
         logger.warn('pooledOrgFinder');
         logger.warn(e);
-        return null;
+        return undefined;
     }
 };
 

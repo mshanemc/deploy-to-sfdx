@@ -8,6 +8,9 @@ import jsforce from 'jsforce';
 import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish, putLead } from '../lib/redisNormal';
 import { deployMsgBuilder } from '../lib/deployMsgBuilder';
 import { utilities } from '../lib/utilities';
+import { getPoolKey } from '../lib/namedUtilities';
+import { multiTemplateURLBuilder } from '../lib/multiTemplateURLBuilder';
+
 import { processWrapper } from '../lib/processWrapper';
 
 import { DeployRequest } from '../lib/types';
@@ -39,27 +42,27 @@ const commonDeploy = async (req, url: string) => {
 
     if (message.visitor) {
         message.visitor.pageview(url).send();
-        if (typeof message.template === 'string') {
-            message.visitor.event('Repo', message.template).send();
-        }
+        message.visitor.event('Repo', getPoolKey(message, '-')).send();
     }
 
     utilities.runHerokuBuilder();
-    await putDeployRequest(message);
-    await cdsPublish(
-        new CDS({
-            deployId: message.deployId
-        })
-    );
+    await Promise.all([
+        putDeployRequest(message),
+        cdsPublish(
+            new CDS({
+                deployId: message.deployId
+            })
+        )
+    ]);
+
     return message;
 };
 
 app.post(
     '/trial',
     wrapAsync(async (req, res, next) => {
-        const message = await commonDeploy(req, '/trial');
+        const [message] = await Promise.all([commonDeploy(req, '/trial'), putLead(req.body)]);
         logger.debug('trial request', message);
-        await putLead(req.body);
         res.redirect(`/deploying/trial/${message.deployId.trim()}`);
     })
 );
@@ -77,7 +80,7 @@ app.get(
     wrapAsync(async (req, res, next) => {
         // allow repos to require the email parameter
         if (req.query.email === 'required') {
-            return res.redirect(`/userinfo?template=${req.query.template}`);
+            return res.redirect(multiTemplateURLBuilder(req.query.template, '/userinfo'));
         }
 
         const message = await commonDeploy(req, '/launch');
@@ -127,11 +130,12 @@ app.get(
     '/authUrl',
     wrapAsync(async (req, res, next) => {
         const byooOauth2 = new jsforce.OAuth2({
-            redirectUri: processWrapper.BYOO_CALLBACK_URI || `http://localhost:${port}/token`,
+            redirectUri: processWrapper.BYOO_CALLBACK_URI ?? `http://localhost:${port}/token`,
             clientId: processWrapper.BYOO_CONSUMERKEY,
             clientSecret: processWrapper.BYOO_SECRET,
             loginUrl: req.query.base_url
         });
+        // console.log('state will be', JSON.stringify(req.query));
         res.send(
             byooOauth2.getAuthorizationUrl({
                 scope: 'api id web openid',
@@ -145,9 +149,9 @@ app.get(
     '/token',
     wrapAsync(async (req, res, next) => {
         const state = JSON.parse(req.query.state);
-
+        // console.log(`state`, state);
         const byooOauth2 = new jsforce.OAuth2({
-            redirectUri: processWrapper.BYOO_CALLBACK_URI || `http://localhost:${port}/token`,
+            redirectUri: processWrapper.BYOO_CALLBACK_URI ?? `http://localhost:${port}/token`,
             clientId: processWrapper.BYOO_CONSUMERKEY,
             clientSecret: processWrapper.BYOO_SECRET,
             loginUrl: state.base_url
@@ -183,6 +187,7 @@ app.get('*', (req, res, next) => {
 app.use((error, req, res, next) => {
     if (processWrapper.UA_ID) {
         const visitor = ua(processWrapper.UA_ID);
+        // TODO handle array of templates
         visitor.event('Error', req.query.template).send();
     }
     logger.error(`request failed: ${req.url}`);

@@ -1,19 +1,14 @@
-const shellSanitize = function(input: string): boolean {
-    if (!input) {
-        return true;
+const evilCharacters = [';', '<', '>', '|', '?', '*', '[', ']', '$', '\\', '(', ')', '{', '}', "'", '&&', '||', '&', '=', '`', '../'];
+
+const filterUnsanitized = (input: string): string => {
+    if (evilCharacters.some(evilChar => input.includes(evilChar))) {
+        throw new Error(`invalid characters in '${input}'`);
     }
-    // eslint-disable-next-line quotes
-    const evilCharacters = [';', '<', '>', '|', '?', '*', '[', ']', '$', '\\', '(', ')', '{', '}', "'", '&&', '||', '&', '=', '`'];
-    let ok = true;
-    evilCharacters.forEach(punk => {
-        if (input.includes(punk)) {
-            ok = false;
-        }
-    });
-    if (input.includes('../')) {
-        return false;
-    }
-    return ok;
+    return input;
+};
+
+const shellSanitize = (input: string): boolean => {
+    return filterUnsanitized(input) === input;
 };
 
 const filterAlphaHypenUnderscore = (input: string): string => {
@@ -22,8 +17,8 @@ const filterAlphaHypenUnderscore = (input: string): string => {
     if (input.length === input.match(regex)[0].length) {
         return input;
     } else {
-        throw new Error(`invalid characters in ${input}`);
+        throw new Error(`invalid characters in '${input}'`);
     }
 };
 
-export { shellSanitize, filterAlphaHypenUnderscore };
+export { shellSanitize, filterAlphaHypenUnderscore, filterUnsanitized };

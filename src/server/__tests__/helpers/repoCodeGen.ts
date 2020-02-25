@@ -38,7 +38,8 @@ import { cdsDelete } from './../../../lib/redisNormal';
 
 const tr = {
     username: '${testRepo.username}',
-    repo: '${testRepo.repo}'
+    repo: '${testRepo.repo}',
+    whitelisted: true
 };
 
 describe('pool for ${testRepo.username}/${testRepo.repo}', () => {
@@ -51,11 +52,13 @@ describe('pool for ${testRepo.username}/${testRepo.repo}', () => {
     
         test('retrieves an org from the pool for ${testRepo.username}/${testRepo.repo}', async () => {
             const req: DeployRequest = {
-                repo: tr.repo,
-                username: tr.username,
                 deployId: '${testRepo.username}-${testRepo.repo}-pool-${new Date().valueOf()}',
                 createdTimestamp: new Date(),
-                whitelisted: true
+                repos: [{
+                    whitelisted: true,
+                    username: tr.username,
+                    repo: tr.repo,
+                }]
             }
             const foundInPool = await pooledOrgFinder(req, true);
             expect(foundInPool).toBeTruthy();
