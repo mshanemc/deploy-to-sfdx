@@ -52,7 +52,7 @@
         "lodash.isequal": "^4.5.0",
         "moment": "^2.24.0",
         "request-promise-native": "^1.0.7",
-        "shane-sfdx-plugins": "^4.17.3",
+        "shane-sfdx-plugins": "^4.19.0",
         "strip-color": "^0.1.0",
         "universal-analytics": "^0.4.20"
     },
