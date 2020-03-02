@@ -3,7 +3,7 @@ import ua from 'universal-analytics';
 
 import { utilities } from './utilities';
 import { redis, putPoolRequest, getPoolDeployCountByRepo } from './redisNormal';
-import { DeployRequest, PoolConfig } from './types';
+import { PoolConfig } from './types';
 import { execProm } from './execProm';
 import { getPoolName, getDeployId, getPoolConfig } from './namedUtilities';
 import { processWrapper } from './processWrapper';
@@ -30,18 +30,23 @@ export const preparePoolByName = async (pool: PoolConfig) => {
             return;
         }
 
-        const message: DeployRequest = {
+        const messages = [];
+
+        const message = {
             pool: true,
-            deployId: getDeployId(pool.repos[0].username, pool.repos[0].repo),
             createdTimestamp: new Date(),
             repos: pool.repos.map(repo => ({ ...repo, whitelisted: checkWhitelist(repo.username, repo.repo) })),
             visitor: processWrapper.UA_ID ? ua(processWrapper.UA_ID) : undefined
         };
 
-        const messages = [];
-
         while (messages.length < needed) {
-            messages.push(putPoolRequest(message));
+            messages.push(
+                putPoolRequest({
+                    ...message,
+                    // deploy ID is here to ensure uniqueness, which matters when heroku apps inherit names from the deployID
+                    deployId: getDeployId(pool.repos[0].username, pool.repos[0].repo)
+                })
+            );
         }
         await Promise.all(messages);
 
