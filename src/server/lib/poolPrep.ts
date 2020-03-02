@@ -40,11 +40,15 @@ export const preparePoolByName = async (pool: PoolConfig) => {
         };
 
         while (messages.length < needed) {
+            // deploy ID is here to ensure uniqueness, which matters when heroku apps inherit names from the deployID
+            const deployId = getDeployId(pool.repos[0].username, pool.repos[0].repo);
+            if (messages.map(item => item.deployId).includes(deployId)) {
+                continue;
+            }
             messages.push(
                 putPoolRequest({
                     ...message,
-                    // deploy ID is here to ensure uniqueness, which matters when heroku apps inherit names from the deployID
-                    deployId: getDeployId(pool.repos[0].username, pool.repos[0].repo)
+                    deployId
                 })
             );
         }
