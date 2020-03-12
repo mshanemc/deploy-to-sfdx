@@ -18,9 +18,10 @@ const randomValueHex = (len: number): string =>
 const getKeyFromRepos = (repos: DeployRequestRepo[], separator = '.'): string =>
     repos
         .map(item =>
-            item.branch ? `${item.username}${separator}${item.repo}${separator}${item.branch}` : `${item.username}${separator}${item.repo}`
+            item.branch
+                ? `${item.username.toLowerCase()}${separator}${item.repo.toLowerCase()}${separator}${item.branch}`
+                : `${item.username.toLowerCase()}${separator}${item.repo.toLowerCase()}`
         )
-        .map(item => item.toLowerCase())
         .join(separator);
 
 const getPoolName = (pool: PoolConfig): string => getKeyFromRepos(pool.repos);
@@ -124,7 +125,7 @@ const poolConversion = (oldPool: PoolConfigDeprecated): PoolConfig => {
             {
                 username: oldPool.user.toLowerCase(),
                 repo: oldPool.repo.toLowerCase(),
-                branch: oldPool.branch ? oldPool.branch.toLowerCase() : undefined,
+                branch: oldPool.branch,
                 whitelisted: true,
                 source: 'github'
             }

@@ -41,7 +41,7 @@ const deployMsgBuilder = (req): DeployRequest => {
             source: 'github',
             username,
             repo,
-            branch: path.includes('/tree/') ? filterAlphaHypenUnderscore(path.split('/tree/')[1]).toLowerCase() : undefined,
+            branch: path.includes('/tree/') ? filterAlphaHypenUnderscore(path.split('/tree/')[1]) : undefined,
             whitelisted: checkWhitelist(username, repo)
         };
     });
