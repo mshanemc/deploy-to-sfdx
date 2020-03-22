@@ -26,8 +26,8 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
             { ...output, complete: true },
             {
                 command: 'line parsing',
-                error: e,
-                raw: e
+                error: e.message,
+                raw: JSON.stringify(e)
             }
         );
         cdsPublish(output);
