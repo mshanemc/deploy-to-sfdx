@@ -1523,19 +1523,30 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@mshanemc/sfdx-migration-automatic@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@mshanemc/sfdx-migration-automatic/-/sfdx-migration-automatic-0.2.1.tgz#3d25c3ef187baf660885eeda1273fa2b608cd7b6"
-  integrity sha512-X6Rib1BSq1jVC5Fv81Ryt3nfL/mSdkC1tXfEj1YN0fjJs71sf64oSPbqw7ZH5SkosmknH+TOfyuuc1Mve0B9Pg==
+"@mshanemc/salesforce-migration-automatic@1.9.0":
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/@mshanemc/salesforce-migration-automatic/-/salesforce-migration-automatic-1.9.0.tgz#8934bdb2f2d7ae0cd21121d7098cca580ddad76e"
+  integrity sha512-FSQBLxAkUzZPNwtFjVcEiwheozgXBDDkgbulVQSnzsPIHgxBqIVvXL/JgsBtSCdYtxaMCPO2GXawdX0y780ekw==
   dependencies:
+    csv-parse "^4.8.2"
+    csv-stringify "^5.3.3"
+    jsforce "^1.9.3"
+
+"@mshanemc/sfdx-migration-automatic@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@mshanemc/sfdx-migration-automatic/-/sfdx-migration-automatic-0.3.0.tgz#6324706a7ca8b82d13cb924d432c21fb2fdcb0b8"
+  integrity sha512-XlwdgusaDZmd41Yvm/TV3X/AnplCBW/iOwpAdeUtRpqDfMzsbJLFBjCWhTrjETb/fC8W62WFncTJ+4WMmAFJwA==
+  dependencies:
+    "@mshanemc/salesforce-migration-automatic" "1.9.0"
     "@oclif/command" "1"
     "@oclif/config" "1"
     "@oclif/errors" "1"
     "@salesforce/command" "^1.0.1"
     "@salesforce/core" "^1.0.1"
+    csv-parse "^4.8.8"
+    csv-stringify "^5.3.6"
     fs-extra "^7.0.1"
     jsforce "^1.9.1"
-    salesforce-migration-automatic "^1.6.0"
     tslib "1"
 
 "@nodelib/fs.scandir@2.1.3":
@@ -4673,7 +4684,7 @@ csv-parse@^1.1.1:
   resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-1.3.3.tgz#d1cfd8743c2f849a0abb2fd544db56695d19a490"
   integrity sha1-0c/YdDwvhJoKuy/VRNtWaV0ZpJA=
 
-csv-parse@^4.6.3:
+csv-parse@^4.6.3, csv-parse@^4.8.8:
   version "4.8.8"
   resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-4.8.8.tgz#0acbc4598c1f28652c4250599108096b3a0a68ae"
   integrity sha512-Kv3Ilz2GV58dOoHBXRCTF8ijxlLjl80bG3d67XPI6DNqffb3AnbPbKr/WvCUMJq5V0AZYi6sukOaOQAVpfuVbg==
@@ -4697,7 +4708,7 @@ csv-stringify@^1.0.4:
   dependencies:
     lodash.get "~4.4.2"
 
-csv-stringify@^5.3.3:
+csv-stringify@^5.3.3, csv-stringify@^5.3.6:
   version "5.3.6"
   resolved "https://registry.yarnpkg.com/csv-stringify/-/csv-stringify-5.3.6.tgz#2655e2e1c01b97b3963bccbc9407b8fb876dc589"
   integrity sha512-kPcRbMvo5NLLD71TAqW5K+g9kbM2HpIZJLAzm73Du8U+5TXmDp9YtXKCBLyxEh0q3Jbg8QhNFBz3b5VJzjZ/jw==
@@ -12376,15 +12387,6 @@ safe-regex@^1.1.0:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
-salesforce-migration-automatic@^1.6.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/salesforce-migration-automatic/-/salesforce-migration-automatic-1.8.0.tgz#a8f78f9b56b8ea5beac8a4521d001f20af145a6e"
-  integrity sha512-EoyMGDhdISpcLE6iHtpeXWFsom+vVHf6DZL7l33/ZAlG9noylqx2LycWWmH8WKtwQJZUIk4PgPwiGvrtMiaOvw==
-  dependencies:
-    csv-parse "^4.8.2"
-    csv-stringify "^5.3.3"
-    jsforce "^1.9.3"
-
 samsam@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/samsam/-/samsam-1.3.0.tgz#8d1d9350e25622da30de3e44ba692b5221ab7c50"
@@ -12614,10 +12616,10 @@ shallow-clone@^0.1.2:
     lazy-cache "^0.2.3"
     mixin-object "^2.0.1"
 
-shane-sfdx-plugins@^4.21.0:
-  version "4.21.0"
-  resolved "https://registry.yarnpkg.com/shane-sfdx-plugins/-/shane-sfdx-plugins-4.21.0.tgz#bd74e4346d24185823167f1105f574f4e5eeaf0d"
-  integrity sha512-BAMatzObb1MFifs873MEoAPTNDdfGG0wmofkPJXpE5vri1wgehNfemR06NA3vaYxAgGl6Z6RHYVYKxJKBkhIBQ==
+shane-sfdx-plugins@^4.25.3:
+  version "4.25.3"
+  resolved "https://registry.yarnpkg.com/shane-sfdx-plugins/-/shane-sfdx-plugins-4.25.3.tgz#15ba8c0839eaf05bc47914e18c5725fe3d541bb0"
+  integrity sha512-GtGEHjbG1CFAe96sr/7hGfi8ICVuVwqk+qmRWTGPblISiVtpdzexLqzW2sLMVGHQZJUgtaTGSc8KLX9i29jctw==
   dependencies:
     "@lifeomic/attempt" "^3.0.0"
     "@oclif/command" "^1.5.12"
