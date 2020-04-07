@@ -1523,21 +1523,21 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@mshanemc/salesforce-migration-automatic@1.9.0":
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/@mshanemc/salesforce-migration-automatic/-/salesforce-migration-automatic-1.9.0.tgz#8934bdb2f2d7ae0cd21121d7098cca580ddad76e"
-  integrity sha512-FSQBLxAkUzZPNwtFjVcEiwheozgXBDDkgbulVQSnzsPIHgxBqIVvXL/JgsBtSCdYtxaMCPO2GXawdX0y780ekw==
+"@mshanemc/salesforce-migration-automatic@1.9.1":
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/@mshanemc/salesforce-migration-automatic/-/salesforce-migration-automatic-1.9.1.tgz#98d6bf96c61444e5c519864ae86a5ae7af79227c"
+  integrity sha512-UWLX0+V0isXc22kHiyPkQsJcv+EYnxFMM5CqRB1x9uW5l29SVmRWt4o1vebUz2pOInBCJLpNeoNg0QJFp2j32w==
   dependencies:
     csv-parse "^4.8.2"
     csv-stringify "^5.3.3"
     jsforce "^1.9.3"
 
-"@mshanemc/sfdx-migration-automatic@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@mshanemc/sfdx-migration-automatic/-/sfdx-migration-automatic-0.3.0.tgz#6324706a7ca8b82d13cb924d432c21fb2fdcb0b8"
-  integrity sha512-XlwdgusaDZmd41Yvm/TV3X/AnplCBW/iOwpAdeUtRpqDfMzsbJLFBjCWhTrjETb/fC8W62WFncTJ+4WMmAFJwA==
+"@mshanemc/sfdx-migration-automatic@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@mshanemc/sfdx-migration-automatic/-/sfdx-migration-automatic-0.3.1.tgz#509653af2f39f17b9132667e5c6150dad779c465"
+  integrity sha512-e3KpvMgw6FQJqZbtwI1KR/UkthkJxlhuhxNuWDZ7FSCWRlem/8HA/hSl/fPLUGtX6LygywAQ9fQ7e9qVvSLyBQ==
   dependencies:
-    "@mshanemc/salesforce-migration-automatic" "1.9.0"
+    "@mshanemc/salesforce-migration-automatic" "1.9.1"
     "@oclif/command" "1"
     "@oclif/config" "1"
     "@oclif/errors" "1"
