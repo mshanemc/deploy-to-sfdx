@@ -11,33 +11,28 @@ import {
     getKeysForCDSs,
     cdsRetrieve,
     cdsDelete,
-    getDeleteRequest
+    getDeleteRequest,
+    getAllPooledOrgs
 } from './redisNormal';
 import { PoolConfig } from './types';
 import { herokuDelete } from './herokuDelete';
 import { exec2JSON } from './execProm';
 import { getPoolName, getPoolConfig } from './namedUtilities';
-import { CDS } from './CDS';
 import { processWrapper } from './processWrapper';
 
 const hoursToKeepBYOO = 12;
 
 const checkExpiration = async (pool: PoolConfig): Promise<string> => {
     const poolname = getPoolName(pool);
-    const currentPoolSize = await redis.llen(poolname); // how many orgs are there?
-
-    if (currentPoolSize === 0) {
+    const allOrgs = await getAllPooledOrgs(poolname);
+    if (allOrgs.length === 0) {
         return `pool ${poolname} is empty`;
     }
-
-    const allMessages = await redis.lrange(poolname, 0, -1); // we'll take them all
-    const allOrgs: CDS[] = allMessages.map(msg => JSON.parse(msg));
-
     const goodOrgs = allOrgs
         .filter(org => moment().diff(moment(org.completeTimestamp), 'hours', true) <= pool.lifeHours)
         .map(org => JSON.stringify(org));
 
-    if (goodOrgs.length === allMessages.length) {
+    if (goodOrgs.length === allOrgs.length) {
         return `all the orgs in pool ${poolname} are fine`;
     }
 

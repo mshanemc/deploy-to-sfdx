@@ -9,3 +9,4 @@ orgdeleter: node lib/server/processes/orgDeleter.js
 deployidcleanup: node lib/server/processes/deployIdCleanup.js
 herokucdscheck: node lib/server/processes/herokuExpirationChecker.js
 leadqueue: node lib/server/processes/trialLeadCreate.js
+pooldrain: node lib/server/processes/poolDrainSubscriber.js

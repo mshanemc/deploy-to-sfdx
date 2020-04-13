@@ -135,4 +135,15 @@ const poolConversion = (oldPool: PoolConfigDeprecated): PoolConfig => {
     return newPool;
 };
 
-export { getPoolName, getPackageDirsFromFile, getDeployId, getCloneCommands, isMultiRepo, isByoo, getArg, getPoolKey, getPoolConfig };
+export {
+    getPoolName,
+    getPackageDirsFromFile,
+    getDeployId,
+    getCloneCommands,
+    isMultiRepo,
+    isByoo,
+    getArg,
+    getPoolKey,
+    getPoolConfig,
+    getKeyFromRepos
+};
