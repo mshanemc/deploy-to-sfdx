@@ -20,10 +20,10 @@ const handleEvent = async message => {
 
     // get orgs from pool
     const allOrgs = await getAllPooledOrgs(poolname);
-    // pass orgs to delete
-    await Promise.all(allOrgs.map(cds => deleteOrg(cds.mainUser.username)));
     // delete the actual pool
     await redis.del(poolname);
+    // pass orgs to delete
+    await Promise.all(allOrgs.map(cds => deleteOrg(cds.mainUser.username)));
 };
 
 (async () => {
