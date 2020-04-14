@@ -5,6 +5,8 @@ import ua from 'universal-analytics';
 import path from 'path';
 import jsforce from 'jsforce';
 
+import cors from 'cors';
+
 import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish, putLead } from '../lib/redisNormal';
 import { deployMsgBuilder } from '../lib/deployMsgBuilder';
 import { utilities } from '../lib/utilities';
@@ -28,6 +30,7 @@ app.listen(port, () => {
 app.use(express.static('dist'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
 function wrapAsync(fn: any) {
     return function(req, res, next) {
