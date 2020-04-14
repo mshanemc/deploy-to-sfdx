@@ -27,11 +27,7 @@ const handleEvent = async message => {
 };
 
 (async () => {
-    // auth to the org
-    // subscribe to the stream
     let conn = await jwtConn();
-
     conn.streaming.topic('/event/Pool_Drain__e').subscribe(handleEvent);
-
     logger.info('subscription is done');
 })();
