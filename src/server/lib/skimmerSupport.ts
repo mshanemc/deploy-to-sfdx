@@ -65,8 +65,7 @@ const doesOrgExist = async (username: string): Promise<boolean> => {
         const queryResult = await exec2JSON(
             `sfdx force:data:soql:query -u ${processWrapper.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`
         );
-        const status = queryResult.result.records[0].Status;
-        return !['Deleted', 'Error'].includes(status);
+        return !['Deleted', 'Error'].includes(queryResult.result.records[0].Status);
     } catch (e) {
         logger.error(`error checking hub for username ${username}`);
         logger.error(e);
