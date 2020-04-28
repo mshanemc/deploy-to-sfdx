@@ -130,7 +130,7 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
         } catch (e) {
             if (msgJSON.pool && output.mainUser && output.mainUser.username) {
                 // delete an org if one got created and it's a pool
-                await deleteOrg(output.deployId);
+                await deleteOrg(output.mainUser.username);
             }
             logger.error(`a very serious error occurred on this line...in the catch section: ${e.name}: ${e.message}`, e);
             // a more serious error...tell the client
