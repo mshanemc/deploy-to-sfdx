@@ -29,12 +29,14 @@ const redis = new Redis(processWrapper.REDIS_URL);
 
 const deleteOrg = async (username: string): Promise<void> => {
     logger.debug(`org delete requested for ${username}`);
-    const msg: DeleteRequest = {
-        username: filterUnsanitized(username),
-        delete: true,
-        created: new Date()
-    };
-    await redis.rpush(orgDeleteExchange, JSON.stringify(msg));
+    if (username) {
+        const msg: DeleteRequest = {
+            username: filterUnsanitized(username),
+            delete: true,
+            created: new Date()
+        };
+        await redis.rpush(orgDeleteExchange, JSON.stringify(msg));
+    }
 };
 
 const putHerokuCDS = async (cds: CDS): Promise<void> => {
