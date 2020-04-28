@@ -144,7 +144,9 @@ const cdsDelete = async (deployId: string) => {
     const retrieved = await redis.get(deployId);
     if (retrieved) {
         const cds = JSON.parse(retrieved) as CDS;
-        await deleteOrg(cds.mainUser.username);
+        if (cds.mainUser.username) {
+            await deleteOrg(cds.mainUser.username);
+        }
     }
     await redis.del(deployId);
 };
