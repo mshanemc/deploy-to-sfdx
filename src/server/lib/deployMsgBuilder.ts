@@ -32,7 +32,7 @@ const makesTemplates = (templateParam): string[] => {
 
 const deployMsgBuilder = (req): DeployRequest => {
     validateQuery(req.query); // check for exploits
-    const repos = makesTemplates(req.query.template).map(template => {
+    const repos = makesTemplates(req.query.template).map((template) => {
         logger.debug(`deployMsgBuilder: template is ${template}`);
         const path = template.replace('https://github.com/', '');
         const username = filterAlphaHypenUnderscore(path.split('/')[0]).toLowerCase();

@@ -29,8 +29,8 @@ const checkExpiration = async (pool: PoolConfig): Promise<string> => {
         return `pool ${poolname} is empty`;
     }
     const goodOrgs = allOrgs
-        .filter(org => moment().diff(moment(org.completeTimestamp), 'hours', true) <= pool.lifeHours)
-        .map(org => JSON.stringify(org));
+        .filter((org) => moment().diff(moment(org.completeTimestamp), 'hours', true) <= pool.lifeHours)
+        .map((org) => JSON.stringify(org));
 
     if (goodOrgs.length === allOrgs.length) {
         return `all the orgs in pool ${poolname} are fine`;
@@ -45,8 +45,8 @@ const checkExpiration = async (pool: PoolConfig): Promise<string> => {
     }
 
     const expiredOrgs = allOrgs
-        .filter(org => moment().diff(moment(org.completeTimestamp), 'hours', true) > pool.lifeHours && org.mainUser && org.mainUser.username)
-        .map(org => JSON.stringify({ username: org.mainUser.username, delete: true }));
+        .filter((org) => moment().diff(moment(org.completeTimestamp), 'hours', true) > pool.lifeHours && org.mainUser && org.mainUser.username)
+        .map((org) => JSON.stringify({ username: org.mainUser.username, delete: true }));
 
     if (expiredOrgs.length > 0) {
         await redis.rpush(orgDeleteExchange, ...expiredOrgs);
@@ -56,8 +56,8 @@ const checkExpiration = async (pool: PoolConfig): Promise<string> => {
 
 const skimmer = async (): Promise<void> => {
     const pools = await getPoolConfig();
-    const results = await Promise.all(pools.map(pool => checkExpiration(pool)));
-    results.forEach(result => logger.debug(result));
+    const results = await Promise.all(pools.map((pool) => checkExpiration(pool)));
+    results.forEach((result) => logger.debug(result));
 };
 
 const doesOrgExist = async (username: string): Promise<boolean> => {
@@ -101,9 +101,9 @@ const herokuExpirationCheck = async (): Promise<void> => {
 
 const removeOldDeployIds = async (): Promise<void> => {
     const deployIds = await getKeysForCDSs();
-    const CDSs = (await Promise.all(deployIds.map(deployId => cdsRetrieve(deployId)))).filter(cds => cds.mainUser && cds.mainUser.username);
+    const CDSs = (await Promise.all(deployIds.map((deployId) => cdsRetrieve(deployId)))).filter((cds) => cds.mainUser && cds.mainUser.username);
     await Promise.all(
-        CDSs.map(cds => {
+        CDSs.map((cds) => {
             if (!cds.expirationDate && moment().diff(moment(cds.browserStartTime), 'hours') > hoursToKeepBYOO) {
                 return cdsDelete(cds.deployId);
             }
@@ -111,7 +111,7 @@ const removeOldDeployIds = async (): Promise<void> => {
                 return cdsDelete(cds.deployId);
             }
             return undefined;
-        }).filter(item => item)
+        }).filter((item) => item)
     );
 };
 
@@ -130,7 +130,7 @@ const processDeleteQueue = async (): Promise<void> => {
 
                 await exec2JSON(
                     `sfdx force:data:record:delete -u ${processWrapper.HUB_USERNAME} -s ActiveScratchOrg -w "SignupUsername='${deleteReq.username}'" --json`
-                ).catch(e => {
+                ).catch((e) => {
                     logger.error(e);
                     logger.warn(`unable to delete org with username: ${deleteReq.username}`);
                 });

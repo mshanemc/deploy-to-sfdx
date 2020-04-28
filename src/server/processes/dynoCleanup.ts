@@ -21,9 +21,9 @@ import { processWrapper } from '../lib/processWrapper';
 
         await Promise.all(
             runDynos
-                .filter(dyno => dyno.type === 'run')
-                .filter(dyno => moment(dyno.created_at).isBefore(moment().subtract(processWrapper.DYNO_TIME_LIMIT, 'minutes')))
-                .map(dyno => heroku.post(`/apps/${processWrapper.HEROKU_APP_NAME}/dynos/${dyno.id}/actions/stop`))
+                .filter((dyno) => dyno.type === 'run')
+                .filter((dyno) => moment(dyno.created_at).isBefore(moment().subtract(processWrapper.DYNO_TIME_LIMIT, 'minutes')))
+                .map((dyno) => heroku.post(`/apps/${processWrapper.HEROKU_APP_NAME}/dynos/${dyno.id}/actions/stop`))
         );
     } catch (err) {
         logger.error('dynoCleanup', err);

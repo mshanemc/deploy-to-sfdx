@@ -35,14 +35,14 @@ export const preparePoolByName = async (pool: PoolConfig) => {
         const message = {
             pool: true,
             createdTimestamp: new Date(),
-            repos: pool.repos.map(repo => ({ ...repo, whitelisted: checkWhitelist(repo.username, repo.repo) })),
+            repos: pool.repos.map((repo) => ({ ...repo, whitelisted: checkWhitelist(repo.username, repo.repo) })),
             visitor: processWrapper.UA_ID ? ua(processWrapper.UA_ID) : undefined
         };
 
         while (messages.length < needed) {
             // deploy ID is here to ensure uniqueness, which matters when heroku apps inherit names from the deployID
             const deployId = getDeployId(pool.repos[0].username, pool.repos[0].repo);
-            if (messages.map(item => item.deployId).includes(deployId)) {
+            if (messages.map((item) => item.deployId).includes(deployId)) {
                 continue;
             }
             messages.push(
@@ -58,8 +58,10 @@ export const preparePoolByName = async (pool: PoolConfig) => {
     }
 };
 
-export const startPoolDeployers = async quantityRequested => {
-    if (quantityRequested === 0) return;
+export const startPoolDeployers = async (quantityRequested) => {
+    if (quantityRequested === 0) {
+        return;
+    }
     logger.debug(`received request for ${quantityRequested} builders.  Max allowed is ${processWrapper.maxPoolBuilders}`);
 
     let builders = 0;
@@ -81,6 +83,6 @@ export const prepareAll = async (): Promise<void> => {
     const pools = await getPoolConfig();
     logger.debug(`preparing ${pools.length} pools`);
 
-    await Promise.all(pools.map(pool => preparePoolByName(pool)));
+    await Promise.all(pools.map((pool) => preparePoolByName(pool)));
     logger.debug('all pools prepared');
 };

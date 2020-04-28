@@ -1,7 +1,7 @@
 // import logger from 'heroku-logger';
 import logger from 'heroku-logger';
 
-const argStripper = function(cmd: string, parameter: string, noarg?: boolean): string {
+const argStripper = function (cmd: string, parameter: string, noarg?: boolean): string {
     // add a space to the end to simplify things
     cmd = cmd.concat(' ');
 

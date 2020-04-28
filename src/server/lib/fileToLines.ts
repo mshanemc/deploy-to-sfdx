@@ -5,7 +5,7 @@ import { commandRewriter, getCommandsWithFileFlagsMap } from '../lib/flagTypeFro
 
 const fileToLines = (filePath: string): Promise<string[]> => {
     let parsedLines = [];
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         readline
             .createInterface({
                 input: fs.createReadStream(filePath),
@@ -24,15 +24,15 @@ const fileToLines = (filePath: string): Promise<string[]> => {
                 if (filePath.split('/').length > 3) {
                     // translate to base command, and if necessary, prepand the filepath to certain flag arguments
                     const commandMap = await getCommandsWithFileFlagsMap();
-                    parsedLines = await Promise.all(parsedLines.map(line => commandRewriter(filePath.split('/')[2], line, commandMap)));
+                    parsedLines = await Promise.all(parsedLines.map((line) => commandRewriter(filePath.split('/')[2], line, commandMap)));
                 }
                 logger.debug(`fileToLines: Lines from ${filePath}: ${parsedLines.join(',')}`);
-                resolve(parsedLines.filter(line => line !== ''));
+                resolve(parsedLines.filter((line) => line !== ''));
             });
     });
 };
 
 const filesToLines = async (filePaths: string[]): Promise<string[]> =>
-    [].concat(...(await Promise.all(filePaths.map(filePath => fileToLines(filePath)))));
+    [].concat(...(await Promise.all(filePaths.map((filePath) => fileToLines(filePath)))));
 
 export { fileToLines, filesToLines };

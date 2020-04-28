@@ -16,7 +16,7 @@ const jwtConn = async () => {
         sub: processWrapper.PD_USERNAME,
         aud: 'https://login.salesforce.com',
         privateKey: processWrapper.PD_KEY
-    }).catch(e => logger.error('tokenResponse', e));
+    }).catch((e) => logger.error('tokenResponse', e));
     logger.debug('tokenResponse', response);
 
     const conn = new jsforce.Connection({

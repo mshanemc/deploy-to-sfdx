@@ -20,9 +20,9 @@ const MergeProjectJSONs = ({ projectJSONs, localFilePaths }): ProjectJSON => {
     // enhancement 1: max api version if one exists
     const maxApiVersion = Math.max(
         ...projectJSONs
-            .map(pj => pj.sourceApiVersion)
-            .filter(version => version) // filter out undefineds
-            .map(version => parseFloat(version))
+            .map((pj) => pj.sourceApiVersion)
+            .filter((version) => version) // filter out undefineds
+            .map((version) => parseFloat(version))
     );
     if (Number.isInteger(maxApiVersion)) {
         output.sourceApiVersion = maxApiVersion + '.0';

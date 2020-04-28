@@ -71,7 +71,7 @@ const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
                 `tmp/${msgJSON.deployId}/config/${scratchDefFileName}`,
                 buildScratchDef({
                     repoFileJSONs: await Promise.all(
-                        msgJSON.repos.map(repo => fs.readJSON(`tmp/${msgJSON.deployId}/${repo.repo}/config/${scratchDefFileName}`))
+                        msgJSON.repos.map((repo) => fs.readJSON(`tmp/${msgJSON.deployId}/${repo.repo}/config/${scratchDefFileName}`))
                     ),
                     projectname: msgJSON.deployId
                 })
@@ -81,9 +81,9 @@ const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
                 `tmp/${msgJSON.deployId}/${projectDefFileName}`,
                 MergeProjectJSONs({
                     projectJSONs: await Promise.all(
-                        msgJSON.repos.map(repo => fs.readJSON(`tmp/${msgJSON.deployId}/${repo.repo}/${projectDefFileName}`))
+                        msgJSON.repos.map((repo) => fs.readJSON(`tmp/${msgJSON.deployId}/${repo.repo}/${projectDefFileName}`))
                     ),
-                    localFilePaths: msgJSON.repos.map(repo => repo.repo)
+                    localFilePaths: msgJSON.repos.map((repo) => repo.repo)
                 })
             )
         ]);

@@ -5,7 +5,7 @@ import { getPoolRequest, putPooledOrg } from './redisNormal';
 import { build } from './commonBuild';
 
 export async function poolBuild(): Promise<boolean> {
-    const msgJSON = await getPoolRequest(true).catch(e => {
+    const msgJSON = await getPoolRequest(true).catch((e) => {
         if (e.message === 'pool request queue is empty') {
             logger.warn(`failed to build pool: ${e.message}`);
         } else {

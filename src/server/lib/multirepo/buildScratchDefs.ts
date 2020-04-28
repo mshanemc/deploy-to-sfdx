@@ -9,17 +9,17 @@ const fieldInfo = {
 };
 
 const featureMerge = (files: ScratchDef[]): string[] => {
-    const features = files.map(file => file.features);
+    const features = files.map((file) => file.features);
     const featuresInAnArray = []
         .concat(...features)
-        .filter(feature => feature)
-        .map(feature => feature.toLowerCase());
+        .filter((feature) => feature)
+        .map((feature) => feature.toLowerCase());
     return [...new Set(featuresInAnArray)];
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mustAgreeOrBeUndefined = (files: ScratchDef[], itemName: string): any[] => {
-    const itemsDefined = files.map(file => file[itemName]).filter(item => item);
+    const itemsDefined = files.map((file) => file[itemName]).filter((item) => item);
     if (new Set(itemsDefined).size > 1) {
         throw new Error(`the repos have conflicting values for ${itemName}`);
     }
@@ -35,18 +35,18 @@ const buildScratchDef = ({ repoFileJSONs, projectname }): ScratchDef => {
     const simpleMerge: ScratchDef = merge.all([...repoFileJSONs, output], {});
 
     // enhancement 0: disallow orgPreferenceSettings
-    repoFileJSONs.forEach(repo => {
+    repoFileJSONs.forEach((repo) => {
         if (repo.settings.orgPreferenceSettings) {
             throw new Error('orgPreferenceSettings is not allowed!');
         }
     });
     // enhancement 1: if anyone is using sampleData, it'll be there
-    fieldInfo.anyTrueMakesTrue.forEach(item => (simpleMerge[item] = repoFileJSONs.some(repo => repo[item])));
+    fieldInfo.anyTrueMakesTrue.forEach((item) => (simpleMerge[item] = repoFileJSONs.some((repo) => repo[item])));
 
     // enhancement 2: merge/dedupe the features list
     simpleMerge.features = featureMerge(repoFileJSONs);
     // enhancement 3: some fields have to agree OR all be undefined
-    fieldInfo.mustAgreeOrBeUndefined.forEach(item => (simpleMerge[item] = mustAgreeOrBeUndefined(repoFileJSONs, item)));
+    fieldInfo.mustAgreeOrBeUndefined.forEach((item) => (simpleMerge[item] = mustAgreeOrBeUndefined(repoFileJSONs, item)));
     // enhancement 4: if template, then no edition
     if (simpleMerge.template) {
         delete simpleMerge.edition;

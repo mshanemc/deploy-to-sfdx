@@ -81,43 +81,41 @@ const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
 };
 
 const thereCanBeOnlyOne = (lines: string[], textSoSearchFor: string) => {
-    const passwordLines = lines.filter(line => line.includes(textSoSearchFor));
+    const passwordLines = lines.filter((line) => line.includes(textSoSearchFor));
 
     if (passwordLines.length > 1) {
-        const firstOccurence = lines.findIndex(line => line.includes(textSoSearchFor));
+        const firstOccurence = lines.findIndex((line) => line.includes(textSoSearchFor));
         return [
             ...lines.slice(0, firstOccurence + 1), // start until the first occurrence, inclusive
-            ...lines.slice(firstOccurence + 2).filter(line => !line.includes(textSoSearchFor)) // and none of the occurrences after that
+            ...lines.slice(firstOccurence + 2).filter((line) => !line.includes(textSoSearchFor)) // and none of the occurrences after that
         ];
     } else {
         return lines;
     }
 };
 
-const multiOrgCorrections = (lines: string[]): string[] => {
+const multiOrgCorrections = (lines: string[]): string[] =>
     // only one password allowed for (multi org).  [BYOO will have them already removed at this stage]
-    return thereCanBeOnlyOne(lines, 'user:password');
-};
-
+    thereCanBeOnlyOne(lines, 'user:password');
 const getMaxDays = (lines: string[]): number =>
     Math.max(
         ...lines
-            .filter(line => line.includes('org:create'))
-            .map(line => parseInt(getArg(line, '-d'), 10) || parseInt(getArg(line, '--days'), 10) || 7)
+            .filter((line) => line.includes('org:create'))
+            .map((line) => parseInt(getArg(line, '-d'), 10) || parseInt(getArg(line, '--days'), 10) || 7)
     );
 
 const lineParse = async (msgJSON: DeployRequest): Promise<string[]> => {
     let parsedLines = (
         await filesToLines(
-            msgJSON.repos.map(repo =>
+            msgJSON.repos.map((repo) =>
                 isMultiRepo(msgJSON) ? `tmp/${msgJSON.deployId}/${repo.repo}/orgInit.sh` : `tmp/${msgJSON.deployId}/orgInit.sh`
             )
         )
     )
-        .map(line => (msgJSON.repos.every(repo => repo.whitelisted) ? line : securityAssertions(line)))
-        .filter(line => !isByoo(msgJSON) || byooFilter(line))
-        .map(line => lineCorrections(line, msgJSON))
-        .map(line => jsonify(line));
+        .map((line) => (msgJSON.repos.every((repo) => repo.whitelisted) ? line : securityAssertions(line)))
+        .filter((line) => !isByoo(msgJSON) || byooFilter(line))
+        .map((line) => lineCorrections(line, msgJSON))
+        .map((line) => jsonify(line));
 
     // non line-level fixes for org:create
     if (isByoo(msgJSON)) {
@@ -131,7 +129,7 @@ const lineParse = async (msgJSON: DeployRequest): Promise<string[]> => {
         // remove all the creates and put it at the beginning
         parsedLines = [
             `sfdx force:org:create -f config/project-scratch-def.json -d ${getMaxDays(parsedLines)} -s --json`,
-            ...parsedLines.filter(line => !line.includes('org:create'))
+            ...parsedLines.filter((line) => !line.includes('org:create'))
         ];
     }
 

@@ -10,13 +10,19 @@
     },
     "extends": ["plugin:@typescript-eslint/recommended", "prettier"],
     "parserOptions": {
-        "ecmaVersion": 2017
+        "ecmaVersion": 2017,
+        "project": "./src/server/tsconfig.json"
     },
     "env": {
         "node": true,
         "es6": true
     },
     "rules": {
+        "@typescript-eslint/prefer-nullish-coalescing": 2,
+        "@typescript-eslint/prefer-optional-chain": 2,
+        "@typescript-eslint/explicit-function-return-type": 0,
+        "@typescript-eslint/no-use-before-define": 0,
+
         "arrow-body-style": ["error", "as-needed"],
         "no-alert": 2,
         "no-array-constructor": 2,
@@ -113,7 +119,7 @@
                 "argsIgnorePattern": "next"
             }
         ],
-        "no-use-before-define": 1,
+        "no-use-before-define": 0,
         "no-void": 0,
         "no-warning-comments": [
             0,
@@ -215,8 +221,6 @@
         "vars-on-top": 0,
         "wrap-iife": 0,
         "wrap-regex": 0,
-        "yoda": [2, "never"],
-        "prefer-nullish-coalescing": true,
-        "prefer-optional-chain": true
+        "yoda": [2, "never"]
     }
 }

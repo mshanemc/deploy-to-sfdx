@@ -10,7 +10,7 @@ const requestPage = '/form.html';
 const resultPage = '/conf.html';
 const requestHost = 'www.salesforce.com';
 
-const leadCreate = async function(incoming): Promise<void> {
+const leadCreate = async function (incoming): Promise<void> {
     const formPostBody = {
         UserFirstName: incoming.UserFirstName,
         UserLastName: incoming.UserLastName,

@@ -26,14 +26,8 @@ const checkWhitelist = (ghuser: string, ghrepo: string): boolean => {
         for (const repo of whitelist2.split(',')) {
             // logger.debug(`checking whitelist 2 element: ${repo}`);
             if (
-                repo
-                    .trim()
-                    .split('/')[0]
-                    .toLowerCase() === ghuser.toLowerCase() &&
-                repo
-                    .trim()
-                    .split('/')[1]
-                    .toLowerCase() === ghrepo.toLowerCase()
+                repo.trim().split('/')[0].toLowerCase() === ghuser.toLowerCase() &&
+                repo.trim().split('/')[1].toLowerCase() === ghrepo.toLowerCase()
             ) {
                 return true;
             }

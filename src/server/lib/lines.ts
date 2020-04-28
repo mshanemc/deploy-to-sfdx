@@ -36,9 +36,9 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
     // remove the open line(s) for pools and put them on the CDS
     if (msgJSON.pool) {
         output.poolLines = {
-            openLine: lines.find(line => line.includes('org:open'))
+            openLine: lines.find((line) => line.includes('org:open'))
         };
-        lines = lines.filter(line => !line.includes('org:open'));
+        lines = lines.filter((line) => !line.includes('org:open'));
     }
     logger.debug('starting the line runs');
 
@@ -93,8 +93,9 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                         output.mainUser.password = response.result.password;
                         output.mainUser.permalink = loginURL(output);
 
-                        commandResult.shortForm = `set password to ${response.result.password} for user ${response.result.username ??
-                            output.mainUser.username}`;
+                        commandResult.shortForm = `set password to ${response.result.password} for user ${
+                            response.result.username ?? output.mainUser.username
+                        }`;
                     } else if (summary === commandSummary.HEROKU_DEPLOY) {
                         const HR: HerokuResult = {
                             appName: response.result.app.name,
@@ -177,9 +178,7 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
 
 export { lineRunner };
 
-const outputAddError = (output: CDS, newError: ClientError): CDS => {
-    return {
-        ...output,
-        errors: [...output.errors, newError]
-    };
-};
+const outputAddError = (output: CDS, newError: ClientError): CDS => ({
+    ...output,
+    errors: [...output.errors, newError]
+});

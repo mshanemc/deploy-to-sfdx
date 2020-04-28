@@ -111,7 +111,7 @@ export interface ClientError {
     raw: any;
 }
 
-interface ClientResult {
+export interface ClientResult {
     command: string;
     summary?: commandSummary; // ex: instead of outputting all the apex class stuff, just summarize that apex was executed.
     shortForm?: string;
@@ -140,4 +140,4 @@ export enum commandSummary {
     DEPLOY = 'deploying via metadata api'
 }
 
-export { CDS, ClientResult };
+export { CDS };

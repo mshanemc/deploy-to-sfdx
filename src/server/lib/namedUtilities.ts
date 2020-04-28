@@ -17,7 +17,7 @@ const randomValueHex = (len: number): string =>
 
 const getKeyFromRepos = (repos: DeployRequestRepo[], separator = '.'): string =>
     repos
-        .map(item =>
+        .map((item) =>
             item.branch
                 ? `${item.username.toLowerCase()}${separator}${item.repo.toLowerCase()}${separator}${item.branch}`
                 : `${item.username.toLowerCase()}${separator}${item.repo.toLowerCase()}`
@@ -28,8 +28,8 @@ const getPoolName = (pool: PoolConfig): string => getKeyFromRepos(pool.repos);
 
 const getPackageDirsFromFile = (projectJSON: ProjectJSON): string =>
     projectJSON.packageDirectories
-        .map(dir => dir.path)
-        .map(dir => filterUnsanitized(dir))
+        .map((dir) => dir.path)
+        .map((dir) => filterUnsanitized(dir))
         .join(',');
 
 const getDeployId = (username: string, repo: string): string =>
@@ -44,7 +44,7 @@ const getCloneCommands = (depReq: DeployRequest): string[] => {
         ];
     }
     return depReq.repos.map(
-        repo =>
+        (repo) =>
             `git clone -b ${repo.branch ?? 'master'} --single-branch https://github.com/${repo.username}/${repo.repo}.git ${depReq.deployId}/${
                 repo.repo
             }`
@@ -108,12 +108,12 @@ const getPoolConfig = async (): Promise<PoolConfig[]> => {
     }
     const pools = JSON.parse(await request(processWrapper.POOLCONFIG_URL)) as PoolConfigDeprecated[];
     if (!processWrapper.SINGLE_REPO) {
-        return pools.map(pool => poolConversion(pool));
+        return pools.map((pool) => poolConversion(pool));
     }
     // single repo env config...ignore non-matching pools
     return pools
-        .map(pool => poolConversion(pool))
-        .filter(pool => pool.repos.length === 1 && processWrapper.SINGLE_REPO.includes(`${pool.repos[0].repo}/${pool.repos[0].username}`));
+        .map((pool) => poolConversion(pool))
+        .filter((pool) => pool.repos.length === 1 && processWrapper.SINGLE_REPO.includes(`${pool.repos[0].repo}/${pool.repos[0].username}`));
 };
 
 const poolConversion = (oldPool: PoolConfigDeprecated): PoolConfig => {
