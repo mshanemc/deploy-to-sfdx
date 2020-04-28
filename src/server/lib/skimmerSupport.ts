@@ -67,11 +67,6 @@ const doesOrgExist = async (username: string): Promise<boolean> => {
         );
         const status = queryResult.result.records[0].Status;
         return !['Deleted', 'Error'].includes(status);
-        if (status === 'Deleted' || status === 'Error') {
-            return false;
-        } else {
-            return true;
-        }
     } catch (e) {
         logger.error(`error checking hub for username ${username}`);
         logger.error(e);
