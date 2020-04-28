@@ -56,13 +56,7 @@ const checkExpiration = async (pool: PoolConfig): Promise<string> => {
 
 const skimmer = async (): Promise<void> => {
     const pools = await getPoolConfig();
-    const promises: Promise<string>[] = [];
-
-    pools.forEach(pool => {
-        promises.push(checkExpiration(pool));
-    });
-
-    const results = await Promise.all(promises);
+    const results = await Promise.all(pools.map(pool => checkExpiration(pool)));
     results.forEach(result => logger.debug(result));
 };
 
@@ -72,7 +66,7 @@ const doesOrgExist = async (username: string): Promise<boolean> => {
             `sfdx force:data:soql:query -u ${processWrapper.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`
         );
         const status = queryResult.result.records[0].Status;
-
+        return !['Deleted', 'Error'].includes(status);
         if (status === 'Deleted' || status === 'Error') {
             return false;
         } else {
@@ -113,7 +107,7 @@ const herokuExpirationCheck = async (): Promise<void> => {
 
 const removeOldDeployIds = async (): Promise<void> => {
     const deployIds = await getKeysForCDSs();
-    const CDSs = await Promise.all(deployIds.map(deployId => cdsRetrieve(deployId)));
+    const CDSs = (await Promise.all(deployIds.map(deployId => cdsRetrieve(deployId)))).filter(cds => cds.mainUser && cds.mainUser.username);
     await Promise.all(
         CDSs.map(cds => {
             if (!cds.expirationDate && moment().diff(moment(cds.browserStartTime), 'hours') > hoursToKeepBYOO) {
