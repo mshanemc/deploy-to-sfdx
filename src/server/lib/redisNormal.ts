@@ -222,6 +222,8 @@ const putPooledOrg = async (depReq: DeployRequest, poolMessage: CDS): Promise<vo
 
 const getAllPooledOrgs = async (poolname: string): Promise<CDS[]> => (await redis.lrange(poolname, 0, -1)).map((msg) => JSON.parse(msg));
 
+const getAllPooledOrgIDs = async (poolname: string): Promise<string[]> => (await getAllPooledOrgs(poolname)).map((cds) => cds.orgId);
+
 const getPoolDeployRequestQueueSize = async () => redis.llen(poolDeployExchange);
 
 /**
@@ -280,5 +282,6 @@ export {
     getLead,
     getLeadQueueSize,
     putFailedLead,
-    getAllPooledOrgs
+    getAllPooledOrgs,
+    getAllPooledOrgIDs
 };

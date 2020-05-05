@@ -7,7 +7,7 @@ import jsforce from 'jsforce';
 
 import cors from 'cors';
 
-import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish, putLead } from '../lib/redisNormal';
+import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish, putLead, getAllPooledOrgIDs } from '../lib/redisNormal';
 import { deployMsgBuilder } from '../lib/deployMsgBuilder';
 import { utilities } from '../lib/utilities';
 import { getPoolKey } from '../lib/namedUtilities';
@@ -110,6 +110,14 @@ app.get(
     wrapAsync(async (req, res, next) => {
         const keys = await getKeys();
         res.send(keys);
+    })
+);
+
+app.get(
+    '/pools/:poolname',
+    wrapAsync(async (req, res, next) => {
+        const orgIDs = await getAllPooledOrgIDs(req.params.poolname);
+        res.send(orgIDs);
     })
 );
 
