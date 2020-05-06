@@ -3589,7 +3589,7 @@ bunyan-sfdx-no-dtrace@1.8.2:
     mv "~2"
     safe-json-stringify "~1"
 
-byline@5.0.0, byline@^5.0.0:
+byline@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/byline/-/byline-5.0.0.tgz#741c5216468eadc457b03410118ad77de8c1ddb1"
   integrity sha1-dBxSFkaOrcRXsDQQEYrXfejB3bE=
@@ -4768,12 +4768,10 @@ csv-parse@^4.8.2:
   resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-4.8.6.tgz#e3e01c2c9593194f1b7aae6291c65304b35022c8"
   integrity sha512-rSJlpgAjrB6pmlPaqiBAp3qVtQHN07VxI+ozs+knMsNvgh4bDQgENKLFYLFMvT+jn/wr/zvqsd7IVZ7Txdkr7w==
 
-csv-split-stream@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/csv-split-stream/-/csv-split-stream-1.0.2.tgz#d80613d839ab68372ea97fe7e30fb54be12c497c"
-  integrity sha1-2AYT2DmraDcuqX/n4w+1S+EsSXw=
-  dependencies:
-    byline "5.0.0"
+csv-parse@^4.9.0:
+  version "4.9.0"
+  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-4.9.0.tgz#a947c66d8ab31207f4933170064dd8268c511e99"
+  integrity sha512-SaFMvRWzobY9z0Nxg+q5pXvU2JY7p++icb1Bb/ZwGSLv058cLabhGg3YNpLPI2KALtZnoe/oNBCfWX9xgTkcaA==
 
 csv-stringify@^1.0.4:
   version "1.1.2"
@@ -12746,10 +12744,10 @@ shallow-clone@^0.1.2:
     lazy-cache "^0.2.3"
     mixin-object "^2.0.1"
 
-shane-sfdx-plugins@^4.25.3:
-  version "4.25.3"
-  resolved "https://registry.yarnpkg.com/shane-sfdx-plugins/-/shane-sfdx-plugins-4.25.3.tgz#15ba8c0839eaf05bc47914e18c5725fe3d541bb0"
-  integrity sha512-GtGEHjbG1CFAe96sr/7hGfi8ICVuVwqk+qmRWTGPblISiVtpdzexLqzW2sLMVGHQZJUgtaTGSc8KLX9i29jctw==
+shane-sfdx-plugins@^4.28.0:
+  version "4.28.0"
+  resolved "https://registry.yarnpkg.com/shane-sfdx-plugins/-/shane-sfdx-plugins-4.28.0.tgz#1c40035e3f339538605ad4ccad382d2f0820b48a"
+  integrity sha512-C8kDrEooBirnsKiwRItvEgAXScE9KgqdH1UEHu7L0N3ix46aEsIqUN52AC32evNx7WAS1vo7y1OxWgMUWSnwSw==
   dependencies:
     "@lifeomic/attempt" "^3.0.0"
     "@oclif/command" "^1.5.12"
@@ -12762,7 +12760,7 @@ shane-sfdx-plugins@^4.25.3:
     aes-js "^3.1.2"
     chalk "^2.4.2"
     cli-ux "^5.2.0"
-    csv-split-stream "^1.0.2"
+    csv-parse "^4.9.0"
     fs-extra "^7.0.1"
     js2xmlparser "^3.0.0"
     json2csv "^4.3.5"
