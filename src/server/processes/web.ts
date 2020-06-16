@@ -74,7 +74,7 @@ app.post(
     '/delete',
     wrapAsync(async (req, res, next) => {
         await cdsDelete(req.body.deployId);
-        res.send({ redirectTo: '/deleteConfirm' });
+        res.send({ redirectTo: '/#deleteConfirm' });
     })
 );
 
@@ -203,7 +203,7 @@ app.use((error, req, res, next) => {
     }
     logger.error(`request failed: ${req.url}`);
     logger.error(error);
-    return res.redirect(`/error?msg=${error}`);
+    return res.redirect(`/#error?msg=${error}`);
 });
 
 // process.on('unhandledRejection', e => {
