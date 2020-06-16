@@ -3,6 +3,7 @@ import { LightningElement, api, track, wire } from 'lwc';
 import isEqual from 'lodash.isequal';
 
 import { CDS } from '../../../../server/lib/CDS';
+// eslint-disable-next-line @lwc/lwc/no-unknown-wire-adapters
 import resultsPoll from '../../messages/resultsPoll/resultsPoll';
 
 export default class DeployMessages extends LightningElement {
@@ -17,7 +18,7 @@ export default class DeployMessages extends LightningElement {
   set deployId(value) {
     this._deployId = value;
     this.results = new CDS({
-      deployId: this.deployId
+      deployId: this.deployId,
     });
   }
 
@@ -79,11 +80,11 @@ export default class DeployMessages extends LightningElement {
       await fetch('/delete', {
         method: 'POST',
         body: JSON.stringify({
-          deployId: this.results.deployId
+          deployId: this.results.deployId,
         }),
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       })
     ).json();
 

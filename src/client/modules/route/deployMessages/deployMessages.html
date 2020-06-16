@@ -1,7 +1,7 @@
 <template>
   <template if:false={results.complete}>
     <div class="section slds-m-vertical_large">
-      <base-progress-bar description={loadingDescription} progress={completionPercentage}></base-progress-bar>
+      <base-progress-bar description={loadingDescription} value={completionPercentage}></base-progress-bar>
     </div>
   </template>
 
@@ -47,7 +47,7 @@
       </div>
 
       <div class="slds-notify slds-notify_toast" role="alert">
-        <div class="slds-text-heading_small ">
+        <div class="slds-text-heading_small">
           Your username is&nbsp;
           <strong>{results.mainUser.username}</strong>&nbsp;and your password is&nbsp;
           <strong>{results.mainUser.password}</strong>

@@ -3,7 +3,7 @@
     <template if:true={template}>
       <p>
         Oh, you want to deploy&nbsp;
-        <template iterator:it={template}>
+        <template iterator:it={templateArray}>
           <span key={it.value} if:false={it.last}><a href={it.value} target="_blank">{it.value}</a> and&nbsp;</span>
           <span key={it.value} if:true={it.last}><a href={it.value} target="_blank">{it.value}</a></span>
         </template>

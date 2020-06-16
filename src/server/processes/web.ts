@@ -66,7 +66,7 @@ app.post(
     wrapAsync(async (req, res, next) => {
         const [message] = await Promise.all([commonDeploy(req, '/trial'), putLead(req.body)]);
         logger.debug('trial request', message);
-        res.redirect(`/deploying/trial/${message.deployId.trim()}`);
+        res.redirect(`/#deploying/trial/${message.deployId.trim()}`);
     })
 );
 
@@ -87,7 +87,7 @@ app.get(
         }
 
         const message = await commonDeploy(req, '/launch');
-        return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
+        return res.redirect(`/#deploying/deployer/${message.deployId.trim()}`);
     })
 );
 
@@ -185,7 +185,7 @@ app.get(
             },
             'byoo'
         );
-        return res.redirect(`/deploying/deployer/${message.deployId.trim()}`);
+        return res.redirect(`/#deploying/deployer/${message.deployId.trim()}`);
     })
 );
 

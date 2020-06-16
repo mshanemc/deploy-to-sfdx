@@ -2497,10 +2497,10 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@mshanemc/lwc-oss-base@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@mshanemc/lwc-oss-base/-/lwc-oss-base-1.0.3.tgz#2c2e0dfe06ee187d66fbc2f8cd4420105c232e3e"
-  integrity sha512-GYE2Ftp1Yy9gnqdG3VhKMMQbA1J4gd8tvRGEOcMoPHQrViZE0RYBCbyuKv/qpPsc/OO1JHAs+Iyli101vDBzkw==
+"@mshanemc/lwc-oss-base@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@mshanemc/lwc-oss-base/-/lwc-oss-base-1.1.1.tgz#4b064ada5f41a4541904fe19ba94a2054e7a1221"
+  integrity sha512-ex0YsAKAb3bIDLjxUuDDwBI+EmtzCBZhOHRWtuAPB7VsSHUcjDKqFPxL3gWk36B7qwMn7jjhBsQEycX4w0p1ag==
   dependencies:
     navigo "^7.1.2"
 

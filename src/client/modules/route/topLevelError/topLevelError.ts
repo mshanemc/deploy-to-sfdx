@@ -1,18 +1,11 @@
 import { LightningElement, api } from 'lwc';
+// import { parseQuery } from '../../structure/main/parseQueryVars';
 
 export default class TopLevelError extends LightningElement {
-  _errorMessages: string[];
-
-  @api
-  set errorMessages(errors: string[]) {
-    this._errorMessages = errors.map((error) => decodeURI(error));
-  }
-
-  get errorMessages() {
-    return this._errorMessages;
-  }
+  @api rawError;
 
   get errorMessage() {
-    return this._errorMessages.join(';');
+    console.log(this.rawError);
+    return decodeURI(this.rawError);
   }
 }

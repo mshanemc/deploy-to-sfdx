@@ -16,4 +16,9 @@ export default class Byoo extends LightningElement {
     this.regularURL = await (await fetch(authURL)).text();
     this.sandboxURL = await (await fetch(`${authURL}&base_url=https://test.salesforce.com`)).text();
   }
+
+  get templateArray() {
+    console.log(this.template);
+    return Array.isArray(this.template) ? this.template : [this.template];
+  }
 }
