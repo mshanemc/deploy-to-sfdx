@@ -6,7 +6,7 @@
     </template>
 
     <template if:true={isError}>
-      <route-top-level-error error-message={params.msg}></route-top-level-error>
+      <route-top-level-error error-messages={params.msg}></route-top-level-error>
     </template>
 
     <template if:true={isDeployer}>
