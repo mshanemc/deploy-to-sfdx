@@ -83,7 +83,7 @@ app.get(
     wrapAsync(async (req, res, next) => {
         // allow repos to require the email parameter
         if (req.query.email === 'required') {
-            return res.redirect(multiTemplateURLBuilder(req.query.template, '/userinfo'));
+            return res.redirect(multiTemplateURLBuilder(req.query.template, '/#userinfo'));
         }
 
         const message = await commonDeploy(req, '/launch');
