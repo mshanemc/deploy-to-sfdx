@@ -22,7 +22,7 @@
         "test": "test:generate && jest test/integrationTests -c jest.config.integration.js",
         "watch": "run-p watch:client watch:server",
         "watch:client": "lwc-services watch",
-        "watch:server": "nodemon"
+        "watch:server": "redis-server --daemonize yes; nodemon"
     },
     "repository": {
         "type": "git",
