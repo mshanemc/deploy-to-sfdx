@@ -129,7 +129,7 @@ app.get(
     })
 );
 
-app.get('/favicons/favicon.ico', (req, res, next) => {
+app.get(['/favicons/favicon.ico', '/favicon.ico'], (req, res, next) => {
     res.sendFile('favicon.ico', { root: path.join(__dirname, '../../../dist/resources/favicons') });
 });
 
