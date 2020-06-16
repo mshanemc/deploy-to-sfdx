@@ -12,13 +12,13 @@ export default class Byoo extends LightningElement {
   }
   async connectedCallback() {
     const authURL = multiTemplateURLBuilder(this.template, '/authURL');
-    console.log(authURL);
+    // console.log(authURL);
     this.regularURL = await (await fetch(authURL)).text();
     this.sandboxURL = await (await fetch(`${authURL}&base_url=https://test.salesforce.com`)).text();
   }
 
   get templateArray() {
-    console.log(this.template);
+    // console.log(this.template);
     return Array.isArray(this.template) ? this.template : [this.template];
   }
 }
