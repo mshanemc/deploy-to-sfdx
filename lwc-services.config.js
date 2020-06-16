@@ -3,6 +3,6 @@ module.exports = {
     sourceDir: './src/client',
     resources: [{ from: 'src/client/resources', to: 'dist/resources' }],
     devServer: {
-        proxy: { '/': 'http://localhost:3002' }
+        proxy: { '/': 'http://localhost:8443' }
     }
 };

@@ -12,6 +12,7 @@
         "local:clean": "heroku local orgdeleter=1",
         "prettier": "prettier --write '**/*.{css,html,js,json,md,yaml,yml}'",
         "start": "node .",
+        "tsn": "ts-node src/server/processes/web.ts --project src/server/tsconfig.json --files",
         "test:generate": "ts-node --project src/server/__tests__/tsconfig.json src/server/__tests__/helpers/repoCodeGen.ts",
         "test:client": "jest src/client/modules/ -c src/client/jest.config.lwc.js",
         "test:client:watch": "jest src/client/modules/ -c src/client/jest.config.lwc.js --watch",
