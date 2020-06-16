@@ -107,14 +107,14 @@
     },
     "nodemonConfig": {
         "watch": [
-            "src/**/*"
+            "src/server/**/*.ts"
         ],
         "ext": "ts, css, html, js",
         "ignore": [
             "src/**/*.spec.ts",
             "src/**/*.test.ts"
         ],
-        "exec": "yarn local:web",
+        "exec": "yarn build:server && heroku local web=1,orgbuilder=1",
         "signal": "SIGTERM"
     },
     "lint-staged": {
