@@ -35,7 +35,7 @@ export const preparePoolByName = async (pool: PoolConfig) => {
         const message = {
             pool: true,
             createdTimestamp: new Date(),
-            repos: pool.repos.map((repo) => ({ ...repo, whitelisted: checkWhitelist(repo.username, repo.repo) })),
+            repos: await Promise.all(pool.repos.map(async (repo) => ({ ...repo, whitelisted: await checkWhitelist(repo.username, repo.repo) }))),
             visitor: processWrapper.UA_ID ? ua(processWrapper.UA_ID) : undefined
         };
 

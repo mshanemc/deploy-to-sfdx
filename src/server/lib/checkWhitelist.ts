@@ -1,12 +1,14 @@
 // import logger from 'heroku-logger';
 import { processWrapper } from './processWrapper';
+import { getPoolConfig } from './namedUtilities';
 
 // checking for whitelisting
-const checkWhitelist = (ghuser: string, ghrepo: string): boolean => {
+const checkWhitelist = async (ghuser: string, ghrepo: string): Promise<boolean> => {
     const whitelist1 = processWrapper.GITHUB_USERNAME_WHITELIST; // comma separated list of username
     const whitelist2 = processWrapper.GITHUB_REPO_WHITELIST; // comma separated list of username/repo
+    const whitelist3 = processWrapper.POOLCONFIG_URL;
 
-    if (!whitelist1 && !whitelist2) {
+    if (!whitelist1 && !whitelist2 && !whitelist3) {
         // logger.debug('no whitelists, returning early');
 
         return false;
@@ -30,6 +32,18 @@ const checkWhitelist = (ghuser: string, ghrepo: string): boolean => {
                 repo.trim().split('/')[1].toLowerCase() === ghrepo.toLowerCase()
             ) {
                 return true;
+            }
+        }
+    }
+
+    // is this username/repo listed known from the org pools
+    if (whitelist3) {
+        const poolConfigs = await getPoolConfig();
+        for (const poolConfig of poolConfigs) {
+            for (const repo of poolConfig.repos) {
+                if (repo.username === ghuser && repo.repo === ghrepo) {
+                    return true;
+                }
             }
         }
     }

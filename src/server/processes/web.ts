@@ -41,7 +41,7 @@ function wrapAsync(fn: any) {
 }
 
 const commonDeploy = async (req, url: string) => {
-    const message: DeployRequest = deployMsgBuilder(req);
+    const message: DeployRequest = await deployMsgBuilder(req);
 
     if (message.visitor) {
         message.visitor.pageview(url).send();
