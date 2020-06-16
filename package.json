@@ -36,6 +36,7 @@
     "homepage": "https://github.com/mshanemc/deploy-to-sfdx#readme",
     "dependencies": {
         "@lifeomic/attempt": "^3.0.0",
+        "@mshanemc/lwc-oss-base": "^1.0.3",
         "@mshanemc/sfdx-migration-automatic": "^0.3.1",
         "@salesforce-ux/design-system": "^2.9.3",
         "@salesforce/analytics": "0.17.0",

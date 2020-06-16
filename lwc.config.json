@@ -1,1 +1,8 @@
-{"modules":[{"dir":"./src/client/modules"}]}
+{
+    "modules": [
+        { "dir": "./src/client/modules" },
+        {
+            "npm": "@mshanemc/lwc-oss-base"
+        }
+    ]
+}

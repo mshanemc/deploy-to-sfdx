@@ -2497,6 +2497,13 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
+"@mshanemc/lwc-oss-base@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@mshanemc/lwc-oss-base/-/lwc-oss-base-1.0.3.tgz#2c2e0dfe06ee187d66fbc2f8cd4420105c232e3e"
+  integrity sha512-GYE2Ftp1Yy9gnqdG3VhKMMQbA1J4gd8tvRGEOcMoPHQrViZE0RYBCbyuKv/qpPsc/OO1JHAs+Iyli101vDBzkw==
+  dependencies:
+    navigo "^7.1.2"
+
 "@mshanemc/salesforce-migration-automatic@1.9.1":
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/@mshanemc/salesforce-migration-automatic/-/salesforce-migration-automatic-1.9.1.tgz#98d6bf96c61444e5c519864ae86a5ae7af79227c"
@@ -11570,6 +11577,11 @@ natural-orderby@^2.0.1:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/natural-orderby/-/natural-orderby-2.0.3.tgz#8623bc518ba162f8ff1cdb8941d74deb0fdcc016"
   integrity sha512-p7KTHxU0CUrcOXe62Zfrb5Z13nLvPhSWR/so3kFulUQU0sgUll2Z0LwpsLN351eOOD+hRGu/F1g+6xDfPeD++Q==
+
+navigo@^7.1.2:
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/navigo/-/navigo-7.1.2.tgz#f543098ae5cbc5763b926742b5047ffb68a187e2"
+  integrity sha512-OlhxHxhLM62X0Sjbkp5wlm1V6GpOIKShFu7dS/fDS3cVqzMHYS880LT5tu6JjGkrSYQbtCNDADmRIP47MoVGlA==
 
 ncp@^2.0.0, ncp@~2.0.0:
   version "2.0.0"
