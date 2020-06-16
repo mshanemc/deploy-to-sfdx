@@ -5,7 +5,7 @@ export default class TopLevelError extends LightningElement {
 
   @api
   set errorMessages(errors: string[]) {
-    this._errorMessages = errors.map(error => decodeURI(error));
+    this._errorMessages = errors.map((error) => decodeURI(error));
   }
 
   get errorMessages() {
