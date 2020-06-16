@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 
-const customServer = require(path.resolve('./src/server/web.ts')).default;
+const customServer = require(path.resolve('./src/server/process/web.ts')).default;
 
 const app = express();
 
