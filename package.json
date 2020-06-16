@@ -7,6 +7,8 @@
         "build": "yarn build:client && yarn build:server",
         "build:server": "tsc -b ./src/server",
         "build:client": "lwc-services build -m production",
+        "heroku:dev:down": "heroku ps:scale web=0 orgbuilder=0 pooldrain=0 -a hosted-scratch-dev",
+        "heroku:dev:up": "heroku ps:scale web=1 orgbuilder=2 -a hosted-scratch-dev",
         "local": "npm run build && heroku local dynoskimmer=1 && heroku local poolskimmer=1 && heroku local oneoffbuilder=1 && heroku local poolwatcher=1 && heroku local pooldeployer=1 && heroku local orgdeleter=1 && heroku local web=1,orgbuilder=5",
         "local:web": "yarn build && heroku local web=1,orgbuilder=1",
         "local:clean": "heroku local orgdeleter=1",
