@@ -78,6 +78,9 @@ const getTypeFromUsageArray = (usage: string, flag: FlagType) => {
 };
 
 const usageAsArray = (usage) => {
+    if (!usage) {
+        return [];
+    }
     const cleanUsage = usage
         .replace('<%= command.id %> ', '')
         .replace(/[[\]']/g, '')
