@@ -104,7 +104,8 @@
     },
     "husky": {
         "hooks": {
-            "pre-push": "rm -rf tmp/*; rm -rf src/tmp/*"
+            "pre-push": "rm -rf tmp/*; rm -rf src/tmp/*",
+            "pre-commit": "rm dump.rbd; rm yarn-error.log"
         }
     },
     "nodemonConfig": {
