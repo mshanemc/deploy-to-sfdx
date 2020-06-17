@@ -72,16 +72,16 @@ describe('multiOrgCorrections', () => {
             './src/server/__tests__/helpers/initFiles/inputFile1',
             './src/server/__tests__/helpers/initFiles/inputFile2'
         ]);
-        expect(multiOrgCorrections(lines).filter(line => line.includes('user:password')).length).toBe(1);
+        expect(multiOrgCorrections(lines).filter((line) => line.includes('user:password')).length).toBe(1);
     });
     it('works with no password command', async () => {
         const lines = await filesToLines([
             './src/server/__tests__/helpers/initFiles/inputFile1',
             './src/server/__tests__/helpers/initFiles/inputFile2'
         ]);
-        expect(multiOrgCorrections(lines.filter(line => !line.includes('user:password'))).filter(line => line.includes('user:password')).length).toBe(
-            0
-        );
+        expect(
+            multiOrgCorrections(lines.filter((line) => !line.includes('user:password'))).filter((line) => line.includes('user:password')).length
+        ).toBe(0);
     });
     it('works with multiple password command', async () => {
         const lines = await filesToLines([
@@ -89,7 +89,7 @@ describe('multiOrgCorrections', () => {
             './src/server/__tests__/helpers/initFiles/inputFile2'
         ]);
         lines.push('sfdx force:user:password:generate');
-        expect(multiOrgCorrections(lines).filter(line => line.includes('user:password')).length).toBe(1);
+        expect(multiOrgCorrections(lines).filter((line) => line.includes('user:password')).length).toBe(1);
     });
 });
 
@@ -107,7 +107,7 @@ describe('maxDays', () => {
             './src/server/__tests__/helpers/initFiles/inputFile1',
             './src/server/__tests__/helpers/initFiles/inputFile2'
         ]);
-        expect(getMaxDays(lines.map(line => line.replace(' -d 1', '')))).toBe(7);
+        expect(getMaxDays(lines.map((line) => line.replace(' -d 1', '')))).toBe(7);
     });
 
     it('works on a two repos with both having undefined -d', async () => {
@@ -115,7 +115,7 @@ describe('maxDays', () => {
             './src/server/__tests__/helpers/initFiles/inputFile1',
             './src/server/__tests__/helpers/initFiles/inputFile2'
         ]);
-        expect(getMaxDays(lines.map(line => line.replace(' -d 1', '').replace(' -d 2', '')))).toBe(7);
+        expect(getMaxDays(lines.map((line) => line.replace(' -d 1', '').replace(' -d 2', '')))).toBe(7);
     });
 });
 
@@ -129,7 +129,7 @@ describe('end-to-end tests', () => {
         await fs.copy('./src/server/__tests__/helpers/initFiles/inputFile1', testOrgInitLoc);
         const results = await lineParse(testDepReqWL);
         expect(results).toHaveLength(file1Length);
-        expect(results.every(line => line.includes(' --json'))).toBe(true);
+        expect(results.every((line) => line.includes(' --json'))).toBe(true);
     });
 
     test('single repo byoo', async () => {
@@ -145,7 +145,7 @@ describe('end-to-end tests', () => {
             }
         });
         expect(results).toHaveLength(file1Length);
-        expect(results.every(line => line.includes(' --json'))).toBe(true);
+        expect(results.every((line) => line.includes(' --json'))).toBe(true);
     });
 
     test('multi repo', async () => {
@@ -154,7 +154,7 @@ describe('end-to-end tests', () => {
         const results = await lineParse(testDepReqWLMulti);
         // remvoes 1 line (the org:create on the 2nd file)
         expect(results).toHaveLength(file1Length + file2Length - 1);
-        expect(results.every(line => line.includes(' --json'))).toBe(true);
+        expect(results.every((line) => line.includes(' --json'))).toBe(true);
     });
 
     test.skip('multi byoo', async () => {});
