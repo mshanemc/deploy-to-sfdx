@@ -37,7 +37,7 @@ describe('flag type parsing', () => {
 
     test('gets commandJSON', async () => {
         const output = await getCommandsWithFileFlagsMap();
-        expect(output.find(item => item.id === getBaseCommand(cmd))).toBeTruthy();
+        expect(output.find((item) => item.id === getBaseCommand(cmd))).toBeTruthy();
     });
 
     test('gets usage array', () => {
