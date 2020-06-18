@@ -10,6 +10,10 @@ export SFDX_AUTOUPDATE_DISABLE=true
 # new json settings
 export SFDX_JSON_TO_STDOUT=true
 
+# heroku credentials for Heroku Connect API
+export HEROKU_USERNAME=$HEROKU_USERNAME
+export HEROKU_PASSWORD=$HEROKU_PASSWORD
+
 echo ".Profile: Creating local resources ..."
 mkdir /app/dist/tmp
 mkdir /app/tmp
