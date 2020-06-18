@@ -62,7 +62,7 @@
         "@babel/core": "^7.3.4",
         "@babel/preset-env": "^7.3.4",
         "@lwc/jest-preset": "^4.3.1",
-        "@salesforce/eslint-config-lwc": "^0.4.0",
+        "@salesforce/eslint-config-lwc": "^0.7.0",
         "@salesforce/wire-service-jest-util": "^2.3.0",
         "@types/dotenv": "^8.2.0",
         "@types/express": "^4.16.1",
