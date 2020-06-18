@@ -12744,10 +12744,10 @@ shallow-clone@^0.1.2:
     lazy-cache "^0.2.3"
     mixin-object "^2.0.1"
 
-shane-sfdx-plugins@^4.28.2:
-  version "4.28.2"
-  resolved "https://registry.yarnpkg.com/shane-sfdx-plugins/-/shane-sfdx-plugins-4.28.2.tgz#6edb1a2dfd8d89b891865b69bb8004a60a0297fb"
-  integrity sha512-0+Bk/7E0Soy3gcFSsYb2KlB5andKhYKIvJpkYUvkviHj35uEasS8slCiuO3OklntuUJY+xsrxloL9o52B0RHpA==
+shane-sfdx-plugins@^4.33.0:
+  version "4.33.0"
+  resolved "https://registry.yarnpkg.com/shane-sfdx-plugins/-/shane-sfdx-plugins-4.33.0.tgz#ba838fdbefaf5fb9f37916f04f4779c8f190692d"
+  integrity sha512-B8+3ArVzuKKjDI97/+SGKptitxsNQ63zxv9pcf36TPK8w1O75jkvfsUsAN8gSad48zyg/q3t0puHB0LNwcPOhw==
   dependencies:
     "@lifeomic/attempt" "^3.0.0"
     "@oclif/command" "^1.5.12"
