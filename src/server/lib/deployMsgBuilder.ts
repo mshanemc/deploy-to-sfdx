@@ -51,6 +51,7 @@ const deployMsgBuilder = (req): DeployRequest => {
         createdTimestamp: new Date(),
         repos,
         byoo: req.byoo,
+        noPool: req.query.nopool,
         visitor: processWrapper.UA_ID ? ua(processWrapper.UA_ID) : undefined,
         email: req.query.email,
         firstname: req.query.firstname,
