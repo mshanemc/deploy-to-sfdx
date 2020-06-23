@@ -26,7 +26,7 @@ const iterateCommandResults = async (repo: string, cds: CDS, msgJSON: DeployRequ
 };
 
 const timesToGA = async (msgJSON: DeployRequest, cds: CDS): Promise<void> => {
-    if (!msgJSON.visitor) {
+    if (!msgJSON.visitor || msgJSON.noPool) {
         // also, if there is no GA hooked up, don't try this
         return;
     }
