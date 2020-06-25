@@ -3,7 +3,7 @@ import TopLevelError from '../../route/topLevelError/topLevelError';
 import DeployMessages from '../../route/deployMessages/deployMessages';
 import TrialLoader from '../../route/trialLoader/trialLoader';
 import Deleted from '../../route/deleted/deleted';
-import UserInfo from '../../route/userinfo/userInfo';
+import UserInfo from '../../route/userInfo/userInfo';
 import Byoo from '../../route/byoo/byoo';
 import TestForm from '../../route/testForm/testForm';
 
