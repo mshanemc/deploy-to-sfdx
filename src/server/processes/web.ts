@@ -43,7 +43,7 @@ function wrapAsync(fn: any) {
 const commonDeploy = async (req, url: string) => {
     const message: DeployRequest = await deployMsgBuilder(req);
 
-    if (message.visitor) {
+    if (message.visitor && !message.noPool) {
         message.visitor.pageview(url).send();
         message.visitor.event('Repo', getPoolKey(message, '-')).send();
     }

@@ -57,7 +57,7 @@
         "moment": "^2.24.0",
         "request-promise-native": "^1.0.7",
         "salesforce-jwt-bearer-token-flow": "^0.2.4",
-        "shane-sfdx-plugins": "^4.28.2",
+        "shane-sfdx-plugins": "^4.35.0",
         "strip-color": "^0.1.0",
         "universal-analytics": "^0.4.20"
     },
@@ -65,7 +65,7 @@
         "@babel/core": "^7.3.4",
         "@babel/preset-env": "^7.3.4",
         "@lwc/jest-preset": "^4.3.1",
-        "@salesforce/eslint-config-lwc": "^0.4.0",
+        "@salesforce/eslint-config-lwc": "^0.7.0",
         "@salesforce/wire-service-jest-util": "^2.3.0",
         "@types/dotenv": "^8.2.0",
         "@types/express": "^4.16.1",

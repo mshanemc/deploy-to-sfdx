@@ -15,6 +15,7 @@ export interface DeployRequest {
     createdTimestamp: Date;
     deployId: string;
     pool?: boolean;
+    noPool?: boolean;
     email?: string;
     firstname?: string;
     lastname?: string;

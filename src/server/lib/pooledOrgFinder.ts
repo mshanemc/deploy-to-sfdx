@@ -17,6 +17,9 @@ import { processWrapper } from './processWrapper';
 const retryOptions = { maxAttempts: 60, delay: 5000 };
 
 const pooledOrgFinder = async function (deployReq: DeployRequest, forcePool = false): Promise<CDS> {
+    if (deployReq.noPool) {
+        return undefined; // pool is deliberately skipped, exit quickly
+    }
     try {
         if (!processWrapper.POOLCONFIG_URL && !forcePool) {
             return undefined; // not set up for pools, exit quickly
