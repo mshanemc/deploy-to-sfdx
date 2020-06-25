@@ -1,8 +1,8 @@
 import { createElement } from 'lwc';
-import { registerTestWireAdapter } from '@salesforce/wire-service-jest-util';
 import resultsPoll from '../../../messages/resultsPoll/resultsPoll';
+import { registerTestWireAdapter } from '@salesforce/wire-service-jest-util';
 
-import DeployMessages from 'route/deployMessages';
+import DeployMessages from '../deployMessages';
 
 import { fullExample } from './data/fullExample';
 
@@ -20,7 +20,7 @@ describe('deploy-messages', () => {
     // Create element
     const deployId = fullExample.deployId;
     const element = createElement('deploy-messages', {
-      is: DeployMessages
+      is: DeployMessages,
     });
 
     element.deployId = deployId;
@@ -28,10 +28,9 @@ describe('deploy-messages', () => {
 
     // Verify displayed id
     const bpb = element.shadowRoot.querySelector('base-progress-bar');
-    expect(element.deployId).toBe(deployId);
     expect(bpb).toBeTruthy();
     expect(bpb.description).toBe(`Deploying ${deployId}`);
-    expect(bpb.progress).toBe(1);
+    expect(bpb.value).toBe(1);
 
     const errors = element.shadowRoot.querySelector('.slds-theme_error');
     expect(errors).toBeFalsy();
@@ -44,7 +43,7 @@ describe('deploy-messages', () => {
     // Create element
     const deployId = fullExample.deployId;
     const element = createElement('deploy-messages', {
-      is: DeployMessages
+      is: DeployMessages,
     });
 
     element.deployId = deployId;
@@ -58,7 +57,7 @@ describe('deploy-messages', () => {
       const bpb = element.shadowRoot.querySelector('base-progress-bar');
       expect(bpb).toBeTruthy();
       expect(bpb.description).toBe(`Deploying ${fullExample.deployId}`);
-      expect(bpb.progress).toBe(25);
+      expect(bpb.value).toBe(25);
 
       const errors = element.shadowRoot.querySelector('div.slds-theme_error');
       expect(errors).toBeTruthy();

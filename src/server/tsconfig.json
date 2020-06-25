@@ -12,8 +12,8 @@
 
         "removeComments": true,
         "types": ["node", "jest", "express", "ioredis", "fs-extra", "moment", "axios", "request-promise-native", "universal-analytics"]
-    },
+    }
     // "compileOnSave": true,
     // "include": ["./src/server/**"],
-    "exclude": ["**/__tests__"]
+    // "exclude": ["**/__tests__"]
 }

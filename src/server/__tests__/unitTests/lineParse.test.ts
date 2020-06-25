@@ -157,7 +157,7 @@ describe('end-to-end tests', () => {
         expect(results.every((line) => line.includes(' --json'))).toBe(true);
     });
 
-    test.skip('multi byoo', async () => {});
+    // test.skip('multi byoo', async () => {});
 
     afterAll(async () => {
         await fs.remove(testDir);

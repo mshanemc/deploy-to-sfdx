@@ -72,9 +72,9 @@ module.exports = {
   // moduleFileExtensions: ['js', 'json', 'ts'],
 
   // A map from regular expressions to module names that allow to stub out resources with a single module
-  // moduleNameMapper: {
-  //   '^foo-(.+){{BODY}}': 'src/client/test/modules/foo/$1/$1'
-  // },
+  moduleNameMapper: {
+    '^base/(.+)$': '<rootDir>/node_modules/@mshanemc/lwc-oss-base/src/modules/base/$1/$1',
+  },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
   // modulePathIgnorePatterns: [],
@@ -141,7 +141,7 @@ module.exports = {
   //   ]
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
-  testPathIgnorePatterns: ['/node_modules/', '/src/server/']
+  testPathIgnorePatterns: ['/node_modules/', '/src/server/'],
 
   // The regexp pattern or array of patterns that Jest uses to detect test files
   // testRegex: [],
