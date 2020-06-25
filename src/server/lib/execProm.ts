@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { exec } from 'child_process';
+import { exec, ExecOptions } from 'child_process';
 import stripColor from 'strip-color';
 import * as util from 'util';
 
@@ -7,10 +7,10 @@ const execProm = util.promisify(exec);
 const maxBuffer = 1024 * 3000;
 
 // tslint:disable-next-line: no-any
-const exec2JSON = async (cmd: string, options = { maxBuffer }): Promise<any> => {
+const exec2JSON = async (cmd: string, options?: ExecOptions): Promise<any> => {
     try {
-        const results = await execProm(cmd, options);
-        return JSON.parse(stripColor(results.stdout));
+        const results = await execProm(cmd, { maxBuffer, ...options });
+        return JSON.parse(stripColor(results.stdout.toString()));
     } catch (err) {
         console.log(err);
         return JSON.parse(stripColor(err.stdout));
@@ -18,9 +18,9 @@ const exec2JSON = async (cmd: string, options = { maxBuffer }): Promise<any> => 
 };
 
 // tslint:disable-next-line: no-any
-const exec2String = async (cmd: string, options = { maxBuffer }): Promise<any> => {
+const exec2String = async (cmd: string, options?: ExecOptions): Promise<any> => {
     try {
-        const results = await execProm(cmd, options);
+        const results = await execProm(cmd, { maxBuffer, ...options });
         return results.stdout;
     } catch (err) {
         // console.log(err);
