@@ -20,6 +20,7 @@ import {
 
 import { DeployRequest, PoolConfig } from '../../lib/types';
 import { CDS } from '../../lib/CDS';
+import { processDeleteQueue } from '../../lib/skimmerSupport';
 
 jest.setTimeout(7000);
 const deployMsgTest: DeployRequest = {
@@ -68,7 +69,7 @@ test('tests HerokuCDS functions', async () => {
     const outputCDSs = await getHerokuCDSs();
     expect(outputCDSs.length).toBe(2);
 
-    outputCDSs.forEach(cds => {
+    outputCDSs.forEach((cds) => {
         expect(cds.herokuResults).toBeTruthy();
     });
 
@@ -99,6 +100,9 @@ test('allows deletes with good usernames', async () => {
     await expect(deleteOrg('sweet@you.good')).resolves.toBeUndefined();
     const result = await deleteOrg('sweet@you.good');
     expect(result).toBeUndefined();
+
+    // clean up after yourself
+    await processDeleteQueue();
 });
 
 test('properly counts poolDeploys', async () => {
