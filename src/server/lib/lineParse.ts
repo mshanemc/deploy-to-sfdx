@@ -77,13 +77,15 @@ const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
         // if the script didn't supply the concise line, make sure it's there.
         return `${argStripper(line, '--concise', true)} --concise`;
     }
-    if (line.includes('sfdx force:source:push') && isByoo(msgJSON) && isMultiRepo(msgJSON)) {
+    if (isByoo(msgJSON) && line.includes('sfdx force:source:push')) {
         const project = fs.readJSONSync(`tmp/${msgJSON.deployId}/sfdx-project.json`);
+        // byoo might not be a scratch org, so we'll deploy it using deploy instead of push, referencing the project directories
         return line.replace(
             'sfdx force:source:push',
             `sfdx force:source:deploy -p ${getPackageDirsFromFile(project)}`
         );
     }
+
     return line;
 };
 
