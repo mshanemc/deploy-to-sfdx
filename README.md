@@ -1,5 +1,7 @@
 # SFDX Deployer
 
+[![npm version](https://badge.fury.io/js/shane-sfdx-plugins.svg)](https://badge.fury.io/js/shane-sfdx-plugins)
+
 Front end: [LWC](lwc.dev)
 
 Back end: nodejs/express/typescript + heroku buildpacks
