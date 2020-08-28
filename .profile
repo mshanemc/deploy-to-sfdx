@@ -15,13 +15,13 @@ mkdir /app/dist/tmp
 mkdir /app/tmp
 
 echo ".Profile: Adding support for private repos"
-echo $MY_GIT_TOKEN
+echo $GITHUB_PAT
 
 git config --global url."https://api@github.com/".insteadOf "https://github.com/"
 git config --global url."https://ssh@github.com/".insteadOf "ssh://git@github.com/"
 git config --global url."https://git@github.com/".insteadOf "git@github.com:"
 
-echo 'echo $MY_GIT_TOKEN' > $HOME/.git-askpass
+echo 'echo $GITHUB_PAT' > $HOME/.git-askpass
 chmod +x $HOME/.git-askpass
 GIT_ASKPASS=$HOME/.git-askpass
 
