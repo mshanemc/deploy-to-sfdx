@@ -47,7 +47,7 @@ you can find a list of all the env vars in <https://github.com/mshanemc/deploy-t
 
 ### strongly recommended
 
--   `HEROKU_API_KEY` can run one-off dynos, needed for org pools (see below) and lets you comine the deployer with my sfdx plugin to deploy heroku apps to a team. If you're note using org pools, be sure to delete these heroku apps. See [the plugin docs](https://github.com/mshanemc/shane-sfdx-plugins#sfdx-shaneherokurepodeploy) for how to use this
+-   `HEROKU_API_KEY` can run one-off dynos, needed for org pools (see below) and lets you combine the deployer with my sfdx plugin to deploy heroku apps to a team. If you're note using org pools, be sure to delete these heroku apps. See [the plugin docs](https://github.com/mshanemc/shane-sfdx-plugins#sfdx-shaneherokurepodeploy) for how to use this
 
 ### optional
 
@@ -123,13 +123,13 @@ Org Pools are the answer. You tell it which username/repo pairs, and how many or
 
 There's 3 worker dynos, both off by default (leave them that way).
 
--   If you want pools, use Heroku Scheduler to run the `poolwatcher` task up to every 10 minutes (as a one-off dyno). If any pool orgs need to be created, it'll start up one-off dynoes to handle that
+-   If you want pools, use Heroku Scheduler to run the `poolwatcher` task up to every 10 minutes (as a one-off dyno). If any pool orgs need to be created, it'll start up one-off dynos to handle that
 -   run poolskimmer with Heroku Scheduler every hour or so--it'll check for expired orgs to help keep you within your limits.
 
 Then, in your .env/heroku config vars, point the deployer to some url that returns json.
 `POOLCONFIG_URL` = `https://where.yourstuff/is`.
 
-Finally, since poolwatcher is starting dynos to handle this pool stuff, you want to enable a heroku Labs setting for getting dyno metadata `heroku labs:enable runtime-dyno-metadata -a`. This lets heroku start more heroku with the name of your app being dynamicly fed into the environment variables without you having to 1) set that up 2) maintain different names for each instance/stage
+Finally, since poolwatcher is starting dynos to handle this pool stuff, you want to enable a heroku Labs setting for getting dyno metadata `heroku labs:enable runtime-dyno-metadata -a`. This lets heroku start more heroku with the name of your app being dynamically fed into the environment variables without you having to 1) set that up 2) maintain different names for each instance/stage
 
 Example code here, but feel free to generate it however you like.
 <https://github.com/mshanemc/poolsConfig>
@@ -192,7 +192,13 @@ But with an orgInit.sh file, you can list out all your sfdx commands and they'll
 
 That lets you create records, assign permsets, create users, install packages, run tests, generate passwords, and do anything you can do with an SFDX command
 
----
+## Private repos
+
+By default, the deployer expects all repos to be public. If you really need private repos, you can use the following buildpack and a [Github Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
+
+<https://github.com/mshanemc/github-via-pat>
+
+## Whatever the personal access token user has access to see, the deployer can then see.
 
 ## Testing
 
@@ -216,7 +222,7 @@ Integration (tests/integrationTests) are slower/harder.
 
 Modify `repoCodeGen.ts` to change the generator.
 
-NOTE: This is using up your scratch org quotas. The tests delete the orgs, so it's minimally wastefuly, but still expect it to take a while AND watch your daily limit. Especially if you're testing deploys and tests are failing...you might be using orgs that never get to the delete phase.
+NOTE: This is using up your scratch org quotas. The tests delete the orgs, so it's minimally wastefully, but still expect it to take a while AND watch your daily limit. Especially if you're testing deploys and tests are failing...you might be using orgs that never get to the delete phase.
 
 ---
 
