@@ -22,6 +22,6 @@ git config --global url."https://git@github.com/".insteadOf "git@github.com:"
 echo 'echo $GITHUB_PAT' > $HOME/.git-askpass
 chmod +x $HOME/.git-askpass
 export GIT_ASKPASS=$HOME/.git-askpass
-export GITHUB_PAT=$GITHUB_PAT
+export GITHUB_PAT=(echo $GITHUB_PAT)
 
 echo ".Profile: Completed!"
