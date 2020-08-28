@@ -14,4 +14,16 @@ echo ".Profile: Creating local resources ..."
 mkdir /app/dist/tmp
 mkdir /app/tmp
 
+echo ".Profile: Adding support for private repos"
+echo $MY_GIT_TOKEN
+
+git config --global url."https://api@github.com/".insteadOf "https://github.com/"
+git config --global url."https://ssh@github.com/".insteadOf "ssh://git@github.com/"
+git config --global url."https://git@github.com/".insteadOf "git@github.com:"
+
+echo 'echo $MY_GIT_TOKEN' > $HOME/.git-askpass
+chmod +x $HOME/.git-askpass
+GIT_ASKPASS=$HOME/.git-askpass
+
+
 echo ".Profile: Completed!"
