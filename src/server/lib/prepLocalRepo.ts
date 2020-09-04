@@ -53,6 +53,9 @@ const prepOrgInit = async (msgJSON: DeployRequest): Promise<string> => {
         if (fs.existsSync(byooInitPath)) {
             // it's byoo and you have a special byoo file that supercedes orgInit.sh
             await fs.copyFile(byooInitPath, orgInitPath);
+        } else {
+            //Otherwise we use the default OrgInit.sh
+            await fs.writeFile(orgInitPath, orgInitDefault);
         }
     } else if (!fs.existsSync(orgInitPath) && !isMultiRepo(msgJSON)) {
         // it's not byoo and there is no file, so we'll create one if it's not multi-deploy
