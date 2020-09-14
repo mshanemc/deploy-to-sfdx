@@ -48,7 +48,8 @@ const prepOrgInit = async (msgJSON: DeployRequest): Promise<string> => {
     const orgInitPath = `tmp/${msgJSON.deployId}/orgInit.sh`;
     logger.debug(`deployQueueCheck: going to look in the directory ${orgInitPath}`);
 
-    if (isByoo(msgJSON)) {
+    // this is NOT handling the scenario of multi-repo with no init files
+    if (isByoo(msgJSON) && !isMultiRepo(msgJSON)) {
         const byooInitPath = `tmp/${msgJSON.deployId}/byooInit.sh`;
         if (fs.existsSync(byooInitPath)) {
             // it's byoo and you have a special byoo file that supercedes orgInit.sh
