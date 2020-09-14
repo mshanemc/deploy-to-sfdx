@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import * as fs from 'fs-extra';
 import logger from 'heroku-logger';
 import { DeployRequest } from './types';
@@ -44,27 +45,27 @@ const prepareRepo = async (msgJSON: DeployRequest, cds: CDS): Promise<CDS> => {
     return cds;
 };
 
-const prepOrgInit = async (msgJSON: DeployRequest): Promise<string> => {
+const prepOrgInit = async (msgJSON: DeployRequest): Promise<void> => {
     const orgInitPath = `tmp/${msgJSON.deployId}/orgInit.sh`;
     logger.debug(`deployQueueCheck: going to look in the directory ${orgInitPath}`);
 
-    // this is NOT handling the scenario of multi-repo with no init files
-    if (isByoo(msgJSON) && !isMultiRepo(msgJSON)) {
-        const byooInitPath = `tmp/${msgJSON.deployId}/byooInit.sh`;
-        if (fs.existsSync(byooInitPath)) {
+    const paths = msgJSON.repos.map((repo) =>
+        isMultiRepo(msgJSON)
+            ? `tmp/${msgJSON.deployId}/${repo.repo}/orgInit.sh`
+            : `tmp/${msgJSON.deployId}/orgInit.sh`
+    );
+
+    for (const path of paths) {
+        if (isByoo(msgJSON) && fs.existsSync(path.replace('orginit', 'byooInit'))) {
             // it's byoo and you have a special byoo file that supercedes orgInit.sh
-            await fs.copyFile(byooInitPath, orgInitPath);
-        } else if (!fs.existsSync(orgInitPath)) {
-            // it's byoo and there is no orgInit
-            await fs.writeFile(orgInitPath, orgInitDefault);
+            await fs.copyFile(path.replace('orginit', 'byooInit'), path);
         }
-        // otherwise, it's byoo and you have a valid init file
-    } else if (!fs.existsSync(orgInitPath) && !isMultiRepo(msgJSON)) {
-        // it's not byoo and there is no file, so we'll create one if it's not multi-deploy
-        logger.debug('deployQueueCheck: no orgInit.sh.  Will use default');
-        await fs.writeFile(orgInitPath, orgInitDefault);
+        if (!fs.existsSync(path)) {
+            // there is no init file, so we'll create a default one
+            logger.debug(`deployQueueCheck: no orgInit.sh for ${path}.  Will use default`);
+            await fs.writeFile(path, orgInitDefault);
+        }
     }
-    return orgInitPath;
 };
 
 const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
