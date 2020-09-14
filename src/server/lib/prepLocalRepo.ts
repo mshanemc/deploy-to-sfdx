@@ -53,7 +53,11 @@ const prepOrgInit = async (msgJSON: DeployRequest): Promise<string> => {
         if (fs.existsSync(byooInitPath)) {
             // it's byoo and you have a special byoo file that supercedes orgInit.sh
             await fs.copyFile(byooInitPath, orgInitPath);
+        } else if (!fs.existsSync(orgInitPath)) {
+            // it's byoo and there is no orgInit
+            await fs.writeFile(orgInitPath, orgInitDefault);
         }
+        // otherwise, it's byoo and you have a valid init file
     } else if (!fs.existsSync(orgInitPath) && !isMultiRepo(msgJSON)) {
         // it's not byoo and there is no file, so we'll create one if it's not multi-deploy
         logger.debug('deployQueueCheck: no orgInit.sh.  Will use default');
@@ -71,7 +75,11 @@ const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
                 `tmp/${msgJSON.deployId}/config/${scratchDefFileName}`,
                 buildScratchDef({
                     repoFileJSONs: await Promise.all(
-                        msgJSON.repos.map((repo) => fs.readJSON(`tmp/${msgJSON.deployId}/${repo.repo}/config/${scratchDefFileName}`))
+                        msgJSON.repos.map((repo) =>
+                            fs.readJSON(
+                                `tmp/${msgJSON.deployId}/${repo.repo}/config/${scratchDefFileName}`
+                            )
+                        )
                     ),
                     projectname: msgJSON.deployId
                 })
@@ -81,7 +89,11 @@ const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
                 `tmp/${msgJSON.deployId}/${projectDefFileName}`,
                 MergeProjectJSONs({
                     projectJSONs: await Promise.all(
-                        msgJSON.repos.map((repo) => fs.readJSON(`tmp/${msgJSON.deployId}/${repo.repo}/${projectDefFileName}`))
+                        msgJSON.repos.map((repo) =>
+                            fs.readJSON(
+                                `tmp/${msgJSON.deployId}/${repo.repo}/${projectDefFileName}`
+                            )
+                        )
                     ),
                     localFilePaths: msgJSON.repos.map((repo) => repo.repo)
                 })
@@ -92,7 +104,10 @@ const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
     if (msgJSON.email) {
         logger.debug('deployQueueCheck: write a file for custom email address', msgJSON);
         const location = `tmp/${msgJSON.deployId}/config/${scratchDefFileName}`;
-        await fs.writeJSON(location, { ...(await fs.readJSON(location)), adminEmail: msgJSON.email });
+        await fs.writeJSON(location, {
+            ...(await fs.readJSON(location)),
+            adminEmail: msgJSON.email
+        });
     }
 };
 
