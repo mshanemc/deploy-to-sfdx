@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import * as fs from 'fs-extra';
 import logger from 'heroku-logger';
 import { DeployRequest } from './types';
@@ -45,27 +44,22 @@ const prepareRepo = async (msgJSON: DeployRequest, cds: CDS): Promise<CDS> => {
     return cds;
 };
 
-const prepOrgInit = async (msgJSON: DeployRequest): Promise<void> => {
+const prepOrgInit = async (msgJSON: DeployRequest): Promise<string> => {
     const orgInitPath = `tmp/${msgJSON.deployId}/orgInit.sh`;
     logger.debug(`deployQueueCheck: going to look in the directory ${orgInitPath}`);
 
-    const paths = msgJSON.repos.map((repo) =>
-        isMultiRepo(msgJSON)
-            ? `tmp/${msgJSON.deployId}/${repo.repo}/orgInit.sh`
-            : `tmp/${msgJSON.deployId}/orgInit.sh`
-    );
-
-    for (const path of paths) {
-        if (isByoo(msgJSON) && fs.existsSync(path.replace('orginit', 'byooInit'))) {
+    if (isByoo(msgJSON)) {
+        const byooInitPath = `tmp/${msgJSON.deployId}/byooInit.sh`;
+        if (fs.existsSync(byooInitPath)) {
             // it's byoo and you have a special byoo file that supercedes orgInit.sh
-            await fs.copyFile(path.replace('orginit', 'byooInit'), path);
+            await fs.copyFile(byooInitPath, orgInitPath);
         }
-        if (!fs.existsSync(path)) {
-            // there is no init file, so we'll create a default one
-            logger.debug(`deployQueueCheck: no orgInit.sh for ${path}.  Will use default`);
-            await fs.writeFile(path, orgInitDefault);
-        }
+    } else if (!fs.existsSync(orgInitPath) && !isMultiRepo(msgJSON)) {
+        // it's not byoo and there is no file, so we'll create one if it's not multi-deploy
+        logger.debug('deployQueueCheck: no orgInit.sh.  Will use default');
+        await fs.writeFile(orgInitPath, orgInitDefault);
     }
+    return orgInitPath;
 };
 
 const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
@@ -77,11 +71,7 @@ const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
                 `tmp/${msgJSON.deployId}/config/${scratchDefFileName}`,
                 buildScratchDef({
                     repoFileJSONs: await Promise.all(
-                        msgJSON.repos.map((repo) =>
-                            fs.readJSON(
-                                `tmp/${msgJSON.deployId}/${repo.repo}/config/${scratchDefFileName}`
-                            )
-                        )
+                        msgJSON.repos.map((repo) => fs.readJSON(`tmp/${msgJSON.deployId}/${repo.repo}/config/${scratchDefFileName}`))
                     ),
                     projectname: msgJSON.deployId
                 })
@@ -91,11 +81,7 @@ const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
                 `tmp/${msgJSON.deployId}/${projectDefFileName}`,
                 MergeProjectJSONs({
                     projectJSONs: await Promise.all(
-                        msgJSON.repos.map((repo) =>
-                            fs.readJSON(
-                                `tmp/${msgJSON.deployId}/${repo.repo}/${projectDefFileName}`
-                            )
-                        )
+                        msgJSON.repos.map((repo) => fs.readJSON(`tmp/${msgJSON.deployId}/${repo.repo}/${projectDefFileName}`))
                     ),
                     localFilePaths: msgJSON.repos.map((repo) => repo.repo)
                 })
@@ -106,10 +92,7 @@ const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
     if (msgJSON.email) {
         logger.debug('deployQueueCheck: write a file for custom email address', msgJSON);
         const location = `tmp/${msgJSON.deployId}/config/${scratchDefFileName}`;
-        await fs.writeJSON(location, {
-            ...(await fs.readJSON(location)),
-            adminEmail: msgJSON.email
-        });
+        await fs.writeJSON(location, { ...(await fs.readJSON(location)), adminEmail: msgJSON.email });
     }
 };
 
