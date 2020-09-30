@@ -7,7 +7,15 @@ import jsforce from 'jsforce';
 
 import cors from 'cors';
 
-import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish, putLead, getAllPooledOrgIDs } from '../lib/redisNormal';
+import {
+    putDeployRequest,
+    getKeys,
+    cdsDelete,
+    cdsRetrieve,
+    cdsPublish,
+    putLead,
+    getAllPooledOrgIDs
+} from '../lib/redisNormal';
 import { deployMsgBuilder } from '../lib/deployMsgBuilder';
 import { utilities } from '../lib/utilities';
 import { getPoolKey } from '../lib/namedUtilities';
@@ -91,16 +99,35 @@ app.get(
     })
 );
 
-app.get(['/', '/error', '/deploying/:format/:deployId', '/userinfo', '/byoo', '/testform', '/deleteConfirm'], (req, res, next) => {
-    res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
-});
+app.get(
+    [
+        '/',
+        '/error',
+        '/deploying/:format/:deployId',
+        '/userinfo',
+        '/byoo',
+        '/testform',
+        '/deleteConfirm'
+    ],
+    (req, res, next) => {
+        res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
+    }
+);
 
 app.get(['/byoo'], (req, res, next) => {
-    if (processWrapper.BYOO_CALLBACK_URI && processWrapper.BYOO_CONSUMERKEY && processWrapper.BYOO_SECRET) {
+    if (
+        processWrapper.BYOO_CALLBACK_URI &&
+        processWrapper.BYOO_CONSUMERKEY &&
+        processWrapper.BYOO_SECRET
+    ) {
         res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
     } else {
         setImmediate(() => {
-            next(new Error('Connected app credentials not properly configured for Bring Your Own Org feature'));
+            next(
+                new Error(
+                    'Connected app credentials not properly configured for Bring Your Own Org feature'
+                )
+            );
         });
     }
 });
@@ -159,8 +186,10 @@ app.get(
 app.get(
     '/token',
     wrapAsync(async (req, res, next) => {
+        const query = JSON.parse(req.query);
+        console.log(`query`, query);
         const state = JSON.parse(req.query.state);
-        // console.log(`state`, state);
+        console.log(`state`, state);
         const byooOauth2 = new jsforce.OAuth2({
             redirectUri: processWrapper.BYOO_CALLBACK_URI ?? `http://localhost:${port}/token`,
             clientId: processWrapper.BYOO_CONSUMERKEY,
