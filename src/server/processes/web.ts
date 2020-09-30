@@ -240,7 +240,9 @@ app.post(
                 },
                 byoo: {
                     accessToken: req.body.orgAuthorization,
-                    instanceUrl: req.body.instanceUrl
+                    instanceUrl: req.body.instanceUrl,
+                    username: req.body.username,
+                    orgId: req.body.orgId
                 }
             },
             'byoo'
