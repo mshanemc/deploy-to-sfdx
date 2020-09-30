@@ -220,7 +220,8 @@ app.get(
 app.post(
     '/qdeploy',
     wrapAsync(async (req, res, next) => {
-        console.log(`req:`, req);
+        console.log(`req.query:`, req.query);
+        console.log(`req.body:`, req.body);
         // const state = JSON.parse(req.query.state);
         // console.log(`state`, state);
         // const byooOauth2 = new jsforce.OAuth2({
@@ -240,13 +241,12 @@ app.post(
                 },
                 byoo: {
                     accessToken: req.body.orgAuthorization,
-                    instanceUrl: req.body.instanceUrl,
-                    username: req.body.username,
-                    orgId: req.body.orgId
+                    instanceUrl: req.body.instanceUrl
                 }
             },
             'byoo'
         );
+        console.log(`message:`, message);
         return res.json({
             deployJobId: message.deployId
         });
