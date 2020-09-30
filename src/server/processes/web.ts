@@ -240,8 +240,8 @@ app.get(
                     template: req.query.template
                 },
                 byoo: {
-                    accessToken: req.headers.orgAuthorization,
-                    instanceUrl: req.headers.instanceUrl
+                    accessToken: req.headers.orgauthorization,
+                    instanceUrl: req.headers.instanceurl
                 }
             },
             'byoo'
