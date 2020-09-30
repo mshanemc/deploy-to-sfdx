@@ -186,8 +186,7 @@ app.get(
 app.get(
     '/token',
     wrapAsync(async (req, res, next) => {
-        const query = JSON.parse(req.query);
-        console.log(`query`, query);
+        console.log(`req.query`, req.query);
         const state = JSON.parse(req.query.state);
         console.log(`state`, state);
         const byooOauth2 = new jsforce.OAuth2({
