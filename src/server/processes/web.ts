@@ -217,11 +217,11 @@ app.get(
     })
 );
 
-app.post(
+app.get(
     '/qdeploy',
     wrapAsync(async (req, res, next) => {
+        console.log(`req.headers:`, req.headers);
         console.log(`req.query:`, req.query);
-        console.log(`req.body:`, req.body);
         // const state = JSON.parse(req.query.state);
         // console.log(`state`, state);
         // const byooOauth2 = new jsforce.OAuth2({
@@ -237,11 +237,11 @@ app.post(
         const message = await commonDeploy(
             {
                 query: {
-                    template: req.body.template
+                    template: req.query.template
                 },
                 byoo: {
-                    accessToken: req.body.orgAuthorization,
-                    instanceUrl: req.body.instanceUrl
+                    accessToken: req.headers.orgAuthorization,
+                    instanceUrl: req.headers.instanceUrl
                 }
             },
             'byoo'
