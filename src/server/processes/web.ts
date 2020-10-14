@@ -217,42 +217,6 @@ app.get(
     })
 );
 
-app.get(
-    '/qdeploy',
-    wrapAsync(async (req, res, next) => {
-        console.log(`req.headers:`, req.headers);
-        console.log(`req.query:`, req.query);
-        // const state = JSON.parse(req.query.state);
-        // console.log(`state`, state);
-        // const byooOauth2 = new jsforce.OAuth2({
-        //     redirectUri: processWrapper.BYOO_CALLBACK_URI ?? `http://localhost:${port}/token`,
-        //     clientId: processWrapper.BYOO_CONSUMERKEY,
-        //     clientSecret: processWrapper.BYOO_SECRET,
-        //     loginUrl: state.base_url
-        // });
-        // const conn = new jsforce.Connection({ oauth2: byooOauth2 });
-        // const userinfo = await conn.authorize(req.query.code);
-
-        // put the request in the queue
-        const message = await commonDeploy(
-            {
-                query: {
-                    template: req.query.template
-                },
-                byoo: {
-                    accessToken: req.headers.orgauthorization,
-                    instanceUrl: req.headers.instanceurl
-                }
-            },
-            'byoo'
-        );
-        console.log(`message:`, message);
-        return res.json({
-            deployJobId: message.deployId
-        });
-    })
-);
-
 app.get('*', (req, res, next) => {
     setImmediate(() => {
         next(new Error(`Route not found: ${req.url} on action ${req.method}`));
@@ -273,3 +237,36 @@ app.use((error, req, res, next) => {
 // process.on('unhandledRejection', e => {
 //     logger.error('this reached the unhandledRejection handler somehow:', e);
 // });
+
+//Q Branch extra endpoints
+app.get(
+    '/qdeploy',
+    wrapAsync(async (req, res, next) => {
+        console.log(`req.headers:`, req.headers);
+        console.log(`req.query:`, req.query);
+        const message = await commonDeploy(
+            {
+                query: {
+                    template: req.query.template
+                },
+                byoo: {
+                    accessToken: req.headers.orgauthorization,
+                    instanceUrl: req.headers.instanceurl
+                }
+            },
+            'byoo'
+        );
+        console.log(`message:`, message);
+        return res.json({
+            deployJobId: message.deployId
+        });
+    })
+);
+
+app.get(
+    '/qdeploy/results/:deployId',
+    wrapAsync(async (req, res, next) => {
+        const results = await cdsRetrieve(req.params.deployId);
+        res.send(results);
+    })
+);
