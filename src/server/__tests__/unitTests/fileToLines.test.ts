@@ -11,6 +11,15 @@ describe('reads lines from file', () => {
         expect(lines.length).toBe(1);
         expect(lines[0]).toEqual(lineToKeep);
     });
+    test('handles bash bang stuff', async () => {
+        const file = `#!/bin/bash
+        testline`;
+        await fs.writeFile(filename, file);
+
+        const lines = await fileToLines(filename);
+        expect(lines.length).toBe(1);
+        expect(lines[0]).toEqual(lineToKeep);
+    });
     test('writes file, then reads back, omitting comments', async () => {
         const file = `#testline
         testline`;

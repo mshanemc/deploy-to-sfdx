@@ -1,11 +1,19 @@
-import { getCommandsWithFileFlagsMap, getBaseCommand, usageAsArray, getTypeFromUsageArray, commandRewriter } from '../../lib/flagTypeFromCommandHelp';
+import {
+    getCommandsWithFileFlagsMap,
+    getBaseCommand,
+    usageAsArray,
+    getTypeFromUsageArray,
+    commandRewriter
+} from '../../lib/flagTypeFromCommandHelp';
 
 const usage = `<%= command.id %> -i <id> -n <string> [-d <string>] [-v <string>] [-m] [-r <url>] [-p <url>] [-k <string>] [-w <number>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`;
 const cmd = 'sfdx force:org:create -f config/project-scratch-def.json -s -a vol -d 1';
 const cmd2 = 'sfdx force:org:create -s -a vol -d 1';
-const cmd3 = 'sfdx force:org:create --definitionfile config/project-scratch-def.json -s -a vol -d 1';
+const cmd3 =
+    'sfdx force:org:create --definitionfile config/project-scratch-def.json -s -a vol -d 1';
 
 describe('flag type parsing', () => {
+    jest.setTimeout(10000);
     // test('handles create -a', async () => {
     //     const output = await getFlagsFromCommandHelp(cmd);
     //     expect(output.find(item => item.flag === '-f')).toHaveProperty('type', 'filepath');
@@ -22,12 +30,16 @@ describe('flag type parsing', () => {
 
     test('rewrites commands', async () => {
         const results = await commandRewriter('somePath', cmd);
-        expect(results).toBe('sfdx force:org:create -f somePath/config/project-scratch-def.json -s -a vol -d 1');
+        expect(results).toBe(
+            'sfdx force:org:create -f somePath/config/project-scratch-def.json -s -a vol -d 1'
+        );
     });
 
     test('rewrites commands with full flag name', async () => {
         const results = await commandRewriter('somePath', cmd3);
-        expect(results).toBe('sfdx force:org:create --definitionfile somePath/config/project-scratch-def.json -s -a vol -d 1');
+        expect(results).toBe(
+            'sfdx force:org:create --definitionfile somePath/config/project-scratch-def.json -s -a vol -d 1'
+        );
     });
 
     test('does not rewrite commands that do not need it', async () => {
