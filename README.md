@@ -127,7 +127,7 @@ Users sign into their app, and then the deployer connects that instead of using 
 
 Change the launcher url from `.../launch?template=...` to `.../byoo?template=...` to use the BYOO feature.
 
-The page warns people about the risks of executing scripts in a non-scratch org. Expect failures because you don't know what features are available.
+The page warns people about the risks of executing scripts in a non-scratch org. Expect failures because you can't guarantee that the target org has the features/settings your repo depends on.
 
 ---
 
