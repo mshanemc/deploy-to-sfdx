@@ -99,13 +99,29 @@ Then it listens to the deploy queue and executes jobs
 It runs a plugin that give it powers SFDX doesn't out-of-the-box
 <https://github.com/mshanemc/shane-sfdx-plugins> along with `sfdx-migration-automatic` and `@salesforce/analytics`
 
-Put plugins in the package.json dependencies, then linked from source in lib/hubAuth.js. Feel free to add additional plugins using npm install some-plugin-of-yours and then add it in hubAuth.js.
+Put plugins in the package.json dependencies, then linked from source in lib/hubAuth.js. Feel free to add additional plugins using `yarn add` some-plugin-of-yours and then add it in hubAuth.js.
 
 ---
 
 ## BYOO Bring your own org (optional, mildly dangerous)
 
-Let people deploy from a repo to an existing org, and run some scripts. Set the BYOO environment variables to match a connected app (it needs to be a separate connected app from the one your hub uses because that one uses cert/jwt to auth, and this one won't have a cert). You'll need to set the appropriate callback URIs for the /token page.
+Let people deploy from a repo to an existing org, and run some scripts. Set the BYOO environment variables to match a connected app (it needs to be a separate connected app from the one your hub uses because that one uses cert/jwt to auth, and this one won't have a cert).
+
+You'll need to set the appropriate callback URIs for the /token page. Mine look like this (3 cloud environments plus local)
+
+-   https://hosted-scratch.herokuapp.com/token
+-   https://hosted-scratch-dev.herokuapp.com/token
+-   https://deployer-prerelease.herokuapp.com/token
+-   http://localhost:8443/token
+
+### BYOO ConnectedApp Details
+
+Your app should have the following scope
+
+-   Access your basic information (id, profile, email, address, phone)
+-   Access and manage your data (api)
+-   Provide access to your data via the Web (web)
+-   Allow access to your unique identifier (openid)
 
 Users sign into their app, and then the deployer connects that instead of using a new scratch org. Password commands are omitted from the scripts, since that would be cruel.
 
@@ -156,9 +172,9 @@ in your `.env` add
 
 -   `LOCAL_ONLY_KEY_PATH=/Users/shane.mclaughlin/code/certificates/server.key` or your equivalent to where your cert for jwt is
 -   in your `process.env` file, put the Heroku Redis url (it can be the same as you're using in the cloud. **Don't commit this file to your repo.**
--   `npm install` will get all your modules installed, including my plugin.
--   `npm run build` will get the typescript and LWC output from /src to /built, which is where the executables go.
--   then start this app with `npm run local:web` and use localhost:8443
+-   `yarn install` will get all your modules installed, including my plugin.
+-   `yarn build` will get the typescript and LWC output from /src to /built, which is where the executables go.
+-   then start this app with `yarn local:web` and use localhost:8443
 
 ## Building for Local Dev
 
@@ -166,9 +182,20 @@ Backend:
 `npx nodemon` will recompile all your typescript and restart the local web and worker servers.
 
 Frontend (LWC):
-`npm run client:watch` will start a server on localhost:3001. It'll rebuild and hotswap anytime you save a file.
+`yarn watch:clien` will start a server on localhost:3001. It'll rebuild and hotswap anytime you save a file.
 
 Running both is good if you're working both front and backend
+
+## Things you might need
+
+Ensure the following is installed:
+
+-   [NodeJS](https://nodejs.org/en/)
+-   [Yarn](https://classic.yarnpkg.com/en/)
+-   [Shane SFDX Plugins](https://github.com/mshanemc/shane-sfdx-plugins)
+-   [SFDX CLI](https://developer.salesforce.com/tools/sfdxcli)
+-   [Heroku CLI (If using Heroku Pools)](https://devcenter.heroku.com/articles/heroku-cli)
+-   Open SSL (For Key Generation)
 
 ---
 
@@ -206,15 +233,15 @@ uses Jest.
 
 There's a file called `testRepos` that you'll want to customize with any repos you want to use for verification. It'll probably fail if you use mine.
 
-Run them with `npm run test:unit`. A few of them are not true unit tests...the require a server and redis running, and will try to connect to github for your testRepos. Run each of these commands in a separate terminal.
+Run them with `yarn test:unit`. A few of them are not true unit tests...the require a server and redis running, and will try to connect to github for your testRepos. Run each of these commands in a separate terminal.
 
 ```shell
-npm run local:web
+yarn local:web
 ```
 
 Integration (tests/integrationTests) are slower/harder.
 
-`npm run test:generate` will parse testRepos.ts and create a integration tests for each repo that
+`yarn test:generate` will parse testRepos.ts and create a integration tests for each repo that
 
 1. tests that it deploys
 2. builds a pooled org using org pools if you specify testPool=true in testrepos
@@ -230,8 +257,8 @@ NOTE: This is using up your scratch org quotas. The tests delete the orgs, so it
 
 I'm using typescript...
 
--   `npm install` will get all your modules installed, including my plugins.
--   `npm build` will get any typescript changes from /src to /built, which is where the executables go.
+-   `yarn install` will get all your modules installed, including my plugins.
+-   `yarn build` will get any typescript changes from /src to /built, which is where the executables go.
 
 Finally, the front end app is Lightning Web Components. You'll figure it out...if not, start here: [https://lwc.dev/](https://lwc.dev/)
 
