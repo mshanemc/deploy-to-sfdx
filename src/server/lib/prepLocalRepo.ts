@@ -67,6 +67,7 @@ const prepOrgInit = async (msgJSON: DeployRequest): Promise<void> => {
             logger.debug(`deployQueueCheck: no orgInit.sh for ${path}.  Will use default`);
             await fs.writeFile(path, orgInitDefault);
         }
+        logger.debug(`init file ready at ${path}`);
     }
 };
 
