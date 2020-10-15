@@ -129,11 +129,10 @@ const lineParse = async (msgJSON: DeployRequest): Promise<string[]> => {
         .map((line) =>
             msgJSON.repos.every((repo) => repo.whitelisted) ? line : securityAssertions(line)
         )
-        .filter((line) => !isByoo(msgJSON) || byooFilter(line))
+        .filter((line) => !isByoo(msgJSON) || byooFilter(line)) // let through if !byoo, and filter out create/password commands
         .map((line) => lineCorrections(line, msgJSON))
         .map((line) => jsonify(line));
 
-    // non line-level fixes for org:create
     if (isByoo(msgJSON)) {
         // special auth scenario for byoo user
         parsedLines.unshift(
