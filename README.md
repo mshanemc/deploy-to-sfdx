@@ -249,7 +249,7 @@ Integration (tests/integrationTests) are slower/harder.
 
 Modify `repoCodeGen.ts` to change the generator.
 
-NOTE: This is using up your scratch org quotas. The tests delete the orgs, so it's minimally wastefully, but still expect it to take a while AND watch your daily limit. Especially if you're testing deploys and tests are failing...you might be using orgs that never get to the delete phase.
+NOTE: This is using up your scratch org quotas. The tests delete the orgs, so it's minimally wasteful, but still expect it to take a while AND watch your daily limit. Especially if you're testing deploys and tests are failing...you might be using orgs that never get to the delete phase.
 
 ---
 
