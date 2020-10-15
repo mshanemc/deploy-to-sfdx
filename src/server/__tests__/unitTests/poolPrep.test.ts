@@ -34,20 +34,33 @@ describe('poolPrep Test', () => {
         expect(await getPoolDeployCountByRepo(basePC)).toBe(10);
 
         // remove something from it
-        let requests: DeployRequest[] = (await redis.lrange(poolDeployExchange, 0, -1)).map(queueItem => JSON.parse(queueItem));
+        const requests: DeployRequest[] = (
+            await redis.lrange(poolDeployExchange, 0, -1)
+        ).map((queueItem) => JSON.parse(queueItem));
 
         requests.splice(
-            requests.findIndex(req => req.repos[0].repo === basePC.repos[0].repo && req.repos[0].username === basePC.repos[0].username),
+            requests.findIndex(
+                (req) =>
+                    req.repos[0].repo === basePC.repos[0].repo &&
+                    req.repos[0].username === basePC.repos[0].username
+            ),
             1
         );
         requests.splice(
-            requests.findIndex(req => req.repos[0].repo === basePC.repos[0].repo && req.repos[0].username === basePC.repos[0].username),
+            requests.findIndex(
+                (req) =>
+                    req.repos[0].repo === basePC.repos[0].repo &&
+                    req.repos[0].username === basePC.repos[0].username
+            ),
             1
         );
 
         expect(requests.length).toBe(8);
         await redis.del(poolDeployExchange);
-        await redis.lpush(poolDeployExchange, ...(requests as any[]).map(req => JSON.stringify(req)));
+        await redis.lpush(
+            poolDeployExchange,
+            ...(requests as any[]).map((req) => JSON.stringify(req))
+        );
         await preparePoolByName(basePC);
         expect(await getPoolDeployCountByRepo(basePC)).toBe(10);
     });

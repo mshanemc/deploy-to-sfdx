@@ -13,7 +13,7 @@ const cmd3 =
     'sfdx force:org:create --definitionfile config/project-scratch-def.json -s -a vol -d 1';
 
 describe('flag type parsing', () => {
-    jest.setTimeout(10000);
+    jest.setTimeout(20000);
     // test('handles create -a', async () => {
     //     const output = await getFlagsFromCommandHelp(cmd);
     //     expect(output.find(item => item.flag === '-f')).toHaveProperty('type', 'filepath');

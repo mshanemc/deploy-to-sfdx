@@ -13,7 +13,11 @@ const fileToLines = (filePath: string): Promise<string[]> => {
             })
             .on('line', (line: string) => {
                 line = line.trim();
-                if ((!line && line.length === 0) || line.startsWith('#!/bin/bash') || line.startsWith('#')) {
+                if (
+                    (!line && line.length === 0) ||
+                    line.startsWith('#!/bin/bash') ||
+                    line.startsWith('#')
+                ) {
                     return; // just ignore the meaningless stuff;
                 }
                 parsedLines.push(line);
@@ -24,7 +28,11 @@ const fileToLines = (filePath: string): Promise<string[]> => {
                 if (filePath.split('/').length > 3) {
                     // translate to base command, and if necessary, prepand the filepath to certain flag arguments
                     const commandMap = await getCommandsWithFileFlagsMap();
-                    parsedLines = await Promise.all(parsedLines.map((line) => commandRewriter(filePath.split('/')[2], line, commandMap)));
+                    parsedLines = await Promise.all(
+                        parsedLines.map((line) =>
+                            commandRewriter(filePath.split('/')[2], line, commandMap)
+                        )
+                    );
                 }
                 logger.debug(`fileToLines: Lines from ${filePath}: ${parsedLines.join(',')}`);
                 resolve(parsedLines.filter((line) => line !== ''));

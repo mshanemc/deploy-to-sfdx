@@ -74,7 +74,7 @@ const file2Length = 7;
 //     createdTimestamp: new Date()
 // };
 describe('multiOrgCorrections', () => {
-    jest.setTimeout(10000);
+    jest.setTimeout(50000);
     it('works with single password command', async () => {
         const lines = await filesToLines([
             './src/server/__tests__/helpers/initFiles/inputFile1',
