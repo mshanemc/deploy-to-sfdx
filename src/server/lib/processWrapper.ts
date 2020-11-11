@@ -43,8 +43,7 @@ const processWrapper = {
 
     // google analytics
     UA_ID: process.env.UA_ID,
-
-    sfdcLeadCaptureServlet: process.env.sfdcLeadCaptureServlet
+    LEAD_QUEUE: process.env.LEAD_QUEUE
 };
 
 export { processWrapper };
