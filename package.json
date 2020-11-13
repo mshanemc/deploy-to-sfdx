@@ -56,6 +56,7 @@
         "moment": "^2.24.0",
         "request-promise-native": "^1.0.7",
         "salesforce-jwt-bearer-token-flow": "^0.2.4",
+        "sfdmu": "^3.7.19",
         "shane-sfdx-plugins": "^4.43.0",
         "strip-color": "^0.1.0",
         "universal-analytics": "^0.4.20"

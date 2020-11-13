@@ -26,7 +26,9 @@ const getKeypath = async (): Promise<string> => {
 };
 
 const buildJWTAuthCommand = async (username = processWrapper.HUB_USERNAME): Promise<string> =>
-    `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${username} --jwtkeyfile ${await getKeypath()}`;
+    `sfdx force:auth:jwt:grant --clientid ${
+        processWrapper.CONSUMERKEY
+    } --username ${username} --jwtkeyfile ${await getKeypath()}`;
 
 const auth = async (): Promise<string> => {
     // where will our cert live?
@@ -39,6 +41,7 @@ const auth = async (): Promise<string> => {
             await exec('sfdx plugins:link node_modules/shane-sfdx-plugins');
             await exec('sfdx plugins:link node_modules/@salesforce/analytics'); // analytics sfx plugins
             await exec('sfdx plugins:link node_modules/@mshanemc/sfdx-migration-automatic');
+            await exec('sfdx plugins:link node_modules/sfdmu');
         }
 
         if (processWrapper.SFDX_PRERELEASE) {
