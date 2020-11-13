@@ -39,16 +39,17 @@ const securityAssertions = (line: string): string => {
             `ERROR: Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`
         );
     }
-    if (line.includes(' -u ')) {
+    if (line.includes(' -u ') || line.includes(' --targetusername ')) {
         throw new Error(
             `ERROR: Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${line}`
         );
     }
-    if (line.includes(' --targetusername ')) {
+    if (line.startsWith('sfdx plugins:')) {
         throw new Error(
-            `ERROR: Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${line}`
+            `ERROR: You can't install your own plugins.  See /src/server/lib/hubAuth for currently installed plugins.  Your command: ${line}`
         );
     }
+
     return line;
 };
 
