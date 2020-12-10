@@ -296,3 +296,34 @@ You can pass in `&email=required` to force user to a form where they add their e
 ---
 
 [![Deploy](https://raw.githubusercontent.com/mshanemc/deploy-to-sfdx/master/client-src/resources/images/sfdx_it_now.png)](https://hosted-scratch.herokuapp.com/launch?template=https://github.com/mshanemc/df17AppBuilding)<https://github.com/mshanemc/df17AppBuilding>
+
+## Programmatic Use
+
+Building something that needs to deploy repos, but has its own front-end, or doesn't have on at all?
+
+`/launch` accepts `POST` as well.
+
+Example Request:
+
+```json
+{
+    "repos": [
+        {
+            "username": "mshanemc",
+            "repo": "df17appbuilding"
+        }
+    ]
+}
+```
+
+see /src/server/lib/types: `DeployRequestExternalFields` for the detailed shape of the input requests.
+
+Example Response:
+
+```json
+{
+    "deployId": "mshanemc-df17AppBuilding-16076158884024a"
+}
+```
+
+You can then `GET` `/results/:deployId` like `/results/mshanemc-df17AppBuilding-16076158884024a`, and keep polling until `complete` is true. See /src/server/**tests**/integrationTests/deployApi.test.ts for an end-to-end example
