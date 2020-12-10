@@ -14,7 +14,7 @@ test('deploys a repo from github via API, verifies completion, and deletes', asy
     const response = await request.post({
         url: `${testURL}/launch`,
         body: {
-            pool: false,
+            noPool: true,
             repos: [repo]
         },
         json: true,
