@@ -22,6 +22,14 @@
         "@typescript-eslint/prefer-optional-chain": 2,
         "@typescript-eslint/explicit-function-return-type": 0,
         "@typescript-eslint/no-use-before-define": 0,
+        "@typescript-eslint/no-unused-vars": [
+            2,
+            {
+                "vars": "local",
+                "args": "all",
+                "argsIgnorePattern": "req|res|next"
+            }
+        ],
 
         "arrow-body-style": ["error", "as-needed"],
         "no-alert": 2,
@@ -115,8 +123,8 @@
             2,
             {
                 "vars": "local",
-                "args": "after-used",
-                "argsIgnorePattern": "next"
+                "args": "all",
+                "argsIgnorePattern": "req|res|next"
             }
         ],
         "no-use-before-define": 0,
