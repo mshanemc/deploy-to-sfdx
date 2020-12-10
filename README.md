@@ -326,4 +326,4 @@ Example Response:
 }
 ```
 
-You can then `GET` `/results/:deployId` like `/results/mshanemc-df17AppBuilding-16076158884024a`, and keep polling until `complete` is true. See /src/server/**tests**/integrationTests/deployApi.test.ts for an end-to-end example
+You can then `GET` `/results/:deployId` like `/results/mshanemc-df17AppBuilding-16076158884024a`, and keep polling until `complete` is true. See `/src/server/**tests**/integrationTests/deployApi.test.ts` for an end-to-end example
