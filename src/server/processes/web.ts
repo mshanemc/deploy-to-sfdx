@@ -7,8 +7,16 @@ import jsforce from 'jsforce';
 
 import cors from 'cors';
 
-import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish, putLead, getAllPooledOrgIDs } from '../lib/redisNormal';
-import { deployMsgBuilder } from '../lib/deployMsgBuilder';
+import {
+    putDeployRequest,
+    getKeys,
+    cdsDelete,
+    cdsRetrieve,
+    cdsPublish,
+    putLead,
+    getAllPooledOrgIDs
+} from '../lib/redisNormal';
+import { deployMsgFromExpressReq, deployMsgFromAPI } from '../lib/deployMsgBuilder';
 import { utilities } from '../lib/utilities';
 import { getPoolKey } from '../lib/namedUtilities';
 import { multiTemplateURLBuilder } from '../lib/multiTemplateURLBuilder';
@@ -40,9 +48,7 @@ function wrapAsync(fn: any) {
     };
 }
 
-const commonDeploy = async (req, url: string) => {
-    const message: DeployRequest = await deployMsgBuilder(req);
-
+const handleDeployRequest = async (message: DeployRequest, url: string) => {
     if (message.visitor && !message.noPool) {
         message.visitor.pageview(url).send();
         message.visitor.event('Repo', getPoolKey(message, '-')).send();
@@ -64,9 +70,13 @@ const commonDeploy = async (req, url: string) => {
 app.post(
     '/trial',
     wrapAsync(async (req, res, next) => {
-        const [message] = await Promise.all([commonDeploy(req, '/trial'), putLead(req.body)]);
+        const [message] = await Promise.all([
+            handleDeployRequest(await deployMsgFromExpressReq(req), '/trial'),
+            putLead(req.body)
+        ]);
+        // const [message] = await Promise.all([commonDeploy(req, '/trial'), putLead(req.body)]);
         logger.debug('trial request', message);
-        res.redirect(`/#deploying/trial/${message.deployId.trim()}`);
+        res.redirect(`/#deploying/trial/${message.deployId}`);
     })
 );
 
@@ -86,21 +96,49 @@ app.get(
             return res.redirect(multiTemplateURLBuilder(req.query.template, '/#userinfo'));
         }
 
-        const message = await commonDeploy(req, '/launch');
-        return res.redirect(`/#deploying/deployer/${message.deployId.trim()}`);
+        const message = await handleDeployRequest(await deployMsgFromExpressReq(req), '/launch');
+        return res.redirect(`/#deploying/deployer/${message.deployId}`);
     })
 );
 
-app.get(['/', '/error', '/deploying/:format/:deployId', '/userinfo', '/byoo', '/testform', '/deleteConfirm'], (req, res, next) => {
-    res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
-});
+app.post(
+    '/launch',
+    wrapAsync(async (req, res, next) => {
+        // const message = await commonDeploy(req, '/launch');
+        const message = await handleDeployRequest(await deployMsgFromAPI(req.body), '/launch');
+        res.send({ deployId: message.deployId });
+    })
+);
+
+app.get(
+    [
+        '/',
+        '/error',
+        '/deploying/:format/:deployId',
+        '/userinfo',
+        '/byoo',
+        '/testform',
+        '/deleteConfirm'
+    ],
+    (req, res, next) => {
+        res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
+    }
+);
 
 app.get(['/byoo'], (req, res, next) => {
-    if (processWrapper.BYOO_CALLBACK_URI && processWrapper.BYOO_CONSUMERKEY && processWrapper.BYOO_SECRET) {
+    if (
+        processWrapper.BYOO_CALLBACK_URI &&
+        processWrapper.BYOO_CONSUMERKEY &&
+        processWrapper.BYOO_SECRET
+    ) {
         res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
     } else {
         setImmediate(() => {
-            next(new Error('Connected app credentials not properly configured for Bring Your Own Org feature'));
+            next(
+                new Error(
+                    'Connected app credentials not properly configured for Bring Your Own Org feature'
+                )
+            );
         });
     }
 });
@@ -170,9 +208,8 @@ app.get(
         const conn = new jsforce.Connection({ oauth2: byooOauth2 });
         const userinfo = await conn.authorize(req.query.code);
 
-        // put the request in the queue
-        const message = await commonDeploy(
-            {
+        const message = await handleDeployRequest(
+            await deployMsgFromExpressReq({
                 query: {
                     template: state.template
                 },
@@ -182,9 +219,10 @@ app.get(
                     username: userinfo.id,
                     orgId: userinfo.organizationId
                 }
-            },
+            }),
             'byoo'
         );
+
         return res.redirect(`/#deploying/deployer/${message.deployId.trim()}`);
     })
 );

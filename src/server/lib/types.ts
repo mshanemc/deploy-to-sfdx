@@ -11,15 +11,18 @@ export interface DeleteRequest {
     created?: Date;
 }
 
-export interface DeployRequest {
+interface DeployRequestInternalFields {
     createdTimestamp: Date;
     deployId: string;
-    pool?: boolean;
-    noPool?: boolean;
-    email?: string;
-    firstname?: string;
-    lastname?: string;
     visitor?: ua.Visitor;
+}
+
+export interface DeployRequestExternalFields {
+    pool?: boolean; // requests the resulting org be put into a pool
+    noPool?: boolean; // skip any pools that exist
+    email?: string; // applied to the user
+    firstname?: string; // applied to the user
+    lastname?: string; // applied to the user
     byoo?: {
         accessToken: string;
         instanceUrl: string;
@@ -28,9 +31,10 @@ export interface DeployRequest {
     };
     repos?: DeployRequestRepo[]; // new version to hold multiples, support more sources
 }
+export interface DeployRequest extends DeployRequestInternalFields, DeployRequestExternalFields {}
 
 export interface DeployRequestRepo {
-    source?: string; // defaults to github for now
+    source?: string; // omit.  defaults to 'github' for now.  Nothing else works
     username: string;
     repo: string;
     branch?: string;

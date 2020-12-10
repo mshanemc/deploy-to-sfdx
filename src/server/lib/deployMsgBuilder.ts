@@ -1,6 +1,6 @@
 import logger from 'heroku-logger';
-import { DeployRequest } from './types';
-import { shellSanitize, filterAlphaHypenUnderscore } from './shellSanitize';
+import { DeployRequest, DeployRequestExternalFields, DeployRequestRepo } from './types';
+import { shellSanitize, filterAlphaHypenUnderscore, filterUnsanitized } from './shellSanitize';
 import { checkWhitelist } from './checkWhitelist';
 import { getDeployId } from './namedUtilities';
 import ua from 'universal-analytics';
@@ -30,26 +30,45 @@ const makesTemplates = (templateParam): string[] => {
     return [templateParam];
 };
 
-const deployMsgBuilder = async (req): Promise<DeployRequest> => {
+const processRepos = async (repos: DeployRequestRepo[]) =>
+    Promise.all(
+        repos.map(async (repo) => ({
+            ...repo,
+            username: filterUnsanitized(repo.username.toLowerCase()),
+            repo: filterUnsanitized(repo.repo.toLowerCase()),
+            source: filterUnsanitized(repo.source ?? 'github'),
+            whitelisted: await checkWhitelist(repo.username, repo.repo)
+        }))
+    );
+
+const deployMsgFromAPI = async (req: DeployRequestExternalFields): Promise<DeployRequest> =>
+    // do some serious validation of inputs.
+    ({
+        ...req,
+        deployId: getDeployId(req.repos[0].username, req.repos[0].repo).trim(),
+        createdTimestamp: new Date(),
+        visitor: processWrapper.UA_ID ? ua(processWrapper.UA_ID) : undefined,
+        repos: await processRepos(req.repos)
+    });
+
+const deployMsgFromExpressReq = async (req): Promise<DeployRequest> => {
     validateQuery(req.query); // check for exploits
-    const repos = await Promise.all(
-        makesTemplates(req.query.template).map(async (template) => {
-            logger.debug(`deployMsgBuilder: template is ${template}`);
+    const repos = await processRepos(
+        makesTemplates(req.query.template).map((template) => {
+            logger.debug(`deployMsgFromExpressReq: template is ${template}`);
             const path = template.replace('https://github.com/', '');
-            const username = filterAlphaHypenUnderscore(path.split('/')[0]).toLowerCase();
-            const repo = filterAlphaHypenUnderscore(path.split('/')[1]).toLowerCase();
             return {
-                source: 'github',
-                username,
-                repo,
-                branch: path.includes('/tree/') ? filterAlphaHypenUnderscore(path.split('/tree/')[1]) : undefined,
-                whitelisted: await checkWhitelist(username, repo)
+                username: filterAlphaHypenUnderscore(path.split('/')[0]),
+                repo: filterAlphaHypenUnderscore(path.split('/')[1]),
+                branch: path.includes('/tree/')
+                    ? filterAlphaHypenUnderscore(path.split('/tree/')[1])
+                    : undefined
             };
         })
     );
 
     const message: DeployRequest = {
-        deployId: getDeployId(repos[0].username, repos[0].repo),
+        deployId: getDeployId(repos[0].username, repos[0].repo).trim(),
         createdTimestamp: new Date(),
         repos,
         byoo: req.byoo,
@@ -61,10 +80,6 @@ const deployMsgBuilder = async (req): Promise<DeployRequest> => {
         pool: req.query.pool
     };
 
-    if (req.query.email) {
-        message.email = req.query.email;
-    }
-
     // posting from trial form
     if (req.body && req.body.UserEmail) {
         if (shellSanitize(req.body.UserEmail)) {
@@ -74,8 +89,8 @@ const deployMsgBuilder = async (req): Promise<DeployRequest> => {
         }
     }
 
-    logger.debug('deployMsgBuilder: done', message);
+    logger.debug('deployMsgFromExpressReq: done', message);
     return message;
 };
 
-export { deployMsgBuilder };
+export { deployMsgFromExpressReq, deployMsgFromAPI };
