@@ -217,27 +217,6 @@ app.get(
     })
 );
 
-app.get('*', (req, res, next) => {
-    setImmediate(() => {
-        next(new Error(`Route not found: ${req.url} on action ${req.method}`));
-    });
-});
-
-app.use((error, req, res, next) => {
-    if (processWrapper.UA_ID) {
-        const visitor = ua(processWrapper.UA_ID);
-        // TODO handle array of templates
-        visitor.event('Error', req.query.template).send();
-    }
-    logger.error(`request failed: ${req.url}`);
-    logger.error(error);
-    return res.redirect(`/#error?msg=${error}`);
-});
-
-// process.on('unhandledRejection', e => {
-//     logger.error('this reached the unhandledRejection handler somehow:', e);
-// });
-
 //Q Branch extra endpoints
 app.get(
     '/qdeploy',
@@ -270,3 +249,24 @@ app.get(
         res.send(results);
     })
 );
+
+app.get('*', (req, res, next) => {
+    setImmediate(() => {
+        next(new Error(`Route not found: ${req.url} on action ${req.method}`));
+    });
+});
+
+app.use((error, req, res, next) => {
+    if (processWrapper.UA_ID) {
+        const visitor = ua(processWrapper.UA_ID);
+        // TODO handle array of templates
+        visitor.event('Error', req.query.template).send();
+    }
+    logger.error(`request failed: ${req.url}`);
+    logger.error(error);
+    return res.redirect(`/#error?msg=${error}`);
+});
+
+// process.on('unhandledRejection', e => {
+//     logger.error('this reached the unhandledRejection handler somehow:', e);
+// });
